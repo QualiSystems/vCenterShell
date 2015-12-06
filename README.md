@@ -1,7 +1,9 @@
 # vCenterShell  
 
-## Open issues/feature requests:
+## Tasks board:
 
-[https://github.com/QualiSystems/vCenterShell/issues](https://github.com/QualiSystems/vCenterShell/issues)
+[https://github.com/QualiSystems/vCenterShell#boards?repos=47491844](https://github.com/QualiSystems/vCenterShell#boards?repos=47491844)
+
+
 
 
