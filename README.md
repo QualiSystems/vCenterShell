@@ -2,7 +2,7 @@
 
 ## Tasks board:
 
-[https://github.com/QualiSystems/vCenterShell#boards?repos=47491844](https://github.com/QualiSystems/vCenterShell#boards?repos=47491844)
+[https://waffle.io/QualiSystems/vCenterShell](https://waffle.io/QualiSystems/vCenterShell)
 
 
 
