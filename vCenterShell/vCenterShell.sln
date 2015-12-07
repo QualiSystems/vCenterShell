@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "vCenterShell", "vCenterShell\vCenterShell.pyproj", "{E5A7B2AC-E237-4D33-9063-6D624ACC0B88}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "tests", "..\tests\tests.pyproj", "{0B1B85F0-F2A2-4B37-A47D-233907CA40A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E5A7B2AC-E237-4D33-9063-6D624ACC0B88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5A7B2AC-E237-4D33-9063-6D624ACC0B88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B1B85F0-F2A2-4B37-A47D-233907CA40A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B1B85F0-F2A2-4B37-A47D-233907CA40A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
