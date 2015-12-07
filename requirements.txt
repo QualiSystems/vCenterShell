@@ -1,0 +1,16 @@
+linecache2
+nose
+pyvmomi
+requests
+six
+teamcity-messages
+traceback2
+unittest2
+virtualenv
+paramiko
+Sphinx
+django
+pypiwin32
+lxml
+ipcalc
+coverage
