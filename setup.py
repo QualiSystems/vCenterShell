@@ -17,7 +17,6 @@ setup(
     author_email='info@qualisystems.com',
     packages=find_packages(),
     install_requires=required,
-    test_suite='tests',
     tests_require=required_for_tests,
     version=version_from_file,
     description='QualiSystems vCenter Shell',
