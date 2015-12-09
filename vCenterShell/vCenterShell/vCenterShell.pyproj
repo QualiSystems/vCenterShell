@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="dvSwitchDataRetriever.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="vCenterShell.py" />
   </ItemGroup>
   <PropertyGroup>
