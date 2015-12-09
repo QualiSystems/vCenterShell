@@ -4,7 +4,7 @@
 
 ## Build [![Build Status](https://travis-ci.org/QualiSystems/vCenterShell.svg?branch=master)](https://travis-ci.org/QualiSystems/vCenterShell)
 
-
-
+## License
+[Apache License 2.0](https://github.com/QualiSystems/vCenterShell/blob/master/LICENSE)
 
 
