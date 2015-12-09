@@ -1,3 +1,2 @@
 nose
-teamcity-messages
 unittest2
