@@ -5,13 +5,15 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e5a7b2ac-e237-4d33-9063-6d624acc0b88</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>vCenterShell.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <StartupFile>__main__.py</StartupFile>
+    <SearchPath>.;pycommon\;..\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>vCenterShell</Name>
     <RootNamespace>vCenterShell</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>{7099a273-30f9-44aa-a190-08c9639e015e}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +24,33 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="demo\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pycommon\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="test\tests.py" />
+    <Compile Include="test\test_common_pyvmomi.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="test\__init__.py" />
+    <Compile Include="__main__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pycommon\common_collection_utils.py" />
+    <Compile Include="pycommon\common_pyvmomi.py" />
+    <Compile Include="demo\basicFlowDemo.py" />
     <Compile Include="vCenterShell.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="test\" />
+    <Folder Include="pycommon\" />
+    <Folder Include="demo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+    <InterpreterReference Include="{7099a273-30f9-44aa-a190-08c9639e015e}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
