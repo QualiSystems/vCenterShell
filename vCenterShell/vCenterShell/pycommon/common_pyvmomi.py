@@ -46,22 +46,6 @@ class pyVmomiService:
         except IOError as e:
             print "I/O error({0}): {1}".format(e.errno, e.strerror)
 
-        #try:
-        #    si = SmartConnect(host=address, user=user, pwd=password, port=port)
-        #    return si
-        #except Exception as exc:
-        #    try:
-        #        import ssl
-        #        default_context = ssl._create_default_https_context
-        #        ssl._create_default_https_context = ssl._create_unverified_context
-        #        si = SmartConnect(host=address, user=user, pwd=password, port=port)
-        #        ssl._create_default_https_context = default_context
-        #        return si
-        #    except Exception as exc1:
-        #        raise Exception(exc1)
-        #else:
-        #    raise Exception(exc)
-
     def disconnect(self, si):
         """ Disconnect from vCenter """
         #self.pyvmomi_disconnect(si)
