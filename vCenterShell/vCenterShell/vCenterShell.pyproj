@@ -27,10 +27,12 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="pycommon\common_name_utils.py" />
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test\tests.py" />
+    <Compile Include="test\test_common_name_utils.py" />
     <Compile Include="test\test_common_pyvmomi.py">
       <SubType>Code</SubType>
     </Compile>

@@ -5,10 +5,10 @@ from qualipy.api.cloudshell_api import *
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 import time
-import uuid
 import sys
 import pycommon
 from pycommon.common_collection_utils import first_or_default
+from pycommon.common_name_utils import generate_unique_name
 
 
 def run(pvService, reservationId):
@@ -81,8 +81,7 @@ def run(pvService, reservationId):
     
     if template:
         # generate unique name
-        unique_id = str(uuid.uuid4())[:8]
-        vm_name = template_name + "_" + unique_id
+        vm_name = generate_unique_name(template_name)
 
         vm = pvService.clone_vm(
             content = content, 

@@ -1,2 +1,3 @@
-import common_pyvmomi
+﻿import common_pyvmomi
 import common_collection_utils
+import common_name_utils
