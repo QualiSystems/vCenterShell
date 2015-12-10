@@ -27,11 +27,15 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
+    <Compile Include="pycommon\common_name_utils.py" />
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test\tests.py" />
-    <Compile Include="test\test_common_pyvmomi.py">
+    <Compile Include="test\test_common_pyvmomi.py" />
+    <Compile Include="test\test_common_name_utils.py" />
+    <Compile Include="test\test_cloudshellDataRetrieverService.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="test\__init__.py" />
@@ -42,7 +46,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="pycommon\common_collection_utils.py" />
-    <Compile Include="pycommon\common_pyvmomi.py" />
+    <Compile Include="pycommon\pyVmomiService.py" />
     <Compile Include="demo\basicFlowDemo.py" />
     <Compile Include="dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
