@@ -1,9 +1,15 @@
 ﻿from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-from pycommon.common_pyvmomi import pyVmomiService
 import unittest
 import mock
 from mock import Mock, MagicMock, create_autospec, mock_open, patch
+
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
+
+from pycommon.pyVmomiService import pyVmomiService
+
 
 class test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
@@ -26,9 +32,3 @@ class test_common_pyvmomi(unittest.TestCase):
     #    #assert
     #    result = "1"
     #    self.assertEqual(result,"1")
-
-
-
-if __name__ == '__main__':
-    runner = unittest.TextTestRunner()
-    unittest.main(testRunner=runner)
