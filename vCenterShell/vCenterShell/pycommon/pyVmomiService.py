@@ -10,7 +10,6 @@ class pyVmomiService:
     def __init__(self,connect,disconnect):
         self.pyvmomi_connect = connect
         self.pyvmomi_disconnect = disconnect
-        pass
 
     #endregion
 
@@ -60,9 +59,9 @@ class pyVmomiService:
         Return an object by name for a specific type, if name is None the
         first found object is returned
 
-        content:    pyvmomi content object
-        vimtype:    the type of object too search
-        name:       the object name to return
+        :param content:    pyvmomi content object
+        :param vimtype:    the type of object too search
+        :param name:       the object name to return
         """
 
         obj = None
