@@ -1,4 +1,4 @@
 nose
-teamcity-messages
 unittest2
 mock
+teamcity-messages
