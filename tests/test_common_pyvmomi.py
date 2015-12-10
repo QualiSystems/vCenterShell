@@ -4,7 +4,10 @@ import unittest
 import mock
 from mock import Mock, MagicMock, create_autospec, mock_open, patch
 
+import sys
+import os.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
+
 from pycommon.pyVmomiService import pyVmomiService
 
 
