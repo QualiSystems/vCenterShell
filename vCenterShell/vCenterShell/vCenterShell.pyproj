@@ -12,7 +12,7 @@
     <Name>vCenterShell</Name>
     <RootNamespace>vCenterShell</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
+    <InterpreterId>{7099a273-30f9-44aa-a190-08c9639e015e}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -24,6 +24,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="commands\commandExecuterService.py" />
+    <Compile Include="commands\deployFromTemplateCommand.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\__init__.py" />
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -32,9 +37,6 @@
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="test\tests.py" />
-    <Compile Include="test\test_common_pyvmomi.py" />
-    <Compile Include="test\__init__.py" />
     <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -50,12 +52,13 @@
     <Compile Include="vCenterShell.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="test\" />
+    <Folder Include="commands\" />
     <Folder Include="pycommon\" />
     <Folder Include="demo\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+    <InterpreterReference Include="{7099a273-30f9-44aa-a190-08c9639e015e}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

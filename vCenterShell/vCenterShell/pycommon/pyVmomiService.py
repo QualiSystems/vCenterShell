@@ -47,8 +47,7 @@ class pyVmomiService:
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
-        #self.pyvmomi_disconnect(si)
-        Disconnect(si)
+        self.pyvmomi_disconnect(si)
     
     #endregion
 
