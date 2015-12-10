@@ -34,10 +34,6 @@
     </Compile>
     <Compile Include="test\tests.py" />
     <Compile Include="test\test_common_pyvmomi.py" />
-    <Compile Include="test\test_common_name_utils.py" />
-    <Compile Include="test\test_cloudshellDataRetrieverService.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="test\__init__.py" />
     <Compile Include="__init__.py">
       <SubType>Code</SubType>

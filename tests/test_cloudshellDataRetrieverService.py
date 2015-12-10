@@ -1,6 +1,9 @@
 ﻿import unittest
 import mock
 from mock import Mock, MagicMock, create_autospec
+import sys
+import os.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 from pycommon.cloudshellDataRetrieverService import *
 
 class test_cloudshellDataRetrieverService(unittest.TestCase):
@@ -108,9 +111,4 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         self.assertEquals(connDetails["user"], "user1")
         self.assertEquals(connDetails["password"], "pass1")
         self.assertEquals(connDetails["vCenter_url"], "vCenterIP")
-
-
-if __name__ == '__main__':
-    runner = unittest.TextTestRunner()
-    unittest.main(testRunner=runner)
 
