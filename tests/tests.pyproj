@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>tests</Name>
     <RootNamespace>tests</RootNamespace>
+    <InterpreterId>{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,6 +29,7 @@
     <Compile Include="tests.py" />
     <Compile Include="test_cloudshellDataRetrieverService.py" />
     <Compile Include="test_common_name_utils.py" />
+    <Compile Include="test_common_pyvmomi.py" />
     <Compile Include="test_dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>
@@ -45,6 +48,9 @@
     <Content Include="config.ini">
       <SubType>Code</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

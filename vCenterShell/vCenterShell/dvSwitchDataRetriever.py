@@ -13,16 +13,11 @@ class dvSwitchDataRetriever:
         self.pvService = pvService
 
     def RetrieveDvSwitchData(self, host, user, pwd, port, name):
-        connection = self.pvService.connect(host, user, pwd, port)
+        si = self.pvService.connect(host, user, pwd, port)
 
-        content = connection.RetrieveContent()
+        content = si.RetrieveContent()
         vmMachine = self.pvService.get_obj(content, [vim.VirtualMachine], name)
 
-        nic = vim.vm.device.VirtualEthernetCard
-        nics = [ x for x in vmMachine.config.hardware.device if isinstance(x, nic)]
-
-        vNics = []
-        for nic in nics:
-            vNics.append( vNic(nic.deviceInfo.summary, nic.macAddress, nic.connectable.connected, nic.connectable.startConnected) )
-
-        return vNics
+        return [ vNic(x.deviceInfo.summary, x.macAddress, x.connectable.connected, x.connectable.startConnected) \
+                for x in vmMachine.config.hardware.device \
+                if isinstance(x, vim.vm.device.VirtualEthernetCard)]

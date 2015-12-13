@@ -60,3 +60,6 @@ target/
 .idea/
 tests/config.ini
 *.cache
+vCenterShell/vCenterShell/qualipy/Include/*
+vCenterShell/vCenterShell/qualipy/Scripts/*
+vCenterShell/vCenterShell/qualipy/*

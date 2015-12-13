@@ -12,7 +12,7 @@
     <Name>vCenterShell</Name>
     <RootNamespace>vCenterShell</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{7099a273-30f9-44aa-a190-08c9639e015e}</InterpreterId>
+    <InterpreterId>{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -41,6 +41,7 @@
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="vNic.py" />
     <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -53,7 +54,6 @@
     <Compile Include="dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="vCenterShell.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
-    <InterpreterReference Include="{7099a273-30f9-44aa-a190-08c9639e015e}\2.7" />
+    <InterpreterReference Include="{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -23,13 +23,13 @@ class test_dvSwitchDataRetriever(unittest.TestCase):
 
     def test_RetrieveDvSwitchData_unitTest(self):
         content = Mock()
-        connection = create_autospec(spec = vim.ServiceInstance)
-        connection.RetrieveContent = Mock(return_value = content)
+        si = create_autospec(spec = vim.ServiceInstance)
+        si.RetrieveContent = Mock(return_value = content)
 
         vNic = create_autospec(spec = vim.vm.device.VirtualEthernetCard)
         vNic.deviceInfo = Mock()
         vNic.deviceInfo.summary = 'network1'
-        vNic.macAddress = 'AA-BB'
+        vNic.macAddress = 'AA-BB' 
         vNic.connectable = Mock()
         vNic.connectable.connected = 'True'
         vNic.connectable.startConnected = 'True'
@@ -38,7 +38,7 @@ class test_dvSwitchDataRetriever(unittest.TestCase):
         vmMachine.config.hardware.device = [vNic]
 
         mockPyVmomiService = Mock()
-        mockPyVmomiService.connect = Mock(return_value = connection)
+        mockPyVmomiService.connect = Mock(return_value = si)
         mockPyVmomiService.get_obj = Mock(return_value = vmMachine)
 
         switchRetriever = dvSwitchDataRetriever(mockPyVmomiService)
