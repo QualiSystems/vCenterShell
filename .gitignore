@@ -58,3 +58,5 @@ docs/_build/
 # PyBuilder
 target/
 .idea/
+tests/config.ini
+*.cache
