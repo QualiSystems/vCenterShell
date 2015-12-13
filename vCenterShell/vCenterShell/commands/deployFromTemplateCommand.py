@@ -3,31 +3,29 @@ import requests
 import atexit
 from qualipy.api.cloudshell_api import *
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 import time
 import sys
 import pycommon
 from pycommon.common_name_utils import generate_unique_name
 from pycommon.cloudshellDataRetrieverService import *
+from commands.baseCommand import BaseCommand
 
-class deployFromTemplateCommand(object):
+class deployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
 
 
-    def __init__(self, pvService, cloudshellConnectData):
+    def __init__(self, pvService):
         """
-        :param pvService:              pyVmomiService Instance
-        :param cloudshellConnectData:  dictionary with cloudshell connection data
+        :param pvService:   pyVmomiService Instance
         """
         self.pvService = pvService
-        self.cloudshellConnectData = cloudshellConnectData
         self.csRetrieverService = cloudshellDataRetrieverService()
 
 
     def execute(self):    
         """ execute the command """
 
-        resource_att = self.__attachAndGetResourceContext()
+        resource_att = helpers.get_resource_context_details()        
 
         # get vCenter resource name, template name, template folder
         vCenterTemplateAttData = self.csRetrieverService.getVCenterTemplateAttributeData(resource_att)
@@ -35,7 +33,7 @@ class deployFromTemplateCommand(object):
         vCenter_resource_name = vCenterTemplateAttData["vCenter_resource_name"]
         vm_folder = vCenterTemplateAttData["vm_folder"]
 
-        print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_name,vm_folder,vCenter_resource_name)
+        print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_name, vm_folder, vCenter_resource_name)
     
 
         # get power state of the cloned VM
@@ -91,14 +89,18 @@ class deployFromTemplateCommand(object):
 
             helpers.get_api_session() \
                 .CreateResource("Virtual Machine",
-                                "Virtual Machine", vm_name,
-                                vm.summary.config.instanceUuid)
+                                "Virtual Machine", 
+                                vm_name,
+                                vm_name)
             helpers.get_api_session() \
                 .AddResourcesToReservation(reservation_id, [vm_name])
             helpers.get_api_session() \
-                .SetAttributeValue(vm_name,
-                                   "vCenter Inventory Path",
-                                   attributeValue = vCenter_resource_name + "/" + vm_folder)
+                .SetAttributesValues(
+                    [ResourceAttributesUpdateRequest(vm_name, 
+                        [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
+                        AttributeNameValue("UUID", vm.summary.config.instanceUuid),
+                        AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
+
         else:
             print "template not found"
 
@@ -106,12 +108,7 @@ class deployFromTemplateCommand(object):
         self.pvService.disconnect(si)
 
 
-    def __attachAndGetResourceContext(self):
-        dev_helpers.attach_to_cloudshell_as(self.cloudshellConnectData["user"], 
-                                            self.cloudshellConnectData["password"], 
-                                            self.cloudshellConnectData["domain"], 
-                                            self.cloudshellConnectData["reservationId"])
-        return helpers.get_resource_context_details()
+    
         
         
 

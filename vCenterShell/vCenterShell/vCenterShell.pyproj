@@ -24,7 +24,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="commands\baseCommand.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="commands\commandExecuterService.py" />
+    <Compile Include="commands\destroyVirtualMachineCommand.py" />
     <Compile Include="commands\deployFromTemplateCommand.py">
       <SubType>Code</SubType>
     </Compile>

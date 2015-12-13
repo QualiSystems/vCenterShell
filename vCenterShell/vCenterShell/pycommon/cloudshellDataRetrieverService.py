@@ -64,3 +64,18 @@ class cloudshellDataRetrieverService:
             "password":password,
             "vCenter_url": vcenter_url
         }
+
+    def getVCenterInventoryPathAttributeData(self, resource_attributes):
+        """ get vCenter resource name & virtual machine folder path """
+
+        path_att = resource_attributes.attributes["vCenter Inventory Path"]
+        path_components = path_att.split("/")
+
+        vm_folder = ""
+        if(len(path_components) > 1):
+            vm_folder = "/".join(path_components[1:])
+
+        return {
+            "vCenter_resource_name" : path_components[0],
+            "vm_folder" : vm_folder
+        }
