@@ -47,8 +47,7 @@ class pyVmomiService:
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
-        #self.pyvmomi_disconnect(si)
-        Disconnect(si)
+        self.pyvmomi_disconnect(si)
     
     #endregion
 
@@ -149,7 +148,10 @@ class pyVmomiService:
         return self.wait_for_task(task)
 
     def destroy_vm(self, content, si, vm):
-        """ destroy the given vm  """
+        """ 
+        destroy the given vm  
+        :param vm: virutal machine pyvmomi object
+        """
 
         print("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name))
 
@@ -161,5 +163,17 @@ class pyVmomiService:
 
         task = vm.Destroy_Task()
         return self.wait_for_task(task)
+
+    def destroy_vm_by_name(self, content, si, vm_name):
+        """ 
+        destroy the given vm  
+        :param str vm: virutal machine name to destroy
+        """
+
+        vm = self.get_obj(content, [vim.VirtualMachine], vm_name)
+        if vm is None:
+            raise ValueError("Could find Virtual Machine with name {0}".format(vm_name))
+
+        return self.destroy_vm(content, si, vm)
 
     #endregion
