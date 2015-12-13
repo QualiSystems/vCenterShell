@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="testCredentials.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests.py" />
     <Compile Include="test_dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
@@ -35,6 +38,11 @@
       <Project>{e5a7b2ac-e237-4d33-9063-6d624acc0b88}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config.ini">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
