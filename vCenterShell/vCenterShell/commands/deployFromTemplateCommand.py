@@ -71,38 +71,34 @@ class deployFromTemplateCommand(BaseCommand):
 
         template = self.pvService.get_obj(content, [vim.VirtualMachine], template_name)
     
-        if template:
-            # generate unique name
-            vm_name = generate_unique_name(template_name)
+        if not template:
+            raise ValueError("template with name '{0}' not found".format(template_name))
 
-            vm = self.pvService.clone_vm(
-                content = content, 
-                si = si,
-                template = template, 
-                vm_name = vm_name,
-                datacenter_name = None, 
-                vm_folder = vm_folder, 
-                datastore_name = datastore_name, 
-                cluster_name = cluster_name,
-                resource_pool = resource_pool,
-                power_on = power_on)
+        # generate unique name
+        vm_name = generate_unique_name(template_name)
 
-            helpers.get_api_session() \
-                .CreateResource("Virtual Machine",
-                                "Virtual Machine", 
-                                vm_name,
-                                vm_name)
-            helpers.get_api_session() \
-                .AddResourcesToReservation(reservation_id, [vm_name])
-            helpers.get_api_session() \
-                .SetAttributesValues(
-                    [ResourceAttributesUpdateRequest(vm_name, 
-                        [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
-                        AttributeNameValue("UUID", vm.summary.config.instanceUuid),
-                        AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
+        vm = self.pvService.clone_vm(
+            content = content, 
+            si = si,
+            template = template, 
+            vm_name = vm_name,
+            datacenter_name = None, 
+            vm_folder = vm_folder, 
+            datastore_name = datastore_name, 
+            cluster_name = cluster_name,
+            resource_pool = resource_pool,
+            power_on = power_on)
 
-        else:
-            print "template not found"
+        session.CreateResource("Virtual Machine",
+                            "Virtual Machine", 
+                            vm_name,
+                            vm_name)
+        session.AddResourcesToReservation(reservation_id, [vm_name])
+        session.SetAttributesValues(
+                [ResourceAttributesUpdateRequest(vm_name, 
+                    [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
+                    AttributeNameValue("UUID", vm.summary.config.instanceUuid),
+                    AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
 
         # disconnect
         self.pvService.disconnect(si)
