@@ -6,7 +6,7 @@
     <ProjectGuid>0b1b85f0-f2a2-4b37-a47d-233907ca40a4</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>tests.py</StartupFile>
-    <SearchPath>..\vCenterShell\vCenterShell\;..\</SearchPath>
+    <SearchPath>..\vCenterShell\vCenterShell\;..\;..\vCenterShell\vCenterShell\pycommon\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>tests</Name>
@@ -25,6 +25,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="tests.py" />
+    <Compile Include="test_cloudshellDataRetrieverService.py" />
+    <Compile Include="test_common_name_utils.py" />
     <Compile Include="test_dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>

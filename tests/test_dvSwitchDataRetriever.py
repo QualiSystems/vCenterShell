@@ -1,4 +1,4 @@
-import unittest
+﻿import unittest
 from mock import Mock, MagicMock, create_autospec, mock_open, patch
 
 import sys
@@ -12,7 +12,7 @@ from pycommon.common_pyvmomi import pyVmomiService
 from testCredentials import *
 
 class test_dvSwitchDataRetriever(unittest.TestCase):
-    
+
     # Integration test, Ignored it on CI
     def integrationTest_RetrieveDvSwitchData_integrationTest(self):
         cred = testCredentials()
