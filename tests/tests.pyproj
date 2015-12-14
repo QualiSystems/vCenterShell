@@ -25,6 +25,7 @@
     <Compile Include="test_cloudshellDataRetrieverService.py" />
     <Compile Include="test_common_name_utils.py" />
     <Compile Include="test_common_pyvmomi.py" />
+    <Compile Include="test_deployFromTemplateCommand.py" />
     <Compile Include="test_dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>
