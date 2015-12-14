@@ -54,6 +54,119 @@ class pyVmomiService:
     #endregion
 
     #region get obj methods
+    def find_by_uuid(self, si, path, uuid, isVM=True):     
+        """
+        Finds vm/host by his uuid in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        uuid:       the object uuid
+        isHost:     if true, search for virtual machines, otherwise search for hosts
+        """  
+        folder = self.get_folder(si, path);
+        searchIndex = si.content.searchIndex
+        return searchIndex.FindByUuid(folder, uuid, isVM)
+
+    def find_host_by_name(self, si, path, name):     
+        """
+        Finds datastore in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the datastore name to return
+        """  
+        return self.find_obj_by_path(si, path, name, 'host');
+
+    def find_datastore_by_name(self, si, path, name):     
+        """
+        Finds datastore in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the datastore name to return
+        """  
+        return self.find_obj_by_path(si, path, name, 'datastore');
+
+    def find_network_by_name(self, si, path, name):     
+        """
+        Finds datastore in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the datastore name to return
+        """  
+        return self.find_obj_by_path(si, path, name, 'network');
+
+    def find_vm_by_name(self, si, path, name):
+        """
+        Finds vm in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the vm name to return
+        """  
+        return self.find_obj_by_path(si, path, name, 'vm');
+
+    def find_obj_by_path(self, si, path, name, typeName):
+        """
+        Finds object in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the object name to return
+        typeName:   the name of the type, can be (vm, network, host, datastore)
+        """  
+        
+        typeName = typeName + 'Folder'
+
+        folder = self.get_folder(si, path)
+        if folder == None:
+            return None
+
+        lookIn = None
+        if hasattr(folder, typeName):        
+            lookIn = getattr(folder, typeName)
+        if hasattr(folder, 'childEntity'):
+            lookIn = folder
+        searchIndex = si.content.searchIndex
+        #searches for the spesific vm in the folder
+        return searchIndex.FindChild(lookIn, name)
+
+    def get_folder(self,si, path):
+        """
+        Finds folder in the vCenter or returns "None"
+
+        si:         pyvmomi 'ServiceInstance'
+        path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        name:       the folder
+        """  
+        paths = path.split("/")
+        searchIndex = si.content.searchIndex
+        subFolder = si.content.rootFolder
+
+        for currPath in paths:
+            #checks if the current path is nested as a child
+            if hasattr(subFolder, "childEntity"):
+                child = searchIndex.FindChild(subFolder, currPath)
+            
+            if child == None and hasattr(subFolder, "vmFolder"):
+                child = searchIndex.FindChild(subFolder.vmFolder, currPath)
+            
+            if child == None and hasattr(subfolder, 'datastoreFolder'):                
+                child = searchIndex.FindChild(subFolder.datastoreFolder, currPath)
+            
+            if child == None and hasattr(subfolder, 'networkFolder'):      
+                child = searchIndex.FindChild(subFolder.networkFolder, currPath)
+            
+            if child == None and hasattr(subfolder, 'hostFolder'):      
+                child = searchIndex.FindChild(subFolder.hostFolder, currPath)
+            
+            if child == None:
+                raise Exception("Path not exist")
+            else:
+                subFolder = child
+                child = None;
+        return subFolder
 
     def get_obj(self, content, vimtype, name):
         """

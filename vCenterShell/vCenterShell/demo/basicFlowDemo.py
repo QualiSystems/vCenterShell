@@ -9,6 +9,7 @@ import uuid
 import sys
 import pycommon
 from pycommon.common_collection_utils import first_or_default
+import datetime
 
 
 def run(pvService, reservationId):
@@ -20,9 +21,22 @@ def run(pvService, reservationId):
     """
 
 
-    #si = pvService.connect("192.168.42.110", "qualisystems\\alex.az", "Freed0m!21")
-    #content = si.RetrieveContent()
+    si = pvService.connect("192.168.30.101", "root", "vmware")
+    
+    #now = datetime.datetime.now()
+    #for i in range(0,100):
+    a1 = pvService.find_vm_by_name       (si, "DC0/raz_test/raztest2/final" ,'DC0_C0_RP0_VM0')
+    a1 = pvService.find_vm_by_name       (si, "DC1" ,'DC1_C0_RP0_VM11')
+    a1 = pvService.find_datastore_by_name(si, "DC1" ,'GlobalDS_0')
+    a1 = pvService.find_host_by_name     (si, "DC1" ,'DC1_H1')
+    a1 = pvService.find_network_by_name  (si, "DC1" ,'DC1_DVPG1')
+    a1 = pvService.find_by_uuid          (si, "DC1" ,'423692d9-9450-3878-1316-c352ffb9c9b9')
+    #print (datetime.datetime.now()- now)
 
+    #now = datetime.datetime.now()
+    #for i in range(0,100):
+    #    pvService.get_obj(si.content, [vim.VirtualMachine], 'a2')
+    #print (datetime.datetime.now()- now)
 
     dev_helpers.attach_to_cloudshell_as("admin","admin","Global",reservationId)
     resource_att = helpers.get_resource_context_details()

@@ -1,5 +1,5 @@
 ﻿from pyVim.connect import SmartConnect, Disconnect
-from pycommon.common_pyvmomi import \pyVmomiService
+from pycommon.common_pyvmomi import pyVmomiService
 from demo import basicFlowDemo
 
 def main():
