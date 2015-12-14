@@ -1,12 +1,11 @@
-import requests
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
+
+from commands.baseCommand import BaseCommand
 from models.VirtualNic import VirtualNic
 
-requests.packages.urllib3.disable_warnings()
 
-
-class NetworkAdaptersRetriever:
+class NetworkAdaptersRetriever(BaseCommand):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         self.pvService = pv_service
         self.csRetrieverService = cs_retriever_service

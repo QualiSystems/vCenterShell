@@ -13,7 +13,7 @@ from commands.NetworkAdaptersRetriever import *
 
 class TestNetworkAdaptersRetriever(unittest.TestCase):
 
-    def test_RetrieveDvSwitchData_unitTest(self):
+    def test_TestNetworkAdaptersRetriever(self):
         content = Mock()
         si = create_autospec(spec=vim.ServiceInstance)
         si.RetrieveContent = Mock(return_value=content)
