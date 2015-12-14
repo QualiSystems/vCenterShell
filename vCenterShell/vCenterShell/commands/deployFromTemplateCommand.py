@@ -5,14 +5,15 @@ from qualipy.api.cloudshell_api import *
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import time
 import sys
-import vCenterShell.pycommon
+import pycommon
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
 from vCenterShell.pycommon.cloudshellDataRetrieverService import *
 from vCenterShell.commands.baseCommand import BaseCommand
-
+from timeit import default_timer as timer
 
 class deployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
+
 
     def __init__(self, pvService):
         """
@@ -68,9 +69,14 @@ class deployFromTemplateCommand(BaseCommand):
         si = self.pvService.connect(vCenterConn["vCenter_url"] , vCenterConn["user"], vCenterConn["password"])
         content = si.RetrieveContent()
 
+        start = timer()
         template = self.pvService.get_obj(content, [vim.VirtualMachine], template_name)
+        end = timer()
+        print "Template search took {0} seconds".format(end - start)
     
-        if template:
+        if not template:
+            raise ValueError("template with name '{0}' not found".format(template_name))
+
             # generate unique name
             vm_name = generate_unique_name(template_name)
 
@@ -86,22 +92,16 @@ class deployFromTemplateCommand(BaseCommand):
                 resource_pool = resource_pool,
                 power_on = power_on)
 
-            helpers.get_api_session() \
-                .CreateResource("Virtual Machine",
+        session.CreateResource("Virtual Machine",
                                 "Virtual Machine", 
                                 vm_name,
                                 vm_name)
-            helpers.get_api_session() \
-                .AddResourcesToReservation(reservation_id, [vm_name])
-            helpers.get_api_session() \
-                .SetAttributesValues(
+        session.AddResourcesToReservation(reservation_id, [vm_name])
+        session.SetAttributesValues(
                     [ResourceAttributesUpdateRequest(vm_name, 
                         [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
                         AttributeNameValue("UUID", vm.summary.config.instanceUuid),
                         AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
-
-        else:
-            print "template not found"
 
         # disconnect
         self.pvService.disconnect(si)
