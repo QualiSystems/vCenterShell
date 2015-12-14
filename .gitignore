@@ -63,3 +63,5 @@ tests/config.ini
 vCenterShell/vCenterShell/qualipy/Include/*
 vCenterShell/vCenterShell/qualipy/Scripts/*
 vCenterShell/vCenterShell/qualipy/*
+*.whl
+QualiPy/*
