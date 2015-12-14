@@ -1,2 +1,2 @@
-﻿import commandExecuterService
-import deployFromTemplateCommand
+﻿import vCenterShell.commands.commandExecuterService
+import vCenterShell.commands.deployFromTemplateCommand
