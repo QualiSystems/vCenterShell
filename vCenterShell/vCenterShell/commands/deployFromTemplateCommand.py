@@ -10,9 +10,9 @@ from pycommon.common_name_utils import generate_unique_name
 from pycommon.cloudshellDataRetrieverService import *
 from commands.baseCommand import BaseCommand
 
+
 class deployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
-
 
     def __init__(self, pvService):
         """
@@ -20,7 +20,6 @@ class deployFromTemplateCommand(BaseCommand):
         """
         self.pvService = pvService
         self.csRetrieverService = cloudshellDataRetrieverService()
-
 
     def execute(self):    
         """ execute the command """

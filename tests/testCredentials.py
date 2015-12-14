@@ -1,6 +1,7 @@
 import ConfigParser, os
 
-class testCredentials:
+
+class TestCredentials:
 
     def __init__(self):
         config = ConfigParser.ConfigParser()

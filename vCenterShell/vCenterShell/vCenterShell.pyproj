@@ -36,12 +36,18 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vCenterConnectionDetails.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
     <Compile Include="pycommon\common_name_utils.py" />
+    <Compile Include="pycommon\resourceConnectionDetailsRetriever.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="vNic.py" />
+    <Compile Include="models\vNic.py" />
     <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -51,12 +57,13 @@
     <Compile Include="pycommon\common_collection_utils.py" />
     <Compile Include="pycommon\pyVmomiService.py" />
     <Compile Include="demo\basicFlowDemo.py" />
-    <Compile Include="dvSwitchDataRetriever.py">
+    <Compile Include="commands\dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
+    <Folder Include="models\" />
     <Folder Include="pycommon\" />
     <Folder Include="demo\" />
   </ItemGroup>
