@@ -6,8 +6,7 @@
     <ProjectGuid>0b1b85f0-f2a2-4b37-a47d-233907ca40a4</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <StartupFile>tests.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
+    <SearchPath>..\vCenterShell\vCenterShell\;..\;..\vCenterShell\vCenterShell\pycommon\</SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>tests</Name>
@@ -23,9 +22,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="tests.py" />
+    <Compile Include="test_cloudshellDataRetrieverService.py" />
+    <Compile Include="test_common_name_utils.py" />
+    <Compile Include="test_common_pyvmomi.py" />
+    <Compile Include="test_dvSwitchDataRetriever.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="test_vCenterShell.py">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\vCenterShell\vCenterShell\vCenterShell.pyproj">
+      <Name>vCenterShell</Name>
+      <Project>{e5a7b2ac-e237-4d33-9063-6d624acc0b88}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

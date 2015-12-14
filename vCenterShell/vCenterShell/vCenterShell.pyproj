@@ -14,6 +14,9 @@
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>{3fb307a9-ac85-472d-9866-903a44abdc38}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>debug deploy</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,27 +27,39 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="commands\baseCommand.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\commandExecuterService.py" />
+    <Compile Include="commands\destroyVirtualMachineCommand.py" />
+    <Compile Include="commands\deployFromTemplateCommand.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="commands\__init__.py" />
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
+    <Compile Include="pycommon\common_name_utils.py" />
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="test\tests.py" />
-    <Compile Include="test\test_common_pyvmomi.py">
+    <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="test\__init__.py" />
     <Compile Include="__main__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="pycommon\common_collection_utils.py" />
-    <Compile Include="pycommon\common_pyvmomi.py" />
+    <Compile Include="pycommon\pyVmomiService.py" />
     <Compile Include="demo\basicFlowDemo.py" />
+    <Compile Include="dvSwitchDataRetriever.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="vCenterShell.py" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="test\" />
+    <Folder Include="commands\" />
     <Folder Include="pycommon\" />
     <Folder Include="demo\" />
   </ItemGroup>
