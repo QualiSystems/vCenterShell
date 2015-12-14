@@ -9,6 +9,7 @@ import pycommon
 from pycommon.common_name_utils import generate_unique_name
 from pycommon.cloudshellDataRetrieverService import *
 from commands.baseCommand import BaseCommand
+from timeit import default_timer as timer
 
 class deployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
@@ -56,7 +57,7 @@ class deployFromTemplateCommand(BaseCommand):
         print "Datastore: {0}".format(datastore_name)
 
 
-        reservation_id = helpers.get_reservation_context_details().id
+        reservation_id = helpers.get_reservation_context_details().id 
         session = helpers.get_api_session()
         vCenter_details = session.GetResourceDetails(vCenter_resource_name)
     
@@ -69,7 +70,10 @@ class deployFromTemplateCommand(BaseCommand):
         si = self.pvService.connect(vCenterConn["vCenter_url"] , vCenterConn["user"], vCenterConn["password"])
         content = si.RetrieveContent()
 
+        start = timer()
         template = self.pvService.get_obj(content, [vim.VirtualMachine], template_name)
+        end = timer()
+        print "Template search took {0} seconds".format(end - start)
     
         if not template:
             raise ValueError("template with name '{0}' not found".format(template_name))
