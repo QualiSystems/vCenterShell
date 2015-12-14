@@ -1,28 +1,22 @@
 ﻿from pyVmomi import vim
-import ssl
 import requests
 import time
 
+
 class pyVmomiService:
  
-    #region ctor
-
-    def __init__(self,connect,disconnect):
+    def __init__(self, connect, disconnect):
         self.pyvmomi_connect = connect
         self.pyvmomi_disconnect = disconnect
 
-    #endregion
-
-    #region connect/disconnect methods
-       
-    def connect(self, address, user, password, port=443):    
+    def connect(self, address, user, password, port=443):
         """  
         Connect to vCenter via SSL and return SI object
         
-        address:    vCenter address (host / ip address)
-        user:       user name for authentication
-        password:   password for authentication
-        port:       port for the SSL connection. Default = 443
+        :param address: vCenter address (host / ip address)
+        :param user:    user name for authentication
+        :param password:password for authentication
+        :param port:    port for the SSL connection. Default = 443
         """
 
         # Disabling urllib3 ssl warnings
@@ -49,10 +43,6 @@ class pyVmomiService:
         """ Disconnect from vCenter """
         self.pyvmomi_disconnect(si)
     
-    #endregion
-
-    #region get obj methods
-
     def get_obj(self, content, vimtype, name):
         """
         Return an object by name for a specific type, if name is None the
@@ -77,10 +67,6 @@ class pyVmomiService:
 
         return obj
 
-    #endregion
-
-    #region task handling methods
-
     def wait_for_task(self, task):
         """ wait for a vCenter task to finish """    
         task_done = False
@@ -96,9 +82,6 @@ class pyVmomiService:
                 return None
             time.sleep(1)
 
-    #endregion
-
-    #region VM methods
 
     def clone_vm(self, content, si, template, vm_name, datacenter_name, vm_folder, datastore_name, cluster_name, resource_pool, power_on):
         """
@@ -175,5 +158,3 @@ class pyVmomiService:
             raise ValueError("Could find Virtual Machine with name {0}".format(vm_name))
 
         return self.destroy_vm(content, si, vm)
-
-    #endregion

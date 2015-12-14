@@ -1,7 +1,7 @@
 ﻿from pyVim.connect import SmartConnect, Disconnect
-from pycommon.pyVmomiService import *
-from deployFromTemplateCommand import *
-from destroyVirtualMachineCommand import *
+from vCenterShell.pycommon.pyVmomiService import *
+from vCenterShell.commands.deployFromTemplateCommand import *
+from vCenterShell.commands.destroyVirtualMachineCommand import *
 
 class commandExecuterService(object):
     """ main class that publishes all available commands """
