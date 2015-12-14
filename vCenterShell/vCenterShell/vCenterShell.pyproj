@@ -39,6 +39,13 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vmClusterModel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\vCenterTemplateModel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\__init__.py" />
     <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
     <Compile Include="pycommon\common_name_utils.py" />
     <Compile Include="pycommon\__init__.py">
@@ -60,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
+    <Folder Include="models\" />
     <Folder Include="pycommon\" />
     <Folder Include="demo\" />
   </ItemGroup>

@@ -8,7 +8,7 @@ from pycommon.cloudshellDataRetrieverService import *
 
 class test_cloudshellDataRetrieverService(unittest.TestCase):
     def setUp(self):
-        self.csRetrieverService = cloudshellDataRetrieverService()
+        self.csRetrieverService = CloudshellDataRetrieverService()
 
     def tearDown(self):
         pass
@@ -22,9 +22,9 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         result = self.csRetrieverService.getVCenterTemplateAttributeData(resource_attributes);
 
         # Assert
-        self.assertEquals(result["vCenter_resource_name"], "vCenter")
-        self.assertEqual(result["vm_folder"], "Alex")
-        self.assertEqual(result["template_name"], "test")
+        self.assertEquals(result.vCenter_resource_name, "vCenter")
+        self.assertEqual(result.vm_folder, "Alex")
+        self.assertEqual(result.template_name, "test")
 
     def test_getPowerStateAttributeData_Value_Is_True(self):
         # Arrange
@@ -57,8 +57,8 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes);
 
         # Assert
-        self.assertEquals(result["cluster_name"], "cluster1")
-        self.assertEquals(result["resource_pool"], "resourcepool1")
+        self.assertEquals(result.cluster_name, "cluster1")
+        self.assertEquals(result.resource_pool, "resourcepool1")
 
     def test_getVMClusterAttributeData_Empty_Attribute(self):
         # Arrange
@@ -69,8 +69,8 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes);
 
         # Assert
-        self.assertEquals(result["cluster_name"], None)
-        self.assertEquals(result["resource_pool"], None)
+        self.assertEquals(result.cluster_name, None)
+        self.assertEquals(result.resource_pool, None)
 
     
     def test_getVMStorageAttributeData(self):

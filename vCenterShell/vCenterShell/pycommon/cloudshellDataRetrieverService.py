@@ -1,6 +1,8 @@
 ﻿from pycommon.common_collection_utils import first_or_default
+from models.vCenterTemplateModel import *
+from models.vmClusterModel import *
 
-class cloudshellDataRetrieverService:
+class CloudshellDataRetrieverService:
 
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
@@ -8,37 +10,37 @@ class cloudshellDataRetrieverService:
         template_att = resource_attributes.attributes["vCenter Template"]
         template_components = template_att.split("/")
 
-        return {
-            "template_name" : template_components[-1],
-            "vCenter_resource_name" : template_components[0],
-            "vm_folder" : template_components[1:-1][0]
-        }
-
+        return VCenterTemplateModel(
+            vCenter_resource_name=template_components[0],
+            vm_folder=template_components[1:-1][0],
+            template_name=template_components[-1])
 
     def getPowerStateAttributeData(self, resource_attributes):
-        """ get power state attribute data """
+        """
+        get power state attribute data 
+        :rtype: boolean
+        """
         power_state = False
         if resource_attributes.attributes["VM Power State"].lower() == "true":
             power_state = True
         return power_state
 
-
     def getVMClusterAttributeData(self, resource_attributes):
         """ 
         get cluster and resource pool from 'VM Cluster' attribute 
         if attribute is empty than return None as values
+        :rtype VMClusterModel:
         """
-        result = { "cluster_name" : None, "resource_pool" : None }
+        result = VMClusterModel(None,None)
 
         storage_att = resource_attributes.attributes["VM Cluster"]
         if storage_att:
             storage_att_components = storage_att.split("/")
             if len(storage_att_components) == 2:
-                result["cluster_name"] = storage_att_components[0]
-                result["resource_pool"] = storage_att_components[1]
+                result.cluster_name = storage_att_components[0]
+                result.resource_pool = storage_att_components[1]
         
         return result
-
 
     def getVMStorageAttributeData(self, resource_attributes):
         """ get datastore from 'VM Storage' attribute """
