@@ -1,8 +1,8 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 
-from commands.baseCommand import BaseCommand
-from models.VirtualNic import VirtualNic
+from vCenterShell.commands.baseCommand import BaseCommand
+from vCenterShell.models.VirtualNic import VirtualNic
 
 
 class NetworkAdaptersRetriever(BaseCommand):

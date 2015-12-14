@@ -5,10 +5,10 @@ from qualipy.api.cloudshell_api import *
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import time
 import sys
-import pycommon
-from pycommon.common_name_utils import generate_unique_name
-from pycommon.cloudshellDataRetrieverService import *
-from commands.baseCommand import BaseCommand
+import vCenterShell.pycommon
+from vCenterShell.pycommon.common_name_utils import generate_unique_name
+from vCenterShell.pycommon.cloudshellDataRetrieverService import *
+from vCenterShell.commands.baseCommand import BaseCommand
 
 
 class deployFromTemplateCommand(BaseCommand):
