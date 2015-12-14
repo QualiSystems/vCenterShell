@@ -6,9 +6,9 @@ import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import time
 import sys
 import pycommon
-from pycommon.common_name_utils import generate_unique_name
-from pycommon.cloudshellDataRetrieverService import *
-from commands.baseCommand import BaseCommand
+from vCenterShell.pycommon.common_name_utils import generate_unique_name
+from vCenterShell.pycommon.cloudshellDataRetrieverService import *
+from vCenterShell.commands.baseCommand import BaseCommand
 from timeit import default_timer as timer
 
 class deployFromTemplateCommand(BaseCommand):
@@ -21,7 +21,6 @@ class deployFromTemplateCommand(BaseCommand):
         """
         self.pvService = pvService
         self.csRetrieverService = cloudshellDataRetrieverService()
-
 
     def execute(self):    
         """ execute the command """
@@ -57,7 +56,7 @@ class deployFromTemplateCommand(BaseCommand):
         print "Datastore: {0}".format(datastore_name)
 
 
-        reservation_id = helpers.get_reservation_context_details().id 
+        reservation_id = helpers.get_reservation_context_details().id
         session = helpers.get_api_session()
         vCenter_details = session.GetResourceDetails(vCenter_resource_name)
     
@@ -78,31 +77,31 @@ class deployFromTemplateCommand(BaseCommand):
         if not template:
             raise ValueError("template with name '{0}' not found".format(template_name))
 
-        # generate unique name
-        vm_name = generate_unique_name(template_name)
+            # generate unique name
+            vm_name = generate_unique_name(template_name)
 
-        vm = self.pvService.clone_vm(
-            content = content, 
-            si = si,
-            template = template, 
-            vm_name = vm_name,
-            datacenter_name = None, 
-            vm_folder = vm_folder, 
-            datastore_name = datastore_name, 
-            cluster_name = cluster_name,
-            resource_pool = resource_pool,
-            power_on = power_on)
+            vm = self.pvService.clone_vm(
+                content = content, 
+                si = si,
+                template = template, 
+                vm_name = vm_name,
+                datacenter_name = None, 
+                vm_folder = vm_folder, 
+                datastore_name = datastore_name, 
+                cluster_name = cluster_name,
+                resource_pool = resource_pool,
+                power_on = power_on)
 
         session.CreateResource("Virtual Machine",
-                            "Virtual Machine", 
-                            vm_name,
-                            vm_name)
+                                "Virtual Machine", 
+                                vm_name,
+                                vm_name)
         session.AddResourcesToReservation(reservation_id, [vm_name])
         session.SetAttributesValues(
-                [ResourceAttributesUpdateRequest(vm_name, 
-                    [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
-                    AttributeNameValue("UUID", vm.summary.config.instanceUuid),
-                    AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
+                    [ResourceAttributesUpdateRequest(vm_name, 
+                        [AttributeNameValue("vCenter Inventory Path", vCenter_resource_name + "/" + vm_folder),
+                        AttributeNameValue("UUID", vm.summary.config.instanceUuid),
+                        AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
 
         # disconnect
         self.pvService.disconnect(si)

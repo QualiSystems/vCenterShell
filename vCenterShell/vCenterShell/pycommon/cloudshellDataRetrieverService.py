@@ -1,4 +1,4 @@
-﻿from pycommon.common_collection_utils import first_or_default
+﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
 
 class cloudshellDataRetrieverService:
 
