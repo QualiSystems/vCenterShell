@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>tests</Name>
     <RootNamespace>tests</RootNamespace>
+    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="testCredentials.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="tests.py" />
     <Compile Include="test_cloudshellDataRetrieverService.py" />
     <Compile Include="test_common_name_utils.py" />
@@ -39,6 +44,14 @@
       <Project>{e5a7b2ac-e237-4d33-9063-6d624acc0b88}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config.ini">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

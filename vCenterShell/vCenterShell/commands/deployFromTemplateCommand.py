@@ -22,7 +22,6 @@ class deployFromTemplateCommand(BaseCommand):
         self.pvService = pvService
         self.csRetrieverService = csRetrieverService
 
-
     def execute(self):
         """ execute the command """
 
@@ -65,31 +64,31 @@ class deployFromTemplateCommand(BaseCommand):
         if not template:
             raise ValueError("template with name '{0}' not found".format(templateModel.template_name))
 
-        # generate unique name
+            # generate unique name
         vm_name = generate_unique_name(templateModel.template_name)
 
-        vm = self.pvService.clone_vm(
-            content = content, 
-            si = si,
-            template = template, 
-            vm_name = vm_name,
-            datacenter_name = None, 
+            vm = self.pvService.clone_vm(
+                content = content, 
+                si = si,
+                template = template, 
+                vm_name = vm_name,
+                datacenter_name = None, 
             vm_folder = templateModel.vm_folder, 
-            datastore_name = datastore_name, 
+                datastore_name = datastore_name, 
             cluster_name = vmClusterModel.cluster_name,
             resource_pool = vmClusterModel.resource_pool,
-            power_on = power_on)
+                power_on = power_on)
 
         session.CreateResource("Virtual Machine",
-                            "Virtual Machine", 
-                            vm_name,
-                            vm_name)
+                                "Virtual Machine", 
+                                vm_name,
+                                vm_name)
         session.AddResourcesToReservation(reservation_id, [vm_name])
         session.SetAttributesValues(
-                [ResourceAttributesUpdateRequest(vm_name, 
+                    [ResourceAttributesUpdateRequest(vm_name, 
                     [AttributeNameValue("vCenter Inventory Path", templateModel.vCenter_resource_name + "/" + templateModel.vm_folder),
-                    AttributeNameValue("UUID", vm.summary.config.instanceUuid),
-                    AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
+                        AttributeNameValue("UUID", vm.summary.config.instanceUuid),
+                        AttributeNameValue("vCenter Template", resource_att.attributes["vCenter Template"])])])
 
         # disconnect
         self.pvService.disconnect(si)
