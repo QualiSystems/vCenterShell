@@ -3,11 +3,13 @@ from mock import Mock, MagicMock, create_autospec, mock_open, patch
 import sys
 import os.path
 
-from vCenterShell.models.vCenterTemplateModel import VCenterTemplateModel
-from vCenterShell.models.vmClusterModel import VMClusterModel
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
+from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
+from vCenterShell.models.VMClusterModel import VMClusterModel
+from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
-from vCenterShell.commands.deployFromTemplateCommand import *
+from vCenterShell.commands.DeployFromTemplateCommand import *
 from pyVmomi import vim
 
 class test_deployFromTemplateCommand(unittest.TestCase):
@@ -29,10 +31,10 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
         csRetrieverService.getVMClusterAttributeData = Mock(return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
         csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
-        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url":"vCenter","user":"user1","password":"pass1"})
+        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter","user":"user1","password":"pass1"})
 
         resourceContext = Mock()
-        resourceContext.attributes = {"vCenter Template":"vCenter/Alex/test"}
+        resourceContext.attributes = {"vCenter Template": "vCenter/Alex/test"}
         helpers.get_resource_context_details = Mock(return_value=resourceContext)
 
         session = Mock()
@@ -45,8 +47,12 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         helpers.get_reservation_context_details = Mock(return_value=reservationContext)
         helpers.get_api_session = Mock(return_value=session)
 
+        connection_details = VCenterConnectionDetails("vCenter", "user", "pass1")
 
-        command = deployFromTemplateCommand(pvService, csRetrieverService)
+        resource_connection_details_retriever = Mock()
+        resource_connection_details_retriever.get_connection_details = Mock(return_value=connection_details)
+
+        command = DeployFromTemplateCommand(pvService, csRetrieverService, resource_connection_details_retriever)
         command.execute()
 
         self.assertTrue(pvService.clone_vm.called)

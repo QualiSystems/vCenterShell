@@ -1,9 +1,11 @@
 ﻿from pyVim.connect import SmartConnect, Disconnect
-from vCenterShell.pycommon.pyVmomiService import *
-from vCenterShell.commands.deployFromTemplateCommand import *
-from vCenterShell.commands.destroyVirtualMachineCommand import *
 
-class commandExecuterService(object):
+from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+from vCenterShell.pycommon.pyVmomiService import *
+from vCenterShell.commands.DeployFromTemplateCommand import *
+from vCenterShell.commands.DestroyVirtualMachineCommand import *
+
+class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
     def __init__(self):
@@ -12,12 +14,13 @@ class commandExecuterService(object):
         """
         self.pyVmomiService = pyVmomiService(SmartConnect, Disconnect)
 
-    def deploy(self):        
-        deployFromTemplateCommand(self.pyVmomiService, CloudshellDataRetrieverService()) \
+    def deploy(self):
+        csDataRetrieverService = CloudshellDataRetrieverService()
+        DeployFromTemplateCommand(self.pyVmomiService, csDataRetrieverService, ResourceConnectionDetailsRetriever(csDataRetrieverService)) \
             .execute()
 
     def destroy(self):        
-        destroyVirtualMachineCommand(self.pyVmomiService) \
+        DestroyVirtualMachineCommand(self.pyVmomiService) \
             .execute()
         
 
