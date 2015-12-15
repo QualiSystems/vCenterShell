@@ -1,12 +1,9 @@
-﻿import requests
+﻿from pyVmomi import vim
+import requests
 import time
-
-from datetime import  datetime
-from pyVmomi import vim
 
 
 class pyVmomiService:
-
     #region consts
     ChildEntity = 'childEntity'
     VM = 'vmFolder'
@@ -14,8 +11,9 @@ class pyVmomiService:
     Datacenter = 'datacenterFolder'
     Host = 'hostFolder'
     Datastore = 'datastoreFolder'
-    #endregion
 
+    #endregion
+ 
     def __init__(self, connect, disconnect):
         self.pyvmomi_connect = connect
         self.pyvmomi_disconnect = disconnect
@@ -53,6 +51,11 @@ class pyVmomiService:
     def disconnect(self, si):
         """ Disconnect from vCenter """
         self.pyvmomi_disconnect(si)
+    
+<<<<<<< HEAD
+    #endregion
+
+    #region get obj methods
 
     def find_datacenter_by_name(self, si, path, name):
         """
@@ -127,8 +130,6 @@ class pyVmomiService:
         :param type_name:   the name of the type, can be (vm, network, host, datastore)
         """         
 
-        now = datetime.now()
-
         folder = self.get_folder(si, path)
         if folder is None:
             return None
@@ -143,10 +144,7 @@ class pyVmomiService:
 
         search_index = si.content.searchIndex
         '#searches for the specific vm in the folder'
-        res = search_index.FindChild(look_in, name)
-
-        print 'find_obj_by_path took: %s' % (str(datetime.now() - now))
-        return res
+        return search_index.FindChild(look_in, name)
 
     def get_folder(self, si, path):
         """
@@ -155,8 +153,6 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         """
-
-        now = datetime.now()
 
         search_index = si.content.searchIndex
         sub_folder = si.content.rootFolder
@@ -194,10 +190,10 @@ class pyVmomiService:
             else:
                 sub_folder = child
                 child = None
-
-        print 'get_folder took: %s' % (str(datetime.now() - now))
         return sub_folder
 
+=======
+>>>>>>> f4c355f4d08ba37dcbb830c888fc177b96b46040
     def get_obj(self, content, vimtype, name):
         """
         Return an object by name for a specific type, if name is None the
@@ -236,6 +232,7 @@ class pyVmomiService:
                 task_done = True
                 return None
             time.sleep(1)
+
 
     def clone_vm(self, content, si, template, vm_name, datacenter_name, vm_folder, datastore_name, cluster_name, resource_pool, power_on):
         """
