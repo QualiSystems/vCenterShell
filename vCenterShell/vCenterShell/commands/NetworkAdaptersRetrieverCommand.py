@@ -1,11 +1,11 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 
-from vCenterShell.commands.baseCommand import BaseCommand
-from vCenterShell.models.VirtualNic import VirtualNic
+from vCenterShell.commands.baseCommand import baseCommand
+from vCenterShell.models.VirtualNicModel import VirtualNicModel
 
 
-class NetworkAdaptersRetriever(BaseCommand):
+class NetworkAdaptersRetrieverCommand(baseCommand):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         self.pvService = pv_service
         self.csRetrieverService = cs_retriever_service
@@ -24,7 +24,7 @@ class NetworkAdaptersRetriever(BaseCommand):
         content = si.RetrieveContent()
         vmMachine = self.pvService.get_obj(content, [vim.VirtualMachine], vcenter_resource_name)
 
-        return [VirtualNic(x.deviceInfo.summary, x.macAddress, x.connectable.connected, x.connectable.startConnected)
+        return [VirtualNicModel(x.deviceInfo.summary, x.macAddress, x.connectable.connected, x.connectable.startConnected)
                 for x in vmMachine.config.hardware.device
                 if isinstance(x, vim.vm.device.VirtualEthernetCard)]
 
