@@ -8,7 +8,7 @@ import time
 import sys
 import vCenterShell.pycommon
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+from vCenterShell.pycommon.cloudshellDataRetrieverService import *
 
 
 class DestroyVirtualMachineCommand(object):
@@ -19,7 +19,7 @@ class DestroyVirtualMachineCommand(object):
         :param pvService:   pyVmomiService Instance
         """
         self.pvService = pvService
-        self.csRetrieverService = CloudshellDataRetrieverService()
+        self.csRetrieverService = cloudshellDataRetrieverService()
 
     def execute(self):
         """ execute the command """
