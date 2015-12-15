@@ -1,5 +1,6 @@
 ﻿from abc import ABCMeta, abstractmethod
 
+
 class BaseCommand(object):
     """base command"""
 
@@ -7,4 +8,3 @@ class BaseCommand(object):
 
     @abstractmethod
     def execute(self): pass
-
