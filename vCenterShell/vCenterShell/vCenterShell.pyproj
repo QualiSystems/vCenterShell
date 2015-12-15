@@ -39,9 +39,16 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vmClusterModel.py">
+    	<SubType>Code</SubType>
+    </Compile>
     <Compile Include="models\vCenterConnectionDetails.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vCenterTemplateModel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\__init__.py" />
     <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
     <Compile Include="pycommon\common_name_utils.py" />
     <Compile Include="pycommon\resourceConnectionDetailsRetriever.py">

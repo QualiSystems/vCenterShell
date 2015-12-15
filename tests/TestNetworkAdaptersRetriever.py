@@ -8,7 +8,7 @@ from pyVmomi import vim
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 from vCenterShell.models.VCenterConnectionDetails import *
-from vCenterShell.commands.NetworkAdaptersRetriever import *
+from vCenterShell.commands.NetworkAdaptersRetrieverCommand import *
 
 
 class TestNetworkAdaptersRetriever(unittest.TestCase):
@@ -48,7 +48,7 @@ class TestNetworkAdaptersRetriever(unittest.TestCase):
         resourceConnectionDetailsRetriever = Mock()
         resourceConnectionDetailsRetriever.getConnectionDetails = Mock(return_value=connDetails)
 
-        switchRetriever = NetworkAdaptersRetriever(pvService, csRetrieverService, resourceConnectionDetailsRetriever)
+        switchRetriever = NetworkAdaptersRetrieverCommand(pvService, csRetrieverService, resourceConnectionDetailsRetriever)
         nics = switchRetriever.execute()
 
         self.assertEqual(nics[0].networkLabel, 'network1')

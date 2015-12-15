@@ -19,7 +19,7 @@ def run(pvService, cloudshellConnectData):
     cloudshellConnectData:  dictionary with cloudshell connection data
     """
 
-    csRetrieverService = cloudshellDataRetrieverService()
+    csRetrieverService = CloudshellDataRetrieverService()
 
     dev_helpers.attach_to_cloudshell_as(cloudshellConnectData["user"], 
                                         cloudshellConnectData["password"], 

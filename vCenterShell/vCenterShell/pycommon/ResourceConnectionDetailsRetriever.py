@@ -1,7 +1,8 @@
 import sys
 import os.path
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
-from models.VCenterConnectionDetails import *
 
 
 class ResourceConnectionDetailsRetriever:
@@ -10,11 +11,13 @@ class ResourceConnectionDetailsRetriever:
         self.csRetrieverService = cs_retriever_service
 
     def get_connection_details(self, resource_name):
-
-        reservation_id = helpers.get_reservation_context_details().id
+        """
+        :rtype VCenterConnectionDetails:
+        """
         session = helpers.get_api_session()
         vCenter_details = session.GetResourceDetails(resource_name)
-    
+
+        # get vCenter connection details from vCenter resource
         vCenterConn = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
 
         return VCenterConnectionDetails(vCenterConn["vCenter_url"], vCenterConn["user"], vCenterConn["password"])
