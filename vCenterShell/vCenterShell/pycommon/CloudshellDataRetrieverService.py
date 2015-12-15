@@ -1,16 +1,16 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
-from vCenterShell.models.vCenterTemplateModel import *
-from vCenterShell.models.vmClusterModel import *
+from vCenterShell.models.VCenterTemplateModel import *
+from vCenterShell.models.VMClusterModel import *
 
 
-class cloudshellDataRetrieverService:
+class CloudshellDataRetrieverService:
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
 
         template_att = resource_attributes.attributes["vCenter Template"]
         template_components = template_att.split("/")
 
-        return vCenterTemplateModel(
+        return VCenterTemplateModel(
                 vCenter_resource_name=template_components[0],
                 vm_folder=template_components[1:-1][0],
                 template_name=template_components[-1])
@@ -31,7 +31,7 @@ class cloudshellDataRetrieverService:
         if attribute is empty than return None as values
         :rtype VMClusterModel:
         """
-        result = vmClusterModel(None, None)
+        result = VMClusterModel(None, None)
 
         storage_att = resource_attributes.attributes["VM Cluster"]
         if storage_att:
