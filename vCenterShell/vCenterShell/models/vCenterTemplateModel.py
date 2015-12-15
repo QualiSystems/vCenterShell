@@ -1,4 +1,4 @@
-﻿class VCenterTemplateModel(object):
+﻿class vCenterTemplateModel(object):
 
     def __init__(self, vCenter_resource_name, vm_folder,  template_name):
         self.vCenter_resource_name = vCenter_resource_name
