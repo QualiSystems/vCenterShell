@@ -5,7 +5,7 @@ from vCenterShell.pycommon.pyVmomiService import *
 from vCenterShell.commands.DeployFromTemplateCommand import *
 from vCenterShell.commands.DestroyVirtualMachineCommand import *
 
-class CommandExecuterService(object):
+class CommandExecuterService12(object):
     """ main class that publishes all available commands """
 
     def __init__(self):

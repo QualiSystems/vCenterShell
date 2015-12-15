@@ -1,11 +1,11 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 
-from vCenterShell.commands.BaseCommand1 import BaseCommand1
+from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.models.VirtualNicModel import VirtualNicModel
 
 
-class NetworkAdaptersRetrieverCommand(BaseCommand1):
+class NetworkAdaptersRetrieverCommand(BaseCommand):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         self.pvService = pv_service
         self.csRetrieverService = cs_retriever_service

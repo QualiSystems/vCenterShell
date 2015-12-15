@@ -1,7 +1,7 @@
 ﻿from abc import ABCMeta, abstractmethod
 
 
-class BaseCommand1(object):
+class BaseCommand(object):
     """base command"""
 
     __metaclass__ = ABCMeta

@@ -1,12 +1,12 @@
 ﻿import os
 import sys
 import commands
-from commands.CommandExecuterService import *
+from commands.CommandExecuterService12 import *
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 def main():
 
-    ces = CommandExecuterService()
+    ces = CommandExecuterService12()
     commandToRun = os.environ.get('COMMAND')
     
     # for debug

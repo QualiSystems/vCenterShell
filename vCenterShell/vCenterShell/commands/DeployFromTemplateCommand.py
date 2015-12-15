@@ -2,11 +2,11 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 from qualipy.api.cloudshell_api import *
-from vCenterShell.commands.BaseCommand1 import BaseCommand1
+from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
 
 
-class DeployFromTemplateCommand(BaseCommand1):
+class DeployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
 
 
