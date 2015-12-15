@@ -5,11 +5,10 @@ from mock import Mock, create_autospec
 from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 from vCenterShell.commands.deployFromTemplateCommand import *
 from pyVmomi import vim
-
 from vCenterShell.models.vCenterTemplateModel import vCenterTemplateModel
-from vCenterShell.models.VMClusterModel import VMClusterModel
-
+from vCenterShell.models.vmClusterModel import vmClusterModel
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
+
 
 class test_deployFromTemplateCommand(unittest.TestCase):
 
@@ -28,7 +27,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         csRetrieverService = Mock()
         csRetrieverService.getVCenterTemplateAttributeData = Mock(return_value=vCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
         csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
-        csRetrieverService.getVMClusterAttributeData = Mock(return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
+        csRetrieverService.getVMClusterAttributeData = Mock(return_value=vmClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
         csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
         csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter","user":"user1","password":"pass1"})
 

@@ -1,4 +1,4 @@
-﻿class VMClusterModel(object):
+﻿class vmClusterModel(object):
 
     def __init__(self, cluster_name, resource_pool):
         self.cluster_name = resource_pool

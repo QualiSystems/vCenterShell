@@ -1,9 +1,9 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
 from vCenterShell.models.vCenterTemplateModel import *
-from vCenterShell.models.VMClusterModel import *
+from vCenterShell.models.vmClusterModel import *
+
 
 class cloudshellDataRetrieverService:
-
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
 
@@ -11,9 +11,9 @@ class cloudshellDataRetrieverService:
         template_components = template_att.split("/")
 
         return vCenterTemplateModel(
-            vCenter_resource_name=template_components[0],
-            vm_folder=template_components[1:-1][0],
-            template_name=template_components[-1])
+                vCenter_resource_name=template_components[0],
+                vm_folder=template_components[1:-1][0],
+                template_name=template_components[-1])
 
     def getPowerStateAttributeData(self, resource_attributes):
         """
@@ -31,7 +31,7 @@ class cloudshellDataRetrieverService:
         if attribute is empty than return None as values
         :rtype VMClusterModel:
         """
-        result = VMClusterModel(None, None)
+        result = vmClusterModel(None, None)
 
         storage_att = resource_attributes.attributes["VM Cluster"]
         if storage_att:
@@ -39,7 +39,7 @@ class cloudshellDataRetrieverService:
             if len(storage_att_components) == 2:
                 result.cluster_name = storage_att_components[0]
                 result.resource_pool = storage_att_components[1]
-        
+
         return result
 
     def getVMStorageAttributeData(self, resource_attributes):
@@ -58,12 +58,13 @@ class cloudshellDataRetrieverService:
         :param session:                    the cloushell api session, its needed in order to decrypt the password
         """
         user = first_or_default(vCenter_resource_details.ResourceAttributes, lambda att: att.Name == "User").Value
-        encryptedPass = first_or_default(vCenter_resource_details.ResourceAttributes, lambda att: att.Name == "Password").Value
+        encryptedPass = first_or_default(vCenter_resource_details.ResourceAttributes,
+                                         lambda att: att.Name == "Password").Value
         vcenter_url = vCenter_resource_details.Address
-        password = session.DecryptPassword(encryptedPass).Value    
+        password = session.DecryptPassword(encryptedPass).Value
         return {
-            "user":user,
-            "password":password,
+            "user": user,
+            "password": password,
             "vCenter_url": vcenter_url
         }
 
@@ -74,10 +75,10 @@ class cloudshellDataRetrieverService:
         path_components = path_att.split("/")
 
         vm_folder = ""
-        if(len(path_components) > 1):
+        if (len(path_components) > 1):
             vm_folder = "/".join(path_components[1:])
 
         return {
-            "vCenter_resource_name" : path_components[0],
-            "vm_folder" : vm_folder
+            "vCenter_resource_name": path_components[0],
+            "vm_folder": vm_folder
         }
