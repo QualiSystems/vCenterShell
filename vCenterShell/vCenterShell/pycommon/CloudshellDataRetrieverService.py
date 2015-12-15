@@ -3,7 +3,7 @@ from vCenterShell.models.VCenterTemplateModel import *
 from vCenterShell.models.VMClusterModel import *
 
 
-class CloudshellDataRetrieverService12:
+class CloudshellDataRetrieverService:
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
 

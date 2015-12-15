@@ -3,13 +3,13 @@ import mock
 from mock import Mock, MagicMock, create_autospec
 import sys
 import os.path
-from vCenterShell.pycommon.CloudshellDataRetrieverService12 import CloudshellDataRetrieverService12
+from vCenterShell.pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 class test_cloudshellDataRetrieverService(unittest.TestCase):
     def setUp(self):
-        self.csRetrieverService = CloudshellDataRetrieverService12()
+        self.csRetrieverService = CloudshellDataRetrieverService()
 
     def tearDown(self):
         pass

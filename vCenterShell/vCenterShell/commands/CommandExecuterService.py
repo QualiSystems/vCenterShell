@@ -15,7 +15,7 @@ class CommandExecuterService(object):
         self.pyVmomiService = pyVmomiService(SmartConnect, Disconnect)
 
     def deploy(self):
-        csDataRetrieverService = CloudshellDataRetrieverService12()
+        csDataRetrieverService = CloudshellDataRetrieverService()
         DeployFromTemplateCommand(self.pyVmomiService, csDataRetrieverService, ResourceConnectionDetailsRetriever(csDataRetrieverService)) \
             .execute()
 
