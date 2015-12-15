@@ -3,8 +3,9 @@ import mock
 from mock import Mock, MagicMock, create_autospec
 import sys
 import os.path
+from vCenterShell.pycommon.cloudshellDataRetrieverService import cloudshellDataRetrieverService
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
-from pycommon.cloudshellDataRetrieverService import *
 
 class test_cloudshellDataRetrieverService(unittest.TestCase):
     def setUp(self):
@@ -19,12 +20,12 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getVCenterTemplateAttributeData(resource_attributes);
+        result = self.csRetrieverService.getVCenterTemplateAttributeData(resource_attributes)
 
         # Assert
-        self.assertEquals(result["vCenter_resource_name"], "vCenter")
-        self.assertEqual(result["vm_folder"], "Alex")
-        self.assertEqual(result["template_name"], "test")
+        self.assertEquals(result.vCenter_resource_name, "vCenter")
+        self.assertEqual(result.vm_folder, "Alex")
+        self.assertEqual(result.template_name, "test")
 
     def test_getPowerStateAttributeData_Value_Is_True(self):
         # Arrange
@@ -32,7 +33,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getPowerStateAttributeData(resource_attributes);
+        result = self.csRetrieverService.getPowerStateAttributeData(resource_attributes)
 
         # Assert
         self.assertEquals(result, True)
@@ -43,7 +44,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getPowerStateAttributeData(resource_attributes);
+        result = self.csRetrieverService.getPowerStateAttributeData(resource_attributes)
 
         # Assert
         self.assertEquals(result, False)
@@ -54,11 +55,11 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes);
+        result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes)
 
         # Assert
-        self.assertEquals(result["cluster_name"], "cluster1")
-        self.assertEquals(result["resource_pool"], "resourcepool1")
+        self.assertEquals(result.cluster_name, "cluster1")
+        self.assertEquals(result.resource_pool, "resourcepool1")
 
     def test_getVMClusterAttributeData_Empty_Attribute(self):
         # Arrange
@@ -66,11 +67,11 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes);
+        result = self.csRetrieverService.getVMClusterAttributeData(resource_attributes)
 
         # Assert
-        self.assertEquals(result["cluster_name"], None)
-        self.assertEquals(result["resource_pool"], None)
+        self.assertEquals(result.cluster_name, None)
+        self.assertEquals(result.resource_pool, None)
 
     
     def test_getVMStorageAttributeData(self):
@@ -79,7 +80,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        datastore_name = self.csRetrieverService.getVMStorageAttributeData(resource_attributes);
+        datastore_name = self.csRetrieverService.getVMStorageAttributeData(resource_attributes)
 
         # Assert
         self.assertEquals(datastore_name, "my storage")
@@ -90,7 +91,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        datastore_name = self.csRetrieverService.getVMStorageAttributeData(resource_attributes);
+        datastore_name = self.csRetrieverService.getVMStorageAttributeData(resource_attributes)
 
         # Arrange
         self.assertEquals(datastore_name, None)
@@ -105,7 +106,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         vCenter_resource_details = Mock(ResourceAttributes=attributes, Address="vCenterIP")
 
          # Act
-        connDetails = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_resource_details);
+        connDetails = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_resource_details)
 
         # Assert
         self.assertEquals(connDetails["user"], "user1")
@@ -118,7 +119,7 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         resource_attributes = Mock(attributes=attributes)
 
         # Act
-        result = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_attributes);
+        result = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_attributes)
 
         # Assert
         self.assertEquals(result["vCenter_resource_name"], "vCenter")

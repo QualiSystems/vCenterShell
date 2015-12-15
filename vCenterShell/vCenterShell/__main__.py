@@ -1,14 +1,14 @@
 ﻿import os
 import sys
 import commands
-from commands.commandExecuterService import *
+from commands.CommandExecuterService import *
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 def main():
 
-    ces = commandExecuterService()
+    ces = CommandExecuterService()
     commandToRun = os.environ.get('COMMAND')
-
+    
     # for debug
     if len(sys.argv) > 2 and sys.argv[1] == "debug":
         cloudshellConnectData = { "user" : "admin", "password" : "admin", "domain" : "Global", "reservationId" : "54636c17-e139-47ba-ac5c-59b6ff6783e7" }

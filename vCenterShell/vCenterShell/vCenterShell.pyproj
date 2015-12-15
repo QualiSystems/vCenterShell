@@ -12,7 +12,7 @@
     <Name>vCenterShell</Name>
     <RootNamespace>vCenterShell</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{3fb307a9-ac85-472d-9866-903a44abdc38}</InterpreterId>
+    <InterpreterId>{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <CommandLineArguments>debug deploy</CommandLineArguments>
@@ -39,11 +39,25 @@
     <Compile Include="demo\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vmClusterModel.py">
+    	<SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\vCenterConnectionDetails.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\vCenterTemplateModel.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="models\__init__.py" />
     <Compile Include="pycommon\cloudshellDataRetrieverService.py" />
     <Compile Include="pycommon\common_name_utils.py" />
+    <Compile Include="pycommon\resourceConnectionDetailsRetriever.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="pycommon\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="models\vNic.py" />
     <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -53,18 +67,19 @@
     <Compile Include="pycommon\common_collection_utils.py" />
     <Compile Include="pycommon\pyVmomiService.py" />
     <Compile Include="demo\basicFlowDemo.py" />
-    <Compile Include="dvSwitchDataRetriever.py">
+    <Compile Include="commands\dvSwitchDataRetriever.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="vCenterShell.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="commands\" />
+    <Folder Include="models\" />
     <Folder Include="pycommon\" />
     <Folder Include="demo\" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="{3fb307a9-ac85-472d-9866-903a44abdc38}\2.7" />
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+    <InterpreterReference Include="{77fdede0-f20b-4544-a2ce-d2316a1b4e8d}\2.7" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

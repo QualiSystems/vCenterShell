@@ -1,17 +1,16 @@
-﻿from pyVim.connect import SmartConnect, Disconnect
-from pyVmomi import vim
-import unittest
-import mock
-from mock import Mock, MagicMock, create_autospec, mock_open, patch
-
+﻿import os.path
 import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
+import unittest
 
-from pycommon.pyVmomiService import pyVmomiService
+from mock import Mock, create_autospec
+from pyVmomi import vim
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
+
+from vCenterShell.pycommon.pyVmomiService import pyVmomiService
 
 
-class test_common_pyvmomi(unittest.TestCase):
+class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
         si = create_autospec(spec=vim.ServiceInstance)
         si.RetrieveContent = Mock()
