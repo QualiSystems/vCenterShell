@@ -5,7 +5,7 @@ from vCenterShell.pycommon.pyVmomiService import *
 from vCenterShell.commands.DeployFromTemplateCommand import *
 from vCenterShell.commands.DestroyVirtualMachineCommand import *
 
-class CommandExecuterService12(object):
+class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
     def __init__(self):
@@ -15,7 +15,7 @@ class CommandExecuterService12(object):
         self.pyVmomiService = pyVmomiService(SmartConnect, Disconnect)
 
     def deploy(self):
-        csDataRetrieverService = cloudshellDataRetrieverService()
+        csDataRetrieverService = CloudshellDataRetrieverService12()
         DeployFromTemplateCommand(self.pyVmomiService, csDataRetrieverService, ResourceConnectionDetailsRetriever(csDataRetrieverService)) \
             .execute()
 
