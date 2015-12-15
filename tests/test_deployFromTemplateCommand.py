@@ -1,16 +1,15 @@
-﻿import unittest
-from mock import Mock, MagicMock, create_autospec, mock_open, patch
+﻿import os.path
 import sys
-import os.path
-
+import unittest
+from mock import Mock, create_autospec
 from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
-from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
-from vCenterShell.models.VMClusterModel import VMClusterModel
-from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 from vCenterShell.commands.DeployFromTemplateCommand import *
 from pyVmomi import vim
+
+from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
+from vCenterShell.models.VMClusterModel import VMClusterModel
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 class test_deployFromTemplateCommand(unittest.TestCase):
 

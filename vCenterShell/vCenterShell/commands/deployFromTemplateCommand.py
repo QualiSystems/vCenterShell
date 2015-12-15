@@ -1,15 +1,10 @@
-﻿from pyVmomi import vim
-import requests
-import atexit
-from qualipy.api.cloudshell_api import *
+﻿from timeit import default_timer as timer
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import time
-import sys
-import pycommon
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+from pyVmomi import vim
+from qualipy.api.cloudshell_api import *
 from vCenterShell.commands.BaseCommand import BaseCommand
-from timeit import default_timer as timer
+from vCenterShell.pycommon.common_name_utils import generate_unique_name
+
 
 class DeployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
