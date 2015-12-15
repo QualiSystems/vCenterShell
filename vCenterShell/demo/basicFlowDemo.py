@@ -6,9 +6,9 @@ import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 import time
 import sys
-import pycommon
-from pycommon.common_name_utils import generate_unique_name
-from pycommon.cloudshellDataRetrieverService import *
+import vCenterShell.pycommon
+from vCenterShell.pycommon.common_name_utils import generate_unique_name
+from vCenterShell.pycommon.CloudshellDataRetrieverService import *
 
 
 def run(pvService, cloudshellConnectData):
