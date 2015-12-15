@@ -1,6 +1,6 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
 from vCenterShell.models.vCenterTemplateModel import *
-from vCenterShell.models.vmClusterModel import *
+from vCenterShell.models.VMClusterModel12 import *
 
 
 class cloudshellDataRetrieverService:
@@ -31,7 +31,7 @@ class cloudshellDataRetrieverService:
         if attribute is empty than return None as values
         :rtype VMClusterModel:
         """
-        result = vmClusterModel(None, None)
+        result = VMClusterModel12(None, None)
 
         storage_att = resource_attributes.attributes["VM Cluster"]
         if storage_att:
