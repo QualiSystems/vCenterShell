@@ -2,7 +2,7 @@
 
 from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 from vCenterShell.pycommon.pyVmomiService import *
-from vCenterShell.commands.DeployFromTemplateCommand1 import *
+from vCenterShell.commands.DeployFromTemplateCommand import *
 from vCenterShell.commands.DestroyVirtualMachineCommand import *
 
 class CommandExecuterService(object):
@@ -16,7 +16,7 @@ class CommandExecuterService(object):
 
     def deploy(self):
         csDataRetrieverService = cloudshellDataRetrieverService()
-        DeployFromTemplateCommand1(self.pyVmomiService, csDataRetrieverService, ResourceConnectionDetailsRetriever(csDataRetrieverService)) \
+        DeployFromTemplateCommand(self.pyVmomiService, csDataRetrieverService, ResourceConnectionDetailsRetriever(csDataRetrieverService)) \
             .execute()
 
     def destroy(self):        

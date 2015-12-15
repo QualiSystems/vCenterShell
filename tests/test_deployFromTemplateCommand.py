@@ -3,7 +3,7 @@ import sys
 import unittest
 from mock import Mock, create_autospec
 from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
-from vCenterShell.commands.DeployFromTemplateCommand1 import *
+from vCenterShell.commands.DeployFromTemplateCommand import *
 from pyVmomi import vim
 from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
 from vCenterShell.models.VMClusterModel import VMClusterModel
@@ -50,7 +50,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         resource_connection_details_retriever = Mock()
         resource_connection_details_retriever.get_connection_details = Mock(return_value=connection_details)
 
-        command = DeployFromTemplateCommand1(pvService, csRetrieverService, resource_connection_details_retriever)
+        command = DeployFromTemplateCommand(pvService, csRetrieverService, resource_connection_details_retriever)
         command.execute()
 
         self.assertTrue(pvService.clone_vm.called)

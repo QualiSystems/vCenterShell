@@ -11,7 +11,7 @@ from vCenterShell.pycommon.common_name_utils import generate_unique_name
 from vCenterShell.pycommon.cloudshellDataRetrieverService import *
 
 
-class DestroyVirtualMachineCommand(object):
+class DestroyVirtualMachineCommand12(object):
     """ Command to Destroy a VM """
 
     def __init__(self, pvService):
