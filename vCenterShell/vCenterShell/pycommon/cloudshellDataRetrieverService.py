@@ -1,5 +1,5 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
-from vCenterShell.models.vCenterTemplateModel import *
+from vCenterShell.models.VCenterTemplateModel import *
 from vCenterShell.models.VMClusterModel import *
 
 
@@ -10,7 +10,7 @@ class cloudshellDataRetrieverService:
         template_att = resource_attributes.attributes["vCenter Template"]
         template_components = template_att.split("/")
 
-        return vCenterTemplateModel(
+        return VCenterTemplateModel(
                 vCenter_resource_name=template_components[0],
                 vm_folder=template_components[1:-1][0],
                 template_name=template_components[-1])

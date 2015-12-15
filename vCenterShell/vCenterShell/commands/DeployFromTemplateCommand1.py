@@ -6,7 +6,7 @@ from vCenterShell.commands.baseCommand import baseCommand
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
 
 
-class deployFromTemplateCommand(baseCommand):
+class DeployFromTemplateCommand1(baseCommand):
     """ Command to Create a VM from a template """
 
 
