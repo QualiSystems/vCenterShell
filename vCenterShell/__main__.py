@@ -1,9 +1,7 @@
-﻿import os
-import sys
-import commands
-from Bootstrapper import Bootstrapper
+﻿import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
+
 from commands.CommandExecuterService import *
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
+from pycommon.Bootstrapper import Bootstrapper
 
 
 def main():
