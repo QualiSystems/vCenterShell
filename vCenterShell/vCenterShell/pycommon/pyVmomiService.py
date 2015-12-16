@@ -1,7 +1,7 @@
 ﻿import requests
 import time
 
-from datetime import  datetime
+from datetime import datetime
 from pyVmomi import vim
 
 
@@ -237,54 +237,106 @@ class pyVmomiService:
                 return None
             time.sleep(1)
 
-    def clone_vm(self, content, si, template, vm_name, datacenter_name, vm_folder, datastore_name, cluster_name, resource_pool, power_on):
+    class CloneVmParameters:
         """
-        Clone a VM from a template/VM, datacenter_name, vm_folder, datastore_name
-        cluster_name, resource_pool, and power_on are all optional.
+        This is clone_vm method params object
         """
+        def __init__(self,
+                     si,
+                     template_name,
+                     vm_name,
+                     vm_folder,
+                     datastore_name=None,
+                     cluster_name=None,
+                     resource_pool=None,
+                     power_on=True):
+            """
+            Constructor of CloneVmParameters
+            :param si:              pyvmomi 'ServiceInstance'
+            :param template_name:   str: the name of the template/vm to clone
+            :param vm_name:         str: the name that will be given to the cloned vm
+            :param vm_folder:       str: the path to the location of the template/vm to clone
+            :param datastore_name:  str: the name of the datastore
+            :param cluster_name:    str: the name of the dcluster
+            :param resource_pool:   str: the name of the resource pool
+            :param power_on:        bool: turn on the cloned vm
+            """
+            self.si = si
+            self.template_name = template_name
+            self.vm_name = vm_name
+            self.vm_folder = vm_folder
+            self.datastore_name = datastore_name
+            self.cluster_name = cluster_name
+            self.resource_pool = resource_pool
+            self.power_on = power_on
 
-        # if none git the first one
-        datacenter = self.get_obj(content, [vim.Datacenter], datacenter_name)
-        print datacenter.name
+    class CloneVmResult:
+        """
+        Clone vm result object, will contain the cloned vm or error message
+        """
+        def __init__(self, vm=None, error=None):
+            """
+            Constructor receives the cloned vm or the error message
 
-        if vm_folder:
-            destfolder = self.get_obj(content, [vim.Folder], vm_folder)
+            :param vm:    cloned vm
+            :param error: will contain the error message if there is one
+            """
+            self.vm = vm
+            self.error = error
+
+    def clone_vm(self, clone_params):
+        """
+        Clone a VM from a template/VM and return the vm oject or throws argument is not valid
+
+        :param clone_params: CloneVmParameters =
+        """
+        result = self.CloneVmResult()
+
+        if not isinstance(clone_params.si, vim.ServiceInstance):
+            result.error = 'si must be init as ServiceInstance'
+            return result
+
+        if clone_params.template_name is None:
+            result.error = 'template_name param cannot be None'
+            return result
+
+        if clone_params.vm_folder is None:
+            result.error = 'vm_folder param cannot be None'
+            return result
+
+        managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
+        if type(managed_object) is vim.Datacenter:
+            dest_folder = managed_object.vmFolder
+
+        template = self.find_vm_by_name(clone_params.si, clone_params.vm_folder, clone_params.template_name)
+
+        if clone_params.datastore_name is None:
+            datastore = template.datastore[0]
         else:
-            destfolder = datacenter.vmFolder
+            datastore = self.get_obj(clone_params.si.content, [vim.Datastore], clone_params.datastore_name)
 
-        print vm_folder
-
-        if datastore_name:
-            print datastore_name
-            datastore = self.get_obj(content, [vim.Datastore], datastore_name)
+        if clone_params.resource_pool:
+            resource_pool = self.get_obj(clone_params.si.content, [vim.ResourcePool], clone_params.resource_pool)
         else:
-            print "store:" + template.datastore[0].info.name
-            datastore = self.get_obj(
-                content, [vim.Datastore], template.datastore[0].info.name)
-
-        # if None, get the first one
-        cluster = self.get_obj(content, [vim.ClusterComputeResource], cluster_name)
-
-        if resource_pool:
-            resource_pool = self.get_obj(content, [vim.ResourcePool], resource_pool)
-        else:
+            '# if None, get the first one'
+            cluster = self.get_obj(clone_params.si.content, [vim.ClusterComputeResource], clone_params.cluster_name)
             resource_pool = cluster.resourcePool
 
-        # set relospec
-        relospec = vim.vm.RelocateSpec()
-        relospec.datastore = datastore
-        relospec.pool = resource_pool
+        '# set relo_spec'
+        relo_spec = vim.vm.RelocateSpec()
+        relo_spec.datastore = datastore
+        relo_spec.pool = resource_pool
 
-        clonespec = vim.vm.CloneSpec()
-        clonespec.location = relospec
-        clonespec.powerOn = power_on
+        clone_spec = vim.vm.CloneSpec()
+        clone_spec.location = relo_spec
+        clone_spec.powerOn = clone_params.power_on
 
         print "cloning VM..."
 
-        task = template.Clone(folder=destfolder, name=vm_name, spec=clonespec)
+        task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
         return self.wait_for_task(task)
 
-    def destroy_vm(self, content, si, vm):
+    def destroy_vm(self, vm):
         """ 
         destroy the given vm  
         :param vm: virutal machine pyvmomi object
@@ -301,14 +353,32 @@ class pyVmomiService:
         task = vm.Destroy_Task()
         return self.wait_for_task(task)
 
-    def destroy_vm_by_name(self, content, si, vm_name):
+    def destroy_vm_by_name(self, si, vm_name, vm_path):
         """ 
         destroy the given vm  
-        :param str vm: virutal machine name to destroy
+        :param si:      pyvmomi 'ServiceInstance'
+        :param vm_name: str name of the vm to destroyed
+        :param vm_path: str path to the vm that will be destroyed
         """
+        if vm_name is not None:
+            vm = self.find_vm_by_name(si, vm_path, vm_name)
 
-        vm = self.get_obj(content, [vim.VirtualMachine], vm_name)
         if vm is None:
-            raise ValueError("Could find Virtual Machine with name {0}".format(vm_name))
+            return 'vm not found'
 
-        return self.destroy_vm(content, si, vm)
+        return self.destroy_vm(vm)
+
+    def destroy_vm_by_uuid(self, si, vm_uuid, vm_path):
+        """
+        destroy the given vm
+        :param si:      pyvmomi 'ServiceInstance'
+        :param vm_uuid: str uuid of the vm to destroyed
+        :param vm_path: str path to the vm that will be destroyed
+        """
+        if vm_uuid is not None:
+            vm = self.find_by_uuid(si, vm_path, vm_uuid)
+
+        if vm is None:
+            return 'vm not found'
+
+        return self.destroy_vm(vm)
