@@ -7,11 +7,12 @@ import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 import time
 import sys
 import vCenterShell.pycommon
+from commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
 from vCenterShell.pycommon.CloudshellDataRetrieverService import *
 
 
-class DestroyVirtualMachineCommand(object):
+class DestroyVirtualMachineCommand(BaseCommand):
     """ Command to Destroy a VM """
 
     def __init__(self, pvService):
