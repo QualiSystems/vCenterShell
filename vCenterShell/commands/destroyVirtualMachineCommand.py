@@ -9,9 +9,10 @@ import sys
 import vCenterShell.pycommon
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
 from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+from vCenterShell.commands.BaseCommand import BaseCommand
 
 
-class DestroyVirtualMachineCommand(object):
+class DestroyVirtualMachineCommand(BaseCommand):
     """ Command to Destroy a VM """
 
     def __init__(self, pvService):
