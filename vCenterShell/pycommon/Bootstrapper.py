@@ -1,9 +1,9 @@
 from pyVim.connect import SmartConnect, Disconnect
 from vCenterShell.pycommon.pyVmomiService import pyVmomiService
-from commands.CommandExecuterService import CommandExecuterService
-from commands.NetworkAdaptersRetrieverCommand import NetworkAdaptersRetrieverCommand
-from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
-from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+from vCenterShell.commands.CommandExecuterService import CommandExecuterService
+from vCenterShell.commands.NetworkAdaptersRetrieverCommand import NetworkAdaptersRetrieverCommand
+from vCenterShell.pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
+from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 
 
 class Bootstrapper(object):
