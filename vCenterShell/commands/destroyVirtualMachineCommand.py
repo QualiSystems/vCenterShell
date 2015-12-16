@@ -40,7 +40,7 @@ class DestroyVirtualMachineCommand(object):
 
         # destroy the vm
         vm_name = resource_att.name
-        self.pvService.destroy_vm_by_name(content, si, vm_name)
+        self.pvService.destroy_vm_by_name(si, vm_name)
 
         # disconnect
         self.pvService.disconnect(si)

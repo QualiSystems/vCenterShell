@@ -2,8 +2,10 @@
 import sys
 import unittest
 
-from mock import Mock, MagicMock, create_autospec
+from datetime import datetime
+from mock import Mock, MagicMock, create_autospec, patch
 from pyVmomi import vim
+from pyVim.connect import SmartConnect, Disconnect
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
@@ -24,6 +26,78 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
     def tearDown(self):
         pass
+
+    def integration_test_clone_vm_destory(self):
+        """
+        Checks whether clone_vm and destroy methods works
+        """
+        '#arrange'
+        pv_service = pyVmomiService(SmartConnect, Disconnect)
+        si = pv_service.connect("192.168.30.101", "root", "vmware")
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='DC0_C0_RP0_VM20',
+                                              vm_name='my_clone',
+                                              vm_folder='DC0')
+        '#act'
+        now = datetime.now()
+        vm = pv_service.clone_vm(params)
+        print 'clone took: %s' % (str(datetime.now() - now))
+
+        '#assert'
+        self.assertTrue(type(vm), vim.VirtualMachine)
+
+        '#tear down'
+        now = datetime.now()
+        destroyed = pv_service.destroy_vm(vm)
+        print 'destroy took: %s' % (str(datetime.now() - now))
+        self.assertIsNone(destroyed)
+
+    def test_destroy_vm_by_name(self):
+        """
+        Checks whether the vm found and call to be destroy
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+        si.content.searchIndex = Mock()
+
+        pv_service.find_vm_by_name = Mock(return_value=Mock(name='vm'))
+        pv_service.destroy_vm = Mock(return_value=True)
+
+        '#act'
+        result = pv_service.destroy_vm_by_name(si, 'vm_name:name', 'fake/path')
+
+        '#assert'
+        self.assertTrue(result)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.destroy_vm.called)
+
+    def test_destroy_vm_by_uuid(self):
+        """
+        Checks whether the vm found and call to be destroy
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+        si.content.searchIndex = Mock()
+
+        pv_service.find_by_uuid = Mock(return_value=Mock(name='vm'))
+        pv_service.destroy_vm = Mock(return_value=True)
+
+        '#act'
+        result = pv_service.destroy_vm_by_uuid(si, 'thisuni-vers-ally-uniq-ueidentifier', 'fake/path')
+
+        '#assert'
+        self.assertTrue(result)
+        self.assertTrue(pv_service.find_by_uuid.called)
+        self.assertTrue(pv_service.destroy_vm.called)
 
     def test_get_folder_path_not_found(self):
         """
