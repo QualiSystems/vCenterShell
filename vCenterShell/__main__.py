@@ -14,7 +14,7 @@ def main():
         cloudshellConnectData = { "user" : "admin", "password" : "admin", "domain" : "Global", "reservationId" : "17b9c357-bfe8-46b9-9828-47b3e1cacc4f" }
         attachAndGetResourceContext(cloudshellConnectData)    
         commandToRun = sys.argv[2]
-        os.environ["resourceContext".upper()] = '{"name":"VCenter Template Request", "address":"Service", "model":"VCenter Template Request", "family":"VM Request", "description":"", "fullname":"", "attributes":{"vCenter Template":"vCenter/Alex/test","VM Power State":"True","VM Storage":"eric ds cluster", "VM Cluster":"QualiSB Cluster/LiverPool"}}'
+        os.environ["resourceContext".upper()] = '{"name":"VCenter Template Request", "address":"Service", "model":"VCenter Template Request", "family":"VM Request", "description":"", "fullname":"", "attributes":{"vCenter Template":"vCenter/QualiSB/Alex/test","VM Power State":"True","VM Storage":"eric ds cluster", "VM Cluster":"QualiSB Cluster/LiverPool"}}'
     
     # execute the command
     getattr(ces, commandToRun)()

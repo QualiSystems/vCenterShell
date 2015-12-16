@@ -1,6 +1,4 @@
-﻿from timeit import default_timer as timer
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from pyVmomi import vim
+﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
 from commands.BaseCommand import BaseCommand
 from pycommon.common_collection_utils import first_or_default
@@ -24,32 +22,32 @@ class DeployFromTemplateCommand(BaseCommand):
                                      data_holder.connection_details.username,
                                      data_holder.connection_details.password,
                                      data_holder.connection_details.port)
-        content = si.RetrieveContent()
+        #content = si.RetrieveContent()
 
-        start = timer()
-        template = self.pv_service.get_obj(content, [vim.VirtualMachine], data_holder.template_model.template_name)
-        end = timer()
-        print "Template search took {0} seconds".format(end - start)
-
-        if not template:
-            raise ValueError("template with name '{0}' not found".format(data_holder.template_model.template_name))
+        #start = timer()
+        #template = self.pv_service.get_obj(content, [vim.VirtualMachine], data_holder.template_model.template_name)
+        #end = timer()
+        #print "Template search took {0} seconds".format(end - start)
+        #if not template:
+        #    raise ValueError("template with name '{0}' not found".format(data_holder.template_model.template_name))
 
         # generate unique name
         vm_name = generate_unique_name(data_holder.template_model.template_name)
 
-        vm = self.pv_service.clone_vm(
-            content=content,
-            si=si,
-            template=template,
-            vm_name=vm_name,
-            datacenter_name=None,
-            vm_folder=data_holder.template_model.vm_folder,
-            datastore_name=data_holder.datastore_name,
-            cluster_name=data_holder.vm_cluster_model.cluster_name,
-            resource_pool=data_holder.vm_cluster_model.resource_pool,
-            power_on=data_holder.power_on)
+        params = self.pv_service.CloneVmParameters(si=si,
+                                                   template_name=data_holder.template_model.template_name,
+                                                   vm_name=vm_name,
+                                                   vm_folder=data_holder.template_model.vm_folder,
+                                                   datastore_name=data_holder.datastore_name,
+                                                   cluster_name=data_holder.vm_cluster_model.cluster_name,
+                                                   resource_pool=data_holder.vm_cluster_model.resource_pool,
+                                                   power_on=data_holder.power_on)
 
-        result = DeployResult(vm_name, vm.summary.config.instanceUuid)
+        clone_vm_result = self.pv_service.clone_vm(params)
+        if clone_vm_result.error:
+            raise ValueError(clone_vm_result.error)
+
+        result = DeployResult(vm_name, clone_vm_result.vm.summary.config.instanceUuid)
 
         # disconnect
         self.pv_service.disconnect(si)

@@ -3,7 +3,7 @@ import time
 
 from datetime import datetime
 from pyVmomi import vim
-
+from timeit import default_timer as timer
 
 class pyVmomiService:
 
@@ -156,7 +156,7 @@ class pyVmomiService:
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         """
 
-        now = datetime.now()
+        start = timer()
 
         search_index = si.content.searchIndex
         sub_folder = si.content.rootFolder
@@ -195,7 +195,9 @@ class pyVmomiService:
                 sub_folder = child
                 child = None
 
-        print 'get_folder took: %s' % (str(datetime.now() - now))
+        end = timer()
+        print 'get_folder "{0}" took: {1} seconds'.format(path, (str(end - start)))
+
         return sub_folder
 
     def get_obj(self, content, vimtype, name):
@@ -307,6 +309,12 @@ class pyVmomiService:
         managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
         if type(managed_object) is vim.Datacenter:
             dest_folder = managed_object.vmFolder
+        elif type(managed_object) is vim.Folder:
+            dest_folder = managed_object
+        else:
+            result.error = 'Failed to find folder: {0}'.format(clone_params.vm_folder)
+            return result
+
 
         template = self.find_vm_by_name(clone_params.si, clone_params.vm_folder, clone_params.template_name)
 
@@ -334,7 +342,9 @@ class pyVmomiService:
         print "cloning VM..."
 
         task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-        return self.wait_for_task(task)
+        vm = self.wait_for_task(task)
+        result.vm = vm
+        return result
 
     def destroy_vm(self, vm):
         """ 

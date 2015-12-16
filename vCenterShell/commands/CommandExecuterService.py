@@ -1,6 +1,6 @@
 ﻿from pyVim.connect import SmartConnect, Disconnect
 from commands.DeployFromTemplateCommand import *
-from commands.destroyVirtualMachineCommand import *
+from commands.DestroyVirtualMachineCommand import *
 from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 from pycommon.pyVmomiService import *
 
