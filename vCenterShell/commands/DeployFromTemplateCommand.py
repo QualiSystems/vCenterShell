@@ -69,8 +69,8 @@ class DeployFromTemplateCommand(BaseCommand):
         datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
         print "Datastore: {0}".format(datastore_name)
 
-        connection_details = self.resource_connection_details_retriever.get_connection_details(
-                template_model.vCenter_resource_name)
+        connection_details = self.resource_connection_details_retriever.connection_details(
+            template_model.vCenter_resource_name)
         print "Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
                                                                         connection_details.username,
                                                                         connection_details.password,
