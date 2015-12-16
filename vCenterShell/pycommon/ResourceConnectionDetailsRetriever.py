@@ -1,6 +1,7 @@
 import sys
 import os.path
-from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
+from models.VCenterConnectionDetails import VCenterConnectionDetails
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

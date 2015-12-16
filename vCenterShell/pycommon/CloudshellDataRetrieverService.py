@@ -1,6 +1,6 @@
-﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
-from vCenterShell.models.VCenterTemplateModel import *
-from vCenterShell.models.VMClusterModel import *
+﻿from pycommon.common_collection_utils import first_or_default
+from models.VCenterTemplateModel import *
+from models.VMClusterModel import *
 
 
 class CloudshellDataRetrieverService:
