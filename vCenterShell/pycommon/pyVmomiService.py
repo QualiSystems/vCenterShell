@@ -374,7 +374,7 @@ class pyVmomiService:
             vm = self.find_vm_by_name(si, vm_path, vm_name)
 
         if vm is None:
-            return 'vm not found'
+            raise ValueError('vm not found')
 
         return self.destroy_vm(vm)
 

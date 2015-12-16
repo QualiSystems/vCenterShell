@@ -17,40 +17,35 @@ class DeployFromTemplateCommand(BaseCommand):
         self.resource_connection_details_retriever = resource_connection_details_retriever
 
     def deploy_from_template(self, data_holder):
-        # connect
-        si = self.pv_service.connect(data_holder.connection_details.host,
-                                     data_holder.connection_details.username,
-                                     data_holder.connection_details.password,
-                                     data_holder.connection_details.port)
-        #content = si.RetrieveContent()
+        si = None
+        try:
+            # connect
+            si = self.pv_service.connect(data_holder.connection_details.host,
+                                         data_holder.connection_details.username,
+                                         data_holder.connection_details.password,
+                                         data_holder.connection_details.port)
 
-        #start = timer()
-        #template = self.pv_service.get_obj(content, [vim.VirtualMachine], data_holder.template_model.template_name)
-        #end = timer()
-        #print "Template search took {0} seconds".format(end - start)
-        #if not template:
-        #    raise ValueError("template with name '{0}' not found".format(data_holder.template_model.template_name))
+            # generate unique name
+            vm_name = generate_unique_name(data_holder.template_model.template_name)
 
-        # generate unique name
-        vm_name = generate_unique_name(data_holder.template_model.template_name)
+            params = self.pv_service.CloneVmParameters(si=si,
+                                                       template_name=data_holder.template_model.template_name,
+                                                       vm_name=vm_name,
+                                                       vm_folder=data_holder.template_model.vm_folder,
+                                                       datastore_name=data_holder.datastore_name,
+                                                       cluster_name=data_holder.vm_cluster_model.cluster_name,
+                                                       resource_pool=data_holder.vm_cluster_model.resource_pool,
+                                                       power_on=data_holder.power_on)
 
-        params = self.pv_service.CloneVmParameters(si=si,
-                                                   template_name=data_holder.template_model.template_name,
-                                                   vm_name=vm_name,
-                                                   vm_folder=data_holder.template_model.vm_folder,
-                                                   datastore_name=data_holder.datastore_name,
-                                                   cluster_name=data_holder.vm_cluster_model.cluster_name,
-                                                   resource_pool=data_holder.vm_cluster_model.resource_pool,
-                                                   power_on=data_holder.power_on)
+            clone_vm_result = self.pv_service.clone_vm(params)
+            if clone_vm_result.error:
+                raise ValueError(clone_vm_result.error)
 
-        clone_vm_result = self.pv_service.clone_vm(params)
-        if clone_vm_result.error:
-            raise ValueError(clone_vm_result.error)
-
-        result = DeployResult(vm_name, clone_vm_result.vm.summary.config.instanceUuid)
-
-        # disconnect
-        self.pv_service.disconnect(si)
+            result = DeployResult(vm_name, clone_vm_result.vm.summary.config.instanceUuid)
+        finally:
+            # disconnect
+            if si:
+                self.pv_service.disconnect(si)
 
         return result
 
