@@ -1,4 +1,5 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
+from vCenterShell.models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
 from vCenterShell.models.VCenterTemplateModel import *
 from vCenterShell.models.VMClusterModel import *
 
@@ -81,7 +82,7 @@ class CloudshellDataRetrieverService:
         if (len(path_components) > 1):
             vm_folder = "/".join(path_components[1:])
 
-        return {
-            "vCenter_resource_name": path_components[0],
-            "vm_folder": vm_folder
-        }
+        return VCenterInventoryPathAttribute(
+            vCenter_resource_name=path_components[0],
+            vm_folder=vm_folder
+        )
