@@ -29,8 +29,8 @@ class DestroyVirtualMachineCommand(BaseCommand):
 
         # get vCenter resource name
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_att)
-        vCenter_resource_name = inventory_path_data["vCenter_resource_name"]
-        vm_folder = inventory_path_data["vm_folder"]
+        vCenter_resource_name = inventory_path_data.vCenter_resource_name
+        vm_folder = inventory_path_data.vm_folder
 
         print "Folder: {0}, vCenter: {1}".format(vm_folder, vCenter_resource_name)
 

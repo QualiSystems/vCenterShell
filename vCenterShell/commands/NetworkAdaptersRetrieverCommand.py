@@ -15,7 +15,7 @@ class NetworkAdaptersRetrieverCommand(BaseCommand):
         resource_att = helpers.get_resource_context_details()
 
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_att)
-        vcenter_resource_name = inventory_path_data["vCenter_resource_name"]
+        vcenter_resource_name = inventory_path_data.vCenter_resource_name
 
         connection_details = self.resourceConnectionDetailsRetriever.connection_details(vcenter_resource_name)
         si = self.pvService.connect(connection_details.host, connection_details.user, connection_details.password,
