@@ -15,12 +15,12 @@ from vCenterShell.commands.BaseCommand import BaseCommand
 class DestroyVirtualMachineCommand(BaseCommand):
     """ Command to Destroy a VM """
 
-    def __init__(self, pvService):
+    def __init__(self, pvService, cloudshell_data_retriever_service):
         """
         :param pvService:   pyVmomiService Instance
         """
         self.pvService = pvService
-        self.csRetrieverService = CloudshellDataRetrieverService()
+        self.csRetrieverService = cloudshell_data_retriever_service
 
     def execute(self):
         """ execute the command """
