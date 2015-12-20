@@ -19,7 +19,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def integration_test_clone_vm_destory(self):
+    def integration_clone_vm_destory(self):
         """
         Checks whether clone_vm and destroy methods works
         """

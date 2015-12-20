@@ -36,6 +36,11 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         helpers.get_resource_context_details = Mock(return_value=resource_att)
         helpers.get_api_session = Mock()
 
+        context_att = Mock()
+        vm_id = Mock(return_value='id')
+        context_att.id = vm_id
+        helpers.get_reservation_context_details = Mock(return_value=context_att)
+
         command = DestroyVirtualMachineCommand(pvService, csRetrieverService)
         command.execute()
 
