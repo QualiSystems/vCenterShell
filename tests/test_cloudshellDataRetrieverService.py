@@ -1,5 +1,4 @@
 ﻿import unittest
-import mock
 from mock import Mock, MagicMock, create_autospec
 import sys
 import os.path
