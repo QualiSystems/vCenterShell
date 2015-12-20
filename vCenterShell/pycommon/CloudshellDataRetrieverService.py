@@ -1,7 +1,7 @@
-﻿from pycommon.common_collection_utils import first_or_default
-from models.VCenterTemplateModel import *
+﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
+from vCenterShell.models.VCenterTemplateModel import *
 from vCenterShell.models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
-from models.VMClusterModel import *
+from vCenterShell.models.VMClusterModel import *
 
 
 class CloudshellDataRetrieverService:

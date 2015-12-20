@@ -1,8 +1,8 @@
 ﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
-from commands.BaseCommand import BaseCommand
-from pycommon.common_collection_utils import first_or_default
-from pycommon.common_name_utils import generate_unique_name
+from vCenterShell.commands.BaseCommand import BaseCommand
+from vCenterShell.pycommon.common_collection_utils import first_or_default
+from vCenterShell.pycommon.common_name_utils import generate_unique_name
 
 
 class DeployFromTemplateCommand(BaseCommand):
