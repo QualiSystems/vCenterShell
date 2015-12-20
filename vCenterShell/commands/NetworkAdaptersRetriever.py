@@ -1,17 +1,16 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 
-from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.models.VirtualNicModel import VirtualNicModel
 
 
-class NetworkAdaptersRetrieverCommand(BaseCommand):
+class NetworkAdaptersRetriever(object):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         self.pvService = pv_service
         self.csRetrieverService = cs_retriever_service
         self.resourceConnectionDetailsRetriever = resource_connection_details_retriever
 
-    def execute(self):
+    def retrieve_virtual_network_cards(self):
         resource_att = helpers.get_resource_context_details()
 
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_att)
