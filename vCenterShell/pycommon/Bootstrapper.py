@@ -17,8 +17,7 @@ class Bootstrapper(object):
                                                                             cloudshell_data_retriever_service,
                                                                             resource_connection_details_retriever)
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
-                                                                       cloudshell_data_retriever_service,
-                                                                       resource_connection_details_retriever)
+                                                                       cloudshell_data_retriever_service)
 
         deploy_from_template_command = DeployFromTemplateCommand(py_vmomi_service, cloudshell_data_retriever_service,
                                                                  resource_connection_details_retriever)
