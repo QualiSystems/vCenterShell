@@ -6,7 +6,7 @@ from datetime import datetime
 from mock import Mock, MagicMock, create_autospec, patch
 from pyVmomi import vim
 from pyVim.connect import SmartConnect, Disconnect
-
+from testCredentials import TestCredentials
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
 from vCenterShell.pycommon.pyVmomiService import pyVmomiService
@@ -32,8 +32,9 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         Checks whether clone_vm and destroy methods works
         """
         '#arrange'
+        cred = TestCredentials()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
-        si = pv_service.connect("192.168.30.101", "root", "vmware")
+        si = pv_service.connect(cred.host, cred.username, cred.password)
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='DC0_C0_RP0_VM20',
