@@ -14,15 +14,7 @@ from vCenterShell.pycommon.pyVmomiService import pyVmomiService
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
-        si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock()
-        si.content = create_autospec(spec=vim.ServiceInstanceContent())
-        
-        mockObj = Mock()
-        mockObj.SmartConnect = Mock(return_value=si)
-        mockObj.Disconnect = Mock()
-        
-        self.pvService = pyVmomiService(mockObj.SmartConnect,mockObj.Disconnect)
+        pass
 
     def tearDown(self):
         pass
@@ -42,17 +34,340 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder='DC0')
         '#act'
         now = datetime.now()
-        vm = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(params)
         print 'clone took: %s' % (str(datetime.now() - now))
 
         '#assert'
-        self.assertTrue(type(vm), vim.VirtualMachine)
+        self.assertTrue(type(res.vm), vim.VirtualMachine)
 
         '#tear down'
         now = datetime.now()
-        destroyed = pv_service.destroy_vm(vm)
+        if res.error is None and res.vm is not None:
+            destroyed = pv_service.destroy_vm(res.vm)
         print 'destroy took: %s' % (str(datetime.now() - now))
         self.assertIsNone(destroyed)
+
+    def test_clone_vm_power_on_false(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.Datastore = vim.Datastore
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        datacenter = Mock(spec=vim.Datacenter)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=datacenter)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder',
+                                              power_on=False)
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNone(res.error)
+        self.assertTrue(vim_mock.vm.RelocateSpec.called)
+        self.assertTrue(vim_mock.vm.CloneSpec.called)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.get_obj.called)
+        self.assertTrue(pv_service.wait_for_task.called)
+
+    def test_clone_vm_resource_pool_is_not_empty(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.Datastore = vim.Datastore
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        datacenter = Mock(spec=vim.Datacenter)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=datacenter)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder',
+                                              resource_pool='my_resource_pool')
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNone(res.error)
+        self.assertTrue(vim_mock.vm.RelocateSpec.called)
+        self.assertTrue(vim_mock.vm.CloneSpec.called)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.get_obj.called)
+        self.assertTrue(pv_service.wait_for_task.called)
+
+    def test_clone_vm_datastore_nmae_is_not_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.Datastore = vim.Datastore
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        datacenter = Mock(spec=vim.Datacenter)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=datacenter)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder',
+                                              datastore_name='my_datastore')
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNone(res.error)
+        self.assertTrue(vim_mock.vm.RelocateSpec.called)
+        self.assertTrue(vim_mock.vm.CloneSpec.called)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.get_obj.called)
+        self.assertTrue(pv_service.wait_for_task.called)
+
+    def test_clone_vm_destenation_folder_is_unsupported(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Folder = vim.Folder
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        folder = Mock(spec=vim.VirtualMachine)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=folder)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder')
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNotNone(res.error)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertFalse(vim_mock.vm.RelocateSpec.called)
+        self.assertFalse(vim_mock.vm.CloneSpec.called)
+        self.assertFalse(pv_service.find_vm_by_name.called)
+        self.assertFalse(pv_service.get_obj.called)
+        self.assertFalse(pv_service.wait_for_task.called)
+
+    def test_clone_vm_destenation_folder_is_folder_type(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Folder = vim.Folder
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        folder = Mock(spec=vim.Folder)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=folder)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder')
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNone(res.error)
+        self.assertTrue(vim_mock.vm.RelocateSpec.called)
+        self.assertTrue(vim_mock.vm.CloneSpec.called)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.get_obj.called)
+        self.assertTrue(pv_service.wait_for_task.called)
+
+    def test_clone_vm_datastore_nmae_is_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = Mock(spec=vim.ServiceInstance)
+        vim_mock = Mock()
+        vim_mock.vm = Mock()
+        vim_mock.vm.RelocateSpec = Mock()
+        vim_mock.vm.CloneSpec = Mock()
+        vim_mock.Datacenter = vim.Datacenter
+        vim_mock.ServiceInstance = vim.ServiceInstance
+
+        datacenter = Mock(spec=vim.Datacenter)
+        template = Mock(spec=vim.VirtualMachine)
+        template.datastore = [Mock()]
+
+        pv_service = pyVmomiService(None, None, vim_mock)
+        pv_service.find_vm_by_name = Mock(return_value=template)
+        pv_service.get_obj = Mock()
+        pv_service.get_folder = Mock(return_value=datacenter)
+        pv_service.wait_for_task = Mock()
+
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder='my_folder')
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertIsNone(res.error)
+        self.assertTrue(vim_mock.vm.RelocateSpec.called)
+        self.assertTrue(vim_mock.vm.CloneSpec.called)
+        self.assertTrue(pv_service.get_folder.called)
+        self.assertTrue(pv_service.find_vm_by_name.called)
+        self.assertTrue(pv_service.get_obj.called)
+        self.assertTrue(pv_service.wait_for_task.called)
+
+    def test_clone_vm_vm_folder_is_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = create_autospec(spec=vim.ServiceInstance)
+
+        pv_service = pyVmomiService(None, None)
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name='my_name',
+                                              vm_folder=None)
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertTrue(res.error is not None)
+
+    def test_clone_vm_vm_name_is_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = create_autospec(spec=vim.ServiceInstance)
+
+        pv_service = pyVmomiService(None, None)
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name='my_temp',
+                                              vm_name=None,
+                                              vm_folder=None)
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertTrue(res.error is not None)
+
+    def test_clone_vm_template_name_is_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        si = create_autospec(spec=vim.ServiceInstance)
+
+        pv_service = pyVmomiService(None, None)
+        params = pv_service.CloneVmParameters(si=si,
+                                              template_name=None,
+                                              vm_name=None,
+                                              vm_folder=None)
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertTrue(res.error is not None)
+
+    def test_clone_vm_si_is_none(self):
+        """
+        Checks clone_vm
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+        params = pv_service.CloneVmParameters(si=None,
+                                              template_name=None,
+                                              vm_name=None,
+                                              vm_folder=None)
+
+        '#act'
+        res = pv_service.clone_vm(params)
+
+        '#assert'
+        self.assertTrue(res.error is not None)
 
     def test_destroy_vm_by_name(self):
         """
@@ -678,13 +993,3 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         '#assert'
         self.assertTrue(result)
-
-
-
-
-    #def test_can_connect_successfully(self):
-    #    #arrange
-    #    si = self.pvService.connect("vCenter", "user", "pass")
-    #    #assert
-    #    result = "1"
-    #    self.assertEqual(result,"1")

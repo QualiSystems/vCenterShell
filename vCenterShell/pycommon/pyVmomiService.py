@@ -2,7 +2,6 @@
 import time
 
 from datetime import datetime
-from pyVmomi import vim
 from timeit import default_timer as timer
 
 class pyVmomiService:
@@ -16,9 +15,14 @@ class pyVmomiService:
     Datastore = 'datastoreFolder'
     #endregion
 
-    def __init__(self, connect, disconnect):
+    def __init__(self, connect, disconnect, vim_import=None):
         self.pyvmomi_connect = connect
         self.pyvmomi_disconnect = disconnect
+        if vim_import is None:
+            from pyVmomi import vim
+            self.vim = vim
+        else:
+            self.vim = vim_import
 
     def connect(self, address, user, password, port=443):
         """  
@@ -30,10 +34,10 @@ class pyVmomiService:
         :param port:    port for the SSL connection. Default = 443
         """
 
-        # Disabling urllib3 ssl warnings
+        '# Disabling urllib3 ssl warnings'
         requests.packages.urllib3.disable_warnings()
 
-        # Disabling SSL certificate verification
+        '# Disabling SSL certificate verification'
         import ssl
         if hasattr(ssl, 'SSLContext'):
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -41,10 +45,10 @@ class pyVmomiService:
 
         try:
             if context:
-                #si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
             else:
-                #si = SmartConnect(host=address, user=user, pwd=password, port=port)
+                '#si = SmartConnect(host=address, user=user, pwd=password, port=port)'
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except IOError as e:
@@ -294,7 +298,7 @@ class pyVmomiService:
         """
         result = self.CloneVmResult()
 
-        if not isinstance(clone_params.si, vim.ServiceInstance):
+        if not isinstance(clone_params.si, self.vim.ServiceInstance):
             result.error = 'si must be init as ServiceInstance'
             return result
 
@@ -302,40 +306,43 @@ class pyVmomiService:
             result.error = 'template_name param cannot be None'
             return result
 
+        if clone_params.vm_name is None:
+            result.error = 'vm_name param cannot be None'
+            return result
+
         if clone_params.vm_folder is None:
             result.error = 'vm_folder param cannot be None'
             return result
 
         managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
-        if type(managed_object) is vim.Datacenter:
+        if isinstance(managed_object, self.vim.Datacenter):
             dest_folder = managed_object.vmFolder
-        elif type(managed_object) is vim.Folder:
+        elif isinstance(managed_object, self.vim.Folder):
             dest_folder = managed_object
         else:
             result.error = 'Failed to find folder: {0}'.format(clone_params.vm_folder)
             return result
-
 
         template = self.find_vm_by_name(clone_params.si, clone_params.vm_folder, clone_params.template_name)
 
         if clone_params.datastore_name is None:
             datastore = template.datastore[0]
         else:
-            datastore = self.get_obj(clone_params.si.content, [vim.Datastore], clone_params.datastore_name)
+            datastore = self.get_obj(clone_params.si.content, [self.vim.Datastore], clone_params.datastore_name)
 
         if clone_params.resource_pool:
-            resource_pool = self.get_obj(clone_params.si.content, [vim.ResourcePool], clone_params.resource_pool)
+            resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
         else:
             '# if None, get the first one'
-            cluster = self.get_obj(clone_params.si.content, [vim.ClusterComputeResource], clone_params.cluster_name)
+            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource], clone_params.cluster_name)
             resource_pool = cluster.resourcePool
 
         '# set relo_spec'
-        relo_spec = vim.vm.RelocateSpec()
+        relo_spec = self.vim.vm.RelocateSpec()
         relo_spec.datastore = datastore
         relo_spec.pool = resource_pool
 
-        clone_spec = vim.vm.CloneSpec()
+        clone_spec = self.vim.vm.CloneSpec()
         clone_spec.location = relo_spec
         clone_spec.powerOn = clone_params.power_on
 
