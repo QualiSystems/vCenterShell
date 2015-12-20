@@ -1,6 +1,11 @@
 from pyVim.connect import SmartConnect, Disconnect
+<<<<<<< HEAD
+
 from commands.DeployFromTemplateCommand import DeployFromTemplateCommand
-from commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
+=======
+from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+>>>>>>> cb590ef6f67632170af5c68c30349923e6fbd6f6
 from vCenterShell.pycommon.pyVmomiService import pyVmomiService
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.NetworkAdaptersRetrieverCommand import NetworkAdaptersRetrieverCommand
@@ -16,6 +21,7 @@ class Bootstrapper(object):
         network_adapter_retriever_command = NetworkAdaptersRetrieverCommand(py_vmomi_service,
                                                                             cloudshell_data_retriever_service,
                                                                             resource_connection_details_retriever)
+<<<<<<< HEAD
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        cloudshell_data_retriever_service,
                                                                        resource_connection_details_retriever)
@@ -27,6 +33,10 @@ class Bootstrapper(object):
                                                              network_adapter_retriever_command,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command)
+=======
+        destroyVirtualMachineCommand = DestroyVirtualMachineCommand(py_vmomi_service, cloudshell_data_retriever_service)
+        self.commandExecuterService = CommandExecuterService(py_vmomi_service, network_adapter_retriever_command, destroyVirtualMachineCommand)
+>>>>>>> cb590ef6f67632170af5c68c30349923e6fbd6f6
 
     def get_command_executer_service(self):
         return self.commandExecuterService

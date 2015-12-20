@@ -1,15 +1,17 @@
+<<<<<<< HEAD
 ﻿from pycommon.common_collection_utils import first_or_default
 from models.VCenterTemplateModel import *
 from models.VMClusterModel import *
+=======
+﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
+from vCenterShell.models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
+from vCenterShell.models.VCenterTemplateModel import *
+from vCenterShell.models.VMClusterModel import *
+>>>>>>> cb590ef6f67632170af5c68c30349923e6fbd6f6
 
 
 class CloudshellDataRetrieverService:
-<<<<<<< HEAD
     PATH_DELIMITER = "/"
-=======
-    def __init__(self):
-        pass
->>>>>>> develop
 
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
@@ -85,7 +87,7 @@ class CloudshellDataRetrieverService:
         if (len(path_components) > 1):
             vm_folder = "/".join(path_components[1:])
 
-        return {
-            "vCenter_resource_name": path_components[0],
-            "vm_folder": vm_folder
-        }
+        return VCenterInventoryPathAttribute(
+            vCenter_resource_name=path_components[0],
+            vm_folder=vm_folder
+        )
