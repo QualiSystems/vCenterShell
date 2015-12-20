@@ -2,7 +2,7 @@ from unittest import TestCase
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
-from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from tests.testCredentials import TestCredentials
 from vCenterShell.commands.VirtualSwitchToMachineConnector import *
 
