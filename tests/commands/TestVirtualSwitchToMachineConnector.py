@@ -4,7 +4,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 import uuid
 
-from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
+from vCenterShell.commands.VirtualMachinePortGroupConfigurer111 import VirtualMachinePortGroupConfigurer
 from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
 from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.testCredentials import TestCredentials
