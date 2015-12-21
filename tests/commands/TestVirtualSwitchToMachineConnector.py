@@ -8,7 +8,7 @@ from vCenterShell.commands.VirtualSwitchToMachineConnector import *
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
-    def test_integrationtest(self):
+    def integrationtest(self):
         resource_connection_details_retriever = Mock()
         credentials = TestCredentials()
         resource_connection_details_retriever.connection_details = Mock(
