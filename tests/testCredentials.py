@@ -10,3 +10,4 @@ class TestCredentials:
         self.host = config.get('Credentials', 'host')
         self.username = config.get('Credentials', 'username')
         self.password = config.get('Credentials', 'password')
+        self.port = config.get('Credentials', 'port')
