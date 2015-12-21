@@ -31,6 +31,6 @@ class DvPortGroupCreator(object):
 
         task = dv_switch.AddDVPortgroup_Task([dv_pg_spec])
         print "Successfully created DV Port Group ", dv_port_name
-        port_group = self.synchronous_task_waiter.wait_for_task(task, si)
+        port_group = self.synchronous_task_waiter.wait_for_task(task)
 
         return port_group
