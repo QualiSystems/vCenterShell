@@ -144,7 +144,7 @@ class DeployFromTemplateCommand(BaseCommand):
 
 
 class DataHolder(object):
-    def __init__(self, d):
+    def __init__(self, d):        
         for a, b in d.items():
             if isinstance(b, dict):
                 setattr(self, a, DataHolder(b))
@@ -156,6 +156,14 @@ class DataHolder(object):
     @classmethod
     def createFromParams(cls, resource_context, connection_details, template_model, datastore_name, vm_cluster_model,
                          power_on):
+        """
+        :param ResourceContextDetails resource_context:
+        :param VCenterConnectionDetails connection_details:
+        :param VCenterTemplateModel template_model:
+        :param str datastore_name:
+        :param VMClusterModel vm_cluster_model:
+        :param bool power_on:
+        """
         dic = {
             'resource_context': resource_context,
             'connection_details': connection_details,
