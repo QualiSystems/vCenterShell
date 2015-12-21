@@ -15,7 +15,6 @@ class pyVmomiService:
     Host = 'hostFolder'
     Datastore = 'datastoreFolder'
     Cluster = 'cluster'
-    DvSwitch = 'dvSwitch'
     #endregion
 
     def __init__(self, connect, disconnect):
@@ -55,16 +54,6 @@ class pyVmomiService:
     def disconnect(self, si):
         """ Disconnect from vCenter """
         self.pyvmomi_disconnect(si)
-
-    def find_dv_switch_by_name(self, si, path, name):
-        """
-        Finds datacenter in the vCenter or returns "None"
-
-        :param si:         pyvmomi 'ServiceInstance'
-        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
-        :param name:       the cluster name to return
-        """  
-        return self.find_obj_by_path(si, path, name, self.DvSwitch)
 
     def find_cluster_by_name(self, si, path, name):
         """
