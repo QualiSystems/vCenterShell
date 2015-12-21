@@ -8,4 +8,6 @@ install:
     - pip install 3rdParty/qualipy-1.0.790.zip
 
 script:
-    nosetests
+    nosetests --with-coverage --cover-erase --cover-package vCenterShell
+
+

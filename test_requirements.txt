@@ -1,4 +1,5 @@
 nose
+coverage
 unittest2
 mock
 teamcity-messages
