@@ -1,5 +1,7 @@
 ﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import json
 from qualipy.api.cloudshell_api import *
+
 from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.common_collection_utils import first_or_default
 from vCenterShell.pycommon.common_name_utils import generate_unique_name
@@ -41,7 +43,7 @@ class DeployFromTemplateCommand(BaseCommand):
             if clone_vm_result.error:
                 raise ValueError(clone_vm_result.error)
 
-            result = DeployResult(vm_name, clone_vm_result.vm.summary.config.instanceUuid)
+            result = DeployResult(vm_name, clone_vm_result.vm.summary.config.uuid)
         finally:
             # disconnect
             if si:
@@ -55,7 +57,8 @@ class DeployFromTemplateCommand(BaseCommand):
 
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
-        print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name, template_model.vm_folder, template_model.vCenter_resource_name)
+        print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name, template_model.vm_folder,
+                                                                template_model.vCenter_resource_name)
 
         # get power state of the cloned VM
         power_on = self.cs_retriever_service.getPowerStateAttributeData(resource_context)
@@ -76,12 +79,12 @@ class DeployFromTemplateCommand(BaseCommand):
                                                                         connection_details.password,
                                                                         connection_details.port)
 
-        return DataHolder(resource_context,
-                          connection_details,
-                          template_model,
-                          datastore_name,
-                          vm_cluster_model,
-                          power_on)
+        return DataHolder.createFromParams(resource_context,
+                                           connection_details,
+                                           template_model,
+                                           datastore_name,
+                                           vm_cluster_model,
+                                           power_on)
 
     def create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
@@ -89,10 +92,13 @@ class DeployFromTemplateCommand(BaseCommand):
         session.CreateResource("Virtual Machine", "Virtual Machine", deploy_result.vm_name, deploy_result.vm_name)
         session.AddResourcesToReservation(reservation_id, [deploy_result.vm_name])
         session.SetAttributesValues(
-                    [ResourceAttributesUpdateRequest(deploy_result.vm_name,
-                    [AttributeNameValue("vCenter Inventory Path", data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder),
-                        AttributeNameValue("UUID", deploy_result.uuid),
-                        AttributeNameValue("vCenter Template", data_holder.resource_context.attributes["vCenter Template"])])])
+            [ResourceAttributesUpdateRequest(deploy_result.vm_name,
+                                             [AttributeNameValue("vCenter Inventory Path",
+                                                                 data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder),
+                                              AttributeNameValue("UUID", deploy_result.uuid),
+                                              AttributeNameValue("vCenter Template",
+                                                                 data_holder.resource_context.attributes[
+                                                                     "vCenter Template"])])])
 
     def replace_app_resource_with_vm_resource(self, data_holder, deploy_result):
         app_name = data_holder.resource_context.name
@@ -111,17 +117,54 @@ class DeployFromTemplateCommand(BaseCommand):
         data_holder = self.get_data_for_deployment()
         deploy_result = self.deploy_from_template(data_holder)
         self.create_resource_for_deployed_vm(data_holder, deploy_result)
-        '#self.replace_app_resource_with_vm_resource(data_holder, deploy_result)'
+        # self.replace_app_resource_with_vm_resource(data_holder, deploy_result)
+
+    def get_params_from_env(self):
+        param = os.environ.get('DEPLOY_DATA')
+        return param
+
+    def deserialize_deploy_params(self):
+        param = self.get_params_from_env()
+        data = DataHolder(json.loads(param))
+        if hasattr(data, 'connection_details') and data.connection_details is not None:
+            return data
+
+        connection_details = self.resource_connection_details_retriever.connection_details(
+            data.template_model.vCenter_resource_name)
+
+        data.connection_details = connection_details
+
+        return data
+
+    def deploy_execute(self):
+        data_holder = self.deserialize_deploy_params()
+        deploy_result = self.deploy_from_template(data_holder)
+        print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
+        # self.create_resource_for_deployed_vm(data_holder, deploy_result)
 
 
 class DataHolder(object):
-    def __init__(self, resource_context, connection_details, template_model, datastore_name, vm_cluster_model, power_on):
-        self.resource_context = resource_context
-        self.connection_details = connection_details
-        self.template_model = template_model
-        self.datastore_name = datastore_name
-        self.vm_cluster_model = vm_cluster_model
-        self.power_on = power_on
+    def __init__(self, d):
+        for a, b in d.items():
+            if isinstance(b, dict):
+                setattr(self, a, DataHolder(b))
+            elif b is not unicode or b is not str:
+                setattr(self, a, b)
+            else:
+                setattr(self, a, str(b))
+
+    @classmethod
+    def createFromParams(cls, resource_context, connection_details, template_model, datastore_name, vm_cluster_model,
+                         power_on):
+        dic = {
+            'resource_context': resource_context,
+            'connection_details': connection_details,
+            'template_model': template_model,
+            'datastore_name': datastore_name,
+            'vm_cluster_model': vm_cluster_model,
+            'power_on': power_on
+        }
+        return cls(dic)
 
 
 class DeployResult(object):
