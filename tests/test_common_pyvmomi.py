@@ -849,6 +849,30 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         '#assert'
         self.assertIsNone(result)
 
+    def test_get_object_by_path_no_folder_found(self):
+        """
+        Checks if the receiving path that does not exist
+        """
+        '#arrange'
+        folder_name = 'rootFolder'
+
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.rootFolder = Mock()
+        si.content.rootFolder.name = folder_name
+        pv_service.get_folder = Mock(return_value=None)
+
+        '#act'
+        result = pv_service.find_obj_by_path(si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
+
+        '#assert'
+        self.assertIsNone(result)
+        self.assertTrue(pv_service.get_folder.called)
+
     def test_get_vm_by_uuid_vm_in_folder(self):
         """
         Checks whether the function can grab object by uuid
