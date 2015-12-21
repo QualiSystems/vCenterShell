@@ -3,6 +3,7 @@ import time
 
 from datetime import datetime
 from timeit import default_timer as timer
+from pyVmomi import vim
 
 class pyVmomiService:
 
@@ -13,6 +14,7 @@ class pyVmomiService:
     Datacenter = 'datacenterFolder'
     Host = 'hostFolder'
     Datastore = 'datastoreFolder'
+    Cluster = 'cluster'
     #endregion
 
     def __init__(self, connect, disconnect, vim_import=None):
