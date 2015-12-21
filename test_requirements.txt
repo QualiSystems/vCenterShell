@@ -2,3 +2,4 @@ nose
 unittest2
 mock
 teamcity-messages
+jsonpickle
