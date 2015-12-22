@@ -1,6 +1,12 @@
-﻿import json
-import unittest
+<<<<<<< HEAD
+﻿import unittest
 
+=======
+﻿import os.path
+import sys
+import json
+import unittest
+>>>>>>> aaf143309e74c194991fcffb12094d4f89f37abb
 from mock import Mock, create_autospec
 from pyVmomi import vim
 from models.VCenterConnectionDetails import VCenterConnectionDetails
@@ -63,7 +69,29 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         self.assertTrue(session.AddResourcesToReservation.called)
         self.assertTrue(session.SetAttributesValues.called)
 
-       
+<<<<<<< HEAD
+=======
+    def test_serialize_and_deserialize_DataHolder_to_json(self):
+        vcenter_template = VCenterTemplateModel("vCenter", "QualiSB/alex", "test")
+        cluster_model = VMClusterModel("QualiSB Cluster", "LiverPool")
+        data_holder = DataHolder.createFromParams(None, None, vcenter_template,"eric ds cluster", cluster_model, True)
+
+        json_string = jsonpickle.encode(data_holder)
+
+        print json_string
+
+        decoded_data_holder = jsonpickle.decode(json_string)
+
+        self.assertEquals(decoded_data_holder.resource_context, None)
+        self.assertEquals(decoded_data_holder.connection_details, None)
+        self.assertEquals(decoded_data_holder.power_on, True)
+        self.assertEquals(decoded_data_holder.datastore_name, "eric ds cluster")
+        self.assertEquals(decoded_data_holder.template_model.vCenter_resource_name, "vCenter")
+        self.assertEquals(decoded_data_holder.template_model.vm_folder, "QualiSB/alex")
+        self.assertEquals(decoded_data_holder.template_model.template_name, "test")
+        self.assertEquals(decoded_data_holder.vm_cluster_model.cluster_name, "QualiSB Cluster")
+        self.assertEquals(decoded_data_holder.vm_cluster_model.resource_pool, "LiverPool")
+>>>>>>> aaf143309e74c194991fcffb12094d4f89f37abb
 
 
     def test_deploy_execute_full_params(self):

@@ -2,10 +2,14 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import json
 from qualipy.api.cloudshell_api import *
+<<<<<<< HEAD
 from pycommon.common_collection_utils import first_or_default
 
 from models.DeployDataHolder import DeployDataHolder
 from pycommon.common_name_utils import generate_unique_name
+=======
+
+>>>>>>> aaf143309e74c194991fcffb12094d4f89f37abb
 from vCenterShell.commands.BaseCommand import BaseCommand
 
 
@@ -81,12 +85,21 @@ class DeployFromTemplateCommand(BaseCommand):
                                                                         connection_details.password,
                                                                         connection_details.port)
 
-        return DeployDataHolder.createFromParams(resource_context,
+<<<<<<< HEAD
+        return DeployDataHolder(resource_context,
+                                connection_details,
+                                template_model,
+                                datastore_name,
+                                vm_cluster_model,
+                                power_on)
+=======
+        return DataHolder.createFromParams(resource_context,
                                            connection_details,
                                            template_model,
                                            datastore_name,
                                            vm_cluster_model,
                                            power_on)
+>>>>>>> aaf143309e74c194991fcffb12094d4f89f37abb
 
     def create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
@@ -145,9 +158,43 @@ class DeployFromTemplateCommand(BaseCommand):
         print res
         # print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
         # self.create_resource_for_deployed_vm(data_holder, deploy_result)
-       
-           
 
+
+<<<<<<< HEAD
+=======
+class DataHolder(object):
+    def __init__(self, d):        
+        for a, b in d.items():
+            if isinstance(b, dict):
+                setattr(self, a, DataHolder(b))
+            elif b is not unicode or b is not str:
+                setattr(self, a, b)
+            else:
+                setattr(self, a, str(b))
+
+    @classmethod
+    def createFromParams(cls, resource_context, connection_details, template_model, datastore_name, vm_cluster_model,
+                         power_on):
+        """
+        :param ResourceContextDetails resource_context:
+        :param VCenterConnectionDetails connection_details:
+        :param VCenterTemplateModel template_model:
+        :param str datastore_name:
+        :param VMClusterModel vm_cluster_model:
+        :param bool power_on:
+        """
+        dic = {
+            'resource_context': resource_context,
+            'connection_details': connection_details,
+            'template_model': template_model,
+            'datastore_name': datastore_name,
+            'vm_cluster_model': vm_cluster_model,
+            'power_on': power_on
+        }
+        return cls(dic)
+
+
+>>>>>>> aaf143309e74c194991fcffb12094d4f89f37abb
 class DeployResult(object):
     def __init__(self, vm_name, uuid):
         self.vm_name = vm_name
