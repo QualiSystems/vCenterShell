@@ -1,8 +1,10 @@
-﻿import unittest
-from mock import Mock, MagicMock, create_autospec
+﻿import os.path
 import sys
-import os.path
-from vCenterShell.pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
+import unittest
+
+from mock import Mock
+
+from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

@@ -1,8 +1,10 @@
 ﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
+from pycommon.common_collection_utils import first_or_default
+
+from models.DeployDataHolder import DeployDataHolder
+from pycommon.common_name_utils import generate_unique_name
 from vCenterShell.commands.BaseCommand import BaseCommand
-from vCenterShell.pycommon.common_collection_utils import first_or_default
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
 
 
 class DeployFromTemplateCommand(BaseCommand):
@@ -76,12 +78,12 @@ class DeployFromTemplateCommand(BaseCommand):
                                                                         connection_details.password,
                                                                         connection_details.port)
 
-        return DataHolder(resource_context,
-                          connection_details,
-                          template_model,
-                          datastore_name,
-                          vm_cluster_model,
-                          power_on)
+        return DeployDataHolder(resource_context,
+                                connection_details,
+                                template_model,
+                                datastore_name,
+                                vm_cluster_model,
+                                power_on)
 
     def create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
@@ -112,24 +114,6 @@ class DeployFromTemplateCommand(BaseCommand):
         deploy_result = self.deploy_from_template(data_holder)
         self.create_resource_for_deployed_vm(data_holder, deploy_result)
         '#self.replace_app_resource_with_vm_resource(data_holder, deploy_result)'
-
-
-class DataHolder(object):
-    def __init__(self, resource_context, connection_details, template_model, datastore_name, vm_cluster_model, power_on):
-        """
-        :param ResourceContextDetails resource_context:
-        :param VCenterConnectionDetails connection_details:
-        :param VCenterTemplateModel template_model:
-        :param str datastore_name:
-        :param VMClusterModel vm_cluster_model:
-        :param bool power_on:
-        """
-        self.resource_context = resource_context
-        self.connection_details = connection_details
-        self.template_model = template_model
-        self.datastore_name = datastore_name
-        self.vm_cluster_model = vm_cluster_model
-        self.power_on = power_on
 
 
 class DeployResult(object):

@@ -4,9 +4,10 @@ import unittest
 
 from mock import Mock, create_autospec
 from pyVmomi import vim
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-from vCenterShell.models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
-from vCenterShell.models.VCenterConnectionDetails import *
+from models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
+from models.VCenterConnectionDetails import *
 from vCenterShell.commands.NetworkAdaptersRetrieverCommand import *
 
 

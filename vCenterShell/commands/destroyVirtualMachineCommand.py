@@ -1,14 +1,6 @@
-﻿from pyVmomi import vim
-import requests
-import atexit
-from qualipy.api.cloudshell_api import *
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-import time
-import sys
-import vCenterShell.pycommon
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from pycommon.CloudshellDataRetrieverService import *
+
 from vCenterShell.commands.BaseCommand import BaseCommand
 
 

@@ -1,15 +1,17 @@
 ﻿import os.path
 import sys
 import unittest
-
 from datetime import datetime
-from mock import Mock, MagicMock, create_autospec, patch
-from pyVmomi import vim
+
+from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
+
 from testCredentials import TestCredentials
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from vCenterShell.pycommon.pyVmomiService import pyVmomiService
+from pycommon.pyVmomiService import pyVmomiService
 
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
