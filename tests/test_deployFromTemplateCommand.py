@@ -63,8 +63,50 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         self.assertTrue(session.AddResourcesToReservation.called)
         self.assertTrue(session.SetAttributesValues.called)
 
-       
+    def test_deploy_execute_create_vm_error(self):
+        content = Mock()
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock(return_value=content)
 
+        vmTemplate = Mock()
+
+        pvService = Mock()
+        pvService.connect = Mock(return_value=si)
+        pvService.disconnect = Mock(return_value=Mock())
+        pvService.get_obj = Mock(return_value=vmTemplate)
+        cloned_vm = Mock()
+        cloned_vm.error = 'this is mock error'
+
+        pvService.clone_vm = Mock(return_value=cloned_vm)
+
+        param = {
+          "resource_context": None,
+          "template_model": {
+            "vCenter_resource_name": "vcenter_resource_name",
+            "vm_folder": "vfolder_name",
+            "template_name": "template_name"
+          },
+          "connection_details": {
+            "host": "host",
+            "username": "user",
+            "password": "pass",
+            "port": "port"
+          },
+          "vm_cluster_model": {
+            "cluster_name": "cluster_name",
+            "resource_pool": "resource_pool"
+          },
+          "datastore_name": "datastore_name",
+          "power_on": False
+        }
+
+        command = DeployFromTemplateCommand(pvService, None, None)
+        command.get_params_from_env = Mock(return_value=json.dumps(param))
+
+        self.assertRaises(ValueError, command.deploy_execute)
+
+        self.assertTrue(pvService.clone_vm.called)
+        self.assertTrue(command.get_params_from_env.called)
 
     def test_deploy_execute_full_params(self):
         content = Mock()
@@ -113,6 +155,18 @@ class test_deployFromTemplateCommand(unittest.TestCase):
 
         self.assertTrue(pvService.clone_vm.called)
         self.assertTrue(command.get_params_from_env.called)
+
+    def test_get_params_from_env(self):
+        # arrange
+        env_param = '{"this": "is json"}'
+        os.environ.__setitem__('DEPLOY_DATA', env_param)
+        command = DeployFromTemplateCommand(None, None, None)
+
+        # act
+        params = command.get_params_from_env()
+
+        # assert
+        self.assertEqual(params, env_param)
 
     def test_deploy_execute_no_connection_details(self):
         # set
