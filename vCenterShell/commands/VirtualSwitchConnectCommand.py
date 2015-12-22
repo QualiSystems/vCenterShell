@@ -3,7 +3,7 @@ from pyVmomi import vim
 
 from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.pyVmomiService import pyVmomiService
-from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetriever
+from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
 
 
 class VirtualSwitchConnectCommand(BaseCommand):
