@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pycommon import Bootstrapper
+from vCenterShell import Bootstrapper
 
 
 class TestBootstrapper(TestCase):

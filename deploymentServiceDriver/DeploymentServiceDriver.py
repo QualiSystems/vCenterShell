@@ -8,7 +8,8 @@ from models.DeployDataHolder import DeployDataHolder
 class DeploymentServiceDriver(object):
     def __init__(self, cs_retriever_service):
         self.cs_retriever_service = cs_retriever_service
-        self.INPUT_DEPLOY_DATA = "DEPLOY_DATA"
+        self.INPUT_KEY_COMMAND = "COMMAND"
+        self.INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
 
     def execute(self):
         data_holder = self.get_data_holder()
@@ -19,11 +20,15 @@ class DeploymentServiceDriver(object):
         result = api.ExecuteCommand(reservation_id,
                                     data_holder.template_model.vCenter_resource_name,
                                     "Resource",
-                                    "deploy_from_template",
-                                    [InputNameValue(self.INPUT_DEPLOY_DATA, json_data_holder)],
+                                    "Deploy From Template",
+                                    [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),
+                                     InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)],
                                     False)
 
-        print result.__dict__
+        if hasattr(result, 'Output'):
+            print result.Output
+        else:
+            print jsonpickle.encode(result, unpicklable=False)
 
     def get_data_holder(self):
         resource_context = helpers.get_resource_context_details()

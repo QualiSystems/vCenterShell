@@ -1,8 +1,9 @@
 ﻿import os
 import sys
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpersimport sys
 
-from pycommon import Bootstrapper
+import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
+
+from Bootstrapper import Bootstrapper
 
 
 def main():
@@ -20,7 +21,10 @@ def main():
         os.environ["resourceContext".upper()] = '{"name":"VCenter Template Request", "address":"Service",' \
                                                 ' "model":"VCenter Template Request", "family":"VM Request", ' \
                                                 '"description":"", "fullname":"", ' \
-                                                '"attributes":{"vCenter Template":"vCenter/QualiSB/Alex/test","VM Power State":"True","VM Storage":"eric ds cluster", "VM Cluster":"QualiSB Cluster/LiverPool"}}'
+                                                '"attributes":{"vCenter Template":"vCenter/QualiSB/Alex/test",' \
+                                                                '"VM Power State":"True",' \
+                                                                '"VM Storage":"eric ds cluster", ' \
+                                                                '"VM Cluster":"QualiSB Cluster/LiverPool"}}'
 
     # execute the command
     getattr(ces, commandToRun)()

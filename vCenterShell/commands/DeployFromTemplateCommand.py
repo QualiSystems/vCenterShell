@@ -45,7 +45,9 @@ class DeployFromTemplateCommand(BaseCommand):
             if clone_vm_result.error:
                 raise ValueError(clone_vm_result.error)
 
-            result = DeployResult(vm_name, clone_vm_result.vm.summary.config.uuid)
+            result = DeployResult(vm_name=vm_name,
+                                  uuid=clone_vm_result.vm.summary.config.uuid,
+                                  vm_path=data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder)
         finally:
             # disconnect
             if si:
@@ -116,12 +118,6 @@ class DeployFromTemplateCommand(BaseCommand):
         session.RemoveServicesFromReservation(reservation_id, app_name)
         session.SetReservationResourcePosition(reservation_id, deploy_result.vm_name, app_poistion.X, app_poistion.Y)
 
-    def execute(self):
-        data_holder = self.get_data_for_deployment()
-        deploy_result = self.deploy_from_template(data_holder)
-        self.create_resource_for_deployed_vm(data_holder, deploy_result)
-        # self.replace_app_resource_with_vm_resource(data_holder, deploy_result)
-
     def get_params_from_env(self):
         param = os.environ.get('DEPLOY_DATA')
         return param
@@ -139,16 +135,29 @@ class DeployFromTemplateCommand(BaseCommand):
 
         return data
 
+    # ------------------------------------------------------------------------------------------------------------------
+
     def deploy_execute(self):
         data_holder = self.deserialize_deploy_params()
         deploy_result = self.deploy_from_template(data_holder)
-        res = jsonpickle.encode(deploy_result, unpicklable=False)
-        print res
-        # print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
-        # self.create_resource_for_deployed_vm(data_holder, deploy_result)
-       
+        print jsonpickle.encode(deploy_result, unpicklable=False)
+
+    def execute(self):
+        data_holder = self.get_data_for_deployment()
+        deploy_result = self.deploy_from_template(data_holder)
+        self.create_resource_for_deployed_vm(data_holder, deploy_result)
+        # self.replace_app_resource_with_vm_resource(data_holder, deploy_result)
+
 
 class DeployResult(object):
-    def __init__(self, vm_name, uuid):
+    def __init__(self, vm_name, uuid, vm_path):
+        """
+        :param str vm_name: The name of the virtual machine
+        :param uuid uuid:   The UUID
+        :param str vm_path: The full path to the VM including the vCenter resource name as the first part. The path
+        parts are sapereted by '/'
+        :return:
+        """
         self.vm_name = vm_name
         self.uuid = uuid
+        self.vm_path = vm_path
