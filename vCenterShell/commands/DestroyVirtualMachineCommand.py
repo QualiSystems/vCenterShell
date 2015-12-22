@@ -24,7 +24,7 @@ class DestroyVirtualMachineCommand(BaseCommand):
         vCenter_resource_name = inventory_path_data.vCenter_resource_name
         vm_folder = inventory_path_data.vm_folder
 
-        print "Folder: {0}, vCenter: {1}".format(vm_folder, vCenter_resource_name)
+        # print "Folder: {0}, vCenter: {1}".format(vm_folder, vCenter_resource_name)
 
         reservation_id = helpers.get_reservation_context_details().id
         session = helpers.get_api_session()
@@ -33,8 +33,8 @@ class DestroyVirtualMachineCommand(BaseCommand):
         # get vCenter connection details from vCenter resource
         vCenterConn = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
 
-        print "Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"], vCenterConn["user"],
-                                                             vCenterConn["password"])
+        # print "Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"], vCenterConn["user"],
+        #                                                      vCenterConn["password"])
 
         # connect
         si = self.pvService.connect(vCenterConn["vCenter_url"], vCenterConn["user"], vCenterConn["password"])

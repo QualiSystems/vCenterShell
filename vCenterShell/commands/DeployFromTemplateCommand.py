@@ -59,27 +59,28 @@ class DeployFromTemplateCommand(BaseCommand):
 
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
-        print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name, template_model.vm_folder,
-                                                                template_model.vCenter_resource_name)
+        # print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name,
+        #                                                         template_model.vm_folder,
+        #                                                         template_model.vCenter_resource_name)
 
         # get power state of the cloned VM
         power_on = self.cs_retriever_service.getPowerStateAttributeData(resource_context)
-        print "Power On: {0}".format(power_on)
+        # print "Power On: {0}".format(power_on)
 
         # get cluster and resource pool
         vm_cluster_model = self.cs_retriever_service.getVMClusterAttributeData(resource_context)
-        print "Cluster: {0}, Resource Pool: {1}".format(vm_cluster_model.cluster_name, vm_cluster_model.resource_pool)
+        # print "Cluster: {0}, Resource Pool: {1}".format(vm_cluster_model.cluster_name, vm_cluster_model.resource_pool)
 
         # get datastore
         datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
-        print "Datastore: {0}".format(datastore_name)
+        # print "Datastore: {0}".format(datastore_name)
 
         connection_details = self.resource_connection_details_retriever.connection_details(
             template_model.vCenter_resource_name)
-        print "Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
-                                                                        connection_details.username,
-                                                                        connection_details.password,
-                                                                        connection_details.port)
+        # print "Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
+        #                                                                 connection_details.username,
+        #                                                                 connection_details.password,
+        #                                                                 connection_details.port)
 
         return DeployDataHolder.create_from_params(resource_context,
                                                    connection_details,

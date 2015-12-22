@@ -149,7 +149,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         res = search_index.FindChild(look_in, name)
 
-        print 'find_obj_by_path took: %s' % (str(datetime.now() - now))
+        # print 'find_obj_by_path took: %s' % (str(datetime.now() - now))
         return res
 
     def get_folder(self, si, path):
@@ -200,7 +200,7 @@ class pyVmomiService:
                 child = None
 
         end = timer()
-        print 'get_folder "{0}" took: {1} seconds'.format(path, (str(end - start)))
+        # print 'get_folder "{0}" took: {1} seconds'.format(path, (str(end - start)))
 
         return sub_folder
 
@@ -233,7 +233,7 @@ class pyVmomiService:
         task_done = False
         while not task_done:
             if task.info.state == 'success':
-                print "Task succeeded: " + task.info.state
+                # print "Task succeeded: " + task.info.state
                 return task.info.result
 
             if task.info.state == 'error':
@@ -346,7 +346,7 @@ class pyVmomiService:
         clone_spec.location = relo_spec
         clone_spec.powerOn = clone_params.power_on
 
-        print "cloning VM..."
+        # print "cloning VM..."
 
         task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
         vm = self.wait_for_task(task)
@@ -359,13 +359,13 @@ class pyVmomiService:
         :param vm: virutal machine pyvmomi object
         """
 
-        print("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name))
+        # print ("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name))
 
         task = vm.PowerOffVM_Task()
         self.wait_for_task(task)
 
-        print("{0}".format(task.info.state))
-        print("Destroying VM {0}".format(vm.name))
+        # print ("{0}".format(task.info.state))
+        # print ("Destroying VM {0}".format(vm.name))
 
         task = vm.Destroy_Task()
         return self.wait_for_task(task)
