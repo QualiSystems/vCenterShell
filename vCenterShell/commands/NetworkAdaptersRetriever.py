@@ -5,10 +5,9 @@ from pyVmomi import vim
 
 from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.models.VirtualNicModel import VirtualNicModel
+from vCenterShell.pycommon.logger import getLogger
 
-from vCenterShell.logger import getLogger
-_logger = getLogger(__name__)
-
+_logger = getLogger("vCenterShell")
 
 #@todo very much trivial implementation. Should be moved & expanded
 class ConnectionException(Exception):
