@@ -1,5 +1,4 @@
 ﻿import unittest
-import mock
 from mock import Mock, MagicMock, create_autospec
 import sys
 import os.path
@@ -122,8 +121,8 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         result = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_attributes)
 
         # Assert
-        self.assertEquals(result["vCenter_resource_name"], "vCenter")
-        self.assertEqual(result["vm_folder"], "Alex")
+        self.assertEquals(result.vCenter_resource_name, "vCenter")
+        self.assertEqual(result.vm_folder, "Alex")
 
 
 

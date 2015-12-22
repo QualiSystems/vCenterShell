@@ -1,18 +1,21 @@
 ﻿from vCenterShell.pycommon.common_collection_utils import first_or_default
 from vCenterShell.models.VCenterTemplateModel import *
+from vCenterShell.models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
 from vCenterShell.models.VMClusterModel import *
 
 
 class CloudshellDataRetrieverService:
+    PATH_DELIMITER = "/"
+
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
 
         template_att = resource_attributes.attributes["vCenter Template"]
-        template_components = template_att.split("/")
+        template_components = template_att.split(self.PATH_DELIMITER)
 
         return VCenterTemplateModel(
                 vCenter_resource_name=template_components[0],
-                vm_folder=template_components[1:-1][0],
+                vm_folder=self.PATH_DELIMITER.join(template_components[1:-1]),
                 template_name=template_components[-1])
 
     def getPowerStateAttributeData(self, resource_attributes):
@@ -78,7 +81,7 @@ class CloudshellDataRetrieverService:
         if (len(path_components) > 1):
             vm_folder = "/".join(path_components[1:])
 
-        return {
-            "vCenter_resource_name": path_components[0],
-            "vm_folder": vm_folder
-        }
+        return VCenterInventoryPathAttribute(
+            vCenter_resource_name=path_components[0],
+            vm_folder=vm_folder
+        )

@@ -21,15 +21,18 @@ class test_deployFromTemplateCommand(unittest.TestCase):
 
         pvService = Mock()
         pvService.connect = Mock(return_value=si)
+        pvService.disconnect = Mock(return_value=Mock())
         pvService.get_obj = Mock(return_value=vmTemplate)
-        pvService.clone_vm = Mock()
+        cloned_vm = Mock()
+        cloned_vm.error = None
+        pvService.clone_vm = Mock(return_value=cloned_vm)
 
         csRetrieverService = Mock()
         csRetrieverService.getVCenterTemplateAttributeData = Mock(return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
         csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
         csRetrieverService.getVMClusterAttributeData = Mock(return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
         csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
-        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter","user":"user1","password":"pass1"})
+        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter", "user":"user1", "password":"pass1"})
 
         resourceContext = Mock()
         resourceContext.attributes = {"vCenter Template": "vCenter/Alex/test"}
