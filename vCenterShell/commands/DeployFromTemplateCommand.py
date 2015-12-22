@@ -81,12 +81,12 @@ class DeployFromTemplateCommand(BaseCommand):
                                                                         connection_details.password,
                                                                         connection_details.port)
 
-        return DeployDataHolder.createFromParams(resource_context,
-                                           connection_details,
-                                           template_model,
-                                           datastore_name,
-                                           vm_cluster_model,
-                                           power_on)
+        return DeployDataHolder.create_from_params(resource_context,
+                                                   connection_details,
+                                                   template_model,
+                                                   datastore_name,
+                                                   vm_cluster_model,
+                                                   power_on)
 
     def create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
@@ -127,7 +127,7 @@ class DeployFromTemplateCommand(BaseCommand):
 
     def deserialize_deploy_params(self):
         param = self.get_params_from_env()
-        data = DataHolder(json.loads(param))
+        data = DeployDataHolder(json.loads(param))
         if hasattr(data, 'connection_details') and data.connection_details is not None:
             return data
 
@@ -141,12 +141,11 @@ class DeployFromTemplateCommand(BaseCommand):
     def deploy_execute(self):
         data_holder = self.deserialize_deploy_params()
         deploy_result = self.deploy_from_template(data_holder)
-        res = jsonpickle.dumps(deploy_result)
+        res = jsonpickle.encode(deploy_result, unpicklable=False)
         print res
         # print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
         # self.create_resource_for_deployed_vm(data_holder, deploy_result)
        
-           
 
 class DeployResult(object):
     def __init__(self, vm_name, uuid):

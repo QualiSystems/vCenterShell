@@ -6,7 +6,6 @@ from models.DeployDataHolder import DeployDataHolder
 
 
 class DeploymentServiceDriver(object):
-
     def __init__(self, cs_retriever_service):
         self.cs_retriever_service = cs_retriever_service
         self.INPUT_DEPLOY_DATA = "DEPLOY_DATA"
@@ -38,9 +37,9 @@ class DeploymentServiceDriver(object):
         # get datastore
         datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
 
-        return DeployDataHolder(template_model=template_model,
-                                datastore_name=datastore_name,
-                                vm_cluster_model=vm_cluster_model,
-                                power_on=power_on,
-                                connection_details=None,
-                                resource_context=None)
+        return DeployDataHolder.create_from_params(template_model=template_model,
+                                                   datastore_name=datastore_name,
+                                                   vm_cluster_model=vm_cluster_model,
+                                                   power_on=power_on,
+                                                   connection_details=None,
+                                                   resource_context=None)
