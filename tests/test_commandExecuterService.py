@@ -37,4 +37,14 @@ class TestCommandExecuterService(unittest.TestCase):
         # assert
         self.assertTrue(deploy_from_template.execute.called)
 
+    def test_deploy_from_template(self):
+        # arrange
+        deploy_from_template = Mock()
+        deploy_from_template.deploy_execute = Mock(return_value=True)
+        command_executer_service = CommandExecuterService(None, None, None, deploy_from_template)
 
+        # act
+        command_executer_service.deploy_from_template()
+
+        # assert
+        self.assertTrue(deploy_from_template.deploy_execute.called)
