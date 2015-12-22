@@ -1,7 +1,10 @@
 ﻿class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
-    def __init__(self, py_vmomi_service, network_adapter_retriever_command, destroy_virtual_machine_command,
+    def __init__(self,
+                 py_vmomi_service,
+                 network_adapter_retriever_command,
+                 destroy_virtual_machine_command,
                  deploy_from_template_command):
         """
         :param py_vmomi_service:  PyVmomi service
