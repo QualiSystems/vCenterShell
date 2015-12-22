@@ -1,5 +1,7 @@
 import unittest
 from mock import MagicMock, Mock
+
+from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 
 
