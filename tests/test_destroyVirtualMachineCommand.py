@@ -5,7 +5,7 @@ import sys
 import unittest
 from mock import Mock, create_autospec, MagicMock
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 from pyVmomi import vim
 from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
 from vCenterShell.models.VMClusterModel import VMClusterModel
