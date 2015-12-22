@@ -98,6 +98,11 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         pvService.get_obj = Mock(return_value=vmTemplate)
         cloned_vm = Mock()
         cloned_vm.error = None
+        cloned_vm.vm = Mock()
+        cloned_vm.vm.summary = Mock()
+        cloned_vm.vm.summary.config = Mock()
+        cloned_vm.vm.summary.config.uuid = 'uuid_mock'
+
         pvService.clone_vm = Mock(return_value=cloned_vm)
 
         param = {
