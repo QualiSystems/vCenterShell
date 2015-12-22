@@ -64,8 +64,9 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         self.assertTrue(session.SetAttributesValues.called)
 
     def test_serialize_and_deserialize_DataHolder_to_json(self):
-        data_holder = DataHolder(None, None, VCenterTemplateModel("vCenter", "QualiSB/alex", "test"),
-                                 "eric ds cluster", VMClusterModel("QualiSB Cluster", "LiverPool"), True)
+        vcenter_template = VCenterTemplateModel("vCenter", "QualiSB/alex", "test")
+        cluster_model = VMClusterModel("QualiSB Cluster", "LiverPool")
+        data_holder = DataHolder.createFromParams(None, None, vcenter_template,"eric ds cluster", cluster_model, True)
 
         json_string = jsonpickle.encode(data_holder)
 
@@ -128,6 +129,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         self.assertTrue(command.get_params_from_env.called)
 
     def test_deploy_execute_no_connection_details(self):
+        # set
         content = Mock()
         si = create_autospec(spec=vim.ServiceInstance)
         si.RetrieveContent = Mock(return_value=content)
@@ -169,8 +171,11 @@ class test_deployFromTemplateCommand(unittest.TestCase):
 
         command = DeployFromTemplateCommand(pvService, None, resource_connection_details_retriever)
         command.get_params_from_env = Mock(return_value=json.dumps(param))
+
+        # act
         command.deploy_execute()
 
+        # assert
         self.assertTrue(pvService.clone_vm.called)
         self.assertTrue(resource_connection_details_retriever.connection_details.called)
         self.assertTrue(command.get_params_from_env.called)

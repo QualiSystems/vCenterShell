@@ -1,4 +1,5 @@
-﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
+﻿import jsonpickle
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import json
 from qualipy.api.cloudshell_api import *
 
@@ -139,7 +140,9 @@ class DeployFromTemplateCommand(BaseCommand):
     def deploy_execute(self):
         data_holder = self.deserialize_deploy_params()
         deploy_result = self.deploy_from_template(data_holder)
-        print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
+        res = jsonpickle.dumps(deploy_result)
+        print res
+        # print str({'vm_name': str(deploy_result.vm_name), 'uuid': str(deploy_result.uuid)})
         # self.create_resource_for_deployed_vm(data_holder, deploy_result)
 
 
