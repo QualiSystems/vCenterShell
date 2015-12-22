@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Logger provider.
 Initial Log Level defined with 'LOG_LEVEL' variable (default value == 'DEBUG')
@@ -9,7 +11,7 @@ import logging
 from logging.config import fileConfig
 
 
-def get_logging_config(level_console="DEBUG", level_file=None, logfile="vCenter.log"):
+def get_logging_config(level_console="DEBUG", level_file=None, logfile=None):
     """
     Returns Logging Config
     @see https://docs.python.org/2/library/logging.config.html#logging.config.dictConfig
@@ -17,7 +19,7 @@ def get_logging_config(level_console="DEBUG", level_file=None, logfile="vCenter.
     :return: <dict> logging config depends on 'log level'
     """
     level_file = level_file or level_console
-    return {
+    logger = {
         'version': 1,
         'formatters': {
             'verbose': {
@@ -37,39 +39,42 @@ def get_logging_config(level_console="DEBUG", level_file=None, logfile="vCenter.
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple'
             },
-            'file': {
+        },
+        'loggers': {
+            '': {
+                'handlers': ['console', 'file'] if logfile else ['console'],
+                'level': 'DEBUG',
+                'propagate': True
+            },
+            'vCenterShell': {
+                'handlers': ['console', 'file'] if logfile else ['console'],
+                'level': 'DEBUG',
+                'propagate': True
+            },
+            'vCenterCommon': {
+                'handlers': ['console', 'file'] if logfile else ['console'],
+                'level': 'DEBUG',
+                'propagate': True
+            },
+        }
+    }
+    if logfile:
+        logger["handlers"]["file"] = {
                 'level': level_file,
                 'class': 'logging.handlers.RotatingFileHandler',
                 'filename': logfile,
                 'maxBytes': 1024 * 10,
                 'backupCount': 10,
                 'formatter': 'simple'
-                },
-            },
-        'loggers': {
-            '': {
-                'handlers': ['console', 'file'],
-                'level': 'DEBUG',
-                'propagate': True
-            },
-            'vCenterShell': {
-                'handlers': ['console', 'file'],
-                'level': 'DEBUG',
-                'propagate': True
-            },
-            'vCenterCommon': {
-                'handlers': ['console', 'file'],
-                'level': 'DEBUG',
-                'propagate': True
-            },
-        }
-    }
+                }
+    return logger
+
 
 initial_log_level = os.environ.get("LOG_LEVEL") or "DEBUG"
 logging.config.dictConfig(get_logging_config(initial_log_level))
 
 
-def configure_loglevel(level_console="DEBUG", level_file=None, logfile="vCenter.log"):
+def configure_loglevel(level_console="DEBUG", level_file=None, logfile=None):
     logging.config.dictConfig(get_logging_config(level_console, level_file, logfile))
 
 

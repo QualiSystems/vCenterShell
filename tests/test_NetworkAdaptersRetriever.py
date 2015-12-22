@@ -6,6 +6,7 @@ from mock import Mock, create_autospec
 from pyVmomi import vim
 
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 from vCenterShell.models.VCenterConnectionDetails import *
 from vCenterShell.commands.NetworkAdaptersRetriever import *

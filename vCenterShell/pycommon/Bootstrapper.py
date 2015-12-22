@@ -6,10 +6,11 @@ from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
 from vCenterShell.pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-
+from vCenterShell.pycommon.logging_service import LoggingService
 
 class Bootstrapper(object):
     def __init__(self):
+        LoggingService("DEBUG")
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         resource_connection_details_retriever = ResourceConnectionDetailsRetriever(cloudshell_data_retriever_service)
