@@ -7,7 +7,7 @@ from pyVmomi import vim
 from vCenterShell.pycommon.pyVmomiService import *
 from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from vCenterShell.commands.VirtualMachinePortGroupConfigurer import *
-
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
@@ -17,6 +17,23 @@ from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.logger import getLogger
 
 _logger = getLogger("vCenterShell")
+
+
+def vm_connection(vm_name, connection_retriever):
+    connection_details = connection_retriever.connection_details(vm_name)
+
+    if not connection_details:
+        _logger.warn("Cannot get connection info for connect to VM '{}'".format(vm_name))
+        return None
+
+    assert(isinstance(connection_details, VCenterConnectionDetails))
+
+    _logger.debug("Connection to VM '{}' Via [{host}:{port}] User: '{username}'".format(
+        vm_name, **connection_details.as_dict()))
+
+    # _logger.debug("Connection to VM '{}' Via [{}:{}] User: '{}'".format(
+    #     vm_name, connection_details.host, connection_details.port, connection_details.username))
+    pass
 
 
 class VirtualSwitchToMachineDisConnector(BaseCommand):
@@ -43,5 +60,5 @@ class VirtualSwitchToMachineDisConnector(BaseCommand):
                                                                               dv_port_name)
 
 
-     def execute(self):
-         pass
+    def execute(self):
+        pass
