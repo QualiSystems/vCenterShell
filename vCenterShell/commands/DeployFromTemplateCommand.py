@@ -6,9 +6,9 @@ from qualipy.api.cloudshell_api import *
 from pycommon.common_collection_utils import first_or_default
 from models.DeployDataHolder import DeployDataHolder
 from pycommon.common_name_utils import generate_unique_name
+from pycommon.logger import configure_loglevel
+from pycommon.logger import getLogger
 from vCenterShell.commands.BaseCommand import BaseCommand
-from vCenterShell.pycommon.logger import getLogger
-from vCenterShell.pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
 configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 

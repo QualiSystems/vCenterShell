@@ -12,8 +12,8 @@ from testCredentials import TestCredentials
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from vCenterShell.pycommon.logger import getLogger
-from vCenterShell.pycommon.logger import configure_loglevel
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
 configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 

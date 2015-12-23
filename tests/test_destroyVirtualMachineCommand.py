@@ -1,3 +1,5 @@
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
+
 __author__ = 'shms'
 
 import os.path
@@ -10,7 +12,6 @@ from pyVmomi import vim
 from models.VCenterTemplateModel import VCenterTemplateModel
 
 from models.VMClusterModel import VMClusterModel
-from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

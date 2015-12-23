@@ -1,6 +1,6 @@
 from pyVmomi import vim
-from vCenterShell.pycommon.pyVmomiService import *
-from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+from pycommon.pyVmomiService import *
+from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from vCenterShell.commands.VirtualMachinePortGroupConfigurer import *
 
 
