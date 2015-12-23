@@ -70,7 +70,7 @@ def get_logging_config(level_console="DEBUG", level_file=None, logfile=None):
     return logger
 
 
-initial_log_level = os.environ.get("LOG_LEVEL") or "DEBUG"
+initial_log_level = os.environ.get("LOGGING_LEVEL") or "DEBUG"
 logging.config.dictConfig(get_logging_config(initial_log_level))
 
 

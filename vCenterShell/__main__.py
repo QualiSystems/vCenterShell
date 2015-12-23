@@ -10,7 +10,7 @@ from Bootstrapper import Bootstrapper
 from vCenterShell.pycommon.logging_service import LoggingService
 
 
-INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
+INITIAL_LOG_LEVEL = os.environ.get("LOGGING_LEVEL") or "DEBUG"
 DEFAULT_LOG_FILENAME = "./logs/vCenter.log"
 
 def main():
