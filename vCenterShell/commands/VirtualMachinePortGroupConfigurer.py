@@ -2,9 +2,7 @@ from pyVmomi import vim
 from vCenterShell.pycommon.pyVmomiService import *
 from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from vCenterShell.pycommon.logger import getLogger
-from vCenterShell.pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
-configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class VirtualMachinePortGroupConfigurer(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
