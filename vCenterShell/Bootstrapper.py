@@ -31,10 +31,10 @@ class Bootstrapper(object):
                                                                  resource_connection_details_retriever)
 
         synchronous_task_waiter = SynchronousTaskWaiter()
-        dv_port_group_creator = DvPortGroupCreator(pyVmomiService, synchronous_task_waiter)
+        dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(pyVmomiService,
                                                                                   synchronous_task_waiter)
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(pyVmomiService,
+        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
                                                                               resource_connection_details_retriever,
                                                                               dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
