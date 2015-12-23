@@ -1,6 +1,6 @@
 from pyVim.connect import SmartConnect, Disconnect
 from vCenterShell.commands.DeployFromTemplateCommand import DeployFromTemplateCommand
-from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 from vCenterShell.pycommon.pyVmomiService import pyVmomiService
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
