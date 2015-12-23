@@ -1,7 +1,10 @@
 from pyVmomi import vim
 from vCenterShell.pycommon.pyVmomiService import *
 from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
-
+from vCenterShell.pycommon.logger import getLogger
+from vCenterShell.pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
+configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class VirtualMachinePortGroupConfigurer(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
@@ -38,5 +41,5 @@ class VirtualMachinePortGroupConfigurer(object):
 
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
         task = vm.ReconfigVM_Task(config_spec)
-        print "Successfully changed network"
+        logger.info("Successfully changed network")
         return self.synchronous_task_waiter.wait_for_task(task)

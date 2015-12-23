@@ -1,6 +1,9 @@
-import time
+import time, os
 from pyVmomi import vim, vmodl
-
+from vCenterShell.pycommon.logger import getLogger
+from vCenterShell.pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
+configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class SynchronousTaskWaiter(object):
     def __init__(self):
@@ -21,13 +24,13 @@ class SynchronousTaskWaiter(object):
         if task.info.state == vim.TaskInfo.State.success:
             if task.info.result is not None and not hideResult:
                 out = '%s completed successfully, result: %s' % (actionName, task.info.result)
-                print out
+                logger.info(out)
             else:
                 out = '%s completed successfully.' % actionName
-                print out
+                logger.info(out)
         else:
             out = '%s did not complete successfully: %s' % (actionName, task.info.error)
-            print out
+            logger.info(out)
             raise task.info.error
 
         return task.info.result
