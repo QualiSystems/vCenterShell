@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+"""
+@see https://waffle.io/QualiSystems/vCenterShell/cards/5666b2aa0c076d2300052216 for initial info
+"""
+
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 
@@ -22,6 +26,7 @@ class DestroyVirtualSwitchCommand(BaseCommand):
         self.csRetrieverService = data_retriever_service
         self.switch_name = switch_name
         self.port_group_name = port_group_name
+
 
     def execute(self):
         #self.delete_port_group(vCenter, dvSwitchName, portGroupName)
