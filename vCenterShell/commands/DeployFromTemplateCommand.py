@@ -7,7 +7,10 @@ from pycommon.common_collection_utils import first_or_default
 from models.DeployDataHolder import DeployDataHolder
 from pycommon.common_name_utils import generate_unique_name
 from vCenterShell.commands.BaseCommand import BaseCommand
-
+from vCenterShell.pycommon.logger import getLogger
+from vCenterShell.pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
+configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class DeployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
@@ -62,28 +65,25 @@ class DeployFromTemplateCommand(BaseCommand):
 
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
-        # print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name,
-        #                                                         template_model.vm_folder,
-        #                                                         template_model.vCenter_resource_name)
-
+        logger.info("Template: {0}, Folder: {1}, vCenter: {2}".format(template_model.template_name, template_model.vm_folder, template_model.vCenter_resource_name))
         # get power state of the cloned VM
         power_on = self.cs_retriever_service.getPowerStateAttributeData(resource_context)
-        # print "Power On: {0}".format(power_on)
+        logger.info("Power On: {0}".format(power_on))
 
         # get cluster and resource pool
         vm_cluster_model = self.cs_retriever_service.getVMClusterAttributeData(resource_context)
-        # print "Cluster: {0}, Resource Pool: {1}".format(vm_cluster_model.cluster_name, vm_cluster_model.resource_pool)
+        logger.info("Cluster: {0}, Resource Pool: {1}".format(vm_cluster_model.cluster_name, vm_cluster_model.resource_pool))
 
         # get datastore
         datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
-        # print "Datastore: {0}".format(datastore_name)
+        logger.info("Datastore: {0}".format(datastore_name))
 
         connection_details = self.resource_connection_details_retriever.connection_details(
             template_model.vCenter_resource_name)
-        # print "Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
-        #                                                                 connection_details.username,
-        #                                                                 connection_details.password,
-        #                                                                 connection_details.port)
+        logger.info("Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
+                                                                              connection_details.username,
+                                                                              connection_details.password,
+                                                                              connection_details.port))
 
         return DeployDataHolder.create_from_params(resource_context,
                                                    connection_details,

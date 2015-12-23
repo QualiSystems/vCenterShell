@@ -1,12 +1,20 @@
-﻿import os
-import sys
+﻿"""
+vCenter Shell Starter
+runs command defined with 'COMMAND' OS environment variable
+"""
 
+import os, sys
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 from Bootstrapper import Bootstrapper
+from vCenterShell.pycommon.logging_service import LoggingService
 
+
+INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
+DEFAULT_LOG_FILENAME = "./logs/vCenter.log"
 
 def main():
+    LoggingService(INITIAL_LOG_LEVEL, INITIAL_LOG_LEVEL, DEFAULT_LOG_FILENAME)
     bootstrapper = Bootstrapper()
     ces = bootstrapper.get_command_executer_service()
     commandToRun = os.environ.get('COMMAND')

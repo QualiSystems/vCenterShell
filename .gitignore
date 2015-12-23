@@ -5,10 +5,13 @@ __pycache__/
 # C extensions
 *.so
 
+logs/*.log
+
 # Distribution / packaging
 .Python
 env/
 build/
+cover/
 develop-eggs/
 dist/
 downloads/
@@ -62,3 +65,4 @@ tests/config.ini
 *.whl
 *.tar.gz
 vCenterShell/vCenterShell/vCenterShell.zip
+*.orig

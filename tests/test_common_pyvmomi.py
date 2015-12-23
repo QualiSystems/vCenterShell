@@ -5,14 +5,17 @@ from datetime import datetime
 
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
+from pycommon.pyVmomiService import pyVmomiService
 from pyVmomi import vim
 
 from testCredentials import TestCredentials
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from pycommon.pyVmomiService import pyVmomiService
-
+from vCenterShell.pycommon.logger import getLogger
+from vCenterShell.pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
+configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
@@ -37,7 +40,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         '#act'
         now = datetime.now()
         res = pv_service.clone_vm(params)
-        print 'clone took: %s' % (str(datetime.now() - now))
+        logger.debug('clone took: %s' % (str(datetime.now() - now)))
 
         '#assert'
         self.assertTrue(type(res.vm), vim.VirtualMachine)
@@ -46,7 +49,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         now = datetime.now()
         if res.error is None and res.vm is not None:
             destroyed = pv_service.destroy_vm(res.vm)
-        print 'destroy took: %s' % (str(datetime.now() - now))
+        logger.debug('destroy took: %s' % (str(datetime.now() - now)))
         self.assertIsNone(destroyed)
 
     def test_clone_vm_power_on_false(self):
@@ -850,6 +853,30 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         '#assert'
         self.assertIsNone(result)
+
+    def test_get_object_by_path_no_folder_found(self):
+        """
+        Checks if the receiving path that does not exist
+        """
+        '#arrange'
+        folder_name = 'rootFolder'
+
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.rootFolder = Mock()
+        si.content.rootFolder.name = folder_name
+        pv_service.get_folder = Mock(return_value=None)
+
+        '#act'
+        result = pv_service.find_obj_by_path(si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
+
+        '#assert'
+        self.assertIsNone(result)
+        self.assertTrue(pv_service.get_folder.called)
 
     def test_get_vm_by_uuid_vm_in_folder(self):
         """

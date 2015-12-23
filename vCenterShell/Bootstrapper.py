@@ -5,7 +5,7 @@ from pycommon.pyVmomiService import pyVmomiService
 from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.DeployFromTemplateCommand import DeployFromTemplateCommand
-from vCenterShell.commands.NetworkAdaptersRetrieverCommand import NetworkAdaptersRetrieverCommand
+from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
 from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
 
 
