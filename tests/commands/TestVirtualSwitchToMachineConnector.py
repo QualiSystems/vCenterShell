@@ -1,15 +1,14 @@
+import uuid
 from unittest import TestCase
+
 from mock import Mock, MagicMock
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-import uuid
 
-from commands.VlanSpecFactory import VlanSpecFactory
-from pycommon.logging_service import LoggingService
-from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
-from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
 from models.VCenterConnectionDetails import VCenterConnectionDetails
+from pycommon.logging_service import LoggingService
 from tests.testCredentials import TestCredentials
+from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
 from vCenterShell.commands.VirtualSwitchToMachineConnector import *
 
 
