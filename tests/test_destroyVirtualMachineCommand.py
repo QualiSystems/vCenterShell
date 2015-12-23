@@ -1,3 +1,4 @@
+from models.VCenterConnectionDetails import VCenterConnectionDetails
 from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
@@ -17,7 +18,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenter
 
 
 class test_destroyVirtualMachineCommand(unittest.TestCase):
-
     def test_destroyVirtualMachineCommand(self):
         content = Mock()
         si = create_autospec(spec=vim.ServiceInstance)
@@ -28,11 +28,14 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         pvService.destroy_vm_by_name = MagicMock()
 
         csRetrieverService = Mock()
-        csRetrieverService.getVCenterTemplateAttributeData = Mock(return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
+        csRetrieverService.getVCenterTemplateAttributeData = Mock(
+            return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
         csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
-        csRetrieverService.getVMClusterAttributeData = Mock(return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
+        csRetrieverService.getVMClusterAttributeData = Mock(
+            return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
         csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
-        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter","user":"user1","password":"pass1"})
+        csRetrieverService.getVCenterConnectionDetails = Mock(
+            return_value=VCenterConnectionDetails("vCenter", "user1", "pass1"))
 
         resource_att = Mock()
         vm_name = Mock(return_value='test')
@@ -53,4 +56,3 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         self.assertTrue(si.RetrieveContent.called)
         pvService.destroy_vm_by_name.assert_called_with(content, si, vm_name)
         self.assertTrue(helpers.get_api_session().DeleteResource.called)
-
