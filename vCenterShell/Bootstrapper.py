@@ -1,6 +1,6 @@
 from pyVim.connect import SmartConnect, Disconnect
 
-from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 from pycommon.pyVmomiService import pyVmomiService
 

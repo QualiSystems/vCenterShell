@@ -1,4 +1,4 @@
-from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
 
