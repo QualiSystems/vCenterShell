@@ -10,7 +10,7 @@ from pycommon.logger import configure_loglevel
 from pycommon.logger import getLogger
 from vCenterShell.commands.BaseCommand import BaseCommand
 logger = getLogger(__name__)
-configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
+#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class DeployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
