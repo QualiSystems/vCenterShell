@@ -11,9 +11,7 @@ from vCenterShell.pycommon.common_name_utils import generate_unique_name
 from vCenterShell.pycommon.CloudshellDataRetrieverService import *
 from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.logger import getLogger
-from vCenterShell.pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
-configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 
 class DestroyVirtualMachineCommand(BaseCommand):
