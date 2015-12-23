@@ -5,7 +5,7 @@ import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 from pycommon.CloudshellDataRetrieverService import *
 
-from vCenterShell.pycommon.logger import getLogger
+from pycommon.logger import getLogger
 logger = getLogger(__name__)
 from pycommon.common_name_utils import generate_unique_name
 
