@@ -84,7 +84,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                     dv_port_name, virtual_machine_path, vm_uuid,
                                                     port_group_path)
 
-    def test_get_uuid(self):
+    def get_uuid(self):
         credentials = TestCredentials()
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         si = py_vmomi_service.connect(credentials.host, credentials.username,
