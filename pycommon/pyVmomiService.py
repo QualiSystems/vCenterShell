@@ -1,9 +1,14 @@
 ﻿import requests
 import time
+import os
 
 from datetime import datetime
 from timeit import default_timer as timer
 from pyVmomi import vim
+from pycommon.logger import configure_loglevel
+from pycommon.logger import getLogger
+logger = getLogger(__name__)
+#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class pyVmomiService:
 
@@ -54,7 +59,7 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
@@ -151,7 +156,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         res = search_index.FindChild(look_in, name)
 
-        print 'find_obj_by_path took: %s' % (str(datetime.now() - now))
+        logger.info('find_obj_by_path took: %s' % (str(datetime.now() - now)))
         return res
 
     def get_folder(self, si, path):
@@ -202,7 +207,7 @@ class pyVmomiService:
                 child = None
 
         end = timer()
-        print 'get_folder "{0}" took: {1} seconds'.format(path, (str(end - start)))
+        logger.info('get_folder "{0}" took: {1} seconds'.format(path, (str(end - start))))
 
         return sub_folder
 
@@ -235,12 +240,12 @@ class pyVmomiService:
         task_done = False
         while not task_done:
             if task.info.state == 'success':
-                print "Task succeeded: " + task.info.state
+                logger.info("Task succeeded: " + task.info.state)
                 return task.info.result
 
             if task.info.state == 'error':
-                print "error type: %s" % task.info.error.__class__.__name__
-                print "found cause: %s" % task.info.error.faultCause
+                logger.info("error type: %s" % task.info.error.__class__.__name__)
+                logger.info("found cause: %s" % task.info.error.faultCause)
                 task_done = True
                 return None
             time.sleep(1)
@@ -348,7 +353,7 @@ class pyVmomiService:
         clone_spec.location = relo_spec
         clone_spec.powerOn = clone_params.power_on
 
-        print "cloning VM..."
+        logger.info("cloning VM...")
 
         task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
         vm = self.wait_for_task(task)
@@ -361,13 +366,13 @@ class pyVmomiService:
         :param vm: virutal machine pyvmomi object
         """
 
-        print("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name))
+        logger.info(("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name)))
 
         task = vm.PowerOffVM_Task()
         self.wait_for_task(task)
 
-        print("{0}".format(task.info.state))
-        print("Destroying VM {0}".format(vm.name))
+        logger.info(("{0}".format(task.info.state)))
+        logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
         return self.wait_for_task(task)

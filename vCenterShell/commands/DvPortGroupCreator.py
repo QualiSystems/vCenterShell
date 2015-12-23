@@ -1,7 +1,11 @@
+import os
 from pyVmomi import vim
-from vCenterShell.pycommon.pyVmomiService import *
-from vCenterShell.pycommon.SynchronousTaskWaiter import *
-
+from pycommon.pyVmomiService import *
+from pycommon.SynchronousTaskWaiter import *
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
+#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class DvPortGroupCreator(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
@@ -30,7 +34,7 @@ class DvPortGroupCreator(object):
         dv_pg_spec.defaultPortConfig.securityPolicy.inherited = False
 
         task = dv_switch.AddDVPortgroup_Task([dv_pg_spec])
-        print "Successfully created DV Port Group ", dv_port_name
+        logger.info("Successfully created DV Port Group ", dv_port_name)
         port_group = self.synchronous_task_waiter.wait_for_task(task)
 
         return port_group

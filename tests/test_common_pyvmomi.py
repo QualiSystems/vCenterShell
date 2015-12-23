@@ -1,19 +1,27 @@
 ﻿import os.path
 import sys
 import unittest
-
 from datetime import datetime
-from mock import Mock, MagicMock, create_autospec, patch
-from pyVmomi import vim
+
+from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
+
+from pycommon.logging_service import LoggingService
+from pycommon.pyVmomiService import pyVmomiService
+from pyVmomi import vim
+
 from testCredentials import TestCredentials
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from vCenterShell.pycommon.pyVmomiService import pyVmomiService
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
 
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
+        LoggingService("CRITICAL", "DEBUG", None)
         pass
 
     def tearDown(self):
@@ -35,7 +43,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         '#act'
         now = datetime.now()
         res = pv_service.clone_vm(params)
-        print 'clone took: %s' % (str(datetime.now() - now))
+        logger.debug('clone took: %s' % (str(datetime.now() - now)))
 
         '#assert'
         self.assertTrue(type(res.vm), vim.VirtualMachine)
@@ -44,7 +52,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         now = datetime.now()
         if res.error is None and res.vm is not None:
             destroyed = pv_service.destroy_vm(res.vm)
-        print 'destroy took: %s' % (str(datetime.now() - now))
+        logger.debug('destroy took: %s' % (str(datetime.now() - now)))
         self.assertIsNone(destroyed)
 
     def test_clone_vm_power_on_false(self):

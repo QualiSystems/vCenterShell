@@ -1,15 +1,13 @@
-﻿from pyVmomi import vim
-import requests
-import atexit
-from qualipy.api.cloudshell_api import *
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-import time
-import sys
-import vCenterShell.pycommon
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+﻿import time
 
+import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from pyVmomi import vim
+from pycommon.CloudshellDataRetrieverService import *
+
+from pycommon.logger import getLogger
+logger = getLogger(__name__)
+from pycommon.common_name_utils import generate_unique_name
 
 def run(pvService, cloudshellConnectData):
     """
@@ -33,24 +31,24 @@ def run(pvService, cloudshellConnectData):
     template_name = vCenterTemplateAttData["template_name"]
     vCenter_resource_name = vCenterTemplateAttData["vCenter_resource_name"]
     vm_folder = vCenterTemplateAttData["vm_folder"]
-    print "Template: {0}, Folder: {1}, vCenter: {2}".format(template_name,vm_folder,vCenter_resource_name)
+    logger.info("Template: {0}, Folder: {1}, vCenter: {2}".format(template_name,vm_folder,vCenter_resource_name))
     
 
     # get power state of the cloned VM
     power_on = csRetrieverService.getPowerStateAttributeData(resource_att)
-    print "Power On: {0}".format(power_on)
+    logger.info("Power On: {0}".format(power_on))
 
 
     # get cluster and resource pool
     vmClusterAttData = csRetrieverService.getVMClusterAttributeData(resource_att)
     cluster_name = vmClusterAttData["cluster_name"]
     resource_pool = vmClusterAttData["resource_pool"]
-    print "Cluster: {0}, Resource Pool: {1}".format(cluster_name, resource_pool)
+    logger.info("Cluster: {0}, Resource Pool: {1}".format(cluster_name, resource_pool))
 
 
     # get datastore
     datastore_name = csRetrieverService.getVMStorageAttributeData(resource_att)
-    print "Datastore: {0}".format(datastore_name)
+    logger.info("Datastore: {0}".format(datastore_name))
 
 
     reservation_id = helpers.get_reservation_context_details().id
@@ -59,7 +57,7 @@ def run(pvService, cloudshellConnectData):
     
     # get vCenter connection details from vCenter resource
     vCenterConn = csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
-    print "Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"] , vCenterConn["user"], vCenterConn["password"])
+    logger.info("Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"] , vCenterConn["user"], vCenterConn["password"]))
  
     # connect
     si = pvService.connect(vCenterConn["vCenter_url"] , vCenterConn["user"], vCenterConn["password"])
@@ -95,7 +93,7 @@ def run(pvService, cloudshellConnectData):
 
 
         sleep_sec = 5
-        print "Sleep for {0} sec".format(sleep_sec)
+        logger.info("Sleep for {0} sec".format(sleep_sec))
         time.sleep( sleep_sec )
 
         
@@ -104,7 +102,7 @@ def run(pvService, cloudshellConnectData):
         helpers.get_api_session().DeleteResource(vm_name)
 
     else:
-        print "template not found"
+        logger.info("template not found")
 
     pvService.disconnect(si)
   
