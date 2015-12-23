@@ -1,72 +1,44 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from pyVmomi import vim
 
-from vCenterShell.commands.BaseCommand import BaseCommand
-from vCenterShell.pycommon.pyVmomiService import pyVmomiService
-from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
+from pycommon.common_collection_utils import first_or_default
 
 
-class VirtualSwitchConnectCommand(BaseCommand):
-    def __init__(self, py_vmomi_service, cs_retriever_service, logger, network_adapters_retriever):
-        self.py_vmomi_service = py_vmomi_service
+class VirtualSwitchConnectCommand:
+    def __init__(self, cs_retriever_service, virtual_switch_to_machine_connector,
+                 dv_port_group_name_generator, vlan_spec_factory):
+        """
+        :param cs_retriever_service:
+        :param virtual_switch_to_machine_connector:
+        :param dv_port_group_name_generator: DvPortGroupNameGenerator
+        :param vlan_spec_factory: VlanSpecFactory
+        """
         self.csRetrieverService = cs_retriever_service
-        self.logger = logger
-        self.network_adapters_retriever = network_adapters_retriever
+        self.virtual_switch_to_machine_connector = virtual_switch_to_machine_connector
+        self.dv_port_group_name_generator = dv_port_group_name_generator
+        self.vlan_spec_factory = vlan_spec_factory  # type: VlanSpecFactory
 
-    def execute(self):
+    def connect_vm_to_vlan(self, vlan_id, vlan_spec_type):
+        resource_context = helpers.get_resource_context_details()
+        inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_context)
 
-        resource_att = helpers.get_resource_context_details()
-        network_name = resource_att["network_name"]
-        network_path = resource_att["network_path"]
+        vm_uuid = resource_context.attributes['UUID']
 
-        inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_att)
-        vcenter_resource_name = inventory_path_data["vCenter_resource_name"]
-        machine_path = inventory_path_data["vm_folder"]
+        virtual_machine_path = inventory_path_data.vm_folder
+        vcenter_resource_name = inventory_path_data.vCenter_resource_name
 
-        connection_details = self.resourceConnectionDetailsRetriever.connection_details(vcenter_resource_name)
-        si = self.pvService.connect(connection_details.host, connection_details.user, connection_details.password,
-                                    connection_details.port)
+        session = helpers.get_api_session()
+        vcenter_resource_details = session.GetResourceDetails(vcenter_resource_name)
 
-        network = self.py_vmomi_service.find_network_by_name(si, network_path, network_name)
+        dv_switch_path = first_or_default(vcenter_resource_details.ResourceAttributes,
+                                          lambda att: att.Name == 'Default dvSwitch Path').Value
+        dv_switch_name = first_or_default(vcenter_resource_details.ResourceAttributes,
+                                          lambda att: att.Name == 'Default dvSwitch Name').Value
+        port_group_path = first_or_default(vcenter_resource_details.ResourceAttributes,
+                                           lambda att: att.Name == 'Default port group path').Value
 
-        vm = self.py_vmomi_service.find_vm_by_name(si, machine_path, vcenter_resource_name)
+        dv_port_name = self.dv_port_group_name_generator.generate_port_group_name(vlan_id)
+        vlan_spec = self.vlan_spec_factory.get_vlan_spec(vlan_spec_type)
 
-        virtual_network_cards = self.network_adapters_retriever.retrieve_virtual_network_cards()
-
-        self.new_virtual_port_group(connection_details.host, v_switch_name, port_group_name, vlad_id)
-        pass
-
-    
-    """
-    Method to create a new virtual port group
-    :param host_name: host name to configure
-    :param v_switch_name: v_switch to configure
-    :param port_group_name: the port group to configure
-    :param vlan_id: the vlan Id to set
-    """
-    def new_virtual_port_group(self, host_name, v_switch_name, port_group_name, vlan_id=0):
-        try:
-            self.logger.info("creating new port group %s on vswitch %s" % (port_group_name, v_switch_name))
-            host = self.content.searchIndex.FindByDnsName(dnsName = host_name, vmSearch = False)
-
-            if host is None:
-                self.logger.error("could not find host %s", host_name)
-                return
-
-            network_config = host.config.network
-            network_system = host.configManager.networkSystem
-
-            spec = self.vim.host.PortGroup.Specification()
-            spec.name = port_group_name
-            spec.vlanId = vlan_id
-            spec.vswitchName = v_switch_name
-            spec.policy = self.vim.host.NetworkPolicy()
-            network_system.AddPortGroup(spec)
-
-            message = "Port group %s created on %s" % (port_group_name, v_switch_name)
-            self.logger.info(message)
-            return message
-
-        except Exception as e:
-            self.logger.error(e)
-            return e.msg
+        self.virtual_switch_to_machine_connector.connect(vcenter_resource_name, dv_switch_path, dv_switch_name,
+                                                         dv_port_name, virtual_machine_path, vm_uuid,
+                                                         port_group_path, vlan_id, vlan_spec)
