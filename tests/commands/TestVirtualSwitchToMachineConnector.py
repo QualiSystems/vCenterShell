@@ -4,6 +4,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 import uuid
 
+from pycommon.logging_service import LoggingService
 from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
 from models.VCenterConnectionDetails import VCenterConnectionDetails
@@ -12,6 +13,8 @@ from vCenterShell.commands.VirtualSwitchToMachineConnector import *
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
+    LoggingService("CRITICAL", "DEBUG", None)
+
     def test_connect(self):
         # Arrange
         si = Mock()

@@ -5,6 +5,8 @@ from datetime import datetime
 
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
+
+from pycommon.logging_service import LoggingService
 from pycommon.pyVmomiService import pyVmomiService
 from pyVmomi import vim
 
@@ -15,10 +17,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 from pycommon.logger import getLogger
 from pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
-configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, 'logs', None))
+
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
+        LoggingService("CRITICAL", "DEBUG", None)
         pass
 
     def tearDown(self):
