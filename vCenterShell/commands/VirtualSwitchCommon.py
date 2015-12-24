@@ -9,7 +9,7 @@ from vCenterShell.pycommon.pyVmomiService import *
 
 from vCenterShell.commands.BaseCommand import BaseCommand
 from vCenterShell.pycommon.utilites.lazy_property import lazy_property
-from vCenterShell.pycommon.logger import getLogger
+frompycommon.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 

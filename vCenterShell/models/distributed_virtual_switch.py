@@ -2,7 +2,7 @@
 
 from vCenterShell.models.named_entry import NamedEntry
 
-from vCenterShell.pycommon.logger import getLogger
+frompycommon.logger import getLogger
 _logger = getLogger("vCenterCommon")
 
 
