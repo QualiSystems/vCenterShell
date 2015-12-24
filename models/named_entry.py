@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-frompycommon.logger import getLogger
+from pycommon.logger import getLogger
 _logger = getLogger("vCenterCommon")
 
 
