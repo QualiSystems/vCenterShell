@@ -14,7 +14,10 @@ class VirtualMachinePortGroupConfigurer(object):
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
 
-    def configure_port_group_on_vm(self, service_instance, virtual_machine_path, vm_uuid, port_group_path,
+    def configure_port_group_on_vm(self, service_instance,
+                                   virtual_machine_path,
+                                   vm_uuid,
+                                   port_group_path,
                                    port_group_name):
 
         vm = self.pyvmomi_service.find_by_uuid(service_instance, virtual_machine_path, vm_uuid)

@@ -49,8 +49,7 @@ class VirtualSwitchRevokeCommand(VirtualSwitchCommandBase):
         dv_switch_name = first_or_default(vcenter_resource_details.ResourceAttributes,
                                           lambda att: att.Name == 'Default dvSwitch Name').Value
 
-        self.revoker.revoke(vlan_id,
-                            vm_name,
+        self.revoker.revoke(vm_name,
                             vm_uuid,
                             dv_switch_path,
                             dv_switch_name,
