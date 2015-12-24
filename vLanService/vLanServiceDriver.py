@@ -8,8 +8,9 @@ attributes = helpers.get_resource_context_details().attributes
 vlan = attributes['VLAN Id']
 access_mode = attributes['Access Mode']
 atLeastOneConnected = False
+resource_name = helpers.get_resource_context_details().name
 for connector in connectors:
-    if connector.Source == helpers.get_resource_context_details().name:
+    if connector.Source == resource_name or connector.Target == resource_name:
         session.ExecuteCommand(reservation_id, connector.Target, 'Resource', 'Connect',
                                [InputNameValue('COMMAND', "connect"),
                                 InputNameValue('VLAN_ID', vlan),
