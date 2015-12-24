@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from commands.VLanIdRangeParser import VLanIdRangeParser
+from vCenterShell.commands.VLanIdRangeParser import VLanIdRangeParser
 
 
 class TestVLanIdRangeParser(TestCase):
