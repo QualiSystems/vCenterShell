@@ -1,4 +1,5 @@
-﻿from models.VCenterTemplateModel import *
+﻿from models.VCenterConnectionDetails import VCenterConnectionDetails
+from models.VCenterTemplateModel import *
 from models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
 from models.VMClusterModel import *
 from pycommon.common_collection_utils import first_or_default
@@ -65,11 +66,8 @@ class CloudshellDataRetrieverService:
                                          lambda att: att.Name == "Password").Value
         vcenter_url = vCenter_resource_details.Address
         password = session.DecryptPassword(encryptedPass).Value
-        return {
-            "user": user,
-            "password": password,
-            "vCenter_url": vcenter_url
-        }
+
+        return VCenterConnectionDetails(vcenter_url, user, password)
 
     def getVCenterInventoryPathAttributeData(self, resource_attributes):
         """ get vCenter resource name & virtual machine folder path """

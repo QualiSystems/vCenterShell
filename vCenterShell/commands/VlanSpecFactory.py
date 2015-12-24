@@ -4,9 +4,8 @@ from pyVmomi import vim
 class VlanSpecFactory(object):
     def __init__(self):
         self.dvsVlanSpec = {
-            'VLAN': vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec(),
-            'VLAN Trunking': vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec(),
-            'Private VLAN': vim.dvs.VmwareDistributedVirtualSwitch.PvlanSpec()
+            'Access': vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec(),
+            'Trunk': vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec()
         }
 
     def get_vlan_spec(self, vlan_spec_name):

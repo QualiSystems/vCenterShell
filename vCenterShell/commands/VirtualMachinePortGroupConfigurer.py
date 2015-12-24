@@ -17,7 +17,8 @@ class VirtualMachinePortGroupConfigurer(object):
     def configure_port_group_on_vm(self, service_instance, virtual_machine_path, vm_uuid, port_group_path,
                                    port_group_name):
 
-        vm = self.pyvmomi_service.find_by_uuid(service_instance, virtual_machine_path, vm_uuid)
+        logger.debug("virtual machine path {} vmUUID {}".format(virtual_machine_path, vm_uuid))
+        vm = self.pyvmomi_service.find_by_uuid(service_instance, vm_uuid, True, virtual_machine_path)
         # vm = self.pyvmomi_service.find_vm_by_name(service_instance, virtual_machine_path, virtual_machine_name)
         # This code is for changing only one Interface. For multiple Interface
         # Iterate through a loop of network names.

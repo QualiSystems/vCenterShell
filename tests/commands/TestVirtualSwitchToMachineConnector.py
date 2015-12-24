@@ -46,7 +46,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         # Assert
         dv_port_group_creator.create_dv_port_group.assert_called_with(dv_port_name, dv_switch_name, dv_switch_path, si,
-                                                                      vlan_spec)
+                                                                      vlan_spec, 11)
         virtual_machine_port_group_configurer.configure_port_group_on_vm.assert_called_with(si, virtual_machine_path,
                                                                                             vm_uuid,
                                                                                             port_group_path,
@@ -77,12 +77,13 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         port_group_path = 'QualiSB'
         dv_switch_path = 'QualiSB'
         dv_switch_name = 'dvSwitch'
-        dv_port_name = 'boris_group21'
+        dv_port_name = 'boris_group24'
 
         # Act
         virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
                                                     dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path)
+                                                    port_group_path, 32,
+                                                    vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
 
     def get_uuid(self):
         credentials = TestCredentials()
