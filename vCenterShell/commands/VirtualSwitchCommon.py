@@ -5,24 +5,23 @@
 """
 
 from pyVmomi import vim
-from vCenterShell.pycommon.pyVmomiService import *
+from pycommon.pyVmomiService import *
 
 from vCenterShell.commands.BaseCommand import BaseCommand
-from vCenterShell.pycommon.utilites.lazy_property import lazy_property
-frompycommon.logger import getLogger
+from pycommon.utilites.lazy_property import lazy_property
+from pycommon.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 
 #@todo only for development purposes - can be removed in next
-from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
-from vCenterShell.pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-from vCenterShell.pycommon.pyVmomiService import pyVmomiService
-from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
-from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
+from models.VCenterConnectionDetails import VCenterConnectionDetails
+from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+from pycommon.pyVmomiService import pyVmomiService
+from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 
 
 #@todo move to more suitable place
-def connection_detaiuls_by_vm_name(vm_name, connection_retriever):
+def connection_details_by_vm_name(vm_name, connection_retriever):
     assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
     connection_details = connection_retriever.connection_details(vm_name)
 
@@ -63,36 +62,36 @@ class VirtualSwitchCommandBase(BaseCommand):
     Abstract Base Switch Class
     """
     def __init__(self,
-                 connection_details,
                  pyvmomi_service,
                  connection_retriever,
-                 port_group_creator,
-                 port_group_configurator):
+                 synchronous_task_waiter=None):
 
         #@todo only for development purposes - can be removed in next
-        assert (issubclass(type(connection_details), VCenterConnectionDetails))
         assert (issubclass(type(pyvmomi_service), pyVmomiService))
         assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
-        assert (issubclass(type(port_group_creator), DvPortGroupCreator))
-        assert (isinstance(port_group_configurator, VirtualMachinePortGroupConfigurer))
 
-        self.connection_details = connection_details
+
         self.pyvmomi_service = pyvmomi_service
         self.connection_retriever = connection_retriever
-        self.port_group_creator = port_group_creator
-        self.port_group_configurator = port_group_configurator
+        self.synchronous_task_waiter = synchronous_task_waiter
 
+        self._service_instance = None
 
-    @lazy_property
+    def is_vcenter_connected(self):
+        return bool(self._service_instance)
+
+    def vcenter_connect(self, connection_details):
+        self._service_instance = service_connection(connection_details, self.pyvmomi_service, self.connection_retriever)
+
+    @property
     def si(self):
-        """
-        :return: 'Service Instance' (SI) object
-        """
-        return service_connection(self.connection_details,
-                                  self.pyvmomi_service,
-                                  self.connection_retriever)
+        return self.service_instance()
 
+    def service_instance(self):
+        return self._service_instance
 
+    def get_connection_details(self, vm_name):
+        return connection_details_by_vm_name(vm_name, self.connection_retriever)
 
-    # def get_virtual_machine(self, service_instance, vm_path, vm_uuid):
-    #     vm = self.pyvmomi_service.find_by_uuid(service_instance, vm_path, vm_uuid)
+    def get_virtual_machine(self, service_instance, vm_path, vm_uuid):
+        vm = self.pyvmomi_service.find_by_uuid(service_instance, vm_path, vm_uuid)
