@@ -19,6 +19,8 @@ class DvPortGroupCreator(object):
 
     def create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id):
         dv_switch = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_switch_name)
+        if dv_switch is None:
+            raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         dv_pg_spec = vim.dvs.DistributedVirtualPortgroup.ConfigSpec()
         dv_pg_spec.name = dv_port_name
