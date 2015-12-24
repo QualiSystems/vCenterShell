@@ -13,16 +13,16 @@ from pycommon.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 
-#@todo only for development purposes - can be removed in next
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-from pycommon.pyVmomiService import pyVmomiService
-from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+# #@todo only for development purposes - can be removed in next
+# from models.VCenterConnectionDetails import VCenterConnectionDetails
+# from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+# from pycommon.pyVmomiService import pyVmomiService
+# from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 
 
 #@todo move to more suitable place
 def connection_details_by_vm_name(vm_name, connection_retriever):
-    assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
+    #assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
     connection_details = connection_retriever.connection_details(vm_name)
 
     if not connection_details:
@@ -41,9 +41,9 @@ def service_connection(connection_details, pyvmomi_service, connection_retriever
     """
 
     #@todo only for development purposes - can be removed in next
-    assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
-    assert (issubclass(type(pyvmomi_service), pyVmomiService))
-    assert(isinstance(connection_details, VCenterConnectionDetails))
+    # assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
+    # assert (issubclass(type(pyvmomi_service), pyVmomiService))
+    # assert(isinstance(connection_details, VCenterConnectionDetails))
 
     _logger.debug("Connection to vCenter  Via [{host}:{port}] User: '{username}'".format(
         **connection_details.as_dict()))
@@ -67,8 +67,8 @@ class VirtualSwitchCommandBase(BaseCommand):
                  synchronous_task_waiter=None):
 
         #@todo only for development purposes - can be removed in next
-        assert (issubclass(type(pyvmomi_service), pyVmomiService))
-        assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
+        # assert (issubclass(type(pyvmomi_service), pyVmomiService))
+        # assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
 
 
         self.pyvmomi_service = pyvmomi_service
