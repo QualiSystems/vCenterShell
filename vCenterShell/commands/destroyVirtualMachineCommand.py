@@ -1,17 +1,12 @@
-﻿from pyVmomi import vim
-import requests
-import atexit
-from qualipy.api.cloudshell_api import *
+﻿import os
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-import time
-import sys
-import vCenterShell.pycommon
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+from pycommon.CloudshellDataRetrieverService import *
+
 from vCenterShell.commands.BaseCommand import BaseCommand
-from vCenterShell.pycommon.logger import getLogger
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
+#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 
 class DestroyVirtualMachineCommand(BaseCommand):

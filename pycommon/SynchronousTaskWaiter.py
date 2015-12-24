@@ -1,7 +1,9 @@
 import time, os
 from pyVmomi import vim, vmodl
-from vCenterShell.pycommon.logger import getLogger
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
 logger = getLogger(__name__)
+#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class SynchronousTaskWaiter(object):
     def __init__(self):

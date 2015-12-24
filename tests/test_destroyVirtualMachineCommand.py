@@ -1,14 +1,18 @@
+from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
+
 __author__ = 'shms'
 
 import os.path
 import sys
 import unittest
-from mock import Mock, create_autospec, MagicMock
+
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from mock import Mock, create_autospec, MagicMock
 from pyVmomi import vim
-from vCenterShell.models.VCenterTemplateModel import VCenterTemplateModel
-from vCenterShell.models.VMClusterModel import VMClusterModel
+from models.VCenterTemplateModel import VCenterTemplateModel
+
+from models.VMClusterModel import VMClusterModel
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 

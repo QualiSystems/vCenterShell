@@ -67,3 +67,4 @@ tests/config.ini
 *.tar.gz
 vCenterShell/vCenterShell/vCenterShell.zip
 *.orig
+vCenterShell.zip
