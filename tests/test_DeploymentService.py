@@ -1,221 +1,88 @@
-﻿import json
-import unittest
-
-from mock import Mock, create_autospec
-from pyVmomi import vim
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from models.VCenterTemplateModel import VCenterTemplateModel
-
-from models.VMClusterModel import VMClusterModel
-from vCenterShell.commands.DeployFromTemplateCommand import *
+﻿import unittest
+from mock import Mock, MagicMock
+from deploymentServiceDriver.DeploymentServiceDriver import *
+from pycommon.CloudshellDataRetrieverService import *
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 
-class test_deployFromTemplateCommand(unittest.TestCase):
+class test_DeploymentService(unittest.TestCase):
+    def test_get_data_holder_in_deployment_service(self):
+        cs = Mock()
+        cs.getVCenterTemplateAttributeData = Mock(return_value=VCenterTemplateModel("vCenter", "some_folder",
+                                                                                    "vm_template"))
+        cs.getPowerStateAttributeData = Mock(return_value=True)
+        cs.getVMClusterAttributeData = Mock(return_value=VMClusterModel("some_cluster", "some_resource_pool"))
+        cs.getVMStorageAttributeData = Mock(return_value="some_datastore")
 
-    def test_deployFromTemplateCommand(self):
-        content = Mock()
-        si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock(return_value=content)
+        deploymentService = DeploymentServiceDriver(cs)
 
-        vmTemplate = Mock()
+        helpers.get_resource_context_details = Mock()
 
-        pvService = Mock()
-        pvService.connect = Mock(return_value=si)
-        pvService.disconnect = Mock(return_value=Mock())
-        pvService.get_obj = Mock(return_value=vmTemplate)
-        cloned_vm = Mock()
-        cloned_vm.error = None
-        pvService.clone_vm = Mock(return_value=cloned_vm)
+        data_holder = deploymentService._get_data_holder()
 
-        csRetrieverService = Mock()
-        csRetrieverService.getVCenterTemplateAttributeData = Mock(return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
-        csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
-        csRetrieverService.getVMClusterAttributeData = Mock(return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
-        csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
-        csRetrieverService.getVCenterConnectionDetails = Mock(return_value={"vCenter_url": "vCenter", "user":"user1", "password":"pass1"})
+        self.assertEquals(data_holder.template_model.vCenter_resource_name, "vCenter")
+        self.assertEquals(data_holder.template_model.vm_folder, "some_folder")
+        self.assertEquals(data_holder.template_model.template_name, "vm_template")
 
-        resourceContext = Mock()
-        resourceContext.attributes = {"vCenter Template": "vCenter/Alex/test"}
-        helpers.get_resource_context_details = Mock(return_value=resourceContext)
+        self.assertEquals(data_holder.datastore_name, "some_datastore")
 
+        self.assertEquals(data_holder.vm_cluster_model.cluster_name, "some_cluster")
+        self.assertEquals(data_holder.vm_cluster_model.resource_pool, "some_resource_pool")
+
+        self.assertTrue(data_holder.power_on)
+
+        self.assertIsNone(data_holder.connection_details)
+        self.assertIsNone(data_holder.resource_context)
+
+    def test_execute_deployment_service(self):
         session = Mock()
-        session.GetResourceDetails = Mock(return_value={})
-        session.CreateResource = Mock()
-        session.AddResourcesToReservation = Mock()
-        session.SetAttributesValues = Mock()
+        session.ExecuteCommand = MagicMock(return_value=Mock(Output="jsonresult"))
 
-        reservationContext = Mock(id="d8efb46f-4440-4685-b043-68de14ec4470")
-        helpers.get_reservation_context_details = Mock(return_value=reservationContext)
+        reservation_details = Mock()
+        reservation_details.id = "3c4b9463-a722-4a63-9c9a-464da6d1e84b"
+
+        helpers.get_reservation_context_details = Mock(return_value=reservation_details)
         helpers.get_api_session = Mock(return_value=session)
 
-        connection_details = VCenterConnectionDetails("vCenter", "user", "pass1")
+        template_model = VCenterTemplateModel("vCenter", "some_folder", "vm_template")
+        vm_cluster_model = VMClusterModel("some_cluster", "some_resource_pool")
+        data_holder = DeployDataHolder.create_from_params(template_model=template_model,
+                                                          datastore_name="some_datastore",
+                                                          vm_cluster_model=vm_cluster_model,
+                                                          power_on=True,
+                                                          connection_details=None,
+                                                          resource_context=None)
+        json_data_holder = jsonpickle.encode(data_holder, unpicklable=False)
 
-        resource_connection_details_retriever = Mock()
-        resource_connection_details_retriever.get_connection_details = Mock(return_value=connection_details)
+        command_inputs = [InputNameValue(DeploymentServiceDriver.INPUT_KEY_COMMAND, "deploy_from_template"),
+                          InputNameValue(DeploymentServiceDriver.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
 
-        command = DeployFromTemplateCommand(pvService, csRetrieverService, resource_connection_details_retriever)
-        command.execute()
+        cs = Mock()
+        deploymentService = DeploymentServiceDriver(cs)
+        deploymentService._get_data_holder = Mock(return_value=data_holder)
+        deploymentService._get_command_inputs_list = Mock(return_value=command_inputs)
 
-        self.assertTrue(pvService.clone_vm.called)
-        self.assertTrue(session.CreateResource.called)
-        self.assertTrue(session.AddResourcesToReservation.called)
-        self.assertTrue(session.SetAttributesValues.called)
+        deploymentService.execute()
 
-    def test_deploy_execute_create_vm_error(self):
-        content = Mock()
-        si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock(return_value=content)
+        session.ExecuteCommand.assert_called_with(reservation_details.id,
+                                                  data_holder.template_model.vCenter_resource_name,
+                                                  "Resource",
+                                                  DeploymentServiceDriver.COMMAND_DEPLOY_FROM_TEMPLATE,
+                                                  command_inputs,
+                                                  False)
 
-        vmTemplate = Mock()
+    def test_get_command_inputs_list(self):
+        json_data = '{"key1":"value1"}'
 
-        pvService = Mock()
-        pvService.connect = Mock(return_value=si)
-        pvService.disconnect = Mock(return_value=Mock())
-        pvService.get_obj = Mock(return_value=vmTemplate)
-        cloned_vm = Mock()
-        cloned_vm.error = 'this is mock error'
+        cs = Mock()
+        deployment_service = DeploymentServiceDriver(cs)
+        command_inputs = deployment_service._get_command_inputs_list(json_data)
 
-        pvService.clone_vm = Mock(return_value=cloned_vm)
+        self.assertEquals(len(command_inputs), 2)
+        self.assertEquals(command_inputs[0].Value, "deploy_from_template")
+        self.assertEquals(command_inputs[0].Name, DeploymentServiceDriver.INPUT_KEY_COMMAND)
+        self.assertEquals(command_inputs[1].Value, json_data)
+        self.assertEquals(command_inputs[1].Name, DeploymentServiceDriver.INPUT_KEY_DEPLOY_DATA)
 
-        param = {
-          "resource_context": None,
-          "template_model": {
-            "vCenter_resource_name": "vcenter_resource_name",
-            "vm_folder": "vfolder_name",
-            "template_name": "template_name"
-          },
-          "connection_details": {
-            "host": "host",
-            "username": "user",
-            "password": "pass",
-            "port": "port"
-          },
-          "vm_cluster_model": {
-            "cluster_name": "cluster_name",
-            "resource_pool": "resource_pool"
-          },
-          "datastore_name": "datastore_name",
-          "power_on": False
-        }
 
-        command = DeployFromTemplateCommand(pvService, None, None)
-        command.get_params_from_env = Mock(return_value=json.dumps(param))
-
-        self.assertRaises(ValueError, command.execute_deploy_from_template)
-
-        self.assertTrue(pvService.clone_vm.called)
-        self.assertTrue(command.get_params_from_env.called)
-
-    def test_deploy_execute_full_params(self):
-        content = Mock()
-        si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock(return_value=content)
-
-        vmTemplate = Mock()
-
-        pvService = Mock()
-        pvService.connect = Mock(return_value=si)
-        pvService.disconnect = Mock(return_value=Mock())
-        pvService.get_obj = Mock(return_value=vmTemplate)
-        cloned_vm = Mock()
-        cloned_vm.error = None
-        cloned_vm.vm = Mock()
-        cloned_vm.vm.summary = Mock()
-        cloned_vm.vm.summary.config = Mock()
-        cloned_vm.vm.summary.config.uuid = 'uuid_mock'
-
-        pvService.clone_vm = Mock(return_value=cloned_vm)
-
-        param = {
-          "resource_context": None,
-          "template_model": {
-            "vCenter_resource_name": "vcenter_resource_name",
-            "vm_folder": "vfolder_name",
-            "template_name": "template_name"
-          },
-          "connection_details": {
-            "host": "host",
-            "username": "user",
-            "password": "pass",
-            "port": "port"
-          },
-          "vm_cluster_model": {
-            "cluster_name": "cluster_name",
-            "resource_pool": "resource_pool"
-          },
-          "datastore_name": "datastore_name",
-          "power_on": False
-        }
-
-        command = DeployFromTemplateCommand(pvService, None, None)
-        command.get_params_from_env = Mock(return_value=json.dumps(param))
-        command.execute_deploy_from_template()
-
-        self.assertTrue(pvService.clone_vm.called)
-        self.assertTrue(command.get_params_from_env.called)
-
-    def test_get_params_from_env(self):
-        # arrange
-        env_param = '{"this": "is json"}'
-        os.environ.__setitem__('DEPLOY_DATA', env_param)
-        command = DeployFromTemplateCommand(None, None, None)
-
-        # act
-        params = command.get_params_from_env()
-
-        # assert
-        self.assertEqual(params, env_param)
-
-    def test_deploy_execute_no_connection_details(self):
-        # set
-        content = Mock()
-        si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock(return_value=content)
-
-        vmTemplate = Mock()
-
-        pvService = Mock()
-        pvService.connect = Mock(return_value=si)
-        pvService.disconnect = Mock(return_value=Mock())
-        pvService.get_obj = Mock(return_value=vmTemplate)
-        cloned_vm = Mock()
-        cloned_vm.error = None
-        cloned_vm.vm = Mock()
-        cloned_vm.vm.summary = Mock()
-        cloned_vm.vm.summary.config = Mock()
-        cloned_vm.vm.summary.config.uuid = 'uuid_mock'
-
-        pvService.clone_vm = Mock(return_value=cloned_vm)
-
-        param = {
-          "resource_context": None,
-          "template_model": {
-            "vCenter_resource_name": "vcenter_resource_name",
-            "vm_folder": "vfolder_name",
-            "template_name": "template_name"
-          },
-          "connection_details": None,
-          "vm_cluster_model": {
-            "cluster_name": "cluster_name",
-            "resource_pool": "resource_pool"
-          },
-          "datastore_name": "datastore_name",
-          "power_on": False
-        }
-
-        connection_details = VCenterConnectionDetails("vCenter", "user", "pass1")
-        resource_connection_details_retriever = Mock()
-        resource_connection_details_retriever.get_connection_details = Mock(return_value=connection_details)
-
-        command = DeployFromTemplateCommand(pvService, None, resource_connection_details_retriever)
-        command.get_params_from_env = Mock(return_value=json.dumps(param))
-
-        # act
-        command.execute_deploy_from_template()
-
-        # assert
-        self.assertTrue(pvService.clone_vm.called)
-        self.assertTrue(resource_connection_details_retriever.connection_details.called)
-        self.assertTrue(command.get_params_from_env.called)

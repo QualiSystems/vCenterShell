@@ -16,7 +16,7 @@
         self.deployFromTemplateCommand = deploy_from_template_command
 
     def deploy_from_template(self):
-        self.deployFromTemplateCommand.deploy_execute()
+        self.deployFromTemplateCommand.execute_deploy_from_template()
 
     def deploy(self):
         self.deployFromTemplateCommand.execute()
