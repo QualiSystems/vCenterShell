@@ -20,7 +20,7 @@ class VirtualSwitchToMachineConnector(object):
                                           connection_details.password,
                                           connection_details.port)
 
-        self.dv_port_group_creator.create_dv_port_group(dv_port_name, dv_switch_name, dv_switch_path, si, vlan_spec)
+        self.dv_port_group_creator.create_dv_port_group(dv_port_name, dv_switch_name, dv_switch_path, si, vlan_spec, vlad_id)
 
         self.virtual_machine_port_group_configurer.configure_port_group_on_vm(si, virtual_machine_path, vm_uuid,
                                                                               port_group_path,

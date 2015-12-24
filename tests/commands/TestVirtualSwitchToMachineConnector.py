@@ -46,7 +46,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         # Assert
         dv_port_group_creator.create_dv_port_group.assert_called_with(dv_port_name, dv_switch_name, dv_switch_path, si,
-                                                                      vlan_spec)
+                                                                      vlan_spec, 11)
         virtual_machine_port_group_configurer.configure_port_group_on_vm.assert_called_with(si, virtual_machine_path,
                                                                                             vm_uuid,
                                                                                             port_group_path,

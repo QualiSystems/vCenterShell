@@ -7,12 +7,14 @@ from timeit import default_timer as timer
 from pyVmomi import vim
 from pycommon.logger import configure_loglevel
 from pycommon.logger import getLogger
+
 logger = getLogger(__name__)
-#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
+
+
+# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class pyVmomiService:
-
-    #region consts
+    # region consts
     ChildEntity = 'childEntity'
     VM = 'vmFolder'
     Network = 'networkFolder'
@@ -20,7 +22,8 @@ class pyVmomiService:
     Host = 'hostFolder'
     Datastore = 'datastoreFolder'
     Cluster = 'cluster'
-    #endregion
+
+    # endregion
 
     def __init__(self, connect, disconnect, vim_import=None):
         self.pyvmomi_connect = connect
@@ -72,7 +75,7 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datacenter name to return
-        """  
+        """
         return self.find_obj_by_path(si, path, name, self.Datacenter)
 
     def find_by_uuid(self, si, path, uuid, is_vm=True):
@@ -83,39 +86,39 @@ class pyVmomiService:
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param uuid:       the object uuid
         :param is_vm:     if true, search for virtual machines, otherwise search for hosts
-        """  
+        """
         folder = self.get_folder(si, path)
         search_index = si.content.searchIndex
         return search_index.FindByUuid(folder, uuid, is_vm)
 
-    def find_host_by_name(self, si, path, name):     
+    def find_host_by_name(self, si, path, name):
         """
         Finds datastore in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """  
+        """
         return self.find_obj_by_path(si, path, name, self.Host)
 
-    def find_datastore_by_name(self, si, path, name):     
+    def find_datastore_by_name(self, si, path, name):
         """
         Finds datastore in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """  
+        """
         return self.find_obj_by_path(si, path, name, self.Datastore)
 
-    def find_network_by_name(self, si, path, name):     
+    def find_network_by_name(self, si, path, name):
         """
         Finds network in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """  
+        """
         return self.find_obj_by_path(si, path, name, self.Network)
 
     def find_vm_by_name(self, si, path, name):
@@ -125,7 +128,7 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the vm name to return
-        """  
+        """
         return self.find_obj_by_path(si, path, name, self.VM)
 
     def find_obj_by_path(self, si, path, name, type_name):
@@ -136,7 +139,7 @@ class pyVmomiService:
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the object name to return
         :param type_name:   the name of the type, can be (vm, network, host, datastore)
-        """         
+        """
 
         now = datetime.now()
 
@@ -191,13 +194,13 @@ class pyVmomiService:
             if child is None and hasattr(sub_folder, self.Datastore):
                 child = search_index.FindChild(sub_folder.datastoreFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Network):
+            if child is None and hasattr(sub_folder, self.Network):
                 child = search_index.FindChild(sub_folder.networkFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Host):
+            if child is None and hasattr(sub_folder, self.Host):
                 child = search_index.FindChild(sub_folder.hostFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Datacenter):
+            if child is None and hasattr(sub_folder, self.Datacenter):
                 child = search_index.FindChild(sub_folder.datacenterFolder, currPath)
 
             if child is None:
@@ -223,7 +226,7 @@ class pyVmomiService:
 
         obj = None
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vimtype, True)
+                content.rootFolder, vimtype, True)
         for c in container.view:
             if name:
                 if c.name == name:
@@ -236,7 +239,7 @@ class pyVmomiService:
         return obj
 
     def wait_for_task(self, task):
-        """ wait for a vCenter task to finish """    
+        """ wait for a vCenter task to finish """
         task_done = False
         while not task_done:
             if task.info.state == 'success':
@@ -254,6 +257,7 @@ class pyVmomiService:
         """
         This is clone_vm method params object
         """
+
         def __init__(self,
                      si,
                      template_name,
@@ -287,6 +291,7 @@ class pyVmomiService:
         """
         Clone vm result object, will contain the cloned vm or error message
         """
+
         def __init__(self, vm=None, error=None):
             """
             Constructor receives the cloned vm or the error message
@@ -341,7 +346,8 @@ class pyVmomiService:
             resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
         else:
             '# if None, get the first one'
-            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource], clone_params.cluster_name)
+            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
+                                   clone_params.cluster_name)
             resource_pool = cluster.resourcePool
 
         '# set relo_spec'
@@ -366,7 +372,8 @@ class pyVmomiService:
         :param vm: virutal machine pyvmomi object
         """
 
-        logger.info(("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name)))
+        logger.info(
+                ("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name)))
 
         task = vm.PowerOffVM_Task()
         self.wait_for_task(task)

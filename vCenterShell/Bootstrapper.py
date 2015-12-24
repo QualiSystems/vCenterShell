@@ -14,6 +14,7 @@ from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMac
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.DeployFromTemplateCommand import DeployFromTemplateCommand
 from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
+from vCenterShell.commands.VLanIdRangeParser import VLanIdRangeParser
 
 
 class Bootstrapper(object):
@@ -32,7 +33,7 @@ class Bootstrapper(object):
 
         synchronous_task_waiter = SynchronousTaskWaiter()
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
-        virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(pyVmomiService,
+        virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
                                                                               resource_connection_details_retriever,
@@ -40,7 +41,8 @@ class Bootstrapper(object):
                                                                               virtual_machine_port_group_configurer)
         virtual_switch_cnnect_command = VirtualSwitchConnectCommand(cloudshell_data_retriever_service,
                                                                     virtual_switch_to_machine_connector,
-                                                                    DvPortGroupNameGenerator(), VlanSpecFactory())
+                                                                    DvPortGroupNameGenerator(), VlanSpecFactory(),
+                                                                    VLanIdRangeParser())
         self.commandExecuterService = CommandExecuterService(py_vmomi_service,
                                                              network_adapter_retriever_command,
                                                              destroy_virtual_machine_command,
