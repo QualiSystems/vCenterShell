@@ -82,7 +82,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         # Act
         virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
                                                     dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path)
+                                                    port_group_path, 11, vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
 
     def get_uuid(self):
         credentials = TestCredentials()
