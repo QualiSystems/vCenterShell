@@ -10,10 +10,10 @@ from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachi
 from vCenterShell.commands.VirtualSwitchConnectCommand import VirtualSwitchConnectCommand
 from vCenterShell.commands.VirtualSwitchToMachineConnector import VirtualSwitchToMachineConnector
 from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
-from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 from vCenterShell.commands.DeployFromTemplateCommand import DeployFromTemplateCommand
 from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
+from vCenterShell.commands.destroyVirtualMachineCommand import DestroyVirtualMachineCommand
 
 
 class Bootstrapper(object):

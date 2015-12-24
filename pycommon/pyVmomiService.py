@@ -75,20 +75,54 @@ class pyVmomiService:
         """  
         return self.find_obj_by_path(si, path, name, self.Datacenter)
 
-    def find_by_uuid(self, si, path, uuid, is_vm=True):
+    def find_by_uuid(self, si, uuid, is_vm=True, path=None, data_center=None):
         """
         Finds vm/host by his uuid in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
-        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param uuid:       the object uuid
+        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param is_vm:     if true, search for virtual machines, otherwise search for hosts
-        """  
-        folder = self.get_folder(si, path)
-        search_index = si.content.searchIndex
-        return search_index.FindByUuid(folder, uuid, is_vm)
+        :param data_center:
+        """
 
-    def find_host_by_name(self, si, path, name):     
+        if uuid is None:
+            return None
+        if path is not None:
+            data_center = self.find_item_in_path_by_type(si, path, vim.Datacenter)
+
+        search_index = si.content.searchIndex
+        return search_index.FindByUuid(data_center, uuid, is_vm)
+
+    def find_item_in_path_by_type(self, si, path, obj_type):
+        """
+        This function finds the first item of that type in path
+        :param ServiceInstance si: pyvmomi ServiceInstance
+        :param str path: the path to search in
+        :param type obj_type: the vim type of the object
+        :return: pyvmomi type instance object or None
+        """
+        if obj_type is None:
+            return None
+
+        search_index = si.content.searchIndex
+        sub_folder = si.content.rootFolder
+
+        if path is None or not path:
+            return sub_folder
+        paths = path.split("/")
+
+        for currPath in paths:
+            if currPath is None or not currPath:
+                continue
+
+            manage = search_index.FindChild(sub_folder, currPath)
+
+            if isinstance(manage, obj_type):
+                return manage
+        return None
+
+    def find_host_by_name(self, si, path, name):
         """
         Finds datastore in the vCenter or returns "None"
 
@@ -400,7 +434,7 @@ class pyVmomiService:
         :param vm_path: str path to the vm that will be destroyed
         """
         if vm_uuid is not None:
-            vm = self.find_by_uuid(si, vm_path, vm_uuid)
+            vm = self.find_by_uuid(si, vm_uuid, vm_path)
 
         if vm is None:
             return 'vm not found'
