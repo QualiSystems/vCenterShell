@@ -52,7 +52,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                                                             port_group_path,
                                                                                             dv_port_name)
 
-    def integrationtest(self):
+    def test_integrationtest(self):
         resource_connection_details_retriever = Mock()
         credentials = TestCredentials()
         resource_connection_details_retriever.connection_details = Mock(
@@ -77,12 +77,13 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         port_group_path = 'QualiSB'
         dv_switch_path = 'QualiSB'
         dv_switch_name = 'dvSwitch'
-        dv_port_name = 'boris_group21'
+        dv_port_name = 'boris_group24'
 
         # Act
         virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
                                                     dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path, 11, vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
+                                                    port_group_path, 32,
+                                                    vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
 
     def get_uuid(self):
         credentials = TestCredentials()

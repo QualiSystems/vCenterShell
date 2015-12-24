@@ -75,50 +75,84 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datacenter name to return
-        """
+        """  
         return self.find_obj_by_path(si, path, name, self.Datacenter)
 
-    def find_by_uuid(self, si, path, uuid, is_vm=True):
+    def find_by_uuid(self, si, uuid, is_vm=True, path=None, data_center=None):
         """
         Finds vm/host by his uuid in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
-        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param uuid:       the object uuid
+        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param is_vm:     if true, search for virtual machines, otherwise search for hosts
-        """
-        folder = self.get_folder(si, path)
-        search_index = si.content.searchIndex
-        return search_index.FindByUuid(folder, uuid, is_vm)
+        :param data_center:
+        """  
 
-    def find_host_by_name(self, si, path, name):
+        if uuid is None:
+            return None
+        if path is not None:
+            data_center = self.find_item_in_path_by_type(si, path, vim.Datacenter)
+
+        search_index = si.content.searchIndex
+        return search_index.FindByUuid(data_center, uuid, is_vm)
+
+    def find_item_in_path_by_type(self, si, path, obj_type):
+        """
+        This function finds the first item of that type in path
+        :param ServiceInstance si: pyvmomi ServiceInstance
+        :param str path: the path to search in
+        :param type obj_type: the vim type of the object
+        :return: pyvmomi type instance object or None
+        """
+        if obj_type is None:
+            return None
+
+        search_index = si.content.searchIndex
+        sub_folder = si.content.rootFolder
+
+        if path is None or not path:
+            return sub_folder
+        paths = path.split("/")
+
+        for currPath in paths:
+            if currPath is None or not currPath:
+                continue
+
+            manage = search_index.FindChild(sub_folder, currPath)
+
+            if isinstance(manage, obj_type):
+                return manage
+        return None
+
+    def find_host_by_name(self, si, path, name):     
         """
         Finds datastore in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """
+        """  
         return self.find_obj_by_path(si, path, name, self.Host)
 
-    def find_datastore_by_name(self, si, path, name):
+    def find_datastore_by_name(self, si, path, name):     
         """
         Finds datastore in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """
+        """  
         return self.find_obj_by_path(si, path, name, self.Datastore)
 
-    def find_network_by_name(self, si, path, name):
+    def find_network_by_name(self, si, path, name):     
         """
         Finds network in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the datastore name to return
-        """
+        """  
         return self.find_obj_by_path(si, path, name, self.Network)
 
     def find_vm_by_name(self, si, path, name):
@@ -128,7 +162,7 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the vm name to return
-        """
+        """  
         return self.find_obj_by_path(si, path, name, self.VM)
 
     def find_obj_by_path(self, si, path, name, type_name):
@@ -139,7 +173,7 @@ class pyVmomiService:
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param name:       the object name to return
         :param type_name:   the name of the type, can be (vm, network, host, datastore)
-        """
+        """         
 
         now = datetime.now()
 
@@ -226,7 +260,7 @@ class pyVmomiService:
 
         obj = None
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vimtype, True)
+            content.rootFolder, vimtype, True)
         for c in container.view:
             if name:
                 if c.name == name:
@@ -239,7 +273,7 @@ class pyVmomiService:
         return obj
 
     def wait_for_task(self, task):
-        """ wait for a vCenter task to finish """
+        """ wait for a vCenter task to finish """    
         task_done = False
         while not task_done:
             if task.info.state == 'success':
@@ -407,7 +441,7 @@ class pyVmomiService:
         :param vm_path: str path to the vm that will be destroyed
         """
         if vm_uuid is not None:
-            vm = self.find_by_uuid(si, vm_path, vm_uuid)
+            vm = self.find_by_uuid(si, vm_uuid, vm_path)
 
         if vm is None:
             return 'vm not found'
