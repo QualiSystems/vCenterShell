@@ -30,14 +30,17 @@ class NetworkAdaptersRetrieverCommand(BaseCommand):
         resource_att = helpers.get_resource_context_details()
 
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_att)
-        vcenter_resource_name = inventory_path_data["vCenter_resource_name"]
-        vcenter_resource_path = inventory_path_data["vm_folder"]
+        resource_name = inventory_path_data["vCenter_resource_name"]
+        resource_path = inventory_path_data["vm_folder"]
 
-        connection_details = self.resourceConnectionDetailsRetriever.get_connection_details(vcenter_resource_name)
-        message_details = u"'{}:{}' User: '{}'".format(connection_details.host, connection_details.port,
+        connection_details = self.resourceConnectionDetailsRetriever.get_connection_details(resource_name)
+        message_details = u"'{}:{}' User: '{}'".format(connection_details.host,
+                                                       connection_details.port,
                                                        connection_details.user)
         try:
-            si = self.pvService.connect(connection_details.host, connection_details.user, connection_details.password,
+            si = self.pvService.connect(connection_details.host,
+                                        connection_details.user,
+                                        connection_details.password,
                                         connection_details.port)
         except Exception, ex:
             _logger.warn(u"Cannot connect {} Reason: {}".format(message_details, ex))
@@ -45,8 +48,21 @@ class NetworkAdaptersRetrieverCommand(BaseCommand):
 
         _logger.debug(u"Successfully log in {}".format(message_details))
 
-        _logger.debug(u"Retrieving... Path: '{}' Name: '{}'".format(vcenter_resource_path, vcenter_resource_name))
-        vm_machine = self.pvService.find_network_by_name(si, vcenter_resource_path, vcenter_resource_name)
+        return NetworkAdaptersRetrieverCommand.retrieve(self.pvService, si, resource_path, resource_name)
+
+
+    @staticmethod
+    def retrieve(pvService, si, path, network_name):
+        """
+        Retrieve Network by Name
+        :param pv_service: <pycommon.pyVmomiService obj>
+        :param si: <service instance>
+        :param path: <str>
+        :param network_name: <str>
+        :return: <list of 'VirtualNicModel'>
+        """
+        _logger.debug(u"Retrieving Network... Path: '{}' Name: '{}'".format(path, network_name))
+        vm_machine = pvService.find_network_by_name(si, path, network_name)
 
         result = [VirtualNicModel(x.deviceInfo.summary,
                                   x.macAddress,
@@ -54,9 +70,8 @@ class NetworkAdaptersRetrieverCommand(BaseCommand):
                                   x.connectable.startConnected)
                     for x in vm_machine.config.hardware.device
                     if isinstance(x, vim.vm.device.VirtualEthernetCard)] if vm_machine else None
+        _logger.debug(u"Retrieving Network Result: {}".format(result))
 
-        _logger.debug(u"Result: {}".format(result))
         return result
-
 
 
