@@ -44,6 +44,15 @@ for resourcePosition in positions.ResourceDiagramLayouts:
         X = resourcePosition.X
         Y = resourcePosition.Y
 
+# Get connected resources to app
+connectedResources = []
+connectors = api.GetReservationDetails(reservationId).ReservationDescription.Connectors
+for connector in connectors:
+    if connector.Source == appName:
+        connectedResources.append(connector.Target)
+    elif connector.Target == appName:
+        connectedResources.append(connector.Source)
+
 # Create deployed app logical resource
 deployed_app_resource = None
 try:
@@ -73,6 +82,13 @@ api.RemoveServicesFromReservation(reservationId, [appName])
 api.SetResourceLiveStatus(deployed_app_resource.Name, "Online", "Active")
 
 api.WriteMessageToReservationOutput(reservationId, "Deployed " + appName + " Successfully")
+
+# Set connections that were connected to the app
+connectionsToRestore = []
+for cr in connectedResources:
+    connectionsToRestore.append(SetConnectorRequest(deployed_app_resource.Name, cr, "bi", ""))
+if len(connectionsToRestore) > 0:
+    api.SetConnectorsInReservation(reservationId, connectionsToRestore)
 
 # small delay to let the diagram refresh
 time.sleep(2)
