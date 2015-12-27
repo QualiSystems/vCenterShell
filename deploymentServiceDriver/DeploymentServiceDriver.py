@@ -6,13 +6,15 @@ from models.DeployDataHolder import DeployDataHolder
 
 
 class DeploymentServiceDriver(object):
+    INPUT_KEY_COMMAND = "COMMAND"
+    INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
+    COMMAND_DEPLOY_FROM_TEMPLATE = "Deploy From Template"
+
     def __init__(self, cs_retriever_service):
         self.cs_retriever_service = cs_retriever_service
-        self.INPUT_KEY_COMMAND = "COMMAND"
-        self.INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
 
     def execute(self):
-        data_holder = self.get_data_holder()
+        data_holder = self._get_data_holder()
         json_data_holder = jsonpickle.encode(data_holder, unpicklable=False)
 
         reservation_id = helpers.get_reservation_context_details().id
@@ -20,9 +22,8 @@ class DeploymentServiceDriver(object):
         result = api.ExecuteCommand(reservation_id,
                                     data_holder.template_model.vCenter_resource_name,
                                     "Resource",
-                                    "Deploy From Template",
-                                    [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),
-                                     InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)],
+                                    self.COMMAND_DEPLOY_FROM_TEMPLATE,
+                                    self._get_command_inputs_list(json_data_holder),
                                     False)
 
         if hasattr(result, 'Output'):
@@ -30,7 +31,7 @@ class DeploymentServiceDriver(object):
         else:
             print jsonpickle.encode(result, unpicklable=False)
 
-    def get_data_holder(self):
+    def _get_data_holder(self):
         resource_context = helpers.get_resource_context_details()
 
         # get vCenter resource name, template name, template folder
@@ -48,3 +49,7 @@ class DeploymentServiceDriver(object):
                                                    power_on=power_on,
                                                    connection_details=None,
                                                    resource_context=None)
+
+    def _get_command_inputs_list(self, json_data_holder):
+        return [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),
+                InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]

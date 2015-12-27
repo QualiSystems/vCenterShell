@@ -3,9 +3,7 @@ import time
 import os
 
 from datetime import datetime
-from timeit import default_timer as timer
 from pyVmomi import vim
-from pycommon.logger import configure_loglevel
 from pycommon.logger import getLogger
 
 logger = getLogger(__name__)
@@ -48,6 +46,7 @@ class pyVmomiService:
         requests.packages.urllib3.disable_warnings()
 
         '# Disabling SSL certificate verification'
+        context = None
         import ssl
         if hasattr(ssl, 'SSLContext'):
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -62,7 +61,9 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except IOError as e:
-            logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
+            #logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
+            import traceback
+            logger.warn("Connection Error: ({}):\n{}".format(e, traceback.format_exc()))
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
@@ -175,8 +176,6 @@ class pyVmomiService:
         :param type_name:   the name of the type, can be (vm, network, host, datastore)
         """         
 
-        now = datetime.now()
-
         folder = self.get_folder(si, path)
         if folder is None:
             return None
@@ -192,8 +191,6 @@ class pyVmomiService:
         search_index = si.content.searchIndex
         '#searches for the specific vm in the folder'
         res = search_index.FindChild(look_in, name)
-
-        logger.info('find_obj_by_path took: %s' % (str(datetime.now() - now)))
         return res
 
     def get_folder(self, si, path):
@@ -203,8 +200,6 @@ class pyVmomiService:
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         """
-
-        start = timer()
 
         search_index = si.content.searchIndex
         sub_folder = si.content.rootFolder
@@ -242,9 +237,6 @@ class pyVmomiService:
             else:
                 sub_folder = child
                 child = None
-
-        end = timer()
-        logger.info('get_folder "{0}" took: {1} seconds'.format(path, (str(end - start))))
 
         return sub_folder
 
