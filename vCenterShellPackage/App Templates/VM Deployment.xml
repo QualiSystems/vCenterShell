@@ -10,8 +10,8 @@
       </AppResource>
     </AppResources>
     <DeploymentPaths>
-      <DeploymentPath Name="vCenter VM from Template" Default="true">
-        <DeploymentService Name="vCenter VM from Template">
+      <DeploymentPath Name="vCenter VM From Template" Default="true">
+        <DeploymentService Name="vCenter VM From Template">
           <Attributes>
             <Attribute Name="VM Cluster" Value="QualiSB Cluster/LiverPool" />
             <Attribute Name="VM Power State" Value="True" />

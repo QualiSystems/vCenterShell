@@ -50,7 +50,7 @@
         <Rule Name="Execution Server Selector" />
       </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="GenericInput" Type="String" DefaultValue="" IsReadOnly="false">
+    <AttributeInfo Name="Generic Input" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules />
     </AttributeInfo>
     <AttributeInfo Name="vCenter Template" Type="String" DefaultValue="" IsReadOnly="false">
@@ -190,12 +190,12 @@
       <Models>
         <ResourceModel Name="Generic Installation Option" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="GenericInput" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Generic Input" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues />
             </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
-            <AttributeValue Name="GenericInput" Value="" />
+            <AttributeValue Name="Generic Input" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
@@ -212,7 +212,7 @@
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="vCenter VM from Template" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="vCenter VM From Template" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>            
             <AttachedAttribute Name="vCenter Template" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues />

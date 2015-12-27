@@ -1,0 +1,2 @@
+class GenericAppmodelResourceModel(object):
+    pass
