@@ -7,7 +7,7 @@ import os, sys
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 from Bootstrapper import Bootstrapper
-from vCenterShell.pycommon.logging_service import LoggingService
+from pycommon.logging_service import LoggingService
 
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"

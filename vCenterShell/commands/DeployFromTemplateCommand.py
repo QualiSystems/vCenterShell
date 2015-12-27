@@ -6,11 +6,9 @@ from qualipy.api.cloudshell_api import *
 from pycommon.common_collection_utils import first_or_default
 from models.DeployDataHolder import DeployDataHolder
 from pycommon.common_name_utils import generate_unique_name
-from pycommon.logger import configure_loglevel
 from pycommon.logger import getLogger
 from vCenterShell.commands.BaseCommand import BaseCommand
 logger = getLogger(__name__)
-#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class DeployFromTemplateCommand(BaseCommand):
     """ Command to Create a VM from a template """
@@ -81,16 +79,16 @@ class DeployFromTemplateCommand(BaseCommand):
         connection_details = self.resource_connection_details_retriever.connection_details(
             template_model.vCenter_resource_name)
         logger.info("Connecting to: {0}, As: {1}, Pwd: {2}, Port: {3}".format(connection_details.host,
-                                                                              connection_details.username,
-                                                                              connection_details.password,
-                                                                              connection_details.port))
+                                                                        connection_details.username,
+                                                                        connection_details.password,
+                                                                        connection_details.port))
 
         return DeployDataHolder.create_from_params(resource_context,
-                                                   connection_details,
-                                                   template_model,
-                                                   datastore_name,
-                                                   vm_cluster_model,
-                                                   power_on)
+                          connection_details,
+                          template_model,
+                          datastore_name,
+                          vm_cluster_model,
+                          power_on)
 
     def _create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
@@ -101,7 +99,7 @@ class DeployFromTemplateCommand(BaseCommand):
         resource_path = data_holder.template_model.vCenter_resource_name + '/' + data_holder.template_model.vm_folder
 
         session.SetAttributesValues(
-            [ResourceAttributesUpdateRequest(deploy_result.vm_name,
+                    [ResourceAttributesUpdateRequest(deploy_result.vm_name,
                                              {AttributeNameValue('vCenter Inventory Path', resource_path),
                                               AttributeNameValue('UUID', deploy_result.uuid),
                                               AttributeNameValue('vCenter Template',

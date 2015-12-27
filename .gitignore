@@ -5,7 +5,8 @@ __pycache__/
 # C extensions
 *.so
 
-logs/*.log
+# Local dev sertings which shlould not be pused out
+settings_local.py
 
 # Distribution / packaging
 .Python
@@ -66,3 +67,4 @@ tests/config.ini
 *.tar.gz
 vCenterShell/vCenterShell/vCenterShell.zip
 *.orig
+vCenterShell.zip

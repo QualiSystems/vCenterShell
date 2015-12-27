@@ -13,14 +13,14 @@ class VirtualSwitchToMachineConnector(object):
         self.virtual_machine_port_group_configurer = virtual_machine_port_group_configurer
 
     def connect(self, virtual_machine_name, dv_switch_path, dv_switch_name, dv_port_name, virtual_machine_path, vm_uuid,
-                port_group_path):
+                port_group_path, vlad_id, vlan_spec):
         connection_details = self.resourceConnectionDetailsRetriever.connection_details(virtual_machine_name)
 
         si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
                                           connection_details.password,
                                           connection_details.port)
 
-        self.dv_port_group_creator.create_dv_port_group(dv_port_name, dv_switch_name, dv_switch_path, si)
+        self.dv_port_group_creator.create_dv_port_group(dv_port_name, dv_switch_name, dv_switch_path, si, vlan_spec, vlad_id)
 
         self.virtual_machine_port_group_configurer.configure_port_group_on_vm(si, virtual_machine_path, vm_uuid,
                                                                               port_group_path,

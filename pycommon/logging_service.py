@@ -10,7 +10,7 @@ DEFAULT_LOG_FILE = "./logs/vCenterShell.log"
 
 class LoggingService(object):
     def __init__(self, log_level_console, log_level_file=None, filename=DEFAULT_LOG_FILE):
-        from pycommon.io_utils import extract_folder_name, compose_folder_if_not_existed
+        from pycommon.utilites.io_utils import extract_folder_name, compose_folder_if_not_existed
 
         log_level_file = log_level_file or log_level_console
 

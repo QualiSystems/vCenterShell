@@ -5,8 +5,10 @@ from pycommon.CloudshellDataRetrieverService import *
 from vCenterShell.commands.BaseCommand import BaseCommand
 from pycommon.logger import getLogger
 from pycommon.logger import configure_loglevel
+
 logger = getLogger(__name__)
-#configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
+
+# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 
 class DestroyVirtualMachineCommand(BaseCommand):
@@ -36,13 +38,13 @@ class DestroyVirtualMachineCommand(BaseCommand):
         vCenter_details = session.GetResourceDetails(vCenter_resource_name)
 
         # get vCenter connection details from vCenter resource
-        vCenterConn = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
+        conn_details = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
 
-        logger.info("Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"], vCenterConn["user"],
-                                                             vCenterConn["password"]))
+        logger.info("Connecting to: {0}, As: {1}, Pwd: {2}".format(conn_details.host, conn_details.username,
+                                                                   conn_details.password))
 
         # connect
-        si = self.pvService.connect(vCenterConn["vCenter_url"], vCenterConn["user"], vCenterConn["password"])
+        si = self.pvService.connect(conn_details.host, conn_details.username, conn_details.password)
         content = si.RetrieveContent()
 
         # destroy the vm
