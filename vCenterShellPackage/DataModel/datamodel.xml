@@ -1,62 +1,190 @@
-<?xml version="1.0" encoding="utf-8"?>
-<DataModelInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
+
+<ResourceManagementExportImport xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/ExportImportConfigurationSchema.xsd">
+  <Tags>
+    <Tag Name="Editable After Run (System Administrators)" />
+    <Tag Name="Editable After Run (Everyone)" />
+    <Tag Name="Configuration" />
+    <Tag Name="Setting" />
+    <Tag Name="Displayed In Diagram" />
+    <Tag Name="Link Configurations" />
+    <Tag Name="Variable Capability" />
+    <Tag Name="Constant Capability" />
+    <Tag Name="Topology Category" />
+    <Tag Name="Displayed In Route Creation" />
+    <Tag Name="Available For Abstract Resources" />
+    <Tag Name="Displayed In Search Filters" />
+    <Tag Name="Execution Server Selector" />
+    <Tag Name="Monitor Modifications" />
+    <Tag Name="Admin Only" />
+  </Tags>
   <Attributes>
-    <AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-        <Rule Name="Setting" />
-      </Rules>
+    <AttributeInfo Name="Tag" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags />
     </AttributeInfo>
-    <AttributeInfo Name="UUID" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-        <Rule Name="Setting" />
-      </Rules>
+    <AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
     </AttributeInfo>
-    <AttributeInfo Name="Location" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-        <Rule Name="Setting" />
-      </Rules>
+    <AttributeInfo Name="UUID" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
     </AttributeInfo>
-    <AttributeInfo Name="Domain Selector" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules>
-        <Rule Name="Configuration" />
-        <Rule Name="Setting" />
-        <Rule Name="Execution Server Selector" />
-      </Rules>
+    <AttributeInfo Name="Location" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
     </AttributeInfo>
-    <AttributeInfo Name="GenericInput" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules />
+    <AttributeInfo Name="vCenter_url" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
     </AttributeInfo>
-    <AttributeInfo Name="Template" Type="String" DefaultValue="" IsReadOnly="false">
-      <Rules />
+    <AttributeInfo Name="Access Mode" Type="String" DefaultValue="Access" IsReadOnly="false" IsCommand="false">
+      <Tags />
+    </AttributeInfo>
+    <AttributeInfo Name="VLAN Id" Type="String" DefaultValue="11-100" IsReadOnly="false" IsCommand="false">
+      <Tags />
+    </AttributeInfo>
+    <AttributeInfo Name="Domain Selector" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+        <TagName Name="Execution Server Selector" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="GenericInput" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags />
+    </AttributeInfo>
+    <AttributeInfo Name="Template" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags />
+    </AttributeInfo>
+    <AttributeInfo Name="vCenter Inventory Path" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Default dvSwitch Name" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Default dvSwitch Path" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Default port group path" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="User" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Password" Type="Password" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
     </AttributeInfo>
   </Attributes>
+  <Modules>
+    <Module Name="Measurement">
+      <AttachedAttributes>
+        <AttributeName>Tag</AttributeName>
+      </AttachedAttributes>
+    </Module>
+    <Module Name="Test">
+      <AttachedAttributes>
+        <AttributeName>Tag</AttributeName>
+      </AttachedAttributes>
+    </Module>
+  </Modules>
   <ResourceFamilies>
-    <ResourceFamily Name="Cloud Provider" Description="" IsSearchable="true">
+    <ResourceFamily Name="Generic App Family" IsMappableContainer="false" IsMappable="false" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic App Model" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="UUID" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="vCenter Inventory Path" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="UUID" Value="" />
+            <AttributeValue Name="vCenter Inventory Path" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers />
+        </ResourceModel>
+      </Models>
+    </ResourceFamily>
+    <ResourceFamily Name="Cloud Provider" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="true">
+      <AttachedAttributes>
+        <AttachedAttribute Name="Password" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+        <AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+      </AttachedAttributes>
+      <AttributeValues>
+        <AttributeValue Name="Password" Value="" />
+        <AttributeValue Name="User" Value="" />
+      </AttributeValues>
       <Models>
         <ResourceModel Name="vCenter" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true">
               <AllowedValues />
             </AttachedAttribute>
+            <AttachedAttribute Name="Default dvSwitch Name" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Default dvSwitch Path" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Default port group path" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="vCenter_url" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
             <AttributeValue Name="Domain Selector" Value="" />
+            <AttributeValue Name="Password" Value="" />
+            <AttributeValue Name="User" Value="" />
+            <AttributeValue Name="Default dvSwitch Name" Value="" />
+            <AttributeValue Name="Default dvSwitch Path" Value="" />
+            <AttributeValue Name="Default port group path" Value="" />
+            <AttributeValue Name="vCenter_url" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories />
     </ResourceFamily>
-    <ResourceFamily Name="Temp Command Connector" IsConnectable="true" Description="" IsSearchable="true">
+    <ResourceFamily Name="Temp Command Connector" IsMappableContainer="false" IsMappable="false" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
@@ -64,16 +192,14 @@
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
-            <ParentModelName>Generic Deployed App</ParentModelName>
             <ParentModelName>vCenter</ParentModelName>
+            <ParentModelName>Generic Deployed App</ParentModelName>
           </ParentModels>
           <Drivers />
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories />
     </ResourceFamily>
-    <ResourceFamily Name="Deployed App" Description="" IsSearchable="true">
+    <ResourceFamily Name="Deployed App" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="true">
       <AttachedAttributes>
         <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true">
           <AllowedValues />
@@ -102,21 +228,19 @@
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories />
     </ResourceFamily>
-    <ResourceFamily Name="Installation Options" Description="" IsService="true" ServiceType="Installation">
+    <ResourceFamily Name="Installation Options" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="false" IsService="true" ServiceType="Installation">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
         <ResourceModel Name="Generic Installation Option" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="GenericInput" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="GenericInput" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
           </AttachedAttributes>
@@ -128,29 +252,25 @@
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories>
-        <Category>Virtualization</Category>
-      </Categories>
     </ResourceFamily>
-    <ResourceFamily Name="Deployment Options" Description="" IsService="true" ServiceType="Deployment">
+    <ResourceFamily Name="Deployment Options" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="false" IsService="true" ServiceType="Deployment">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="vCenter VM from Template" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="VCenter VM From Template" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Template" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Template" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues />
             </AttachedAttribute>
           </AttachedAttributes>
@@ -164,32 +284,37 @@
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories>
-        <Category>Virtualization</Category>
-      </Categories>
     </ResourceFamily>
-    <ResourceFamily Name="Virtual Network" Description="" IsService="true" ServiceType="Regular">
+    <ResourceFamily Name="Virtual Network" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="false" IsService="true" ServiceType="Regular">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
         <ResourceModel Name="VLAN" Description="" SupportsConcurrentCommands="false">
-          <AttachedAttributes />
-          <AttributeValues />
+          <AttachedAttributes>
+            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" IsRequired="true">
+              <AllowedValues>
+                <AllowedValue>Access</AllowedValue>
+                <AllowedValue>Trunk</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" IsRequired="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Access Mode" Value="Access" />
+            <AttributeValue Name="VLAN Id" Value="" />
+          </AttributeValues>
           <ParentModels />
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories>
-        <Category>Virtualization</Category>
-      </Categories>
     </ResourceFamily>
-    <ResourceFamily Name="Apps Orchestration" Description="" IsService="true" ServiceType="Orchestration">
+    <ResourceFamily Name="Apps Orchestration" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" Searchable="false" IsService="true" ServiceType="Orchestration">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
@@ -200,16 +325,11 @@
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
-          <Scripts />
         </ResourceModel>
       </Models>
-      <Categories>
-        <Category>Virtualization</Category>
-      </Categories>
     </ResourceFamily>
   </ResourceFamilies>
   <DriverDescriptors>
     <DriverDescriptor Name="Generic Driver" DriverType="TestShellDriver" />
   </DriverDescriptors>
-  <ScriptDescriptors />
-</DataModelInfo>
+</ResourceManagementExportImport>
