@@ -46,6 +46,7 @@ class pyVmomiService:
         requests.packages.urllib3.disable_warnings()
 
         '# Disabling SSL certificate verification'
+        context = None
         import ssl
         if hasattr(ssl, 'SSLContext'):
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -60,7 +61,9 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except IOError as e:
-            logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
+            #logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
+            import traceback
+            logger.warn("Connection Error: ({}):\n{}".format(e, traceback.format_exc()))
 
     def disconnect(self, si):
         """ Disconnect from vCenter """

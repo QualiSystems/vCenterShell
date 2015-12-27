@@ -22,7 +22,7 @@ class DeployFromTemplateCommand(BaseCommand):
         self.resource_connection_details_retriever = resource_connection_details_retriever
         self.DEPLOY_DATA = 'DEPLOY_DATA'
 
-    def deploy_from_template(self, data_holder):
+    def _deploy_from_template(self, data_holder):
         si = None
         try:
             # connect
@@ -57,7 +57,7 @@ class DeployFromTemplateCommand(BaseCommand):
 
         return result
 
-    def get_data_for_deployment(self):
+    def _get_data_for_deployment(self):
         """ execute the command """
         resource_context = helpers.get_resource_context_details()
 
@@ -90,7 +90,7 @@ class DeployFromTemplateCommand(BaseCommand):
                           vm_cluster_model,
                           power_on)
 
-    def create_resource_for_deployed_vm(self, data_holder, deploy_result):
+    def _create_resource_for_deployed_vm(self, data_holder, deploy_result):
         reservation_id = helpers.get_reservation_context_details().id
         session = helpers.get_api_session()
         session.CreateResource('Virtual Machine', 'Virtual Machine', deploy_result.vm_name, deploy_result.vm_name)
@@ -138,15 +138,15 @@ class DeployFromTemplateCommand(BaseCommand):
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def deploy_execute(self):
+    def execute_deploy_from_template(self):
         data_holder = self.deserialize_deploy_params()
-        deploy_result = self.deploy_from_template(data_holder)
+        deploy_result = self._deploy_from_template(data_holder)
         print jsonpickle.encode(deploy_result, unpicklable=False)
 
     def execute(self):
-        data_holder = self.get_data_for_deployment()
-        deploy_result = self.deploy_from_template(data_holder)
-        self.create_resource_for_deployed_vm(data_holder, deploy_result)
+        data_holder = self._get_data_for_deployment()
+        deploy_result = self._deploy_from_template(data_holder)
+        self._create_resource_for_deployed_vm(data_holder, deploy_result)
         # self.replace_app_resource_with_vm_resource(data_holder, deploy_result)
 
 

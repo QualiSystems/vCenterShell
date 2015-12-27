@@ -5,8 +5,8 @@ __pycache__/
 # C extensions
 *.so
 
-logs/*.log
-*.log
+# Local dev sertings which shlould not be pused out
+settings_local.py
 
 # Distribution / packaging
 .Python

@@ -2,7 +2,7 @@ import os
 import sys
 import zipfile
 
-DRIVER_FILE_NAME_FORMAT = '{0}_{1}.zip'
+DRIVER_FILE_NAME_FORMAT = '../output/{0}_{1}.zip'
 STRIPING_CHARS = ' \t\n\r'
 INCLUDE_DIRS = 'include_dirs'
 
@@ -18,6 +18,12 @@ def zip_dir(path, ziph):
             filename = os.path.join(root, file_to_zip)
             if os.path.isfile(filename):  # regular files only
                 ziph.write(filename)
+
+
+def ensure_dir(f):
+    d = os.path.dirname(f)
+    if not os.path.exists(d):
+        os.makedirs(d)
 
 
 args = sys.argv
@@ -45,6 +51,9 @@ with open(confing_file_name) as f_config:
 
 for driver in drivers:
     zip_name = DRIVER_FILE_NAME_FORMAT.format(driver, version)
+
+    ensure_dir(zip_name)
+
     # deletes old package
     if os.path.isfile(zip_name):
         os.remove(zip_name)

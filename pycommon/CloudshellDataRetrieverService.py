@@ -47,7 +47,10 @@ class CloudshellDataRetrieverService:
         return result
 
     def getVMStorageAttributeData(self, resource_attributes):
-        """ get datastore from 'VM Storage' attribute """
+        """
+        get datastore from 'VM Storage' attribute
+        :rtype str:
+        """
         datastore_name = resource_attributes.attributes["VM Storage"]
         if not datastore_name:
             datastore_name = None
