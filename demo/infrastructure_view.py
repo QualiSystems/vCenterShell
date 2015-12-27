@@ -2,11 +2,9 @@
 vCenter Shell Starter
 """
 
-import os, sys
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-from settings import *
+import os
 
-from vCenterShell.demo.dev_bootstrapper import DevBootstrapper
+from demo import DevBootstrapper
 #from vCenterShell.demo.dev_bootstrapper import attachAndGetResourceContext
 from pycommon.logging_service import LoggingService
 
@@ -14,8 +12,6 @@ from pycommon.logging_service import LoggingService
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
 DEFAULT_LOG_FILENAME = "./vCenterTest.log"
 
-
-from vCenterShell.commands.NetworkAdaptersRetrieverCommand import NetworkAdaptersRetrieverCommand
 
 def main():
     LoggingService(INITIAL_LOG_LEVEL, INITIAL_LOG_LEVEL, DEFAULT_LOG_FILENAME)
