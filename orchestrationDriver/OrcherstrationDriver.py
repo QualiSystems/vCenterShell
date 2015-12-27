@@ -21,8 +21,6 @@ deployment_result = None
 try:
     result = api.ExecuteDeployAppCommand(reservationId, appName)
     deployment_result = json.loads(result.Output)
-    # deployment_result = json.loads('{"vm_name": "test_orchTest", "vm_path": "vCenter/QualiSB/Alex", '
-    #                               '"uuid": "42225168-afdb-61b0-6827-1bc81fbd970a"}')
 except CloudShellAPIError as exc:
     print "Error deploying app {0}. Error: {1}".format(appName, exc.rawxml)
     exit(1)
