@@ -103,7 +103,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         command = DeployFromTemplateCommand(pvService, None, None)
         command.get_params_from_env = Mock(return_value=json.dumps(param))
 
-        self.assertRaises(ValueError, command.deploy_execute)
+        self.assertRaises(ValueError, command.execute_deploy_from_template)
 
         self.assertTrue(pvService.clone_vm.called)
         self.assertTrue(command.get_params_from_env.called)
@@ -151,7 +151,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
 
         command = DeployFromTemplateCommand(pvService, None, None)
         command.get_params_from_env = Mock(return_value=json.dumps(param))
-        command.deploy_execute()
+        command.execute_deploy_from_template()
 
         self.assertTrue(pvService.clone_vm.called)
         self.assertTrue(command.get_params_from_env.called)
@@ -213,7 +213,7 @@ class test_deployFromTemplateCommand(unittest.TestCase):
         command.get_params_from_env = Mock(return_value=json.dumps(param))
 
         # act
-        command.deploy_execute()
+        command.execute_deploy_from_template()
 
         # assert
         self.assertTrue(pvService.clone_vm.called)

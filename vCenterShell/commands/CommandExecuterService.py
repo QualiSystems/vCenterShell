@@ -23,7 +23,7 @@ class CommandExecuterService(object):
         self.virtual_switch_revoke_command = virtual_switch_revoke_command
 
     def deploy_from_template(self):
-        self.deployFromTemplateCommand.deploy_execute()
+        self.deployFromTemplateCommand.execute_deploy_from_template()
 
     def deploy(self):
         self.deployFromTemplateCommand.execute()

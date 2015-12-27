@@ -37,4 +37,4 @@ class TestCommandExecuterService(unittest.TestCase):
         command_executer_service.deploy_from_template()
 
         # assert
-        self.assertTrue(deploy_from_template.deploy_execute.called)
+        self.assertTrue(deploy_from_template.execute_deploy_from_template.called)
