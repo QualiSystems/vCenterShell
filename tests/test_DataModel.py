@@ -28,16 +28,23 @@ class TestDataModel(TestCase):
                 validation_errors.append(value_error.message)
                 continue
 
-            #attributes = resource_model.findall('/AttachedAttribute', ns)
-            # foreach model_attribute in resource_model
-            # hasattr(getattr(getattr(imported_model,'VirtualNicModel'),'VirtualNicModel')('','','',''),'macAddress')
+            attribute_names = self.get_model_attributes(ns, resource_model)
 
-            # imported_model = __import__('models', fromlist=['VirtualNicModel'])
+            for attribute_name in attribute_names:
+                if not hasattr(klass, attribute_name):
+                    validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name, model_name))
 
         for validation_error in validation_errors:
             print validation_error
 
         self.assertSequenceEqual(validation_errors, [])
+
+    def get_model_attributes(self, ns, resource_model):
+        attribute_nodes = resource_model.findall('default:AttachedAttributes/default:AttachedAttribute', ns)
+        attribute_names = [attribute_node.attrib['Name'].lower().replace(' ', '_')
+                           for attribute_node
+                           in attribute_nodes]
+        return attribute_names
 
     def get_class(self, class_path):
         module_path, class_name = class_path.rsplit(".", 1)
@@ -52,4 +59,9 @@ class TestDataModel(TestCase):
         except AttributeError:
             raise ValueError("Module '%s' has no class '%s'" % (module_path, class_name,))
 
-        return cls
+        try:
+            instance = getattr(cls, class_name)()
+        except TypeError as type_error:
+            raise ValueError('Failed to instantiate class {0}. Error: {1}'.format(class_name, type_error.message))
+
+        return instance

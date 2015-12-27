@@ -1,2 +1,4 @@
 class VLANResourceModel(object):
-    pass
+    def __init__(self):
+        self.access_mode = ''
+        self.vlan_id = ''

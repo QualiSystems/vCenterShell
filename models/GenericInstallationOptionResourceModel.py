@@ -1,2 +1,3 @@
 class GenericInstallationOptionResourceModel(object):
-    pass
+    def __init__(self):
+        self.generic_input = ''
