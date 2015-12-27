@@ -12,11 +12,12 @@ class TestDataModel(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
     def test_resource_models(self):
-        ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/ExportImportConfigurationSchema.xsd'}
+        ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
         datamodel_path = os.path.join(os.path.dirname(__file__), '../vCenterShellPackage/DataModel/datamodel.xml')
         tree = ET.parse(datamodel_path)
         root = tree.getroot()
         resource_models = root.findall('.//default:ResourceModel', ns)
+        self.assertGreater(len(resource_models), 0)
         validation_errors = []
         for resource_model in resource_models:
             model_name = resource_model.attrib['Name'].replace(' ', '') + 'ResourceModel'
@@ -27,6 +28,7 @@ class TestDataModel(TestCase):
                 validation_errors.append(value_error.message)
                 continue
 
+            #attributes = resource_model.findall('/AttachedAttribute', ns)
             # foreach model_attribute in resource_model
             # hasattr(getattr(getattr(imported_model,'VirtualNicModel'),'VirtualNicModel')('','','',''),'macAddress')
 

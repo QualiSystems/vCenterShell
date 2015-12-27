@@ -212,7 +212,7 @@
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="vCenter VM from Template" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="vCenter VM From Template" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>            
             <AttachedAttribute Name="vCenter Template" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues />
