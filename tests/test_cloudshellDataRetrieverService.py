@@ -1,8 +1,10 @@
-﻿import unittest
-from mock import Mock, MagicMock, create_autospec
+﻿import os.path
 import sys
-import os.path
-from vCenterShell.pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
+import unittest
+
+from mock import Mock
+
+from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
@@ -105,12 +107,12 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         vCenter_resource_details = Mock(ResourceAttributes=attributes, Address="vCenterIP")
 
          # Act
-        connDetails = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_resource_details)
+        conn_details = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_resource_details)
 
         # Assert
-        self.assertEquals(connDetails["user"], "user1")
-        self.assertEquals(connDetails["password"], "pass1")
-        self.assertEquals(connDetails["vCenter_url"], "vCenterIP")
+        self.assertEquals(conn_details.username, "user1")
+        self.assertEquals(conn_details.password, "pass1")
+        self.assertEquals(conn_details.host, "vCenterIP")
 
     def test_getVCenterInventoryPathAttributeData(self):
         # Arrange

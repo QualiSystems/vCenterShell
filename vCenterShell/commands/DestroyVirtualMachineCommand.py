@@ -1,15 +1,14 @@
-﻿from pyVmomi import vim
-import requests
-import atexit
-from qualipy.api.cloudshell_api import *
+﻿import os
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-import time
-import sys
-import vCenterShell.pycommon
-from vCenterShell.pycommon.common_name_utils import generate_unique_name
-from vCenterShell.pycommon.CloudshellDataRetrieverService import *
+from pycommon.CloudshellDataRetrieverService import *
+
 from vCenterShell.commands.BaseCommand import BaseCommand
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
+
+logger = getLogger(__name__)
+
+# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 
 class DestroyVirtualMachineCommand(BaseCommand):
@@ -32,20 +31,20 @@ class DestroyVirtualMachineCommand(BaseCommand):
         vCenter_resource_name = inventory_path_data.vCenter_resource_name
         vm_folder = inventory_path_data.vm_folder
 
-        print "Folder: {0}, vCenter: {1}".format(vm_folder, vCenter_resource_name)
+        logger.info("Folder: {0}, vCenter: {1}".format(vm_folder, vCenter_resource_name))
 
         reservation_id = helpers.get_reservation_context_details().id
         session = helpers.get_api_session()
         vCenter_details = session.GetResourceDetails(vCenter_resource_name)
 
         # get vCenter connection details from vCenter resource
-        vCenterConn = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
+        conn_details = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_details)
 
-        print "Connecting to: {0}, As: {1}, Pwd: {2}".format(vCenterConn["vCenter_url"], vCenterConn["user"],
-                                                             vCenterConn["password"])
+        logger.info("Connecting to: {0}, As: {1}, Pwd: {2}".format(conn_details.host, conn_details.username,
+                                                                   conn_details.password))
 
         # connect
-        si = self.pvService.connect(vCenterConn["vCenter_url"], vCenterConn["user"], vCenterConn["password"])
+        si = self.pvService.connect(conn_details.host, conn_details.username, conn_details.password)
         content = si.RetrieveContent()
 
         # destroy the vm

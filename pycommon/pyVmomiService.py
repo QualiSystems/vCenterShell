@@ -1,13 +1,20 @@
 ﻿import requests
 import time
+import os
 
 from datetime import datetime
 from timeit import default_timer as timer
 from pyVmomi import vim
+from pycommon.logger import configure_loglevel
+from pycommon.logger import getLogger
+
+logger = getLogger(__name__)
+
+
+# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class pyVmomiService:
-
-    #region consts
+    # region consts
     ChildEntity = 'childEntity'
     VM = 'vmFolder'
     Network = 'networkFolder'
@@ -15,7 +22,8 @@ class pyVmomiService:
     Host = 'hostFolder'
     Datastore = 'datastoreFolder'
     Cluster = 'cluster'
-    #endregion
+
+    # endregion
 
     def __init__(self, connect, disconnect, vim_import=None):
         self.pyvmomi_connect = connect
@@ -40,6 +48,7 @@ class pyVmomiService:
         requests.packages.urllib3.disable_warnings()
 
         '# Disabling SSL certificate verification'
+        context = None
         import ssl
         if hasattr(ssl, 'SSLContext'):
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
@@ -54,7 +63,9 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except IOError as e:
-            print "I/O error({0}): {1}".format(e.errno, e.strerror)
+            #logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
+            import traceback
+            logger.warn("Connection Error: ({}):\n{}".format(e, traceback.format_exc()))
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
@@ -70,18 +81,52 @@ class pyVmomiService:
         """  
         return self.find_obj_by_path(si, path, name, self.Datacenter)
 
-    def find_by_uuid(self, si, path, uuid, is_vm=True):
+    def find_by_uuid(self, si, uuid, is_vm=True, path=None, data_center=None):
         """
         Finds vm/host by his uuid in the vCenter or returns "None"
 
         :param si:         pyvmomi 'ServiceInstance'
-        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param uuid:       the object uuid
+        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
         :param is_vm:     if true, search for virtual machines, otherwise search for hosts
+        :param data_center:
         """  
-        folder = self.get_folder(si, path)
+
+        if uuid is None:
+            return None
+        if path is not None:
+            data_center = self.find_item_in_path_by_type(si, path, vim.Datacenter)
+
         search_index = si.content.searchIndex
-        return search_index.FindByUuid(folder, uuid, is_vm)
+        return search_index.FindByUuid(data_center, uuid, is_vm)
+
+    def find_item_in_path_by_type(self, si, path, obj_type):
+        """
+        This function finds the first item of that type in path
+        :param ServiceInstance si: pyvmomi ServiceInstance
+        :param str path: the path to search in
+        :param type obj_type: the vim type of the object
+        :return: pyvmomi type instance object or None
+        """
+        if obj_type is None:
+            return None
+
+        search_index = si.content.searchIndex
+        sub_folder = si.content.rootFolder
+
+        if path is None or not path:
+            return sub_folder
+        paths = path.split("/")
+
+        for currPath in paths:
+            if currPath is None or not currPath:
+                continue
+
+            manage = search_index.FindChild(sub_folder, currPath)
+
+            if isinstance(manage, obj_type):
+                return manage
+        return None
 
     def find_host_by_name(self, si, path, name):     
         """
@@ -151,7 +196,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         res = search_index.FindChild(look_in, name)
 
-        print 'find_obj_by_path took: %s' % (str(datetime.now() - now))
+        logger.info('find_obj_by_path took: %s' % (str(datetime.now() - now)))
         return res
 
     def get_folder(self, si, path):
@@ -186,13 +231,13 @@ class pyVmomiService:
             if child is None and hasattr(sub_folder, self.Datastore):
                 child = search_index.FindChild(sub_folder.datastoreFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Network):
+            if child is None and hasattr(sub_folder, self.Network):
                 child = search_index.FindChild(sub_folder.networkFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Host):
+            if child is None and hasattr(sub_folder, self.Host):
                 child = search_index.FindChild(sub_folder.hostFolder, currPath)
 
-            if child is None and hasattr(sub_folder,  self.Datacenter):
+            if child is None and hasattr(sub_folder, self.Datacenter):
                 child = search_index.FindChild(sub_folder.datacenterFolder, currPath)
 
             if child is None:
@@ -202,7 +247,7 @@ class pyVmomiService:
                 child = None
 
         end = timer()
-        print 'get_folder "{0}" took: {1} seconds'.format(path, (str(end - start)))
+        logger.info('get_folder "{0}" took: {1} seconds'.format(path, (str(end - start))))
 
         return sub_folder
 
@@ -235,12 +280,12 @@ class pyVmomiService:
         task_done = False
         while not task_done:
             if task.info.state == 'success':
-                print "Task succeeded: " + task.info.state
+                logger.info("Task succeeded: " + task.info.state)
                 return task.info.result
 
             if task.info.state == 'error':
-                print "error type: %s" % task.info.error.__class__.__name__
-                print "found cause: %s" % task.info.error.faultCause
+                logger.info("error type: %s" % task.info.error.__class__.__name__)
+                logger.info("found cause: %s" % task.info.error.faultCause)
                 task_done = True
                 return None
             time.sleep(1)
@@ -249,6 +294,7 @@ class pyVmomiService:
         """
         This is clone_vm method params object
         """
+
         def __init__(self,
                      si,
                      template_name,
@@ -282,6 +328,7 @@ class pyVmomiService:
         """
         Clone vm result object, will contain the cloned vm or error message
         """
+
         def __init__(self, vm=None, error=None):
             """
             Constructor receives the cloned vm or the error message
@@ -336,7 +383,8 @@ class pyVmomiService:
             resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
         else:
             '# if None, get the first one'
-            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource], clone_params.cluster_name)
+            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
+                                   clone_params.cluster_name)
             resource_pool = cluster.resourcePool
 
         '# set relo_spec'
@@ -348,7 +396,7 @@ class pyVmomiService:
         clone_spec.location = relo_spec
         clone_spec.powerOn = clone_params.power_on
 
-        print "cloning VM..."
+        logger.info("cloning VM...")
 
         task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
         vm = self.wait_for_task(task)
@@ -361,13 +409,14 @@ class pyVmomiService:
         :param vm: virutal machine pyvmomi object
         """
 
-        print("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name))
+        logger.info(
+                ("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name)))
 
         task = vm.PowerOffVM_Task()
         self.wait_for_task(task)
 
-        print("{0}".format(task.info.state))
-        print("Destroying VM {0}".format(vm.name))
+        logger.info(("{0}".format(task.info.state)))
+        logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
         return self.wait_for_task(task)
@@ -395,7 +444,7 @@ class pyVmomiService:
         :param vm_path: str path to the vm that will be destroyed
         """
         if vm_uuid is not None:
-            vm = self.find_by_uuid(si, vm_path, vm_uuid)
+            vm = self.find_by_uuid(si, vm_uuid, vm_path)
 
         if vm is None:
             return 'vm not found'

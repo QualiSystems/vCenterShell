@@ -20,7 +20,4 @@ class ResourceConnectionDetailsRetriever:
         resource_details = session.GetResourceDetails(resource_name)
 
         # get vCenter connection details from vCenter resource
-        connection_details = self.csRetrieverService.getVCenterConnectionDetails(session, resource_details)
-
-        return VCenterConnectionDetails(connection_details["vCenter_url"], connection_details["user"],
-                                        connection_details["password"])
+        return self.csRetrieverService.getVCenterConnectionDetails(session, resource_details)
