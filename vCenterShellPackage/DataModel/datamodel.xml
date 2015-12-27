@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataModelInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
+  <Attributes>
+    <AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="UUID" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Location" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Domain Selector" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Execution Server Selector" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="GenericInput" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules />
+    </AttributeInfo>
+    <AttributeInfo Name="Template" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules />
+    </AttributeInfo>
+  </Attributes>
+  <ResourceFamilies>
+    <ResourceFamily Name="Cloud Provider" Description="" IsSearchable="true">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="vCenter" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Domain Selector" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Temp Command Connector" IsConnectable="true" Description="" IsSearchable="true">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Temp Command Connector Model" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels>
+            <ParentModelName>Generic Deployed App</ParentModelName>
+            <ParentModelName>vCenter</ParentModelName>
+          </ParentModels>
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Deployed App" Description="" IsSearchable="true">
+      <AttachedAttributes>
+        <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+        <AttachedAttribute Name="UUID" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+        <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+      </AttachedAttributes>
+      <AttributeValues>
+        <AttributeValue Name="Cloud Provider" Value="" />
+        <AttributeValue Name="UUID" Value="" />
+        <AttributeValue Name="Location" Value="" />
+      </AttributeValues>
+      <Models>
+        <ResourceModel Name="Generic Deployed App" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="Cloud Provider" Value="" />
+            <AttributeValue Name="UUID" Value="" />
+            <AttributeValue Name="Location" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Installation Options" Description="" IsService="true" ServiceType="Installation">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic Installation Option" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="GenericInput" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="GenericInput" Value="" />
+            <AttributeValue Name="Location" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Deployment Options" Description="" IsService="true" ServiceType="Deployment">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="vCenter VM from Template" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Location" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Template" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Cloud Provider" Value="" />
+            <AttributeValue Name="Location" Value="" />
+            <AttributeValue Name="Template" Value="" />
+            <AttributeValue Name="Domain Selector" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Virtual Network" Description="" IsService="true" ServiceType="Regular">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="VLAN" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Apps Orchestration" Description="" IsService="true" ServiceType="Orchestration">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Simple" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+  </ResourceFamilies>
+  <DriverDescriptors>
+    <DriverDescriptor Name="Generic Driver" DriverType="TestShellDriver" />
+  </DriverDescriptors>
+  <ScriptDescriptors />
+</DataModelInfo>
