@@ -1,4 +1,4 @@
-class VCenterResourceModel(object):
+class vCenterResourceModel(object):
     def __init__(self, vcenter_url, user, password, domain_selector, default_dvswitch_name, default_dvswitch_path,
                  default_port_group_path):
         self.vcenter_url = vcenter_url

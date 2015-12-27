@@ -1,0 +1,2 @@
+class VLANResourceModel(object):
+    pass
