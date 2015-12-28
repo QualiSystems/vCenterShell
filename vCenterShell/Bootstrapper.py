@@ -1,5 +1,4 @@
 from pyVim.connect import SmartConnect, Disconnect
-
 from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
@@ -13,9 +12,8 @@ from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrie
 from vCenterShell.commands.VLanIdRangeParser import VLanIdRangeParser
 from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.commands.VirtualSwitchConnectCommand import VirtualSwitchConnectCommand
-from vCenterShell.commands.VirtualSwitchFromMachineRevoker import VirtualSwitchFromMachineRevoker
-from vCenterShell.commands.VirtualSwitchRevokeCommand import VirtualSwitchRevokeCommand
 from vCenterShell.commands.VirtualSwitchToMachineConnector import VirtualSwitchToMachineConnector
+from vCenterShell.commands.VirtualSwitchToMachineDisconnectCommand import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
 
 
@@ -49,21 +47,17 @@ class Bootstrapper(object):
                                                                      VLanIdRangeParser())
 
         # Virtual Switch Revoke
-        virtual_switch_from_machine_revoker = VirtualSwitchFromMachineRevoker(pyVmomiService,
-                                                                              resource_connection_details_retriever,
-                                                                              synchronous_task_waiter)
-
-        virtual_switch_revoke_command = VirtualSwitchRevokeCommand(pyVmomiService,
-                                                                   virtual_switch_from_machine_revoker,
-                                                                   resource_connection_details_retriever,
-                                                                   synchronous_task_waiter)
+        virtual_switch_disconnect_command = \
+            VirtualSwitchToMachineDisconnectCommand(pyVmomiService,
+                                                    resource_connection_details_retriever,
+                                                    synchronous_task_waiter)
 
         self.commandExecuterService = CommandExecuterService(py_vmomi_service,
                                                              network_adapter_retriever_command,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,
-                                                             virtual_switch_revoke_command)
+                                                             virtual_switch_disconnect_command)
 
     def get_command_executer_service(self):
         return self.commandExecuterService
