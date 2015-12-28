@@ -1,6 +1,7 @@
 from pyVim.connect import SmartConnect, Disconnect
 from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+from pycommon.ResourceModelParser import ResourceModelParser
 from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from pycommon.pyVmomiService import pyVmomiService
 from vCenterShell.commands.CommandExecuterService import CommandExecuterService
@@ -44,7 +45,8 @@ class Bootstrapper(object):
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
-                                                                     VLanIdRangeParser())
+                                                                     VLanIdRangeParser(),
+                                                                     ResourceModelParser())
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
