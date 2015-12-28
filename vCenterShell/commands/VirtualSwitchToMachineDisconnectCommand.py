@@ -22,6 +22,13 @@ class VirtualSwitchToMachineDisconnectCommand:
         self.synchronous_task_waiter = synchronous_task_waiter
 
     def disconnect(self, vcenter_name, vm_uuid, network_name):
+        """
+        disconnect all of the network adapter of the vm
+        :param <str> network_name: the name of the specific network to disconnect
+        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> vm_uuid: the uuid of the vm
+        :return:
+        """
         connection_details = self.connection_retriever.connection_details(vcenter_name)
 
         si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
@@ -34,6 +41,12 @@ class VirtualSwitchToMachineDisconnectCommand:
         return self.remove_interfaces_from_vm(vm, lambda device: self.is_device_match_network(device, network_name))
 
     def disconnect_all(self, vcenter_name, vm_uuid):
+        """
+        disconnect all of the network adapter of the vm
+        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> vm_uuid: the uuid of the vm
+        :return:
+        """
         connection_details = self.connection_retriever.connection_details(vcenter_name)
 
         si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
@@ -45,6 +58,12 @@ class VirtualSwitchToMachineDisconnectCommand:
         return self.remove_interfaces_from_vm(vm)
 
     def is_device_match_network(self, device, network_name):
+        """
+        checks if the device has a backing with of the right network name
+        :param <vim.vm.Device> device: instance of adapter
+        :param <str> network_name: network name
+        :return:
+        """
         backing = device.backing
 
         if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
@@ -56,7 +75,6 @@ class VirtualSwitchToMachineDisconnectCommand:
     def remove_interfaces_from_vm(self, virtual_machine, filter_function=None):
         """
         @see https://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/vim.VirtualMachine.html#reconfigure
-        :param first_only:
         :param filter_function: function that gets the device and decide if it should be deleted
         :param virtual_machine: <vim.vm object>
         :return:
@@ -75,6 +93,11 @@ class VirtualSwitchToMachineDisconnectCommand:
         return None
 
     def remove_devices(self, device_change, virtual_machine):
+        """
+        gets the adapters to remove from the vm and removes them
+        :param <array<vim.vm.device.VirtualDeviceSpec>> device_change:  the adapters to remove
+        :param <vim.VirtualMachine> virtual_machine:  the vm to remove the adapters from
+        """
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
         task = virtual_machine.ReconfigVM_Task(config_spec)
         logger.info("Virtual Machine remove ALL Interfaces task STARTED")
