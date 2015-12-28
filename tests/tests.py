@@ -2,6 +2,7 @@ import sys
 import unittest
 
 sys.path.append("/")
+sys.path.append("../")
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner()

@@ -7,4 +7,5 @@ class BaseCommand(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def execute(self): pass
+    def execute(self):
+        """This method should be overridden"""

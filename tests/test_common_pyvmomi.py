@@ -1,19 +1,27 @@
 ﻿import os.path
 import sys
 import unittest
-
 from datetime import datetime
-from mock import Mock, MagicMock, create_autospec, patch
-from pyVmomi import vim
+
+from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
+
+from pycommon.logging_service import LoggingService
+from pycommon.pyVmomiService import pyVmomiService
+from pyVmomi import vim
+
 from testCredentials import TestCredentials
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from vCenterShell.pycommon.pyVmomiService import pyVmomiService
+from pycommon.logger import getLogger
+from pycommon.logger import configure_loglevel
+logger = getLogger(__name__)
 
 
 class ignore_test_common_pyvmomi(unittest.TestCase):
     def setUp(self):
+        LoggingService("CRITICAL", "DEBUG", None)
         pass
 
     def tearDown(self):
@@ -35,7 +43,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         '#act'
         now = datetime.now()
         res = pv_service.clone_vm(params)
-        print 'clone took: %s' % (str(datetime.now() - now))
+        logger.debug('clone took: %s' % (str(datetime.now() - now)))
 
         '#assert'
         self.assertTrue(type(res.vm), vim.VirtualMachine)
@@ -44,7 +52,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         now = datetime.now()
         if res.error is None and res.vm is not None:
             destroyed = pv_service.destroy_vm(res.vm)
-        print 'destroy took: %s' % (str(datetime.now() - now))
+        logger.debug('destroy took: %s' % (str(datetime.now() - now)))
         self.assertIsNone(destroyed)
 
     def test_clone_vm_power_on_false(self):
@@ -873,42 +881,170 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertIsNone(result)
         self.assertTrue(pv_service.get_folder.called)
 
-    def test_get_vm_by_uuid_vm_in_folder(self):
+    def test_find_item_in_path_by_type_not_found(self):
         """
         Checks whether the function can grab object by uuid
         """
         '#arrange'
+
+        class counter:
+            i = 0
+        def side_eff(*args, **kwargs):
+            counter.i += 1
+            return 'not found'
+
+
         pv_service = pyVmomiService(None, None)
-
-        def find_by_uuid_mock(*args, **kwargs):
-            folder = args[0]['vmFolder_test']
-            uuid = args[1]
-            isVM = args[2]
-            if not isVM:
-                return False
-
-            for item in folder:
-                if item == uuid: return True
-            return False
-
-        get_folder = MagicMock(return_value={
-            'vmFolder_test': [
-                'b8e4d6de-a2ff-11e5-bf7f-feff819cdc9f',
-                'b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f']})
-        pv_service.get_folder = get_folder
 
         si = create_autospec(spec=vim.ServiceInstance)
         si.RetrieveContent = Mock()
         si.content = create_autospec(spec=vim.ServiceInstanceContent())
 
         si.content.searchIndex = Mock()
-        si.content.searchIndex.FindByUuid = Mock(side_effect=find_by_uuid_mock)
+        si.content.rootFolder = Mock()
+        si.content.searchIndex.FindChild = Mock(side_effect=side_eff)
 
         '#act'
-        result = pv_service.find_by_uuid(si, '', 'b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f')
+        result = pv_service.find_item_in_path_by_type(si, 'test//dc/asd', vim.Datacenter)
+
+        '#assert'
+        self.assertIsNone(result)
+        self.assertTrue(counter.i, 2)
+
+    def test_find_item_in_path_by_type_complex_path(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+
+        class counter:
+            i = 0
+        def side_eff(*args, **kwargs):
+            if counter.i != 1:
+                counter.i = counter.i + 1;
+                return 'not yet'
+            else:
+                counter.i = counter.i + 1;
+                return Mock(spec=vim.Datacenter)
+
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.searchIndex = Mock()
+        si.content.rootFolder = Mock()
+        si.content.searchIndex.FindChild = Mock(side_effect=side_eff)
+
+        '#act'
+        result = pv_service.find_item_in_path_by_type(si, 'test//dc/asd', vim.Datacenter)
+
+        '#assert'
+        self.assertTrue(isinstance(result, vim.Datacenter))
+        self.assertTrue(counter.i, 1)
+
+    def test_find_item_in_path_by_type_type_is_None(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.searchIndex = Mock()
+        si.content.rootFolder = Mock()
+
+        '#act'
+        result = pv_service.find_item_in_path_by_type(si, 'test', None)
+
+        '#assert'
+        self.assertIsNone(result,  si.content.rootFolder)
+
+    def test_find_item_in_path_by_type_path_None(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.searchIndex = Mock()
+        si.content.rootFolder = Mock
+
+        '#act'
+        result = pv_service.find_item_in_path_by_type(si, None, 'not none')
+
+        '#assert'
+        self.assertEqual(result,  si.content.rootFolder)
+
+    def test_get_vm_by_uuid_vm_with_path(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        dc = Mock(spec=vim.Datacenter)
+        pv_service.find_item_in_path_by_type = Mock(return_value=dc)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.searchIndex = Mock()
+        si.content.searchIndex.FindByUuid = Mock(return_value='b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f')
+
+        '#act'
+        result = pv_service.find_by_uuid(si, 'b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f', True, 'path/path/path')
 
         '#assert'
         self.assertTrue(result)
+        self.assertTrue(pv_service.find_item_in_path_by_type.called_with(si, 'path/path/path', vim.Datacenter))
+
+    def test_get_vm_by_uuid_vm_without_uuid(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        '#act'
+        result = pv_service.find_by_uuid(si, None)
+
+        '#assert'
+        self.assertIsNone(result)
+
+    def test_get_vm_by_uuid_vm_without_path(self):
+        """
+        Checks whether the function can grab object by uuid
+        """
+        '#arrange'
+        pv_service = pyVmomiService(None, None)
+
+        si = create_autospec(spec=vim.ServiceInstance)
+        si.RetrieveContent = Mock()
+        si.content = create_autospec(spec=vim.ServiceInstanceContent())
+
+        si.content.searchIndex = Mock()
+        si.content.searchIndex.FindByUuid = Mock(return_value='b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f')
+
+        '#act'
+        result = pv_service.find_by_uuid(si, 'b8e4da4e-a2ff-11e5-bf7f-feff819cdc9f')
+
+        '#assert'
+        self.assertTrue(result)
+        self.assertTrue(si.content.searchIndex.FindByUuid.called)
 
     def test_get_vm_by_name_isVm_VM_type(self):
         """

@@ -1,7 +1,6 @@
-﻿import unittest
-
+﻿import os.path
 import sys
-import os.path
+import unittest
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 # Comment out because of 'generate_unique_name' not defined :(
