@@ -1,0 +1,2 @@
+class TempCommandConnectorModelResourceModel(object):
+    pass

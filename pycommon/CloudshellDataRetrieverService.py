@@ -15,7 +15,7 @@ class CloudshellDataRetrieverService:
         template_components = template_att.split(self.PATH_DELIMITER)
 
         return VCenterTemplateModel(
-                vCenter_resource_name=template_components[0],
+                vcenter_resource_name=template_components[0],
                 vm_folder=self.PATH_DELIMITER.join(template_components[1:-1]),
                 template_name=template_components[-1])
 

@@ -68,3 +68,4 @@ tests/config.ini
 vCenterShell/vCenterShell/vCenterShell.zip
 *.orig
 vCenterShell.zip
+vCenterShellPackage/Resource Scripts/*
