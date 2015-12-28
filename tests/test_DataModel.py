@@ -1,5 +1,7 @@
 import os
 import sys
+from os import listdir
+from os.path import join
 from unittest import TestCase
 from pycommon.logging_service import LoggingService
 import xml.etree.ElementTree as ET
@@ -40,31 +42,38 @@ class TestDataModel(TestCase):
         self.assertSequenceEqual(validation_errors, [])
 
     def test_app_templates(self):
-        app_templates_path = os.path.join(os.path.dirname(__file__),
-                                          '../vCenterShellPackage/App Templates/VM Deployment.xml')
-        tree = ET.parse(app_templates_path)
-        root = tree.getroot()
-        deployment_nodes = root.findall('.//DeploymentService')
-        validation_errors = []
-        for deployment_node in deployment_nodes:
-            resource_model_name = self.get_class_name_from_model_node(deployment_node)
-            try:
-                klass = self.get_class('models.' + resource_model_name)
-            except ValueError as value_error:
-                validation_errors.append(value_error.message)
-                continue
+        xml_files = self.get_app_templates_xml_files()
+        for xml_file in xml_files:
+            tree = ET.parse(xml_file)
+            root = tree.getroot()
+            deployment_nodes = root.findall('.//DeploymentService')
+            validation_errors = []
+            for deployment_node in deployment_nodes:
+                resource_model_name = self.get_class_name_from_model_node(deployment_node)
+                try:
+                    klass = self.get_class('models.' + resource_model_name)
+                except ValueError as value_error:
+                    validation_errors.append(value_error.message)
+                    continue
 
-            attribute_names = self.get_template_attributes(deployment_node)
+                attribute_names = self.get_template_attributes(deployment_node)
 
-            for attribute_name in attribute_names:
-                if not hasattr(klass, attribute_name):
-                    validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name,
-                                                                                            resource_model_name))
+                for attribute_name in attribute_names:
+                    if not hasattr(klass, attribute_name):
+                        validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name,
+                                                                                                resource_model_name))
 
         for validation_error in validation_errors:
             print validation_error
 
         self.assertSequenceEqual(validation_errors, [])
+
+    def get_app_templates_xml_files(self):
+        app_templates_path = os.path.join(os.path.dirname(__file__), '../vCenterShellPackage/App Templates/')
+        xml_files = [os.path.join(app_templates_path, f)
+                     for f in listdir(app_templates_path)
+                     if os.path.splitext(f)[1] == '.xml']
+        return xml_files
 
     def get_model_attributes(self, ns, resource_model):
         attribute_nodes = resource_model.findall('default:AttachedAttributes/default:AttachedAttribute', ns)
