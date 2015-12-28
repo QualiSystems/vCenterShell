@@ -39,12 +39,52 @@ class TestDataModel(TestCase):
 
         self.assertSequenceEqual(validation_errors, [])
 
+    def test_app_templates(self):
+        app_templates_path = os.path.join(os.path.dirname(__file__),
+                                          '../vCenterShellPackage/App Templates/VM Deployment.xml')
+        tree = ET.parse(app_templates_path)
+        root = tree.getroot()
+        deployment_nodes = root.findall('.//DeploymentService')
+        validation_errors = []
+        for deployment_node in deployment_nodes:
+            resource_model_name = self.get_class_name_from_model_node(deployment_node)
+            try:
+                klass = self.get_class('models.' + resource_model_name)
+            except ValueError as value_error:
+                validation_errors.append(value_error.message)
+                continue
+
+            attribute_names = self.get_template_attributes(deployment_node)
+
+            for attribute_name in attribute_names:
+                if not hasattr(klass, attribute_name):
+                    validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name,
+                                                                                            resource_model_name))
+
+        for validation_error in validation_errors:
+            print validation_error
+
+        self.assertSequenceEqual(validation_errors, [])
+
     def get_model_attributes(self, ns, resource_model):
         attribute_nodes = resource_model.findall('default:AttachedAttributes/default:AttachedAttribute', ns)
-        attribute_names = [attribute_node.attrib['Name'].lower().replace(' ', '_')
+        attribute_names = [self.get_attribute_name_from_attribute_node(attribute_node)
                            for attribute_node
                            in attribute_nodes]
         return attribute_names
+
+    def get_template_attributes(self, resource_model):
+        attribute_nodes = resource_model.findall('Attributes/Attribute')
+        attribute_names = [self.get_attribute_name_from_attribute_node(attribute_node)
+                           for attribute_node
+                           in attribute_nodes]
+        return attribute_names
+
+    def get_class_name_from_model_node(self, model_node):
+        return model_node.attrib['Name'].replace(' ', '') + 'ResourceModel'
+
+    def get_attribute_name_from_attribute_node(self, attribute_node):
+        return attribute_node.attrib['Name'].lower().replace(' ', '_')
 
     def get_class(self, class_path):
         module_path, class_name = class_path.rsplit(".", 1)
