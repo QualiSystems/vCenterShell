@@ -1,17 +1,27 @@
 from pyVmomi import vim
-from vCenterShell.pycommon.pyVmomiService import *
-from vCenterShell.pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+from pycommon.pyVmomiService import *
+from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+from pycommon.logger import configure_loglevel
+from pycommon.logger import getLogger
 
+logger = getLogger(__name__)
+
+
+# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class VirtualMachinePortGroupConfigurer(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
 
-    def configure_port_group_on_vm(self, service_instance, virtual_machine_path, vm_uuid, port_group_path,
+    def configure_port_group_on_vm(self, service_instance,
+                                   virtual_machine_path,
+                                   vm_uuid,
+                                   port_group_path,
                                    port_group_name):
 
-        vm = self.pyvmomi_service.find_by_uuid(service_instance, virtual_machine_path, vm_uuid)
+        logger.debug("virtual machine path {} vmUUID {}".format(virtual_machine_path, vm_uuid))
+        vm = self.pyvmomi_service.find_by_uuid(service_instance, vm_uuid, True)
         # vm = self.pyvmomi_service.find_vm_by_name(service_instance, virtual_machine_path, virtual_machine_name)
         # This code is for changing only one Interface. For multiple Interface
         # Iterate through a loop of network names.
@@ -38,5 +48,5 @@ class VirtualMachinePortGroupConfigurer(object):
 
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
         task = vm.ReconfigVM_Task(config_spec)
-        print "Successfully changed network"
+        logger.info("Successfully changed network")
         return self.synchronous_task_waiter.wait_for_task(task)
