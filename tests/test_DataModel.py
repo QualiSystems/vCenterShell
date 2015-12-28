@@ -24,10 +24,10 @@ class TestDataModel(TestCase):
         self.assertGreater(len(resource_models), 0)
         validation_errors = []
         for resource_model in resource_models:
-            model_name = self.get_resource_model_class_name(resource_model.attrib['Name'])
+            model_name = ResourceModelParser().get_resource_model_class_name(resource_model.attrib['Name'])
 
             try:
-                klass = ResourceModelParser.get_class('models.' + model_name)
+                klass = ResourceModelParser().get_class('models.' + model_name)
             except ValueError as value_error:
                 validation_errors.append(value_error.message)
                 continue
@@ -53,7 +53,7 @@ class TestDataModel(TestCase):
             for deployment_node in deployment_nodes:
                 resource_model_name = self.get_class_name_from_model_node(deployment_node)
                 try:
-                    klass = self.get_class('models.' + resource_model_name)
+                    klass = ResourceModelParser().get_class('models.' + resource_model_name)
                 except ValueError as value_error:
                     validation_errors.append(value_error.message)
                     continue
@@ -93,7 +93,7 @@ class TestDataModel(TestCase):
 
     def get_class_name_from_model_node(self, model_node):
         resource_model = model_node.attrib['Name']
-        return ResourceModelParser.get_resource_model_class_name(resource_model)
+        return ResourceModelParser().get_resource_model_class_name(resource_model)
 
     def get_attribute_name_from_attribute_node(self, attribute_node):
         return attribute_node.attrib['Name'].lower().replace(' ', '_')
