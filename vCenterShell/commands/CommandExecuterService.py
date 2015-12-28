@@ -48,3 +48,8 @@ class CommandExecuterService(object):
         vcenter_name = os.environ.get('VCENTER_NAME')
         vm_uuid = os.environ.get('VM_UUID')
         self.vm_power_management_command.power_off(vcenter_name, vm_uuid)
+
+    def power_on(self):
+        vcenter_name = os.environ.get('VCENTER_NAME')
+        vm_uuid = os.environ.get('VM_UUID')
+        self.vm_power_management_command.power_on(vcenter_name, vm_uuid)
