@@ -10,7 +10,7 @@ class CommandExecuterService(object):
                  destroy_virtual_machine_command,
                  deploy_from_template_command,
                  virtual_switch_connect_command,
-                 virtual_switch_disconnect_command):
+                 virtual_switch_disconnect_command,
                  vm_power_management_command):
         """
         :param py_vmomi_service:  PyVmomi service
