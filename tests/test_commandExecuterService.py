@@ -90,3 +90,39 @@ class TestCommandExecuterService(unittest.TestCase):
 
         # assert
         self.assertTrue(power_manager.power_on.called)
+
+    def test_disconnect(self):
+        # arrange
+        virtual_switch_disconnect_command = Mock()
+        virtual_switch_disconnect_command.disconnect = Mock(return_value=True)
+        command_executer_service = CommandExecuterService(Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          virtual_switch_disconnect_command,
+                                                          Mock())
+
+        # act
+        command_executer_service.disconnect()
+
+        # assert
+        self.assertTrue(virtual_switch_disconnect_command.disconnect.called)
+
+    def test_disconnect_all(self):
+        # arrange
+        virtual_switch_disconnect_command = Mock()
+        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
+        command_executer_service = CommandExecuterService(Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          virtual_switch_disconnect_command,
+                                                          Mock())
+
+        # act
+        command_executer_service.disconnect_all()
+
+        # assert
+        self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)

@@ -31,7 +31,7 @@ class CommandExecuterService(object):
         self.deployFromTemplateCommand.execute()
 
     def destroy(self):
-        self.revoke()
+        self.disconnect_all()
         self.destroyVirtualMachineCommand.execute()
 
     def connect(self):
@@ -39,10 +39,18 @@ class CommandExecuterService(object):
         vlan_spec_type = os.environ.get('VLAN_SPEC_TYPE')
         self.virtual_switch_connect_command.connect_vm_to_vlan(vlan_id, vlan_spec_type)
 
-    def revoke(self):
+    def disconnect_all(self):
+        # todo: the vcenter param should be getting inside the command from resource
         vcener_name = os.environ.get('VCENTER_NAME')
         virtual_machine_id = os.environ.get('VM_UUID')
         self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id)
+
+    def disconnect(self):
+        # todo: the vcenter param should be getting inside the command from resource
+        vcener_name = os.environ.get('VCENTER_NAME')
+        virtual_machine_id = os.environ.get('VM_UUID')
+        network_name = os.environ.get('NETWORK_NAME')
+        self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
 
     def power_off(self):
         vm_uuid = os.environ.get('VM_UUID')
