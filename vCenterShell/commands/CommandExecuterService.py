@@ -45,11 +45,9 @@ class CommandExecuterService(object):
         self.virtual_switch_revoke_command.revoke_vm_from_vlan(vlan_id, vlan_spec_type)
 
     def power_off(self):
-        vcenter_name = os.environ.get('VCENTER_NAME')
         vm_uuid = os.environ.get('VM_UUID')
-        self.vm_power_management_command.power_off(vcenter_name, vm_uuid)
+        self.vm_power_management_command.power_off(vm_uuid)
 
     def power_on(self):
-        vcenter_name = os.environ.get('VCENTER_NAME')
         vm_uuid = os.environ.get('VM_UUID')
-        self.vm_power_management_command.power_on(vcenter_name, vm_uuid)
+        self.vm_power_management_command.power_on(vm_uuid)

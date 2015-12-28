@@ -19,7 +19,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         pv_service = Mock()
         pv_service.find_by_uuid = Mock(return_value=vm)
 
-        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock(), Mock())
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock(), Mock(), Mock())
 
         # act
         res = power_manager._get_vm(si, vm_uuid)
@@ -36,7 +36,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         pv_service = Mock()
         pv_service.find_by_uuid = Mock(return_value=None)
 
-        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock(), Mock())
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock(), Mock(), Mock())
 
         # assert
         self.assertRaises(Exception, power_manager._get_vm, si, vm_uuid)
@@ -47,22 +47,29 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         si = Mock(spec=vim.ServiceInstance)
         vcenter_name = 'vcenter name'
         connection_detail = Mock()
+        connection_retriever = Mock()
+        resource_att = Mock()
+        qualipy_helpers = Mock()
+        pv_service = Mock()
+
+        inventory_path_data = {'vCenter_resource_name': Mock()}
+        qualipy_helpers.get_resource_context_details = Mock(return_value=resource_att)
+        connection_retriever.getVCenterInventoryPathAttributeData = \
+            Mock(return_value=inventory_path_data)
 
         connection_detail.host = 'host'
-        connection_detail.username = 'host'
-        connection_detail.password = 'host'
-        connection_detail.port = 'host'
+        connection_detail.username = 'username'
+        connection_detail.password = 'password'
+        connection_detail.port = 'port'
 
-        connection_retriever = Mock()
         connection_retriever.connection_details = Mock(return_value=connection_detail)
 
-        pv_service = Mock()
         pv_service.connect = Mock(return_value=si)
 
-        power_manager = VirtualMachinePowerManagementCommand(pv_service, connection_retriever, Mock())
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, connection_retriever, Mock(), qualipy_helpers)
 
         # act
-        res = power_manager._connect_to_vcenter(vcenter_name)
+        res = power_manager._connect_to_vcenter()
 
         # assert
         self.assertEqual(si, res)
@@ -85,12 +92,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         synchronous_task_waiter = Mock()
         synchronous_task_waiter.wait_for_task = Mock(return_value=True)
 
-        power_manager = VirtualMachinePowerManagementCommand(Mock(), Mock(), synchronous_task_waiter)
+        power_manager = VirtualMachinePowerManagementCommand(Mock(), Mock(), synchronous_task_waiter, Mock())
         power_manager._connect_to_vcenter = Mock(return_value=si)
         power_manager._get_vm = Mock(return_value=vm)
 
         # act
-        res = power_manager.power_on(vcenter_name, vm_uuid)
+        res = power_manager.power_on(vm_uuid)
 
         # assert
         self.assertTrue(res)
@@ -112,12 +119,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         synchronous_task_waiter = Mock()
         synchronous_task_waiter.wait_for_task = Mock(return_value=True)
 
-        power_manager = VirtualMachinePowerManagementCommand(Mock(), Mock(), synchronous_task_waiter)
+        power_manager = VirtualMachinePowerManagementCommand(Mock(), Mock(), synchronous_task_waiter, Mock())
         power_manager._connect_to_vcenter = Mock(return_value=si)
         power_manager._get_vm = Mock(return_value=vm)
 
         # act
-        res = power_manager.power_off(vcenter_name, vm_uuid)
+        res = power_manager.power_off(vm_uuid)
 
         # assert
         self.assertTrue(res)

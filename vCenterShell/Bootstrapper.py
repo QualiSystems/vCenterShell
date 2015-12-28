@@ -16,6 +16,7 @@ from vCenterShell.commands.VirtualSwitchConnectCommand import VirtualSwitchConne
 from vCenterShell.commands.VirtualSwitchToMachineConnector import VirtualSwitchToMachineConnector
 from vCenterShell.commands.VirtualSwitchToMachineDisconnectCommand import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 
 class Bootstrapper(object):
@@ -56,7 +57,8 @@ class Bootstrapper(object):
         # Power Command
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
                                                                            resource_connection_details_retriever,
-                                                                           synchronous_task_waiter)
+                                                                           synchronous_task_waiter,
+                                                                           helpers)
 
         self.commandExecuterService = CommandExecuterService(py_vmomi_service,
                                                              network_adapter_retriever_command,
