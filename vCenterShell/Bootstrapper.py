@@ -12,10 +12,12 @@ from vCenterShell.commands.DvPortGroupNameGenerator import DvPortGroupNameGenera
 from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
 from vCenterShell.commands.VLanIdRangeParser import VLanIdRangeParser
 from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
+from vCenterShell.commands.VirtualMachinePowerManagementCommand import VirtualMachinePowerManagementCommand
 from vCenterShell.commands.VirtualSwitchConnectCommand import VirtualSwitchConnectCommand
 from vCenterShell.commands.VirtualSwitchToMachineConnector import VirtualSwitchToMachineConnector
 from vCenterShell.commands.VirtualSwitchToMachineDisconnectCommand import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 
 class Bootstrapper(object):
@@ -54,12 +56,19 @@ class Bootstrapper(object):
                                                     resource_connection_details_retriever,
                                                     synchronous_task_waiter)
 
+        # Power Command
+        vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
+                                                                           resource_connection_details_retriever,
+                                                                           synchronous_task_waiter,
+                                                                           helpers)
+
         self.commandExecuterService = CommandExecuterService(py_vmomi_service,
                                                              network_adapter_retriever_command,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,
-                                                             virtual_switch_disconnect_command)
+                                                             virtual_switch_disconnect_command,
+                                                             vm_power_management_command)
 
     def get_command_executer_service(self):
         return self.commandExecuterService

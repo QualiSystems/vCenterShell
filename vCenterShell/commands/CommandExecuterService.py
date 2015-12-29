@@ -10,7 +10,8 @@ class CommandExecuterService(object):
                  destroy_virtual_machine_command,
                  deploy_from_template_command,
                  virtual_switch_connect_command,
-                 virtual_switch_disconnect_command):
+                 virtual_switch_disconnect_command,
+                 vm_power_management_command):
         """
         :param py_vmomi_service:  PyVmomi service
         :param network_adapter_retriever_command:  Network adapter retriever command
@@ -21,6 +22,7 @@ class CommandExecuterService(object):
         self.deployFromTemplateCommand = deploy_from_template_command
         self.virtual_switch_connect_command = virtual_switch_connect_command
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
+        self.vm_power_management_command = vm_power_management_command
 
     def deploy_from_template(self):
         self.deployFromTemplateCommand.execute_deploy_from_template()
@@ -29,7 +31,7 @@ class CommandExecuterService(object):
         self.deployFromTemplateCommand.execute()
 
     def destroy(self):
-        self.revoke()
+        self.disconnect_all()
         self.destroyVirtualMachineCommand.execute()
 
     def connect(self):
@@ -37,9 +39,23 @@ class CommandExecuterService(object):
         vlan_spec_type = os.environ.get('VLAN_SPEC_TYPE')
         self.virtual_switch_connect_command.connect_vm_to_vlan(vlan_id, vlan_spec_type)
 
-    def revoke(self):
+    def disconnect_all(self):
+        # todo: the vcenter param should be getting inside the command from resource
         vcener_name = os.environ.get('VCENTER_NAME')
         virtual_machine_id = os.environ.get('VM_UUID')
         self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id)
 
+    def disconnect(self):
+        # todo: the vcenter param should be getting inside the command from resource
+        vcener_name = os.environ.get('VCENTER_NAME')
+        virtual_machine_id = os.environ.get('VM_UUID')
+        network_name = os.environ.get('NETWORK_NAME')
+        self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
 
+    def power_off(self):
+        vm_uuid = os.environ.get('VM_UUID')
+        self.vm_power_management_command.power_off(vm_uuid)
+
+    def power_on(self):
+        vm_uuid = os.environ.get('VM_UUID')
+        self.vm_power_management_command.power_on(vm_uuid)
