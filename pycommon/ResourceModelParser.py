@@ -9,25 +9,57 @@ class ResourceModelParser:
         :param resource_instance: Instance of resource
         :return:
         """
-        resource_class_name = self.get_resource_model_class_name(resource_instance.ResourceModelName)
-        instance = self.get_class('models.' + resource_class_name)
+
+        instance = ResourceModelParser.create_resource_model_instance(resource_instance)
+        props = ResourceModelParser.get_public_properties(instance)
         for attrib in resource_instance.attrib:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
-            if hasattr(instance, property_name):
+            if props.__contains__(property_name):
                 setattr(instance, property_name, resource_instance.attrib[attrib])
+                props.remove(property_name)
 
+        if props:
+            raise ValueError('Property(ies) {0} not found on resource with attributes {1}'
+                             .format(','.join(props), ','.join(resource_instance.attrib)))
         return instance
 
     @staticmethod
-    def get_resource_model_class_name(resource_model):
+    def get_public_properties(instance):
         """
+        Return list of public properties of an instance
+        :param instance: class instance
+        :return: list
+        """
+        return [prop for prop in dir(instance) if not prop.startswith('__')]
 
-        :param resource_model:
+    @staticmethod
+    def create_resource_model_instance(resource_instance):
+        """
+        Create an instance of class named *ResourceModel
+        from models folder according to ResourceModelName of a resource
+        :param resource_instance: Resource with ResourceModelName property
+        :return: instance of ResourceModel class
+        """
+        resource_class_name = ResourceModelParser.get_resource_model_class_name(resource_instance.ResourceModelName)
+        instance = ResourceModelParser.get_class('models.' + resource_class_name)
+        return instance
+
+    @staticmethod
+    def get_resource_model_class_name(resource_family):
+        """
+        Returns ResouceModel class name by resource family
+        :param resource_family: Resource family
         :rtype: string
         """
-        return resource_model.replace(' ', '') + 'ResourceModel'
+        return resource_family.replace(' ', '') + 'ResourceModel'
 
-    def get_class(self, class_path):
+    @staticmethod
+    def get_class(class_path):
+        """
+        Returns an instance of a class by its class_path.
+        :param class_path: contains modules and class name with dot delimited
+        :return: Any
+        """
         module_path, class_name = class_path.rsplit(".", 1)
 
         try:
@@ -49,4 +81,9 @@ class ResourceModelParser:
 
     @staticmethod
     def get_property_name_from_attribute_name(attribute_name):
+        """
+        Returns property name from attribute name
+        :param attribute_name: Attribute name, may contain upper and lower case and spaces
+        :return: string
+        """
         return attribute_name.lower().replace(' ', '_')

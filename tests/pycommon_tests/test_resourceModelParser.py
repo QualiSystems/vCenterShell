@@ -19,3 +19,16 @@ class TestResourceModelParser(TestCase):
 
         self.assertEqual(resource_model.access_mode, 'Trunk')
         self.assertEqual(resource_model.vlan_id, '123')
+
+    def test_parse_resource_model_missing_attribute(self):
+
+        resource_model_parser = ResourceModelParser()
+
+        resource_info = create_autospec(ResourceInfo)
+
+        # ResourceInfo({'Name': '', 'ResourceModelName': 'Simple'})
+        resource_info.ResourceModelName = 'VLAN'
+        resource_info.attrib = {'Access Mode': 'Trunk'}
+
+        self.assertRaises(ValueError, resource_model_parser.convert_to_resource_model, resource_info)
+
