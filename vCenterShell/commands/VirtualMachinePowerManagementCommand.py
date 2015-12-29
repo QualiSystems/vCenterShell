@@ -39,12 +39,14 @@ class VirtualMachinePowerManagementCommand(object):
         :param vm_uuid: the uuid of the vm
         :return:
         """
+        _logger.info('connecting to vcenter')
         si = self._connect_to_vcenter()
-        _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
 
+        _logger.info('retrieving vm by uuid: {0}'.format(vm_uuid))
         vm = self._get_vm(si, vm_uuid)
 
         # hard power off
+        _logger.info('hard powering of vm')
         task = vm.PowerOff()
         return self.synchronous_task_waiter.wait_for_task(task)
 
@@ -55,10 +57,13 @@ class VirtualMachinePowerManagementCommand(object):
         :param vm_uuid: the uuid of the vm
         :return:
         """
+        _logger.info('connecting to vcenter')
         si = self._connect_to_vcenter()
-        _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
 
+        _logger.info('retrieving vm by uuid: {0}'.format(vm_uuid))
         vm = self._get_vm(si, vm_uuid)
+
+        _logger.info('powering on vm')
         task = vm.PowerOn()
         return self.synchronous_task_waiter.wait_for_task(task)
 
