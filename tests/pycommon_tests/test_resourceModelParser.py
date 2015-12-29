@@ -14,8 +14,8 @@ class TestResourceModelParser(TestCase):
 
         # ResourceInfo({'Name': '', 'ResourceModelName': 'Simple'})
         resource_info.ResourceModelName = 'VLAN'
-        resource_info.attrib = {'access_mode': 'Trunk', 'vlan_id': '123'}
-        resource_model = resource_model_parser.parse_resource_model(resource_info)
+        resource_info.attrib = {'Access Mode': 'Trunk', 'VLAN ID': '123'}
+        resource_model = resource_model_parser.convert_to_resource_model(resource_info)
 
         self.assertEqual(resource_model.access_mode, 'Trunk')
         self.assertEqual(resource_model.vlan_id, '123')

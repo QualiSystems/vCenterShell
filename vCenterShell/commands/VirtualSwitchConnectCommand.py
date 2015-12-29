@@ -23,7 +23,7 @@ class VirtualSwitchConnectCommand:
         resource_context = helpers.get_resource_context_details()
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_context)
 
-        generic_deployed_app_resource_model = self.resourse_model_parser.parse_resource_model(resource_context)
+        generic_deployed_app_resource_model = self.resourse_model_parser.convert_to_resource_model(resource_context)
         vm_uuid = generic_deployed_app_resource_model.uuid
 
         virtual_machine_path = inventory_path_data.vm_folder
@@ -32,7 +32,7 @@ class VirtualSwitchConnectCommand:
         session = helpers.get_api_session()
         vcenter_resource_details = session.GetResourceDetails(vcenter_resource_name)
 
-        vcenter_resource_model = self.resourse_model_parser.parse_resource_model(vcenter_resource_details)
+        vcenter_resource_model = self.resourse_model_parser.convert_to_resource_model(vcenter_resource_details)
         dv_switch_path = vcenter_resource_model.default_dvswitch_path
         dv_switch_name = vcenter_resource_model.default_dvswitch_name
         port_group_path = vcenter_resource_model.default_port_group_path

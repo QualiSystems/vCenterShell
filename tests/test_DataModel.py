@@ -93,8 +93,9 @@ class TestDataModel(TestCase):
 
     def get_class_name_from_model_node(self, model_node):
         resource_model = model_node.attrib['Name']
-        return ResourceModelParser().get_resource_model_class_name(resource_model)
+        return ResourceModelParser.get_resource_model_class_name(resource_model)
 
     def get_attribute_name_from_attribute_node(self, attribute_node):
-        return attribute_node.attrib['Name'].lower().replace(' ', '_')
+        return ResourceModelParser.get_property_name_from_attribute_name(attribute_node.attrib['Name'])
+
 
