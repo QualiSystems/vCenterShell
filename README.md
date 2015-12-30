@@ -1,5 +1,7 @@
 # vCenterShell  
 
+[![Join the chat at https://gitter.im/QualiSystems/vCenterShell](https://badges.gitter.im/QualiSystems/vCenterShell.svg)](https://gitter.im/QualiSystems/vCenterShell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Board [![Stories in Ready](https://badge.waffle.io/QualiSystems/vCenterShell.svg?label=ready&title=Ready)](http://waffle.io/QualiSystems/vCenterShell)
 
 ## Build [![Build Status](https://travis-ci.org/QualiSystems/vCenterShell.svg?branch=master)](https://travis-ci.org/QualiSystems/vCenterShell)
