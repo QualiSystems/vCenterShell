@@ -13,3 +13,6 @@ script:
 
 after_success:
     coveralls
+    
+notifications:
+    webhools: https://qualisystems.getbadges.io/api/app/webhook/63350e33-4119-49c3-8127-075aaa022926
