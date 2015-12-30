@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="vCenter" FolderFullPath="" Address="192.168.42.110" ModelName="vCenter" Driver="Generic Driver" xmlns="http://schemas.qualisystems.com/ResourceManagement/ResourceSchema.xsd">
+  <Attributes>
+    <Attribute Name="Domain Selector" Value="" />
+    <Attribute Name="vCenter_url" Value="" />
+    <Attribute Name="Password" Value="" />
+    <Attribute Name="User" Value="" />
+    <Attribute Name="Default dvSwitch Name" Value="" />
+    <Attribute Name="Default dvSwitch Path" Value="" />
+    <Attribute Name="Default port group path" Value="" />
+  </Attributes>
+  <ChildResources />
+  <Connections />
+</ResourceInfo>
