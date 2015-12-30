@@ -32,3 +32,12 @@ class TestResourceModelParser(TestCase):
 
         self.assertRaises(ValueError, resource_model_parser.convert_to_resource_model, resource_info)
 
+    def test_parse_resource_model_class_does_not_exist(self):
+
+        resource_model_parser = ResourceModelParser()
+
+        resource_info = create_autospec(ResourceInfo)
+
+        resource_info.ResourceModelName = 'NOT EXISTS'
+
+        self.assertRaises(ValueError, resource_model_parser.convert_to_resource_model, resource_info)
