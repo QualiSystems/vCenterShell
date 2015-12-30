@@ -7,6 +7,8 @@
 
 ## Coverage [![Coverage Status](https://coveralls.io/repos/QualiSystems/vCenterShell/badge.svg?branch=develop&service=github)](https://coveralls.io/github/QualiSystems/vCenterShell?branch=develop)
 
+## Code Climate [![Code Climate](https://codeclimate.com/github/QualiSystems/vCenterShell/badges/gpa.svg)](https://codeclimate.com/github/QualiSystems/vCenterShell)
+
 ## Chat [![Join the chat at https://gitter.im/QualiSystems/vCenterShell](https://badges.gitter.im/QualiSystems/vCenterShell.svg)](https://gitter.im/QualiSystems/vCenterShell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Links
