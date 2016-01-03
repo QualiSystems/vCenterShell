@@ -1,4 +1,6 @@
 ﻿import os
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
+
 
 
 class CommandExecuterService(object):
@@ -35,27 +37,27 @@ class CommandExecuterService(object):
         self.destroyVirtualMachineCommand.execute()
 
     def connect(self):
-        vlan_id = os.environ.get('VLAN_ID')
-        vlan_spec_type = os.environ.get('VLAN_SPEC_TYPE')
+        vlan_id = helpers.get_user_param('VLAN_ID')
+        vlan_spec_type = helpers.get_user_param('VLAN_SPEC_TYPE')
         self.virtual_switch_connect_command.connect_vm_to_vlan(vlan_id, vlan_spec_type)
 
     def disconnect_all(self):
         # todo: the vcenter param should be getting inside the command from resource
-        vcener_name = os.environ.get('VCENTER_NAME')
-        virtual_machine_id = os.environ.get('VM_UUID')
+        vcener_name = helpers.get_user_param('VCENTER_NAME')
+        virtual_machine_id = helpers.get_user_param('VM_UUID')
         self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id)
 
     def disconnect(self):
         # todo: the vcenter param should be getting inside the command from resource
-        vcener_name = os.environ.get('VCENTER_NAME')
-        virtual_machine_id = os.environ.get('VM_UUID')
-        network_name = os.environ.get('NETWORK_NAME')
+        vcener_name = helpers.get_user_param('VCENTER_NAME')
+        virtual_machine_id = helpers.get_user_param('VM_UUID')
+        network_name = helpers.get_user_param('NETWORK_NAME')
         self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
 
     def power_off(self):
-        vm_uuid = os.environ.get('VM_UUID')
+        vm_uuid = helpers.get_user_param('VM_UUID')
         self.vm_power_management_command.power_off(vm_uuid)
 
     def power_on(self):
-        vm_uuid = os.environ.get('VM_UUID')
+        vm_uuid = helpers.get_user_param('VM_UUID')
         self.vm_power_management_command.power_on(vm_uuid)

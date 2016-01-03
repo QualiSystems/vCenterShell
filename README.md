@@ -1,5 +1,7 @@
 # vCenterShell  
 
+A lightweight CloudShell 'shell' that allows integrating with vCenter as an app deployment option.
+
 
 ## Board [![Stories in Ready](https://badge.waffle.io/QualiSystems/vCenterShell.svg?label=ready&title=Ready)](http://waffle.io/QualiSystems/vCenterShell)
 
