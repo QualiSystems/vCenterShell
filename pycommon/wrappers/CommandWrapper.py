@@ -25,7 +25,7 @@ class CommandWrapper:
 
     def execute_command_with_connection(self, connection_details, command, *args):
         if not self.logger:
-            self.logger.error(LOGGER_CANNOT_BE_NONE)
+            print LOGGER_CANNOT_BE_NONE
             raise Exception(LOGGER_CANNOT_BE_NONE)
         if not command:
             self.logger.error(COMMAND_CANNOT_BE_NONE)
