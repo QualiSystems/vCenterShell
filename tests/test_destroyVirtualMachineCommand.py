@@ -29,7 +29,7 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
 
         csRetrieverService = Mock()
         csRetrieverService.getVCenterTemplateAttributeData = Mock(
-            return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vCenter_resource_name='vCenter'))
+            return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vcenter_resource_name='vCenter'))
         csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
         csRetrieverService.getVMClusterAttributeData = Mock(
             return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
