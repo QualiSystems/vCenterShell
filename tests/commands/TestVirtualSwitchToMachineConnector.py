@@ -77,12 +77,12 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         port_group_path = 'QualiSB'
         dv_switch_path = 'QualiSB'
         dv_switch_name = 'dvSwitch'
-        dv_port_name = 'boris_group51'
+        dv_port_name = 'boris_group59'
 
         # Act
         virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
                                                     dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path, 51,
+                                                    port_group_path, 59,
                                                     vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
 
     def get_uuid(self):

@@ -5,7 +5,7 @@ from qualipy.api.cloudshell_api import *
 
 # Retrieve environment variables
 reservationId = helpers.get_reservation_context_details().id
-resourceDetails = json.loads(os.environ["RESOURCECONTEXT"])
+resourceDetails = helpers.get_resource_context_details()
 appName = resourceDetails["name"]
 deploymentService = resourceDetails["appData"]["deploymentService"]["name"]
 deployed_app_family = resourceDetails["appData"]["logicalResource"]["family"]
