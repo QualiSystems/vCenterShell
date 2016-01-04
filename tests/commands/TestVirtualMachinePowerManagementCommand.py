@@ -106,7 +106,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         self.assertTrue(synchronous_task_waiter.wait_for_task.called_with(task))
         self.assertTrue(vm.PowerOn.called)
 
-    def test_power_on(self):
+    def test_power_off(self):
         # arrange
         vcenter_name = 'vcenter name'
         vm_uuid = 'uuid'
