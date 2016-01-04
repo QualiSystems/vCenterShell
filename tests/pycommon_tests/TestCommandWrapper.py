@@ -54,6 +54,13 @@ class TestCommandWrapper(TestCase):
         # assert
         self.assertRaises(Exception, wrapper.execute_command, None)
 
+    def test_execute_command_no_logger(self):
+        # arrange
+        wrapper = CommandWrapper(None, self.pv_service)
+
+        # assert
+        self.assertRaises(Exception, wrapper.execute_command, None)
+
     def test_execute_command_no_args(self):
         # arrange
         wrapper = CommandWrapper(self.logger, self.pv_service)
@@ -61,16 +68,11 @@ class TestCommandWrapper(TestCase):
         # assert
         self.assertRaises(Exception, wrapper.execute_command, None)
 
-    def test_execute_command_no_logger(self):
+    def test_execute_command_exception_in_command(self):
         # arrange
-        wrapper = CommandWrapper(None, self.pv_service)
+        def command():
+            raise Exception('evil')
+        wrapper = CommandWrapper(self.logger, self.pv_service)
 
         # assert
-        self.assertRaises(Exception, wrapper.execute_command, None)
-
-    def test_execute_command_no_logger(self):
-        # arrange
-        wrapper = CommandWrapper(None, self.pv_service)
-
-        # assert
-        self.assertRaises(Exception, wrapper.execute_command, None)
+        self.assertRaises(Exception, wrapper.execute_command, command)

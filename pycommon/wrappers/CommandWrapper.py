@@ -30,8 +30,6 @@ class CommandWrapper:
         if not command:
             self.logger.error(COMMAND_CANNOT_BE_NONE)
             raise Exception(COMMAND_CANNOT_BE_NONE)
-        if not args:
-            args = tuple()
 
         try:
             command_name = command.__name__
