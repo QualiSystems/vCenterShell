@@ -4,7 +4,6 @@
 @see https://waffle.io/QualiSystems/vCenterShell/cards/5666b2aa0c076d2300052216 for initial info
 """
 from common.logger import getLogger
-from vCenterShell.commands.BaseCommand import BaseCommand
 
 _logger = getLogger("vCenterShell")
 
@@ -52,7 +51,7 @@ def service_connection(connection_details, pyvmomi_service, connection_retriever
     return service_instance
 
 
-class VirtualSwitchCommandBase(BaseCommand):
+class VirtualSwitchCommandBase(object):
     """
     Abstract Base Switch Class
     """
