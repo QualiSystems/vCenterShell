@@ -1,4 +1,4 @@
-from pycommon.logger import getLogger
+from common.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 

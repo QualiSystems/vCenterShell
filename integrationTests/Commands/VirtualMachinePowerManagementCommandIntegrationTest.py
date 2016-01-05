@@ -1,10 +1,12 @@
 from unittest import TestCase
+
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
+
+from common.logger.service import LoggingService
+from common.vcenter import task_waiter
+from common.vcenter.vmomi_service import pyVmomiService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from pycommon import SynchronousTaskWaiter
-from pycommon.logging_service import LoggingService
-from pycommon.pyVmomiService import pyVmomiService
 from tests.testCredentials import TestCredentials
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
@@ -33,7 +35,7 @@ class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
         power_manager = VirtualMachinePowerManagementCommand(pv_service,
                                                              resource_connection_details_retriever,
-                                                             SynchronousTaskWaiter.SynchronousTaskWaiter(),
+                                                             task_waiter.SynchronousTaskWaiter(),
                                                              qualipy_helpers)
 
         power_manager.power_on(uuid)
@@ -59,7 +61,7 @@ class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
         power_manager = VirtualMachinePowerManagementCommand(pv_service,
                                                              resource_connection_details_retriever,
-                                                             SynchronousTaskWaiter.SynchronousTaskWaiter(),
+                                                             task_waiter.SynchronousTaskWaiter(),
                                                              Mock())
 
         power_manager.power_off(uuid)

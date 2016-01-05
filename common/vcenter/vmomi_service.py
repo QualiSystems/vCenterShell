@@ -4,7 +4,7 @@ import os
 
 from datetime import datetime
 from pyVmomi import vim
-from pycommon.logger import getLogger
+from common.logger import getLogger
 
 logger = getLogger(__name__)
 

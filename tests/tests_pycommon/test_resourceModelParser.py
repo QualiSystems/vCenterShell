@@ -2,7 +2,7 @@ from unittest import TestCase
 from mock import create_autospec
 from qualipy.api.cloudshell_api import ResourceInfo
 
-from pycommon.ResourceModelParser import ResourceModelParser
+from common.model_factory import ResourceModelParser
 
 
 class TestResourceModelParser(TestCase):

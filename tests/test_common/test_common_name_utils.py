@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenter
 
 # Comment out because of 'generate_unique_name' not defined :(
 
-# from pycommon.common_name_utils import generate_unique_name
+# from common.common_name_utils import generate_unique_name
 #
 # class test_common_name_utils(unittest.TestCase):
 #

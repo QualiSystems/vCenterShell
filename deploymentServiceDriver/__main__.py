@@ -1,5 +1,5 @@
 ﻿from DeploymentServiceDriver import DeploymentServiceDriver
-from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
+from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 
 
 def main():

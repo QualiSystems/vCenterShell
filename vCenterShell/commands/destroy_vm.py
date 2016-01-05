@@ -1,6 +1,6 @@
 ﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
-from pycommon.logger import getLogger
+from common.logger import getLogger
 
 logger = getLogger(__name__)
 

@@ -1,13 +1,14 @@
 import ConfigParser
 import os
 from unittest import TestCase
+
 from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 
 from PerfMethodWrapper import PerfMethodWrapper
-from pycommon.logger import getLogger
-from pycommon.pyVmomiService import pyVmomiService
+from common.logger import getLogger
+from common.vcenter.vmomi_service import pyVmomiService
 from tests.testCredentials import TestCredentials
-from pyVmomi import vim
 
 # consts
 START = 'START'

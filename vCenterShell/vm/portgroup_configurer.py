@@ -1,8 +1,7 @@
 from pyVmomi import vim
-from pycommon.pyVmomiService import *
-from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
-from pycommon.logger import configure_loglevel
-from pycommon.logger import getLogger
+
+from common.logger import getLogger
+from common.vcenter.vmomi_service import *
 
 logger = getLogger(__name__)
 

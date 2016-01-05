@@ -1,12 +1,11 @@
 import os
 import sys
+import xml.etree.ElementTree as ET
 from os import listdir
-from os.path import join
 from unittest import TestCase
 
-from pycommon.ResourceModelParser import ResourceModelParser
-from pycommon.logging_service import LoggingService
-import xml.etree.ElementTree as ET
+from common.model_factory import ResourceModelParser
+from common.logger.service import LoggingService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))

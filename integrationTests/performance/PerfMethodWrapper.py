@@ -1,5 +1,5 @@
 from TimerWrapper import TimerWrapper
-from pycommon.logger import getLogger
+from common.logger import getLogger
 
 
 class PerfMethodWrapper:

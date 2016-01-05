@@ -6,7 +6,7 @@ import unittest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-from pycommon.logging_service import LoggingService
+from common.logger.service import LoggingService
 
 
 class TestLoggingService(unittest.TestCase):

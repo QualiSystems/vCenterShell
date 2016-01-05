@@ -3,12 +3,13 @@ vCenter Shell Starter
 runs command defined with 'COMMAND' OS environment variable
 """
 
-import os, sys
+import os
+import sys
+
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 from bootstrap import Bootstrapper
-from pycommon.logging_service import LoggingService
-
+from common.logger.service import LoggingService
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
 DEFAULT_LOG_FILENAME = "./logs/vCenter.log"

@@ -1,7 +1,9 @@
 ﻿import unittest
+
 from mock import Mock, MagicMock
+
+from common.cloudshell.data_retriever import *
 from deploymentServiceDriver.DeploymentServiceDriver import *
-from pycommon.CloudshellDataRetrieverService import *
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

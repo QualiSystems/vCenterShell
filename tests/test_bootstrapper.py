@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pycommon.logging_service import LoggingService
+from common.logger.service import LoggingService
 from vCenterShell import bootstrap
 
 

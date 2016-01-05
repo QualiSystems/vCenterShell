@@ -1,8 +1,8 @@
-﻿from models.VCenterConnectionDetails import VCenterConnectionDetails
-from models.VCenterTemplateModel import *
+﻿from common.utilites.common_collection import first_or_default
+from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
+from models.VCenterTemplateModel import *
 from models.VMClusterModel import *
-from pycommon.common_collection_utils import first_or_default
 
 
 class CloudshellDataRetrieverService:

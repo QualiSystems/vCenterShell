@@ -6,8 +6,9 @@
 """
 
 from pyVmomi import vim
-from pycommon.pyVmomiService import *
-from pycommon.logger import getLogger
+
+from common.logger import getLogger
+from common.vcenter.vmomi_service import *
 
 _logger = getLogger("vCenterShell")
 

@@ -5,17 +5,16 @@ from datetime import datetime
 
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
-
-from pycommon.logging_service import LoggingService
-from pycommon.pyVmomiService import pyVmomiService
 from pyVmomi import vim
 
-from testCredentials import TestCredentials
+from common.logger.service import LoggingService
+from common.vcenter.vmomi_service import pyVmomiService
+from tests.testCredentials import TestCredentials
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from pycommon.logger import getLogger
-from pycommon.logger import configure_loglevel
+from common.logger import getLogger
+
 logger = getLogger(__name__)
 
 

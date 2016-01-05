@@ -2,18 +2,15 @@ import unittest
 
 from mock import MagicMock, Mock
 
-from common.command_context_mocker import *
-from common.vm_context import *
+from test_common.command_context_mocker import CommandContextMocker
+from test_common.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
 
 class TestCommandExecuterService(unittest.TestCase):
-
     def test_destroyVirtualMachineCommand(self):
-        network_adapter_retriever_command = None
         destroy_virtual_machine_command = MagicMock()
         command_executer_service = CommandExecuterService(None,
-                                                          network_adapter_retriever_command,
                                                           destroy_virtual_machine_command,
                                                           Mock(),
                                                           Mock(),
@@ -33,7 +30,6 @@ class TestCommandExecuterService(unittest.TestCase):
         deploy_from_template.execute = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
                                                           Mock(),
-                                                          Mock(),
                                                           deploy_from_template,
                                                           Mock(),
                                                           Mock(),
@@ -50,7 +46,6 @@ class TestCommandExecuterService(unittest.TestCase):
         deploy_from_template = Mock()
         deploy_from_template.deploy_execute = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
-                                                          Mock(),
                                                           Mock(),
                                                           deploy_from_template,
                                                           Mock(),
@@ -72,11 +67,9 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          Mock(),
                                                           power_manager)
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-
 
         # act
         command_executer_service.power_off()
@@ -89,7 +82,6 @@ class TestCommandExecuterService(unittest.TestCase):
         power_manager = Mock()
         power_manager.power_on = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
-                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -111,10 +103,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock())
-
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
@@ -134,7 +124,6 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock())
 
@@ -146,4 +135,3 @@ class TestCommandExecuterService(unittest.TestCase):
 
         # assert
         self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)
-

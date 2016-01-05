@@ -4,9 +4,9 @@ import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
 
+from common.logger import getLogger
+from common.utilites.common_name import generate_unique_name
 from models.DeployDataHolder import DeployDataHolder
-from pycommon.common_name_utils import generate_unique_name
-from pycommon.logger import getLogger
 
 logger = getLogger(__name__)
 

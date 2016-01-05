@@ -3,21 +3,16 @@
 """
 @see https://waffle.io/QualiSystems/vCenterShell/cards/5666b2aa0c076d2300052216 for initial info
 """
-
-from pyVmomi import vim
-from pycommon.pyVmomiService import *
-
+from common.logger import getLogger
 from vCenterShell.commands.BaseCommand import BaseCommand
-from pycommon.utilites.lazy_property import lazy_property
-from pycommon.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 
 # #@todo only for development purposes - can be removed in next
 # from models.VCenterConnectionDetails import VCenterConnectionDetails
-# from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-# from pycommon.pyVmomiService import pyVmomiService
-# from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
+# from common.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
+# from common.pyVmomiService import pyVmomiService
+# from common.SynchronousTaskWaiter import SynchronousTaskWaiter
 
 
 #@todo move to more suitable place

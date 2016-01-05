@@ -3,7 +3,7 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 from models.VirtualNicModel import VirtualNicModel
-from pycommon.logger import getLogger
+from common.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 
@@ -15,9 +15,9 @@ class ConnectionException(Exception):
 class NetworkAdaptersRetrieverCommand(object):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         """
-        :param pv_service: <pycommon.pyVmomiService obj>
-        :param cs_retriever_service: <pycommon.CloudshellDataRetrieverService obj>
-        :param resource_connection_details_retriever: <pycommon.ResourceConnectionDetailsRetriever obj>
+        :param pv_service: <common.pyVmomiService obj>
+        :param cs_retriever_service: <common.CloudshellDataRetrieverService obj>
+        :param resource_connection_details_retriever: <common.ResourceConnectionDetailsRetriever obj>
         :return:
         """
         self.pvService = pv_service
@@ -53,7 +53,7 @@ class NetworkAdaptersRetrieverCommand(object):
     def retrieve(pvService, si, path, network_name):
         """
         Retrieve Network by Name
-        :param pv_service: <pycommon.pyVmomiService obj>
+        :param pv_service: <common.pyVmomiService obj>
         :param si: <service instance>
         :param path: <str>
         :param network_name: <str>

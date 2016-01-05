@@ -1,10 +1,12 @@
 from unittest import TestCase
+
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
+
+from common.logger.service import LoggingService
+from common.vcenter import task_waiter
+from common.vcenter.vmomi_service import pyVmomiService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from pycommon import SynchronousTaskWaiter
-from pycommon.logging_service import LoggingService
-from pycommon.pyVmomiService import pyVmomiService
 from tests.testCredentials import TestCredentials
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 
@@ -26,7 +28,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_switch_to_machine_connector = \
             VirtualSwitchToMachineDisconnectCommand(pv_service,
                                                     resource_connection_details_retriever,
-                                                    SynchronousTaskWaiter.SynchronousTaskWaiter())
+                                                    task_waiter.SynchronousTaskWaiter())
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', 'New Virtual Machine').config.uuid
 
         virtual_switch_to_machine_connector.disconnect_all('name of the vCenter',
@@ -46,7 +48,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_switch_to_machine_connector = \
             VirtualSwitchToMachineDisconnectCommand(pv_service,
                                                     resource_connection_details_retriever,
-                                                    SynchronousTaskWaiter.SynchronousTaskWaiter())
+                                                    task_waiter.SynchronousTaskWaiter())
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz/', '2').config.uuid
 
         virtual_switch_to_machine_connector.disconnect('name of the vCenter',

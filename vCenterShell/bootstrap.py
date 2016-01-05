@@ -1,13 +1,11 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
-from vCenterShell.commands.DvPortGroupNameGenerator import DvPortGroupNameGenerator
-from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
 
-from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
-from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-from pycommon.ResourceModelParser import ResourceModelParser
-from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
-from pycommon.pyVmomiService import pyVmomiService
+from common.model_factory import ResourceModelParser
+from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.vcenter.task_waiter import SynchronousTaskWaiter
+from common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.command_executer import CommandExecuterService
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
@@ -15,6 +13,8 @@ from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
+from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
