@@ -15,7 +15,7 @@ class ConnectionException(Exception):
 class NetworkAdaptersRetrieverCommand(object):
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         """
-        :param pv_service: <common.pyVmomiService obj>
+        :param pv_service: <common.pv_service obj>
         :param cs_retriever_service: <common.CloudshellDataRetrieverService obj>
         :param resource_connection_details_retriever: <common.ResourceConnectionDetailsRetriever obj>
         :return:
@@ -53,7 +53,7 @@ class NetworkAdaptersRetrieverCommand(object):
     def retrieve(pvService, si, path, network_name):
         """
         Retrieve Network by Name
-        :param pv_service: <common.pyVmomiService obj>
+        :param pv_service: <common.pv_service obj>
         :param si: <service instance>
         :param path: <str>
         :param network_name: <str>

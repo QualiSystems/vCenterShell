@@ -16,7 +16,7 @@ class DeployFromTemplateCommand(object):
 
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
         """
-        :param pvService:   pyVmomiService Instance
+        :param pvService:   pv_service Instance
         """
         self.pv_service = pv_service
         self.cs_retriever_service = cs_retriever_service
