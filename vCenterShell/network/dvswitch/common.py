@@ -10,7 +10,7 @@ _logger = getLogger("vCenterShell")
 # #@todo only for development purposes - can be removed in next
 # from models.VCenterConnectionDetails import VCenterConnectionDetails
 # from common.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-# from common.pyVmomiService import pyVmomiService
+# from common.pv_service import pv_service
 # from common.SynchronousTaskWaiter import SynchronousTaskWaiter
 
 
@@ -29,14 +29,14 @@ def service_connection(connection_details, pyvmomi_service, connection_retriever
     """
     Connect to vCenter via SSL and return 'Service Instance' (SI) object
     :param vm_name: <str> Name of Virtual Machine
-    :param pyvmomi_service: <pyVmomiService>
+    :param pyvmomi_service: <pv_service>
     :param connection_retriever: <ResourceConnectionDetailsRetriever>
     :return: <obj> 'service instance' (si)
     """
 
     #@todo only for development purposes - can be removed in next
     # assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
-    # assert (issubclass(type(pyvmomi_service), pyVmomiService))
+    # assert (issubclass(type(pyvmomi_service), pv_service))
     # assert(isinstance(connection_details, VCenterConnectionDetails))
 
     _logger.debug("Connection to vCenter  Via [{host}:{port}] User: '{username}'".format(
@@ -61,7 +61,7 @@ class VirtualSwitchCommandBase(object):
                  synchronous_task_waiter=None):
 
         #@todo only for development purposes - can be removed in next
-        # assert (issubclass(type(pyvmomi_service), pyVmomiService))
+        # assert (issubclass(type(pyvmomi_service), pv_service))
         # assert (issubclass(type(connection_retriever), ResourceConnectionDetailsRetriever))
 
 
