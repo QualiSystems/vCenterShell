@@ -16,7 +16,7 @@ class TestDataModel(TestCase):
 
     def test_resource_models(self):
         ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
-        datamodel_path = os.path.join(os.path.dirname(__file__), '../vCenterShellPackage/DataModel/datamodel.xml')
+        datamodel_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/DataModel/datamodel.xml')
         tree = ET.parse(datamodel_path)
         root = tree.getroot()
         resource_models = root.findall('.//default:ResourceModel', ns)
@@ -70,7 +70,7 @@ class TestDataModel(TestCase):
         self.assertSequenceEqual(validation_errors, [])
 
     def get_app_templates_xml_files(self):
-        app_templates_path = os.path.join(os.path.dirname(__file__), '../vCenterShellPackage/App Templates/')
+        app_templates_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/App Templates/')
         xml_files = [os.path.join(app_templates_path, f)
                      for f in listdir(app_templates_path)
                      if os.path.splitext(f)[1] == '.xml']

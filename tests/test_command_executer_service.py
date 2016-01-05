@@ -2,8 +2,8 @@ import unittest
 
 from mock import MagicMock, Mock
 
-from test_common.command_context_mocker import CommandContextMocker
-from test_common.vm_context import VmContext
+from utils.command_context_mocker import CommandContextMocker
+from utils.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
 

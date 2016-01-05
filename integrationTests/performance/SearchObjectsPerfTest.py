@@ -8,7 +8,7 @@ from pyVmomi import vim
 from PerfMethodWrapper import PerfMethodWrapper
 from common.logger import getLogger
 from common.vcenter.vmomi_service import pyVmomiService
-from tests.testCredentials import TestCredentials
+from tests.utils.testing_credentials import TestCredentials
 
 # consts
 START = 'START'

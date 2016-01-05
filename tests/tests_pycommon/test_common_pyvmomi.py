@@ -9,7 +9,7 @@ from pyVmomi import vim
 
 from common.logger.service import LoggingService
 from common.vcenter.vmomi_service import pyVmomiService
-from tests.testCredentials import TestCredentials
+from tests.utils.testing_credentials import TestCredentials
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 

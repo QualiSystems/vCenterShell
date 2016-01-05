@@ -7,7 +7,7 @@ from pyVmomi import vim
 
 from common.logger.service import LoggingService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.testCredentials import TestCredentials
+from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.vm.dvswitch_connector import *
 

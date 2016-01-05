@@ -7,7 +7,7 @@ from common.logger.service import LoggingService
 from common.vcenter import task_waiter
 from common.vcenter.vmomi_service import pyVmomiService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.testCredentials import TestCredentials
+from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
 
