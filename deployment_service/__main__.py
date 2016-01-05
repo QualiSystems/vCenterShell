@@ -1,4 +1,4 @@
-﻿from DeploymentServiceDriver import DeploymentServiceDriver
+﻿from driver import DeploymentServiceDriver
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 
 
