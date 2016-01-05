@@ -7,7 +7,7 @@ from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VCenterTemplateModel import VCenterTemplateModel
 
 from models.VMClusterModel import VMClusterModel
-from vCenterShell.commands.DeployFromTemplateCommand import *
+from vCenterShell.commands.deploy_vm import *
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

@@ -1,5 +1,5 @@
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
+from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
 

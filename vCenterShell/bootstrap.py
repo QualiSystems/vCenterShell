@@ -1,23 +1,23 @@
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
+from vCenterShell.commands.DvPortGroupNameGenerator import DvPortGroupNameGenerator
+from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
+
 from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
 from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
 from pycommon.ResourceModelParser import ResourceModelParser
 from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
 from pycommon.pyVmomiService import pyVmomiService
-from vCenterShell.commands.CommandExecuterService import CommandExecuterService
-from vCenterShell.commands.DeployFromTemplateCommand import DeployFromTemplateCommand
-from vCenterShell.commands.DestroyVirtualMachineCommand import DestroyVirtualMachineCommand
-from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
-from vCenterShell.commands.DvPortGroupNameGenerator import DvPortGroupNameGenerator
-from vCenterShell.commands.NetworkAdaptersRetriever import NetworkAdaptersRetrieverCommand
-from vCenterShell.commands.VLanIdRangeParser import VLanIdRangeParser
-from vCenterShell.commands.VirtualMachinePortGroupConfigurer import VirtualMachinePortGroupConfigurer
-from vCenterShell.commands.VirtualMachinePowerManagementCommand import VirtualMachinePowerManagementCommand
-from vCenterShell.commands.VirtualSwitchConnectCommand import VirtualSwitchConnectCommand
-from vCenterShell.commands.VirtualSwitchToMachineConnector import VirtualSwitchToMachineConnector
-from vCenterShell.commands.VirtualSwitchToMachineDisconnectCommand import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from vCenterShell.command_executer import CommandExecuterService
+from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
+from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
+from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
+from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
+from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
+from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
+from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
+from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 
 
 class Bootstrapper(object):
@@ -25,9 +25,7 @@ class Bootstrapper(object):
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         resource_connection_details_retriever = ResourceConnectionDetailsRetriever(cloudshell_data_retriever_service)
-        network_adapter_retriever_command = NetworkAdaptersRetrieverCommand(py_vmomi_service,
-                                                                            cloudshell_data_retriever_service,
-                                                                            resource_connection_details_retriever)
+
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        cloudshell_data_retriever_service)
 
@@ -63,7 +61,6 @@ class Bootstrapper(object):
                                                                            helpers)
 
         self.commandExecuterService = CommandExecuterService(py_vmomi_service,
-                                                             network_adapter_retriever_command,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,

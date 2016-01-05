@@ -8,8 +8,8 @@ from pyVmomi import vim
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from pycommon.logging_service import LoggingService
 from tests.testCredentials import TestCredentials
-from vCenterShell.commands.DvPortGroupCreator import DvPortGroupCreator
-from vCenterShell.commands.VirtualSwitchToMachineConnector import *
+from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+from vCenterShell.vm.dvswitch_connector import *
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):

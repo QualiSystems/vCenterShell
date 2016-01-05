@@ -1,16 +1,17 @@
-﻿import jsonpickle
+﻿import json
+
+import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import json
 from qualipy.api.cloudshell_api import *
 
-from pycommon.common_collection_utils import first_or_default
 from models.DeployDataHolder import DeployDataHolder
 from pycommon.common_name_utils import generate_unique_name
 from pycommon.logger import getLogger
-from vCenterShell.commands.BaseCommand import BaseCommand
+
 logger = getLogger(__name__)
 
-class DeployFromTemplateCommand(BaseCommand):
+
+class DeployFromTemplateCommand(object):
     """ Command to Create a VM from a template """
 
     def __init__(self, pv_service, cs_retriever_service, resource_connection_details_retriever):
@@ -105,19 +106,6 @@ class DeployFromTemplateCommand(BaseCommand):
                                               AttributeNameValue('vCenter Template',
                                                                  data_holder.resource_context.attributes[
                                                                      'vCenter Template'])})])
-
-    # def replace_app_resource_with_vm_resource(self, data_holder, deploy_result):
-    #     app_name = data_holder.resource_context.name
-    #     self.create_resource_for_deployed_vm(data_holder, deploy_result)
-    #
-    #     reservation_id = helpers.get_reservation_context_details().id
-    #     session = helpers.get_api_session()
-    #
-    #     services_position = session.GetReservationServicesPositions(reservation_id)
-    #     app_poistion = first_or_default(services_position.ResourceDiagramLayouts, lambda x: x.ResourceName == app_name)
-    #
-    #     session.RemoveServicesFromReservation(reservation_id, app_name)
-    #     session.SetReservationResourcePosition(reservation_id, deploy_result.vm_name, app_poistion.X, app_poistion.Y)
 
     def get_params_from_env(self):
         param = os.environ.get(self.DEPLOY_DATA)

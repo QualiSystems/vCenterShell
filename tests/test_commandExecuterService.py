@@ -1,9 +1,10 @@
 import unittest
-from mock import MagicMock, Mock
-from common.vm_context import *
-from common.command_context_mocker import *
-from vCenterShell.commands.CommandExecuterService import CommandExecuterService
 
+from mock import MagicMock, Mock
+
+from common.command_context_mocker import *
+from common.vm_context import *
+from vCenterShell.command_executer import CommandExecuterService
 
 
 class TestCommandExecuterService(unittest.TestCase):

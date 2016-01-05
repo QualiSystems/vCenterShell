@@ -12,7 +12,7 @@ from pycommon.logger import getLogger
 _logger = getLogger("vCenterShell")
 
 
-class VirtualSwitchToMachineDisconnectCommand:
+class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
                  connection_retriever,

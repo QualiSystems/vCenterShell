@@ -6,7 +6,7 @@ runs command defined with 'COMMAND' OS environment variable
 import os, sys
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
-from Bootstrapper import Bootstrapper
+from bootstrap import Bootstrapper
 from pycommon.logging_service import LoggingService
 
 

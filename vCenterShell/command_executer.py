@@ -8,7 +8,6 @@ class CommandExecuterService(object):
 
     def __init__(self,
                  py_vmomi_service,
-                 network_adapter_retriever_command,
                  destroy_virtual_machine_command,
                  deploy_from_template_command,
                  virtual_switch_connect_command,
@@ -19,7 +18,6 @@ class CommandExecuterService(object):
         :param network_adapter_retriever_command:  Network adapter retriever command
         """
         self.pyVmomiService = py_vmomi_service
-        self.networkAdapterRetrieverCommand = network_adapter_retriever_command
         self.destroyVirtualMachineCommand = destroy_virtual_machine_command
         self.deployFromTemplateCommand = deploy_from_template_command
         self.virtual_switch_connect_command = virtual_switch_connect_command

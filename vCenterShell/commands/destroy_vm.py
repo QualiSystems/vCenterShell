@@ -1,17 +1,11 @@
-﻿import os
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from pycommon.CloudshellDataRetrieverService import *
+﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
-from vCenterShell.commands.BaseCommand import BaseCommand
 from pycommon.logger import getLogger
-from pycommon.logger import configure_loglevel
 
 logger = getLogger(__name__)
 
-# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
-
-class DestroyVirtualMachineCommand(BaseCommand):
+class DestroyVirtualMachineCommand(object):
     """ Command to Destroy a VM """
 
     def __init__(self, pvService, cloudshell_data_retriever_service):

@@ -3,7 +3,7 @@ import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pycommon.common_collection_utils import first_or_default
 
 
-class VirtualSwitchConnectCommand:
+class VirtualSwitchConnectCommand(object):
     def __init__(self, cs_retriever_service, virtual_switch_to_machine_connector,
                  dv_port_group_name_generator, vlan_spec_factory, vlan_id_range_parser, resourse_model_parser):
         """

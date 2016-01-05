@@ -1,5 +1,6 @@
 from unittest import TestCase
-from vCenterShell.commands.VlanSpecFactory import VlanSpecFactory
+
+from vCenterShell.network.vlan.factory import VlanSpecFactory
 
 
 class TestVlanSpecFactory(TestCase):

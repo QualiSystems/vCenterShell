@@ -6,7 +6,7 @@ from pycommon import SynchronousTaskWaiter
 from pycommon.logging_service import LoggingService
 from pycommon.pyVmomiService import pyVmomiService
 from tests.testCredentials import TestCredentials
-from vCenterShell.commands.VirtualSwitchToMachineDisconnectCommand import VirtualSwitchToMachineDisconnectCommand
+from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

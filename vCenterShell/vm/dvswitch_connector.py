@@ -1,9 +1,3 @@
-from pyVmomi import vim
-from pycommon.pyVmomiService import *
-from pycommon.SynchronousTaskWaiter import SynchronousTaskWaiter
-from vCenterShell.commands.VirtualMachinePortGroupConfigurer import *
-
-
 class VirtualSwitchToMachineConnector(object):
     def __init__(self, pyvmomi_service, resource_connection_details_retriever, dv_port_group_creator,
                  virtual_machine_port_group_configurer):
