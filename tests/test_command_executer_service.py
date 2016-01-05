@@ -19,6 +19,7 @@ class TestCommandExecuterService(unittest.TestCase):
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
+        CommandContextMocker.set_vm_uuid_param(VmContext.DEFAULT_NETWORK_FULL_NAME)
 
         command_executer_service.destroy()
 
@@ -109,6 +110,7 @@ class TestCommandExecuterService(unittest.TestCase):
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
         CommandContextMocker.set_vm_uuid_param(VmContext.NETWORK_NAME)
+        CommandContextMocker.set_vm_uuid_param(VmContext.DEFAULT_NETWORK_FULL_NAME)
 
         # act
         command_executer_service.disconnect()
@@ -129,9 +131,10 @@ class TestCommandExecuterService(unittest.TestCase):
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
+        CommandContextMocker.set_vm_uuid_param(VmContext.DEFAULT_NETWORK_FULL_NAME)
 
         # act
         command_executer_service.disconnect_all()
 
         # assert
-        self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)
+        self.assertTrue(virtual_switch_disconnect_command.disconnect.called)

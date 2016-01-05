@@ -43,14 +43,22 @@ class CommandExecuterService(object):
         # todo: the vcenter param should be getting inside the command from resource
         vcener_name = helpers.get_user_param('VCENTER_NAME')
         virtual_machine_id = helpers.get_user_param('VM_UUID')
-        self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id)
+        default_network_name = helpers.get_user_param('DEFAULT_NETWORK_FULL_NAME')
+        self.virtual_switch_disconnect_command.disconnect(vcener_name,
+                                                          virtual_machine_id,
+                                                          None,
+                                                          default_network_name)
 
     def disconnect(self):
         # todo: the vcenter param should be getting inside the command from resource
         vcener_name = helpers.get_user_param('VCENTER_NAME')
         virtual_machine_id = helpers.get_user_param('VM_UUID')
         network_name = helpers.get_user_param('NETWORK_NAME')
-        self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
+        default_network_name = helpers.get_user_param('DEFAULT_NETWORK_FULL_NAME')
+        self.virtual_switch_disconnect_command.disconnect(vcener_name,
+                                                          virtual_machine_id,
+                                                          network_name,
+                                                          default_network_name)
 
     def power_off(self):
         vm_uuid = helpers.get_user_param('VM_UUID')

@@ -14,13 +14,6 @@ from common.logger import getLogger
 logger = getLogger("vCenterCommon")
 
 
-# #todo move to more suitable place
-# def vm_reconfig_task(vm, device_change):
-#     config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-#     task = vm.ReconfigVM_Task(config_spec)
-#     return task
-
-
 def vnic_set_connectivity_status(nicspec, is_connected):
     if not nicspec.device.connectable:
         nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()

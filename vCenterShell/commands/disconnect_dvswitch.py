@@ -83,12 +83,12 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
     def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
         """
-        disconnect all of the network adapter of the vm
-        :param <str> default_network_name: the name of the network which will be attached against a disconnected one
-        :param <str> network_name: the name of the specific network to disconnect
+        disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
-        :return:
+        :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
+        :param <str | None> network_name: the name of the specific network to disconnect
+        :return: Started Task
         """
         connection_details = self.connection_retriever.connection_details(vcenter_name)
 
@@ -100,13 +100,19 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        network = self.get_network_by_name(vm, network_name)
-        if network is None:
-            raise KeyError('network not found ({0})'.format(network_name))
-
+        if network_name:
+            network = self.get_network_by_name(vm, network_name)
+            if network is None:
+                raise KeyError('network not found ({0})'.format(network_name))
+        else:
+            network = None
 
         default_network = self.get_network_by_full_name(si, default_network_full_name)
-        return self.port_group_configurer.disconnect_network(vm, network, default_network)
+        if network:
+            return self.port_group_configurer.disconnect_network(vm, network, default_network, erase_network=True)
+
+        else:
+            return self.port_group_configurer.disconnect_all_networks(vm, default_network)
 
     def is_device_match_network(self, device, network_name):
         """

@@ -7,52 +7,12 @@ from common.vcenter.vmomi_service import *
 from vCenterShell.network.vnic.vnic_common import (vnic_compose_empty,
                                                    vnic_attached_to_network)
 
+from vCenterShell.network import network_is_portgroup
+from vCenterShell.vm import vm_reconfig_task
+
 from common.logger import getLogger
 logger = getLogger("vCenterCommon")
 
-
-
-# class VirtualMachinePortGroupConfigurer(object):
-#     def __init__(self, pyvmomi_service, synchronous_task_waiter):
-#         self.pyvmomi_service = pyvmomi_service
-#         self.synchronous_task_waiter = synchronous_task_waiter
-#
-#     def configure_port_group_on_vm(self, service_instance,
-#                                    virtual_machine_path,
-#                                    vm_uuid,
-#                                    port_group_path,
-#                                    port_group_name):
-#
-#         logger.debug("virtual machine path {} vmUUID {}".format(virtual_machine_path, vm_uuid))
-#         vm = self.pyvmomi_service.find_by_uuid(service_instance, vm_uuid, True)
-#         # vm = self.pyvmomi_service.find_vm_by_name(service_instance, virtual_machine_path, virtual_machine_name)
-#         # This code is for changing only one Interface. For multiple Interface
-#         # Iterate through a loop of network names.
-#         device_change = []
-#         for device in vm.config.hardware.device:
-#             if isinstance(device, vim.vm.device.VirtualEthernetCard):
-#                 nicspec = vim.vm.device.VirtualDeviceSpec()
-#                 nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
-#                 nicspec.device = device
-#                 nicspec.device.wakeOnLanEnabled = True
-#
-#                 network = self.pyvmomi_service.find_network_by_name(service_instance, port_group_path, port_group_name)
-#                 dvs_port_connection = vim.dvs.PortConnection()
-#                 dvs_port_connection.portgroupKey = network.key
-#                 dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
-#                 nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-#                 nicspec.device.backing.port = dvs_port_connection
-#
-#                 nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
-#                 nicspec.device.connectable.startConnected = True
-#                 nicspec.device.connectable.allowGuestControl = True
-#                 device_change.append(nicspec)
-#                 break
-#
-#         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-#         task = vm.ReconfigVM_Task(config_spec)
-#         logger.info("Successfully changed network")
-#         return self.synchronous_task_waiter.wait_for_task(task)
 
 class VirtualMachinePortGroupConfigurer(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
@@ -156,12 +116,24 @@ class VirtualMachinePortGroupConfigurer(object):
             return self.update_vnic_by_mapping(vm, update_mapping)
         return None
 
-    def disconnect_all_port_groups(self, vm, default_network=None):
+    def erase_network_by_mapping(self, update_mapping):
+        for item in update_mapping:
+            network = item[1]
+            if network:
+                try:
+                    task = self.destroy_port_group_task(network)
+                    if task:
+                        self.synchronous_task_waiter.wait_for_task(task)
+                except:
+                    logger.debug("Port Group cannot be destroyed because of using")
+                    pass
+
+    def disconnect_all_networks(self, vm, default_network=None):
         vnics = self.map_vnics(vm)
         update_mapping = [(vnic, None, False, default_network, ) for _, vnic in vnics.items()]
         return self.update_vnic_by_mapping(vm, update_mapping)
 
-    def disconnect_network(self, vm, network, default_network=None):
+    def disconnect_network(self, vm, network, default_network=None, erase_network=False):
         condition = lambda vnic: True if default_network else not self.is_vnic_disconnected(vnic)
         vnics = self.map_vnics(vm)
 
@@ -169,7 +141,11 @@ class VirtualMachinePortGroupConfigurer(object):
                           for vnic_name, vnic in vnics.items()
                           if self.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
-        return self.update_vnic_by_mapping(vm, update_mapping)
+        self.update_vnic_by_mapping(vm, update_mapping)
+        if erase_network:
+            self.erase_network_by_mapping(update_mapping)
+
+        return None
 
     def update_vnic_by_mapping(self, vm, mapping):
         if not vm or not mapping:
@@ -231,9 +207,8 @@ class VirtualMachinePortGroupConfigurer(object):
         nic_spec.device.connectable.startConnected = to_connect
 
     def reconfig_vm(self, device_change, vm):
-        config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-        task = vm.ReconfigVM_Task(config_spec)
-        logger.info("Successfully changed network")
+        logger.info("Changing network...")
+        task = vm_reconfig_task(vm, device_change)
         return self.synchronous_task_waiter.wait_for_task(task)
 
     def is_vnic_attached_to_network(self, device, network):
@@ -247,3 +222,11 @@ class VirtualMachinePortGroupConfigurer(object):
     def is_vnic_disconnected(self, vnic):
         is_disconnected = not (hasattr(vnic, 'connectable') and vnic.connectable.connected)
         return is_disconnected
+
+    @staticmethod
+    def destroy_port_group_task(network):
+        from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+        if network_is_portgroup(network):
+            task = DvPortGroupCreator.dv_port_group_destroy_task(network)
+            return task
+        return None

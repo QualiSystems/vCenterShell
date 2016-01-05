@@ -5,8 +5,6 @@ The most common network/Distributed Virtual Switch staff
 """
 
 
-#from common.vcenter.vmomi_service import *
-
 from common.logger import getLogger
 _logger = getLogger("vCenterCommon")
 
@@ -19,7 +17,7 @@ def network_is_portgroup(network):
     return True if network and str(network).startswith("vim.dvs.VmwareDistributedVirtualSwitch:") else False
 
 
-#todo - REMOME DATA bellow - just for development purposes
+#todo - REMOVE INFO bellow - just for development purposes
 """
 
 'vim.dvs.DistributedVirtualPortgroup:dvportgroup-12337'
