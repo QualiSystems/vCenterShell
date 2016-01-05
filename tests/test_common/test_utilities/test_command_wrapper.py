@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from mock import Mock
-from common.wrappers.CommandWrapper import CommandWrapper
+from common.wrappers.command_wrapper import CommandWrapper
 
 
 class TestCommandWrapper(TestCase):
