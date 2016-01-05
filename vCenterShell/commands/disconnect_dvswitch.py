@@ -81,6 +81,10 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         path, name = get_path_and_name(default_network_full_name)
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
+
+    def disconnect_all(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
+        return self.disconnect(vcenter_name, vm_uuid, None, default_network_full_name)
+
     def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces

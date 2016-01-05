@@ -214,4 +214,4 @@ class TestCommandExecuterService(unittest.TestCase):
         command_executer_service.disconnect_all()
 
         # assert
-        self.assertTrue(virtual_switch_disconnect_command.disconnect.called)
+        self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)
