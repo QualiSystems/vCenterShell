@@ -1,11 +1,13 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
 
+from common.logger import getLogger
 from common.model_factory import ResourceModelParser
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
+from common.wrappers.command_wrapper import CommandWrapper
 from vCenterShell.command_executer import CommandExecuterService
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
@@ -29,7 +31,8 @@ class Bootstrapper(object):
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        cloudshell_data_retriever_service)
 
-        deploy_from_template_command = DeployFromTemplateCommand(py_vmomi_service, cloudshell_data_retriever_service,
+        deploy_from_template_command = DeployFromTemplateCommand(py_vmomi_service,
+                                                                 cloudshell_data_retriever_service,
                                                                  resource_connection_details_retriever)
 
         # Virtual Switch Connect
@@ -41,6 +44,7 @@ class Bootstrapper(object):
                                                                               resource_connection_details_retriever,
                                                                               dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
+
         virtual_switch_connect_command = VirtualSwitchConnectCommand(cloudshell_data_retriever_service,
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
@@ -51,16 +55,19 @@ class Bootstrapper(object):
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
             VirtualSwitchToMachineDisconnectCommand(pyVmomiService,
-                                                    resource_connection_details_retriever,
+                                                    cloudshell_data_retriever_service,
                                                     synchronous_task_waiter)
 
         # Power Command
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
-                                                                           resource_connection_details_retriever,
                                                                            synchronous_task_waiter,
                                                                            helpers)
 
-        self.commandExecuterService = CommandExecuterService(py_vmomi_service,
+        self.commandExecuterService = CommandExecuterService(helpers,
+                                                             getLogger,
+                                                             py_vmomi_service,
+                                                             CommandWrapper,
+                                                             resource_connection_details_retriever,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,

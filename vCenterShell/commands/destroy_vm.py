@@ -10,7 +10,7 @@ class DestroyVirtualMachineCommand(object):
 
     def __init__(self, pvService, cloudshell_data_retriever_service):
         """
-        :param pvService:   pyVmomiService Instance
+        :param pvService:   pv_service Instance
         """
         self.pvService = pvService
         self.csRetrieverService = cloudshell_data_retriever_service
