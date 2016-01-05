@@ -5,9 +5,9 @@ The most common network/Distributed Virtual Switch staff
 """
 
 
-from common.logger import getLogger
+#from common.vcenter.vmomi_service import *
 
-from common.pyVmomiService import *
+from common.logger import getLogger
 _logger = getLogger("vCenterCommon")
 
 

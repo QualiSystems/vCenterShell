@@ -7,9 +7,9 @@
 
 from pyVmomi import vim
 
-from common.logger import getLogger
 from common.vcenter.vmomi_service import *
-
+from vCenterShell.network.vnic.vnic_common import vm_reconfig_task
+from common.logger import getLogger
 _logger = getLogger("vCenterShell")
 
 
@@ -30,29 +30,33 @@ class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
                  connection_retriever,
-                 synchronous_task_waiter):
+                 port_group_configurer):
         self.pyvmomi_service = pyvmomi_service
         self.connection_retriever = connection_retriever
-        self.synchronous_task_waiter = synchronous_task_waiter
+        self.port_group_configurer = port_group_configurer
 
-    # def xdisconnect(self, vcenter_name, vm_uuid, network_name):
-    #     """
-    #     disconnect all of the network adapter of the vm
-    #     :param <str> network_name: the name of the specific network to disconnect
-    #     :param <str> vcenter_name: the name of the vCenter to connect to
-    #     :param <str> vm_uuid: the uuid of the vm
-    #     :return:
-    #     """
-    #     connection_details = self.connection_retriever.connection_details(vcenter_name)
-    #
-    #     si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
-    #                                       connection_details.password,
-    #                                       connection_details.port)
-    #     _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
-    #
-    #     vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-    #
-    #     return self.remove_interfaces_from_vm(vm, lambda device: self.is_device_match_network(device, network_name))
+        #self.synchronous_task_waiter = synchronous_task_waiter
+
+    #todo - NOT USED - REMOVE
+    def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
+        """
+        disconnect all of the network adapter of the vm
+        :param <str> network_name: the name of the specific network to disconnect & vNic remove
+        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> vm_uuid: the uuid of the vm
+        :return:
+        """
+        connection_details = self.connection_retriever.connection_details(vcenter_name)
+
+        si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
+                                          connection_details.password,
+                                          connection_details.port)
+        _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
+
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+
+        condition = lambda device: self.is_device_match_network(device, network_name) if network_name else lambda x: True
+        return self.remove_interfaces_from_vm_task(vm, condition)
 
     #todo move to COMMON
     def get_network_by_name(self, vm, network_name):
@@ -104,40 +108,23 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         default_network = self.get_network_by_full_name(si, default_network_full_name)
         return self.port_group_configurer.disconnect_network(vm, network, default_network)
 
-    # def disconnect_all(self, vcenter_name, vm_uuid):
-    #     """
-    #     disconnect all of the network adapter of the vm
-    #     :param <str> vcenter_name: the name of the vCenter to connect to
-    #     :param <str> vm_uuid: the uuid of the vm
-    #     :return:
-    #     """
-    #     connection_details = self.connection_retriever.connection_details(vcenter_name)
-    #
-    #     si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
-    #                                       connection_details.password,
-    #                                       connection_details.port)
-    #     _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
-    #
-    #     vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-    #     return self.remove_interfaces_from_vm(vm)
-    #
-    # def is_device_match_network(self, device, network_name):
-    #     """
-    #     checks if the device has a backing with of the right network name
-    #     :param <vim.vm.Device> device: instance of adapter
-    #     :param <str> network_name: network name
-    #     :return:
-    #     """
-    #     backing = device.backing
-    #
-    #     if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
-    #         return network_name == backing.network.name
-    #     elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
-    #         return network_name == backing.port.portgroupKey
-    #     return False
+    def is_device_match_network(self, device, network_name):
+        """
+        checks if the device has a backing with of the right network name
+        :param <vim.vm.Device> device: instance of adapter
+        :param <str> network_name: network name
+        :return:
+        """
+        backing = device.backing
+
+        if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
+            return network_name == backing.network.name
+        elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
+            return network_name == backing.port.portgroupKey
+        return False
 
     #todo NOT USED but work OK - move to COMMON
-    def remove_interfaces_from_vm(self, virtual_machine, filter_function=None):
+    def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """
         @see https://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/vim.VirtualMachine.html#reconfigure
         :param filter_function: function that gets the device and decide if it should be deleted
@@ -154,17 +141,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                 device_change.append(nicspec)
 
         if len(device_change) > 0:
-            return self.remove_devices(device_change, virtual_machine)
+            return vm_reconfig_task(virtual_machine, device_change)
         return None
 
-    #todo NOT USED but work OK - move to COMMON & RENAME
-    def remove_devices(self, device_change, virtual_machine):
-        """
-        gets the adapters to remove from the vm and removes them
-        :param <array<vim.vm.device.VirtualDeviceSpec>> device_change:  the adapters to remove
-        :param <vim.VirtualMachine> virtual_machine:  the vm to remove the adapters from
-        """
-        config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-        task = virtual_machine.ReconfigVM_Task(config_spec)
-        logger.info("Virtual Machine remove ALL Interfaces task STARTED")
-        return self.synchronous_task_waiter.wait_for_task(task)
