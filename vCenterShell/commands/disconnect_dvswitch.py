@@ -8,7 +8,7 @@
 from pyVmomi import vim
 
 from common.vcenter.vmomi_service import *
-from vCenterShell.network.vnic.vnic_common import vm_reconfig_task
+from vCenterShell.vm import vm_reconfig_task
 from common.logger import getLogger
 _logger = getLogger("vCenterShell")
 
@@ -81,7 +81,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         path, name = get_path_and_name(default_network_full_name)
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
-    def disconnect(self, vcenter_name, vm_uuid, network_name, default_network_full_name=None):
+    def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
         """
         disconnect all of the network adapter of the vm
         :param <str> default_network_name: the name of the network which will be attached against a disconnected one

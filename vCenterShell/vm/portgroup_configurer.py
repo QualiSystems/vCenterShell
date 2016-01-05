@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from pyVmomi import vim
 
 from common.logger import getLogger
 from common.vcenter.vmomi_service import *
-from vCenterShell.network.vnic.common import vnic_compose_empty, vnic_attached_to_network
+from vCenterShell.network.vnic.vnic_common import (vnic_compose_empty,
+                                                   vnic_attached_to_network)
 
 from common.logger import getLogger
 logger = getLogger("vCenterCommon")
@@ -123,7 +126,6 @@ class VirtualMachinePortGroupConfigurer(object):
             if self.is_vnic_disconnected(vnic):
                 update_mapping.append((vnic, network, True))
                 return self.update_vnic_by_mapping(vm, update_mapping)
-                # if self.is_vnic_attached_to_network(vnic, network)
         raise Exception('no available vnic')
 
     def connect_vinc_port_group(self, vm, vnic_name, network):

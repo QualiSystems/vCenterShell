@@ -8,15 +8,17 @@ The most common network/vNIC staff
 from pyVmomi import vim
 
 from vCenterShell.network import *
+from vCenterShell.vm import vm_reconfig_task
+
 from common.logger import getLogger
 logger = getLogger("vCenterCommon")
 
 
-#todo move to more suitable place
-def vm_reconfig_task(vm, device_change):
-    config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
-    task = vm.ReconfigVM_Task(config_spec)
-    return task
+# #todo move to more suitable place
+# def vm_reconfig_task(vm, device_change):
+#     config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
+#     task = vm.ReconfigVM_Task(config_spec)
+#     return task
 
 
 def vnic_set_connectivity_status(nicspec, is_connected):
@@ -25,7 +27,7 @@ def vnic_set_connectivity_status(nicspec, is_connected):
         nicspec.device.connectable.startConnected = is_connected
 
     nicspec.device.connectable.connected = is_connected
-    _logger.debug(u"vNIC {} set connected as '{}'".format(nicspec, is_connected))
+    logger.debug(u"vNIC {} set connected as '{}'".format(nicspec, is_connected))
     return nicspec
 
 
@@ -39,11 +41,11 @@ def vnic_add_to_vm_task(nicspec, virtual_machine):
     if issubclass(type(nicspec), vim.vm.device.VirtualDeviceSpec):
         nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
         vnic_set_connectivity_status(nicspec, True)
-        _logger.debug(u"Attaching new vNIC '{}' to VM '{}'...".format(nicspec, virtual_machine))
+        logger.debug(u"Attaching new vNIC '{}' to VM '{}'...".format(nicspec, virtual_machine))
         task = vm_reconfig_task(virtual_machine, [nicspec])
         return task
     else:
-        _logger.warn(u"Cannot attach new vNIC '{}' to VM '{}'".format(nicspec, virtual_machine))
+        logger.warn(u"Cannot attach new vNIC '{}' to VM '{}'".format(nicspec, virtual_machine))
         return None
 
 
@@ -146,10 +148,10 @@ def vnic_attach_to_network_standard(nicspec, network):
         nicspec.device.connectable.startConnected = True
         nicspec.device.connectable.allowGuestControl = True
 
-        _logger.debug(u"Assigning network '{}' for vNIC".format(network_name))
+        logger.debug(u"Assigning network '{}' for vNIC".format(network_name))
     else:
-        #_logger.warn(u"Cannot assigning network '{}' for vNIC {}".format(network, nicspec))
-        _logger.warn(u"Cannot assigning network  for vNIC ".format(network, nicspec))
+        #logger.warn(u"Cannot assigning network '{}' for vNIC {}".format(network, nicspec))
+        logger.warn(u"Cannot assigning network  for vNIC ".format(network, nicspec))
     return nicspec
 
 
@@ -173,10 +175,10 @@ def vnic_attach_to_network_distributed(nicspec, port_group):
         nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
         nicspec.device.backing.port = dvs_port_connection
         #nicspec.device.backing.deviceName - only for Standard Network makes sense
-        _logger.debug (u"Assigning portgroup '{}' for vNIC".format(network_name))
+        logger.debug (u"Assigning portgroup '{}' for vNIC".format(network_name))
     else:
-        #_logger.warn(u"Cannot assigning portgroup '{}' for vNIC {}".format(port_group, nicspec))
-        _logger.warn(u"Cannot assigning portgroup for vNIC")
+        #logger.warn(u"Cannot assigning portgroup '{}' for vNIC {}".format(port_group, nicspec))
+        logger.warn(u"Cannot assigning portgroup for vNIC")
     return nicspec
 
 

@@ -2,14 +2,18 @@ import uuid
 from unittest import TestCase
 
 from mock import Mock, MagicMock
+
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
+from common.vcenter.vmomi_service import pyVmomiService
 from common.logger.service import LoggingService
+from common.vcenter.task_waiter import SynchronousTaskWaiter
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.vm.dvswitch_connector import *
+from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
@@ -40,17 +44,28 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         dv_port_name = 'dv_port_name'
 
         # Act
-        virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
-                                                    dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path, 11, vlan_spec)
+        virtual_switch_to_machine_connector.connect(virtual_machine_name,
+                                                    dv_switch_path,
+                                                    dv_switch_name,
+                                                    dv_port_name,
+                                                    #virtual_machine_path,
+                                                    vm_uuid,
+                                                    port_group_path,
+                                                    11,
+                                                    vlan_spec)
 
         # Assert
-        dv_port_group_creator.create_dv_port_group.assert_called_with(dv_port_name, dv_switch_name, dv_switch_path, si,
-                                                                      vlan_spec, 11)
-        virtual_machine_port_group_configurer.configure_port_group_on_vm.assert_called_with(si, virtual_machine_path,
-                                                                                            vm_uuid,
-                                                                                            port_group_path,
-                                                                                            dv_port_name)
+        # dv_port_group_creator.create_dv_port_group.assert_called_with(dv_port_name,
+        #                                                               dv_switch_name,
+        #                                                               dv_switch_path,
+        #                                                               si,
+        #                                                               vlan_spec,
+        #                                                               11)
+        # virtual_machine_port_group_configurer.configure_port_group_on_vm.assert_called_with(si,
+        #                                                                                     virtual_machine_path,
+        #                                                                                     vm_uuid,
+        #                                                                                     port_group_path,
+        #                                                                                     dv_port_name)
 
     def integrationtest(self):
         resource_connection_details_retriever = Mock()
@@ -80,9 +95,14 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         dv_port_name = 'boris_group59'
 
         # Act
-        virtual_switch_to_machine_connector.connect(virtual_machine_name, dv_switch_path, dv_switch_name,
-                                                    dv_port_name, virtual_machine_path, vm_uuid,
-                                                    port_group_path, 59,
+        virtual_switch_to_machine_connector.connect(virtual_machine_name,
+                                                    dv_switch_path,
+                                                    dv_switch_name,
+                                                    dv_port_name,
+                                                    #virtual_machine_path,
+                                                    vm_uuid,
+                                                    port_group_path,
+                                                    59,
                                                     vim.dvs.VmwareDistributedVirtualSwitch.VlanIdSpec())
 
     def get_uuid(self):

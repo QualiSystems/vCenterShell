@@ -43,7 +43,7 @@ class VirtualSwitchToMachineConnector(object):
                 dv_switch_path,
                 dv_switch_name,
                 dv_port_name,
-                virtual_machine_path,
+                #virtual_machine_path,
                 vm_uuid,
                 port_group_path,
                 vlan_id,

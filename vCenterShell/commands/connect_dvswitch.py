@@ -1,4 +1,6 @@
-# import qualipy.scripts.cloudshell_scripts_helpers as helpers
+# -*- coding: utf-8 -*-
+
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 #
 #
 # class VirtualSwitchConnectCommand(object):
@@ -55,8 +57,8 @@ class VirtualSwitchConnectCommand:
                  dv_port_group_name_generator,
                  vlan_spec_factory,
                  vlan_id_range_parser,
-                 resourse_model_parser,
-                 helpers):
+                 resourse_model_parser):
+                 #helpers):
         """
         :param cs_retriever_service:
         :param virtual_switch_to_machine_connector:
@@ -69,7 +71,7 @@ class VirtualSwitchConnectCommand:
         self.vlan_spec_factory = vlan_spec_factory  # type: VlanSpecFactory
         self.vlan_id_range_parser = vlan_id_range_parser
         self.resourse_model_parser = resourse_model_parser
-        self.helpers = helpers
+        #self.helpers = helpers
         self.resource_context = None
         self.vm_uuid = None
         self.session = None
@@ -77,7 +79,7 @@ class VirtualSwitchConnectCommand:
 
 
     def connect_vm_to_vlan(self, vlan_id, vlan_spec_type):
-        resource_context = self.helpers.get_resource_context_details()
+        resource_context = helpers.get_resource_context_details()
         inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(resource_context)
 
         generic_deployed_app_resource_model = self.resourse_model_parser.convert_to_resource_model(resource_context)
@@ -86,7 +88,7 @@ class VirtualSwitchConnectCommand:
         virtual_machine_path = inventory_path_data.vm_folder
         vcenter_resource_name = inventory_path_data.vCenter_resource_name
 
-        session = self.helpers.get_api_session()
+        session = helpers.get_api_session()
         vcenter_resource_details = session.GetResourceDetails(vcenter_resource_name)
 
         vcenter_resource_model = self.resourse_model_parser.convert_to_resource_model(vcenter_resource_details)
@@ -103,13 +105,13 @@ class VirtualSwitchConnectCommand:
                                                          port_group_path, vlan_id_range, vlan_spec)
 
     def create_context(self, helpers):
-        self.resource_context = self.helpers.get_resource_context_details()
+        self.resource_context = helpers.get_resource_context_details()
         self.vm_uuid = self.resourse_model_parser.convert_to_resource_model(self.resource_context).uuid
         self.session = helpers.get_api_session()
         self.inventory_path_data = self.csRetrieverService.getVCenterInventoryPathAttributeData(self.resource_context)
 
     def connect_to_first_vnic(self, vlan_id, vlan_spec_type):
-        self.create_context(self.helpers)
+        self.create_context(helpers)
         vcenter_resource_name = self.inventory_path_data.vCenter_resource_name
         vcenter_resource_details = self.session.GetResourceDetails(vcenter_resource_name)
 
@@ -127,7 +129,7 @@ class VirtualSwitchConnectCommand:
                                                          vlan_spec)
 
     def connect_specific_vnic(self, vlan_id, vlan_spec_type, vnic_name):
-        self.create_context(self.helpers)
+        self.create_context(helpers)
         vcenter_resource_name = self.inventory_path_data.vCenter_resource_name
         vcenter_resource_details = self.session.GetResourceDetails(vcenter_resource_name)
 
@@ -150,7 +152,7 @@ class VirtualSwitchConnectCommand:
                                                                        vlan_spec)
 
     def connect_networks(self, vlan_id, vlan_spec_type):
-        self.create_context(self.helpers)
+        self.create_context(helpers)
         vcenter_resource_name = self.inventory_path_data.vCenter_resource_name
         vcenter_resource_details = self.session.GetResourceDetails(vcenter_resource_name)
 
@@ -163,7 +165,7 @@ class VirtualSwitchConnectCommand:
                                                                   networks_mapping)
 
     def connect_by_mapping(self, vlan_id, vlan_spec_type):
-        self.create_context(self.helpers)
+        self.create_context(helpers)
         vcenter_resource_name = self.inventory_path_data.vCenter_resource_name
         vcenter_resource_details = self.session.GetResourceDetails(vcenter_resource_name)
 
