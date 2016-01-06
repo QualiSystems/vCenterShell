@@ -434,7 +434,9 @@ class pyVmomiService:
             vm = self.find_by_uuid(si, vm_uuid, vm_path)
             if vm:
                 return self.destroy_vm(vm)
-        return 'vm not found'
+        #return 'vm not found'
+        # for apply the same Interface as for 'destroy_vm_by_name'
+        raise ValueError('vm not found')
 
     def get_vm_by_uuid(self, si, vm_uuid):
         return self.find_by_uuid(si, vm_uuid, True)
