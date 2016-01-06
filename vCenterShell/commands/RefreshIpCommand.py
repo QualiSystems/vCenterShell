@@ -1,10 +1,10 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import time
 
-TIMEOUT = 600
-
 
 class RefreshIpCommand(object):
+    TIMEOUT = 600
+
     def __init__(self, pyvmomi_service, cs_retriever_rervice, qualipy_helpers, resource_model_parser):
         self.qualipy_helpers = qualipy_helpers
         self.pyvmomi_service = pyvmomi_service
@@ -18,7 +18,7 @@ class RefreshIpCommand(object):
         :param resource_name: Logical resource name to update address property on
         """
 
-        session = self.qualipy_helpers.helpers.get_api_session()
+        session = self.qualipy_helpers.get_api_session()
         resource_details = session.GetResourceDetails(resource_name)
 
         # GenericAppModelResourceModel
@@ -27,7 +27,8 @@ class RefreshIpCommand(object):
         resource_context = self.qualipy_helpers.get_resource_context_details()
         connection_details = self.cs_retriever_rervice.getVCenterConnectionDetails(resource_context)
 
-        si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
+        si = self.pyvmomi_service.connect(connection_details.host,
+                                          connection_details.username,
                                           connection_details.password,
                                           connection_details.port)
 
@@ -39,16 +40,18 @@ class RefreshIpCommand(object):
         ip = self._obtain_ip(vm, vm_resource)
 
         if ip is None:
-            raise ValueError('IP address of VM {0} could not be obtained during {1} seconds', resource_name, TIMEOUT)
+            raise ValueError('IP address of VM {0} could not be obtained during {1} seconds',
+                             resource_name,
+                             self.TIMEOUT)
 
-        pass
+        session.UpdateResourceAddress(resource_name, ip)
 
     def _obtain_ip(self, vm, vm_resource):
         time_elapsed = 0
         ip = None
-        interval = TIMEOUT / 10
-        while time_elapsed < TIMEOUT and ip is None:
-            ips = self._get_ip_addresses(vm, vm_resource)
+        interval = self.TIMEOUT / 10
+        while time_elapsed < self.TIMEOUT and ip is None:
+            ips = RefreshIpCommand._get_ip_addresses(vm, vm_resource)
             if len(ips) >= 1:
                 ip = ips[0]
             else:
@@ -56,7 +59,8 @@ class RefreshIpCommand(object):
                 time.sleep(interval)
         return ip
 
-    def _get_ip_addresses(self, vm, vm_resource):
+    @staticmethod
+    def _get_ip_addresses(vm, vm_resource):
         ips = []
         for nic in vm.guest.net:
             if nic.network != vm_resource.default_network:
