@@ -2,10 +2,11 @@
 
 REM build driver scripts
 
-python driver_packager.py packeger_configs\\packager_config_deployment_service_driver.txt deployment_service Deploy
-python driver_packager.py packeger_configs\\packager_config_vCenterShell.txt vCenterShell "Deploy From Template"
-python driver_packager.py packeger_configs\\packager_config_vCenterShell.txt vCenterShell "Destroy VM"
-python driver_packager.py packeger_configs\\packager_config_vCenterShell.txt vCenterShell Connect
+python driver_packager.py packeger_configs\\deployment_service_driver.ini
+python driver_packager.py packeger_configs\\connect_command.ini
+python driver_packager.py packeger_configs\\deploy_from_template_command.ini
+python driver_packager.py packeger_configs\\destroy_vm_command.ini
+
 copy orchestration_service\driver.py "vCenterShellPackage\\Resource Scripts\\Deploy App.py" /Y
 copy vlan_service\vlan_driver.py "vCenterShellPackage\\Resource Scripts\\Connect All.py" /Y
 
