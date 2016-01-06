@@ -136,19 +136,6 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         # assert
         self.assertFalse(res)
 
-    def test_is_device_match_network_not_found(self):
-        # arrange
-        device = Mock()
-        device.backing = Mock(spec=[])
-
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineDisconnectCommand(Mock(), Mock(), Mock())
-
-        # act
-        #res = virtual_switch_to_machine_connector.is_device_match_network(device, 'Fake name')
-        res = device_is_attached_to_network(device, 'Fake name')
-
-        # assert
-        self.assertFalse(res)
 
     def test_remove_interfaces_from_vm_no_nic_found(self):
         # arrange
