@@ -1,13 +1,11 @@
 from unittest import TestCase
-
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
-from pycommon.pyVmomiService import pyVmomiService
-from tests.testCredentials import TestCredentials
-
+from common.vcenter.vmomi_service import pyVmomiService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.utils import helpers
 from vCenterShell.commands.RefreshIpCommand import RefreshIpCommand
+from tests.utils.testing_credentials import TestCredentials
+from tests.utils import helpers
 
 
 class TestRefreshIpCommand(TestCase):

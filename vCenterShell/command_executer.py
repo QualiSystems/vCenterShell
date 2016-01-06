@@ -1,5 +1,4 @@
 ﻿
-
 class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
