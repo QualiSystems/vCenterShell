@@ -439,3 +439,13 @@ class pyVmomiService:
             return 'vm not found'
 
         return self.destroy_vm(vm)
+
+    def get_vm_by_uuid(self, si, vm_uuid):
+        return self.find_by_uuid(si, vm_uuid, True)
+
+
+    def get_network_by_name_from_vm(self, vm, network_name):
+        for network in vm.network:
+            if network_name == network.name:
+                return network
+        return None
