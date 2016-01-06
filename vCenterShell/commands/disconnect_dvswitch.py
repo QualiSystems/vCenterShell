@@ -117,20 +117,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             return self.port_group_configurer.disconnect_all_networks(vm, default_network, erase_network=True)
 
-    # def is_device_match_network(self, device, network_name):
-    #     """
-    #     checks if the device has a backing with of the right network name
-    #     :param <vim.vm.Device> device: instance of adapter
-    #     :param <str> network_name: network name
-    #     :return:
-    #     """
-    #     backing = device.backing
-    #
-    #     if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
-    #         return network_name == backing.network.name
-    #     elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
-    #         return network_name == backing.port.portgroupKey
-    #     return False
 
     #todo NOT USED but work OK - move to COMMON
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
