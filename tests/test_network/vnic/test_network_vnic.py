@@ -25,14 +25,14 @@ class TestNetwork(TestCase):
 
     def test_device_attahed_to_network_standard(self):
 
-        self.assertFalse(device_is_attachet_to_network(None, None))
+        self.assertFalse(device_is_attached_to_network(None, None))
 
         network_name = "TEST"
         device = Mock()
         device.backing = Mock()
         device.backing.network = Mock()
         device.backing.network.name = network_name
-        self.assertTrue(device_is_attachet_to_network(device, network_name))
+        self.assertTrue(device_is_attached_to_network(device, network_name))
 
     def test_device_attahed_to_network_distributed(self):
         network_name = "PORT-GROUP"
@@ -42,7 +42,7 @@ class TestNetwork(TestCase):
         hasattr(device.backing, "network")
         del device.backing.network
         device.backing.port.portgroupKey = network_name
-        self.assertTrue(device_is_attachet_to_network(device, network_name))
+        self.assertTrue(device_is_attached_to_network(device, network_name))
 
 
     def test_xx(self):
