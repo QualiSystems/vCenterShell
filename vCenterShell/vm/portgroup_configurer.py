@@ -127,9 +127,9 @@ class VirtualMachinePortGroupConfigurer(object):
                 if task:
                     try:
                         self.synchronous_task_waiter.wait_for_task(task)
-                    except Exception, ex:
+                    except vim.fault.ResourceInUse:
                         pass
-                        logger.debug("Port Group cannot be destroyed because of it using")
+                        logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
 
 
     def disconnect_all_networks(self, vm, default_network=None):
