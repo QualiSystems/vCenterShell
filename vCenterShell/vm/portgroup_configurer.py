@@ -73,6 +73,7 @@ class VirtualMachinePortGroupConfigurer(object):
         if len(update_mapping) == len(networks):
             return self.update_vnic_by_mapping(vm, update_mapping)
         raise Exception('not enough available vnics')
+        #
 
     def sort_vnics_by_name(self, vnic_mapping):
         sorted_by_name = sorted(vnic_mapping.items(), key=lambda kvp: kvp[0])
@@ -120,13 +121,14 @@ class VirtualMachinePortGroupConfigurer(object):
         for item in update_mapping:
             network = item[1]
             if network:
-                try:
-                    task = self.destroy_port_group_task(network)
-                    if task:
+                task = self.destroy_port_group_task(network)
+                if task:
+                    try:
                         self.synchronous_task_waiter.wait_for_task(task)
-                except:
-                    logger.debug("Port Group cannot be destroyed because of using")
-                    pass
+                    except Exception, ex:
+                        pass
+                        logger.debug("Port Group cannot be destroyed because of it using")
+
 
     def disconnect_all_networks(self, vm, default_network=None):
         vnics = self.map_vnics(vm)
