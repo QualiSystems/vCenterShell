@@ -9,7 +9,7 @@ from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from vCenterShell.command_executer import CommandExecuterService
-from vCenterShell.commands.RefreshIpCommand import RefreshIpCommand
+from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand

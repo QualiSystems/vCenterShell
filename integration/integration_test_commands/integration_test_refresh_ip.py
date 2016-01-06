@@ -3,7 +3,7 @@ from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 from common.vcenter.vmomi_service import pyVmomiService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from vCenterShell.commands.RefreshIpCommand import RefreshIpCommand
+from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from tests.utils.testing_credentials import TestCredentials
 from tests.utils import helpers
 
