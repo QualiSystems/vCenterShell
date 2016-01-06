@@ -5,9 +5,7 @@ from utils.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
 
-
 class TestCommandExecuterService(unittest.TestCase):
-
     def test_destroyVirtualMachineCommand(self):
         network_adapter_retriever_command = None
         destroy_virtual_machine_command = MagicMock()
@@ -17,6 +15,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           destroy_virtual_machine_command,
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -42,6 +41,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           deploy_from_template,
                                                           Mock(),
                                                           Mock(),
+                                                          Mock(),
                                                           Mock())
 
         # act
@@ -61,6 +61,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           deploy_from_template,
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock())
@@ -100,10 +101,10 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          power_manager)
+                                                          power_manager,
+                                                          Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-
 
         # act
         command_executer_service.power_off()
@@ -146,10 +147,10 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          power_manager)
+                                                          power_manager,
+                                                          Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-
 
         # act
         command_executer_service.power_on()
@@ -176,8 +177,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
+                                                          Mock(),
                                                           Mock())
-
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
@@ -189,26 +190,4 @@ class TestCommandExecuterService(unittest.TestCase):
         # assert
         self.assertTrue(virtual_switch_disconnect_command.disconnect.called)
 
-    def test_disconnect_all(self):
-        # arrange
-        virtual_switch_disconnect_command = Mock()
-        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
-        command_executer_service = CommandExecuterService(Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          virtual_switch_disconnect_command,
-                                                          Mock())
 
-        CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-        CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
-
-        # act
-        command_executer_service.disconnect_all()
-
-        # assert
-        self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)

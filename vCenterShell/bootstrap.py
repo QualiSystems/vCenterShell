@@ -9,6 +9,7 @@ from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from vCenterShell.command_executer import CommandExecuterService
+from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
@@ -45,12 +46,14 @@ class Bootstrapper(object):
                                                                               dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
 
+        resource_model_parser = ResourceModelParser()
+
         virtual_switch_connect_command = VirtualSwitchConnectCommand(cloudshell_data_retriever_service,
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
                                                                      VLanIdRangeParser(),
-                                                                     ResourceModelParser())
+                                                                     resource_model_parser)
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
@@ -62,6 +65,9 @@ class Bootstrapper(object):
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
                                                                            synchronous_task_waiter,
                                                                            helpers)
+        # Refresh IP command
+        refresh_ip_command = RefreshIpCommand(pyVmomiService, cloudshell_data_retriever_service, helpers,
+                                              resource_model_parser)
 
         self.commandExecuterService = CommandExecuterService(helpers,
                                                              getLogger,
@@ -72,7 +78,8 @@ class Bootstrapper(object):
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,
                                                              virtual_switch_disconnect_command,
-                                                             vm_power_management_command)
+                                                             vm_power_management_command,
+                                                             refresh_ip_command)
 
     def get_command_executer_service(self):
         return self.commandExecuterService
