@@ -7,6 +7,8 @@ The most common network/vNIC staff
 
 from pyVmomi import vim
 
+from common.vcenter.vmomi_service import pyVmomiService
+
 from vCenterShell.network import *
 from vCenterShell.vm import vm_reconfig_task
 
@@ -61,22 +63,32 @@ def vnic_remove_from_vm_list(virtual_machine, filter_function=None):
     return device_change
 
 
-def vnic_get_network_attached(device):
+def _network_get_network_by_connection(vm, port_connection, pyvmomi_service):
+    #vim.dvs.PortConnection
+    network_key = port_connection.portgroupKey
+    network = pyvmomi_service.get_network_by_key_from_vm(vm, network_key)
+    return network
+
+
+def vnic_get_network_attached(vm, device, pyvmomi_service):
     """
     Get a Network connected to a particular Device (vNIC)
+    @see https://github.com/vmware/pyvmomi/blob/master/docs/vim/dvs/PortConnection.rst
+
     :param device: <vim.vm.device.VirtualVmxnet3> instance of adapter
     :return: <vim Network Obj or None>
     """
+
     try:
         backing = device.backing
-        if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
+        if hasattr(backing, 'network'):
             return backing.network
         elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
-            return backing.port
-        return None
+            return _network_get_network_by_connection(vm, backing.port, pyvmomi_service)
     except:
         logger.debug(u"Cannot determinate which Network connected to device {}".format(device))
         return None
+
 
 def device_is_attached_to_network(device, network_name):
     """
@@ -106,8 +118,6 @@ def vnic_is_attachet_to_network(nicspec, network_name):
     :return:
     """
     return device_is_attached_to_network(nicspec.device, network_name)
-
-
 
 
 def vnic_compose_empty(device=None):

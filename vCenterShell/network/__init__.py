@@ -23,6 +23,32 @@ def network_is_portgroup(network):
 
 #todo - REMOVE INFO bellow - just for development purposes
 """
+(vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo) {
+   dynamicType = <unset>,
+   dynamicProperty = (vmodl.DynamicProperty) [],
+   port = (vim.dvs.PortConnection) {
+      dynamicType = <unset>,
+      dynamicProperty = (vmodl.DynamicProperty) [],
+      switchUuid = '4a 56 22 50 c9 99 03 c0-03 94 cf df c1 62 99 ef',
+      portgroupKey = 'dvportgroup-12521',
+      portKey = '425',
+      connectionCookie = 185489114
+   }
+}
+               Array: <class 'pyVmomi.VmomiSupport.vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo[]'>
+     dynamicProperty: (vmodl.DynamicProperty) []
+         dynamicType: None
+                port: (vim.dvs.PortConnection) {
+   dynamicType = <unset>,
+   dynamicProperty = (vmodl.DynamicProperty) [],
+   switchUuid = '4a 56 22 50 c9 99 03 c0-03 94 cf df c1 62 99 ef',
+   portgroupKey = 'dvportgroup-12521',
+   portKey = '425',
+   connectionCookie = 185489114
+}
+"""
+
+"""
 
 'vim.dvs.DistributedVirtualPortgroup:dvportgroup-12337'
                Array: <class 'pyVmomi.VmomiSupport.vim.dvs.DistributedVirtualPortgroup[]'>
