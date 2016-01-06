@@ -4,7 +4,9 @@ import zipfile
 
 DRIVER_FILE_NAME_FORMAT = 'vCenterShellPackage/Resource Scripts/{0}.zip'
 STRIPING_CHARS = ' \t\n\r'
+DRIVER_FOLDER = 'driver_folder'
 INCLUDE_DIRS = 'include_dirs'
+TARGET_NAME = 'target_name'
 VERSION_FILENAME = 'version.txt'
 
 
@@ -39,26 +41,23 @@ def add_version_file_to_zip(ziph):
 
 def main(args):
     config_file_name = args[1]
-    driver = args[2]
-    target_name = args[3]
+    #driver = args[2]
+    #target_name = args[3]
 
-    print 'packing driver: {0}'.format(target_name)
-
-    with open('version.txt') as f_version:
-        if f_version is None:
-            raise Exception('no version file found')
-        version = f_version.read()
-        if not version:
-            raise Exception('no version file found')
 
     with open(config_file_name) as f_config:
         if f_config is None:
             raise Exception('no packager config file found')
-        confing = dict()
+        config = dict()
         config_raw = f_config.read().splitlines()
         for att in config_raw:
             cnf_att = att.split(':')
-            confing[cnf_att[0].strip(' \t\n\r')] = cnf_att[1].strip(STRIPING_CHARS).split(',')
+            config[cnf_att[0].strip(' \t\n\r')] = cnf_att[1].strip(STRIPING_CHARS).split(',')
+
+    target_name = config[TARGET_NAME][0]
+    driver = config[DRIVER_FOLDER][0]
+
+    print 'packing driver: {0}'.format(target_name)
 
     zip_name = DRIVER_FILE_NAME_FORMAT.format(target_name)
 
@@ -76,7 +75,7 @@ def main(args):
 
     add_version_file_to_zip(zip_file)
 
-    for dir_to_include in confing[INCLUDE_DIRS]:
+    for dir_to_include in config[INCLUDE_DIRS]:
         zip_dir(dir_to_include, zip_file)
 
     zip_file.close()
