@@ -1,12 +1,12 @@
 from unittest import TestCase
+
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
-from pycommon.ResourceModelParser import ResourceModelParser
 from pycommon.pyVmomiService import pyVmomiService
-from tests import TestingHelpers
 from tests.testCredentials import TestCredentials
+
+from models.VCenterConnectionDetails import VCenterConnectionDetails
+from tests.utils import helpers
 from vCenterShell.commands.RefreshIpCommand import RefreshIpCommand
 
 
@@ -32,7 +32,7 @@ class TestRefreshIpCommand(TestCase):
         refresh_ip_command = RefreshIpCommand(py_vmomi_service, cloudshell_data_retriever_service, qualipy_helpers,
                                               resource_model_parser)
 
-        uuid = TestingHelpers.get_uuid('vCenter-Server-Appliance-yaniv')
+        uuid = helpers.get_uuid('vCenter-Server-Appliance-yaniv')
         refresh_ip_command.refresh_ip(uuid, '')
 
         pass

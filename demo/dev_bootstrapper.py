@@ -1,22 +1,15 @@
+import os.path
+import sys
+
 from pyVim.connect import SmartConnect, Disconnect
 
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-
-from settings import *
-
-from pycommon.CloudshellDataRetrieverService import CloudshellDataRetrieverService
-from pycommon.ResourceConnectionDetailsRetriever import ResourceConnectionDetailsRetriever
-from pycommon.pyVmomiService import pyVmomiService
-
-
-import sys
-import os.path
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.vcenter.vmomi_service import pyVmomiService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
-from pycommon.logger import getLogger
+from common.logger import getLogger
 _logger = getLogger(__name__)
 
 def getConnectDataContext():
