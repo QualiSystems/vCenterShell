@@ -8,7 +8,7 @@ from vCenterShell.network.vnic.vnic_common import (vnic_compose_empty,
                                                    vnic_attached_to_network)
 
 from vCenterShell.network import network_is_portgroup
-from vCenterShell.network.vnic.vnic_common import vnic_add_new_to_vm_task
+from vCenterShell.network.vnic.vnic_common import vnic_add_new_to_vm_task, vnic_get_network_attached
 from vCenterShell.vm import vm_reconfig_task
 
 from common.logger import getLogger
@@ -73,9 +73,11 @@ class VirtualMachinePortGroupConfigurer(object):
 
         if len(update_mapping) == len(networks):
             return self.update_vnic_by_mapping(vm, update_mapping)
-        #raise Exception('not enough available vnics')
-        attach_new_vnic_task = vnic_add_new_to_vm_task(vm, networks)
-        return self.synchronous_task_waiter.wait_for_task(attach_new_vnic_task)
+        raise Exception('not enough available vnics')
+
+        #todo IMPLEMENT
+        # attach_new_vnic_task = vnic_add_new_to_vm_task(vm, network)
+        # return self.synchronous_task_waiter.wait_for_task(attach_new_vnic_task)
 
     def sort_vnics_by_name(self, vnic_mapping):
         sorted_by_name = sorted(vnic_mapping.items(), key=lambda kvp: kvp[0])
@@ -87,9 +89,11 @@ class VirtualMachinePortGroupConfigurer(object):
         sorted_by_name = self.sort_vnics_by_name(vnic_mapping)
         for vnic_name, vnic in sorted_by_name:
             if self.is_vnic_disconnected(vnic):
-                update_mapping.append((vnic, network, True))
+                update_mapping.append((vnic, network, True, None))
                 return self.update_vnic_by_mapping(vm, update_mapping)
-        raise Exception('no available vnic')
+        #raise Exception('no available vnic')
+        attach_new_vnic_task = vnic_add_new_to_vm_task(vm, network)
+        return self.synchronous_task_waiter.wait_for_task(attach_new_vnic_task)
 
     def connect_vinc_port_group(self, vm, vnic_name, network):
         """
@@ -121,7 +125,7 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def erase_network_by_mapping(self, update_mapping):
         for item in update_mapping:
-            network = item[1]
+            network = item[1] or vnic_get_network_attached(item[0])
             if network:
                 task = self.destroy_port_group_task(network)
                 if task:
@@ -132,10 +136,13 @@ class VirtualMachinePortGroupConfigurer(object):
                         logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
 
 
-    def disconnect_all_networks(self, vm, default_network=None):
+    def disconnect_all_networks(self, vm, default_network=None, erase_network=False):
         vnics = self.map_vnics(vm)
-        update_mapping = [(vnic, None, False, default_network, ) for _, vnic in vnics.items()]
-        return self.update_vnic_by_mapping(vm, update_mapping)
+        update_mapping = [(vnic, None, False, default_network, ) for vnic in vnics.values()]
+        self.update_vnic_by_mapping(vm, update_mapping)
+        if erase_network:
+            self.erase_network_by_mapping(update_mapping)
+        return None
 
     def disconnect_network(self, vm, network, default_network=None, erase_network=False):
         condition = lambda vnic: True if default_network else not self.is_vnic_disconnected(vnic)
@@ -148,7 +155,6 @@ class VirtualMachinePortGroupConfigurer(object):
         self.update_vnic_by_mapping(vm, update_mapping)
         if erase_network:
             self.erase_network_by_mapping(update_mapping)
-
         return None
 
     def update_vnic_by_mapping(self, vm, mapping):

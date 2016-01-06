@@ -9,6 +9,7 @@ from pyVmomi import vim
 
 from common.vcenter.vmomi_service import *
 from vCenterShell.vm import vm_reconfig_task
+from vCenterShell.network.vnic.vnic_common import device_is_attached_to_network
 from common.logger import getLogger
 _logger = getLogger("vCenterShell")
 
@@ -37,7 +38,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         #self.synchronous_task_waiter = synchronous_task_waiter
 
-    #todo - NOT USED - REMOVE
     def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
         """
         disconnect all of the network adapter of the vm
@@ -55,7 +55,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        condition = lambda device: self.is_device_match_network(device, network_name) if network_name else lambda x: True
+        condition = lambda device: device_is_attached_to_network(device, network_name) if network_name else lambda x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
     #todo move to COMMON
@@ -100,38 +100,37 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                                           connection_details.username,
                                           connection_details.password,
                                           connection_details.port)
-        _logger.debug("Revoking Interface from VM '{}'...".format(vm_uuid))
+        _logger.debug(u"Disconnect Interface VM: '{}' Network: '{}' ...".format(vm_uuid, network_name or "ALL"))
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if network_name:
             network = self.get_network_by_name(vm, network_name)
             if network is None:
-                raise KeyError('network not found ({0})'.format(network_name))
+                raise KeyError(u'Network not found ({0})'.format(network_name))
         else:
             network = None
 
         default_network = self.get_network_by_full_name(si, default_network_full_name)
         if network:
             return self.port_group_configurer.disconnect_network(vm, network, default_network, erase_network=True)
-
         else:
-            return self.port_group_configurer.disconnect_all_networks(vm, default_network)
+            return self.port_group_configurer.disconnect_all_networks(vm, default_network, erase_network=True)
 
-    def is_device_match_network(self, device, network_name):
-        """
-        checks if the device has a backing with of the right network name
-        :param <vim.vm.Device> device: instance of adapter
-        :param <str> network_name: network name
-        :return:
-        """
-        backing = device.backing
-
-        if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
-            return network_name == backing.network.name
-        elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
-            return network_name == backing.port.portgroupKey
-        return False
+    # def is_device_match_network(self, device, network_name):
+    #     """
+    #     checks if the device has a backing with of the right network name
+    #     :param <vim.vm.Device> device: instance of adapter
+    #     :param <str> network_name: network name
+    #     :return:
+    #     """
+    #     backing = device.backing
+    #
+    #     if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
+    #         return network_name == backing.network.name
+    #     elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
+    #         return network_name == backing.port.portgroupKey
+    #     return False
 
     #todo NOT USED but work OK - move to COMMON
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):

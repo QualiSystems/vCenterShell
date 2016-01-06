@@ -4,6 +4,7 @@
 The most common network/Distributed Virtual Switch staff
 """
 
+from pyVmomi import vim
 
 from common.logger import getLogger
 _logger = getLogger("vCenterCommon")
@@ -13,8 +14,11 @@ def network_is_standard(network):
     return True if network and str(network).startswith("vim.Network:") else False
 
 
+#todo need to be cleared
 def network_is_portgroup(network):
-    return True if network and str(network).startswith("vim.dvs.VmwareDistributedVirtualSwitch:") else False
+    return isinstance(network, vim.dvs.DistributedVirtualPortgroup) \
+           or network and str(network).startswith("vim.dvs.VmwareDistributedVirtualSwitch:")
+    #return True if network and str(network).startswith("vim.dvs.VmwareDistributedVirtualSwitch:") else False
 
 
 #todo - REMOVE INFO bellow - just for development purposes

@@ -141,9 +141,12 @@ class VirtualSwitchToMachineConnector(object):
                                           connection_details.username,
                                           connection_details.password,
                                           connection_details.port)
+        return si
 
     def connect_and_get_vm(self, vcenter_name, vm_uuid):
         si = self.get_si(vcenter_name)
+        if not si:
+            raise Exception("Cannot connect to vCenter Infrastructure")
         logger.debug("virtual machine vmUUID {}".format(vm_uuid))
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         return si, vm

@@ -61,14 +61,30 @@ def vnic_remove_from_vm_list(virtual_machine, filter_function=None):
     return device_change
 
 
-def device_is_attachet_to_network(device, network_name):
+def vnic_get_network_attached(device):
+    """
+    Get a Network connected to a particular Device (vNIC)
+    :param device: <vim.vm.device.VirtualVmxnet3> instance of adapter
+    :return: <vim Network Obj or None>
+    """
+    try:
+        backing = device.backing
+        if hasattr(backing, 'network') and hasattr(backing.network, 'name'):
+            return backing.network
+        elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
+            return backing.port
+        return None
+    except:
+        logger.debug(u"Cannot determinate which Network connected to device {}".format(device))
+        return None
+
+def device_is_attached_to_network(device, network_name):
     """
     Checks if the device has a backing with of the right network name
     :param <vim.vm.Device> device: instance of adapter
     :param <str> network_name: network name
     :return:
     """
-
     try:
         backing = device.backing
     except:
@@ -89,7 +105,9 @@ def vnic_is_attachet_to_network(nicspec, network_name):
     :param <str> network_name: network name
     :return:
     """
-    return device_is_attachet_to_network(nicspec.device, network_name)
+    return device_is_attached_to_network(nicspec.device, network_name)
+
+
 
 
 def vnic_compose_empty(device=None):

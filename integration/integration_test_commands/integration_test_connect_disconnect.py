@@ -51,7 +51,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         self.dv_switch_name = 'dvSwitch-SergiiT'
         #self.dv_port_group_name = 'aa-dvPortGroup2A'
-        self.dv_port_group_name = 'aa-dvPortGroup2'
+        self.dv_port_group_name = 'aa-dvPortGroup2A'
 
         self.standard_network_name = "Anetwork"
         try:
@@ -80,15 +80,15 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
 
     def integrationtest_connect(self):
-        resource_connection_details_retriever = self.resource_connection_details_retriever
+
         py_vmomi_service = self.py_vmomi_service
         synchronous_task_waiter = SynchronousTaskWaiter()
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service, synchronous_task_waiter)
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
-                                                                              resource_connection_details_retriever,
-                                                                              dv_port_group_creator,
-                                                                              virtual_machine_port_group_configurer)
+        connector = VirtualSwitchToMachineConnector(py_vmomi_service,
+                                                    self.resource_connection_details_retriever,
+                                                    dv_port_group_creator,
+                                                    virtual_machine_port_group_configurer)
 
 
         self.vm_uuid = self.vm_uuid or self.get_vm_uuid(py_vmomi_service, self.virtual_machine_name)
@@ -96,7 +96,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
 
         # Act
-        virtual_switch_to_machine_connector.connect( self.virtual_machine_name,
+        connector.connect( self.virtual_machine_name,
                                                      self.dv_switch_path,
                                                      self.dv_switch_name,
                                                      self.dv_port_group_name,
@@ -108,19 +108,15 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         pass
 
     def integrationtest_disconnect(self):
-        virtual_switch_to_machine_connector = \
-            VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
-                                                    self.resource_connection_details_retriever,
-                                                    self.synchronous_task_waiter)
-
-
-
+        dv_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
+        connector = VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
+                                                            self.resource_connection_details_retriever,
+                                                            dv_port_group_configurer)
 
         self.vm_uuid = self.vm_uuid or self.get_vm_uuid(self.py_vmomi_service,  self.virtual_machine_name)
         print "DISCONNECT. Machine: '{}' UUID: [{}]".format(self.virtual_machine_name, self.vm_uuid)
 
-        result = virtual_switch_to_machine_connector.disconnect_all(self.vcenter_name,
-                                                                    self.vm_uuid)
+        result = connector.disconnect_all(self.vcenter_name, self.vm_uuid)
 
         print result
 
@@ -154,11 +150,13 @@ class TestVirtualSwitchToMachineConnector(TestCase):
     def test_integration(self):
         #self.integrationtest_attach_vnic()
         #self.integrationtest_connect()
-        #self.integrationtest_disconnect()
+        self.integrationtest_disconnect()
         #self.integrationtest_attach_vnic()
-        #self.integrationtest_attach_vnic_portgroup()
+        # self.integrationtest_attach_vnic_portgroup()
+        # self.integrationtest_attach_vnic_portgroup()
+        # self.integrationtest_attach_vnic_portgroup()
         #self.integrationtest_attach_vnic_standard()
-        print "Skipped for UnitTesting"
+        print "Integration Testing COMPLETED"
         #self.port_group_destroy()
         pass
 
