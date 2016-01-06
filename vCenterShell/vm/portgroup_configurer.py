@@ -8,6 +8,7 @@ from vCenterShell.network.vnic.vnic_common import (vnic_compose_empty,
                                                    vnic_attached_to_network)
 
 from vCenterShell.network import network_is_portgroup
+from vCenterShell.network.vnic.vnic_common import vnic_add_new_to_vm_task
 from vCenterShell.vm import vm_reconfig_task
 
 from common.logger import getLogger
@@ -72,8 +73,9 @@ class VirtualMachinePortGroupConfigurer(object):
 
         if len(update_mapping) == len(networks):
             return self.update_vnic_by_mapping(vm, update_mapping)
-        raise Exception('not enough available vnics')
-        #
+        #raise Exception('not enough available vnics')
+        attach_new_vnic_task = vnic_add_new_to_vm_task(vm, networks)
+        return self.synchronous_task_waiter.wait_for_task(attach_new_vnic_task)
 
     def sort_vnics_by_name(self, vnic_mapping):
         sorted_by_name = sorted(vnic_mapping.items(), key=lambda kvp: kvp[0])

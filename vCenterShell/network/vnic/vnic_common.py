@@ -201,6 +201,18 @@ def vnic_new_attached_to_network(network):
     return vnic_attached_to_network(vnic_compose_empty(), network)
 
 
+def vnic_add_new_to_vm_task(vm, network=None):
+    """
+    Compose new vNIC and attach it to VM & connect to Network
+    :param nicspec: <vim.vm.VM>
+    :param network: <vim network obj>
+    :return: <Task>
+    """
+
+    nicspes = vnic_new_attached_to_network(network)
+    task = vnic_add_to_vm_task(nicspes, vm)
+    return task
+
 
 
 # (vim.vm.device.VirtualVmxnet3) {
