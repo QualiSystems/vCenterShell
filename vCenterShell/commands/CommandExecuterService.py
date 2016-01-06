@@ -1,6 +1,4 @@
-﻿import os
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-
+﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 
 class CommandExecuterService(object):
@@ -13,10 +11,17 @@ class CommandExecuterService(object):
                  deploy_from_template_command,
                  virtual_switch_connect_command,
                  virtual_switch_disconnect_command,
-                 vm_power_management_command):
+                 vm_power_management_command,
+                 refresh_ip_command):
         """
         :param py_vmomi_service:  PyVmomi service
         :param network_adapter_retriever_command:  Network adapter retriever command
+        :param destroy_virtual_machine_command: Destroy virtual machine command
+        :param deploy_from_template_command: Deploy from template command
+        :param virtual_switch_connect_command:
+        :param virtual_switch_disconnect_command:
+        :param vm_power_management_command:
+        :param refresh_ip_command:
         """
         self.pyVmomiService = py_vmomi_service
         self.networkAdapterRetrieverCommand = network_adapter_retriever_command
@@ -25,6 +30,7 @@ class CommandExecuterService(object):
         self.virtual_switch_connect_command = virtual_switch_connect_command
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
         self.vm_power_management_command = vm_power_management_command
+        self.refresh_ip_command = refresh_ip_command
 
     def deploy_from_template(self):
         self.deployFromTemplateCommand.execute_deploy_from_template()
@@ -61,3 +67,8 @@ class CommandExecuterService(object):
     def power_on(self):
         vm_uuid = helpers.get_user_param('VM_UUID')
         self.vm_power_management_command.power_on(vm_uuid)
+
+    def refresh_ip(self):
+        vm_uuid = helpers.get_user_param('VM_UUID')
+        resource_name = helpers.get_user_param('RESOURCE_NAME')
+        self.refresh_ip_command.refresh_ip(vm_uuid, resource_name)

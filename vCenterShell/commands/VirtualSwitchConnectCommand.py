@@ -1,7 +1,5 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
-from pycommon.common_collection_utils import first_or_default
-
 
 class VirtualSwitchConnectCommand:
     def __init__(self, cs_retriever_service, virtual_switch_to_machine_connector,
