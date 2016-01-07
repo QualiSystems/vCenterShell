@@ -65,8 +65,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                           self.credentials.password))
 
             self.synchronous_task_waiter = SynchronousTaskWaiter()
-            #self.virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
-            self.virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(self.synchronous_task_waiter)
+            self.virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
         except:
             print "Infrastructure not available - pretty OK or UnitTesting environment"
             pass
