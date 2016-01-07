@@ -20,6 +20,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
+                                                          Mock(),
                                                           Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
@@ -43,6 +44,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           deploy_from_template,
                                                           Mock(),
                                                           Mock(),
+                                                          Mock(),
                                                           Mock())
 
         # act
@@ -62,6 +64,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           deploy_from_template,
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock())
@@ -97,6 +100,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           command_wrapper_method,
                                                           pv_service,
                                                           connection_retriever,
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -147,6 +151,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
+                                                          Mock(),
                                                           power_manager)
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
@@ -177,6 +182,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
+                                                          Mock(),
                                                           Mock())
 
 
@@ -203,6 +209,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
+                                                          Mock(),
                                                           Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
