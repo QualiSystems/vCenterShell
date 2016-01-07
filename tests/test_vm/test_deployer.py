@@ -58,20 +58,18 @@ class TestVirtualMachineDeployer(TestCase):
 
         pv_service.CloneVmParameters = Mock(return_value=clone_parmas)
         pv_service.clone_vm = Mock(return_value=clone_res)
-        params = DeployDataHolder({
-            "resource_context": None,
-            "template_model": {
+        params = DeployDataHolder.create_from_params(
+            template_model={
                 "vCenter_resource_name": "vcenter_resource_name",
                 "vm_folder": "vfolder_name",
                 "template_name": "template_name"
             },
-            "vm_cluster_model": {
+            vm_cluster_model={
                 "cluster_name": "cluster_name",
                 "resource_pool": "resource_pool"
             },
-            "datastore_name": "datastore_name",
-            "power_on": False
-        })
+            datastore_name="datastore_name",
+            power_on= False)
 
         deployer = VirtualMachineDeployer(pv_service, name_gen)
 
