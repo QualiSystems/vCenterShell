@@ -31,7 +31,9 @@ class Bootstrapper(object):
     def __init__(self):
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cloudshell_data_retriever_service = CloudshellDataRetrieverService()
-        resource_connection_details_retriever = ResourceConnectionDetailsRetriever(cloudshell_data_retriever_service)
+        resource_connection_details_retriever = ResourceConnectionDetailsRetriever(helpers,
+                                                                                   cloudshell_data_retriever_service)
+        command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
         name_generator = generate_unique_name
         template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
         cloudshell_resource_creater = CloudshellResourceCreator(helpers)
@@ -69,17 +71,14 @@ class Bootstrapper(object):
 
         # Power Command
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
-                                                                           synchronous_task_waiter,
-                                                                           helpers)
+                                                                           synchronous_task_waiter)
         # Refresh IP command
         refresh_ip_command = RefreshIpCommand(pyVmomiService, cloudshell_data_retriever_service, helpers,
                                               resource_model_parser)
 
         self.commandExecuterService = CommandExecuterService(jsonpickle,
                                                              helpers,
-                                                             getLogger,
-                                                             py_vmomi_service,
-                                                             CommandWrapper,
+                                                             command_wrapper,
                                                              resource_connection_details_retriever,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,

@@ -1,12 +1,9 @@
-﻿
-class CommandExecuterService(object):
+﻿class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
     def __init__(self,
                  serializer,
                  qualipy_helpers,
-                 logger_retriever,
-                 pv_service,
                  command_wrapper,
                  connection_retriever,
                  destroy_virtual_machine_command,
@@ -15,22 +12,9 @@ class CommandExecuterService(object):
                  virtual_switch_disconnect_command,
                  vm_power_management_command,
                  refresh_ip_command):
-
-        :param qualipy_helpers: Wrapper of TestShell API in Python
-        :param logger_retriever: Logger retriever
-        :param py_vmomi_service: Wrapper of pyvmomi
-        :param command_wrapper: Command wrapper
-        :param connection_retriever: Connection retriever
-        :param destroy_virtual_machine_command: Destroy virtual machine command
-        :param deploy_from_template_command: Deploy from template command
-        :param virtual_switch_connect_command: Virtual switch connect command
-        :param virtual_switch_disconnect_command: Virtual switch disconnect command
-        :param vm_power_management_command: VM power management command
-        :param refresh_ip_command: Refresh IP command
+        self.serializer = serializer
         self.qualipy_helpers = qualipy_helpers
-        self.get_logger = logger_retriever
-        self.pv_service = pv_service
-        self.command_wrappper = command_wrapper
+        self.command_wrapper = command_wrapper
         self.connection_retriever = connection_retriever
         self.destroyVirtualMachineCommand = destroy_virtual_machine_command
         self.deployFromTemplateCommand = deploy_from_template_command
@@ -67,14 +51,13 @@ class CommandExecuterService(object):
         data = self.serializer.decode(deployment_params)
 
         # prepare for execute command
-        command_wrapper = self.init_command_wrapper('DeployFromTemplate')
-        connection_details = self.get_vcenter_connection_details()
+        connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        result = command_wrapper.execute_command_with_connection(
-                                                            connection_details,
-                                                            self.deployFromTemplateCommand.execute_deploy_from_template,
-                                                            data)
+        result = self.command_wrapper.execute_command_with_connection(
+            connection_details,
+            self.deployFromTemplateCommand.execute_deploy_from_template,
+            data)
         print self.serializer.encode(result)
 
     def power_off(self):
@@ -82,26 +65,24 @@ class CommandExecuterService(object):
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
 
         # prepare for execute command
-        command_wrapper = self.init_command_wrapper('PowerOffCommand')
-        connection_details = self.get_vcenter_connection_details()
+        connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        command_wrapper.execute_command_with_connection(connection_details,
-                                                        self.vm_power_management_command.power_off,
-                                                        vm_uuid)
+        self.command_wrapper.execute_command_with_connection(connection_details,
+                                                             self.vm_power_management_command.power_off,
+                                                             vm_uuid)
 
     def power_on(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
 
         # prepare for execute command
-        command_wrapper = self.init_command_wrapper('PowerOnCommand')
-        connection_details = self.get_vcenter_connection_details()
+        connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        command_wrapper.execute_command_with_connection(connection_details,
-                                                        self.vm_power_management_command.power_on,
-                                                        vm_uuid)
+        self.command_wrapper.execute_command_with_connection(connection_details,
+                                                             self.vm_power_management_command.power_on,
+                                                             vm_uuid)
 
     def refresh_ip(self):
         # get command parameters from the environment
@@ -109,28 +90,10 @@ class CommandExecuterService(object):
         resource_name = self.qualipy_helpers.get_user_param('RESOURCE_NAME')
 
         # prepare for execute command
-        command_wrapper = self.init_command_wrapper('RefreshIpCommand')
-        connection_details = self.get_vcenter_connection_details()
+        connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        command_wrapper.execute_command_with_connection(connection_details,
-                                                        self.refresh_ip_command.refresh_ip,
-                                                        vm_uuid,
-                                                        resource_name)
-
-    def init_command_wrapper(self, command_name):
-        logger = self.get_logger(command_name)
-        command_wrapper = self.command_wrappper(logger, self.pv_service)
-        return command_wrapper
-
-    def get_vcenter_connection_details(self):
-        """
-        connects to the specified vCenter
-        :rtype vim.ServiceInstance: si
-        """
-        # gets the name of the vcenter to connect
-        resource_att = self.qualipy_helpers.get_resource_context_details()
-        inventory_path_data = self.connection_retriever.getVCenterInventoryPathAttributeData(resource_att)
-        vcenter_resource_name = inventory_path_data['vCenter_resource_name']
-        connection_details = self.connection_retriever.connection_details(vcenter_resource_name)
-        return connection_details
+        self.execute_command_with_connection(connection_details,
+                                             self.refresh_ip_command.refresh_ip,
+                                             vm_uuid,
+                                             resource_name)
