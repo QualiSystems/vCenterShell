@@ -171,6 +171,7 @@
           <AttributeValues>
             <AttributeValue Name="UUID" Value="" />
             <AttributeValue Name="vCenter Inventory Path" Value="" />
+            <AttributeValue Name="Default Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>

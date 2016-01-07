@@ -12,10 +12,21 @@ class CommandExecuterService(object):
                  deploy_from_template_command,
                  virtual_switch_connect_command,
                  virtual_switch_disconnect_command,
-                 vm_power_management_command):
+                 vm_power_management_command,
+                 refresh_ip_command):
         """
-        :param py_vmomi_service:  PyVmomi service
-        :param network_adapter_retriever_command:  Network adapter retriever command
+
+        :param qualipy_helpers: Wrapper of TestShell API in Python
+        :param logger_retriever: Logger retriever
+        :param py_vmomi_service: Wrapper of pyvmomi
+        :param command_wrapper: Command wrapper
+        :param connection_retriever: Connection retriever
+        :param destroy_virtual_machine_command: Destroy virtual machine command
+        :param deploy_from_template_command: Deploy from template command
+        :param virtual_switch_connect_command: Virtual switch connect command
+        :param virtual_switch_disconnect_command: Virtual switch disconnect command
+        :param vm_power_management_command: VM power management command
+        :param refresh_ip_command: Refresh IP command
         """
         self.qualipy_helpers = qualipy_helpers
         self.get_logger = logger_retriever
@@ -27,6 +38,7 @@ class CommandExecuterService(object):
         self.virtual_switch_connect_command = virtual_switch_connect_command
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
         self.vm_power_management_command = vm_power_management_command
+        self.refresh_ip_command = refresh_ip_command
 
     def deploy_from_template(self):
         self.deployFromTemplateCommand.execute_deploy_from_template()
@@ -83,6 +95,21 @@ class CommandExecuterService(object):
         command_wrapper.execute_command_with_connection(connection_details,
                                                         self.vm_power_management_command.power_on,
                                                         vm_uuid)
+
+    def refresh_ip(self):
+        # get command parameters from the environment
+        vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+        resource_name = self.qualipy_helpers.get_user_param('RESOURCE_NAME')
+
+        # prepare for execute command
+        command_wrapper = self.init_command_wrapper('RefreshIpCommand')
+        connection_details = self.get_vcenter_connection_details()
+
+        # execute command
+        command_wrapper.execute_command_with_connection(connection_details,
+                                                        self.refresh_ip_command.refresh_ip,
+                                                        vm_uuid,
+                                                        resource_name)
 
     def init_command_wrapper(self, command_name):
         logger = self.get_logger(command_name)
