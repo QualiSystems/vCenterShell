@@ -1,8 +1,6 @@
 from unittest import TestCase
 from mock import Mock, MagicMock
-from pyVmomi import vim
 from common.logger.service import LoggingService
-from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
 
 
