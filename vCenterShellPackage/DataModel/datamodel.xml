@@ -89,6 +89,11 @@
         <Rule Name="Setting" />
       </Rules>
     </AttributeInfo>
+	<AttributeInfo Name="Target Interface" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Link Configurations" />
+      </Rules>
+    </AttributeInfo>
   </Attributes>
   <ResourceFamilies>
     <ResourceFamily Name="Cloud Provider" Description="" IsSearchable="true">
@@ -171,6 +176,7 @@
           <AttributeValues>
             <AttributeValue Name="UUID" Value="" />
             <AttributeValue Name="vCenter Inventory Path" Value="" />
+            <AttributeValue Name="Default Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
