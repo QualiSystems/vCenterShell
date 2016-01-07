@@ -42,8 +42,19 @@
         self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
 
     def destroy(self):
-        self.disconnect_all()
-        self.destroyVirtualMachineCommand.execute()
+        # get command parameters from the environment
+        uuid = self.qualipy_helpers.get_user_param('uuid')
+        resource = self.qualipy_helpers.get_resource_context_details()
+
+        # prepare for execute command
+        connection_details = self.connection_retriever.connection_details()
+
+        # execute command
+        self.command_wrapper.execute_command_with_connection(
+            connection_details,
+            self.destroyVirtualMachineCommand.destroy,
+            uuid,
+            resource.fullname)
 
     def deploy_from_template(self):
         # get command parameters from the environment

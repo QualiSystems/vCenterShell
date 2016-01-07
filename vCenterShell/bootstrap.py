@@ -3,6 +3,7 @@ import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.cloudshell.resource_remover import CloudshellResourceRemover
 from common.logger import getLogger
 from common.model_factory import ResourceModelParser
 from common.utilites.common_name import generate_unique_name
@@ -31,14 +32,12 @@ class Bootstrapper(object):
         cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         resource_connection_details_retriever = ResourceConnectionDetailsRetriever(helpers,
                                                                                    cloudshell_data_retriever_service)
+        resource_remover = CloudshellResourceRemover(helpers)
         command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
         name_generator = generate_unique_name
         template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
-
-        destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
-                                                                       cloudshell_data_retriever_service)
 
         # Virtual Switch Connect
         synchronous_task_waiter = SynchronousTaskWaiter()
@@ -65,6 +64,10 @@ class Bootstrapper(object):
                                                     cloudshell_data_retriever_service,
                                                     synchronous_task_waiter)
 
+        destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
+                                                                       resource_remover,
+                                                                       # todo: merge with sergaiiT
+                                                                       virtual_switch_disconnect_command)
         # Power Command
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
                                                                            synchronous_task_waiter)

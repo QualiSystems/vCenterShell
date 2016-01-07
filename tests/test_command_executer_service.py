@@ -129,12 +129,26 @@ class TestCommandExecuterService(unittest.TestCase):
         self.assertTrue(connection_retriever.connection_details.called_with(vcenter_name))
 
     def test_destroyVirtualMachineCommand(self):
-        destroy_virtual_machine_command = MagicMock()
-        command_executer_service = CommandExecuterService(Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          Mock(),
-                                                          destroy_virtual_machine_command,
+        # arrange
+        vcenter_name = 'name'
+        resource_att = Mock()
+        Destroyer = Mock()
+        connection_retriever = Mock()
+        connection_details = Mock()
+        command_wrapper = Mock()
+
+        resource_att.fullname = 'full_name'
+        connection_retriever.getVCenterInventoryPathAttributeData = \
+            Mock(return_value={'vCenter_resource_name': vcenter_name})
+        connection_retriever.connection_details = Mock(return_value=connection_details)
+        self.quali_helpers.get_resource_context_details = Mock(return_value=resource_att)
+        Destroyer.power_off = Mock(return_value=True)
+
+        command_executer_service = CommandExecuterService(self.serializer,
+                                                          self.quali_helpers,
+                                                          self.command_wrapper,
+                                                          connection_retriever,
+                                                          Destroyer,
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -142,11 +156,17 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-        CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
 
+        # act
         command_executer_service.destroy()
 
-        destroy_virtual_machine_command.execute.assert_called_with()
+        # assert
+        self.assertTrue(connection_retriever.getVCenterInventoryPathAttributeData.called_with(resource_att))
+        self.assertTrue(command_wrapper.execute_command_with_connection.called_with(connection_details,
+                                                                                    Destroyer.destroy,
+                                                                                    VmContext.VM_UUID,
+                                                                                    resource_att.fullname))
+        self.assertTrue(connection_retriever.connection_details.called_with(vcenter_name))
 
     def test_disconnect(self):
         # arrange

@@ -19,40 +19,28 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenter
 
 class test_destroyVirtualMachineCommand(unittest.TestCase):
     def test_destroyVirtualMachineCommand(self):
-        content = Mock()
+        # arrange
+        pv_service = Mock()
+        resource_remover = Mock()
+        disconnector = Mock()
         si = create_autospec(spec=vim.ServiceInstance)
-        si.RetrieveContent = Mock(return_value=content)
+        resource_name = 'this/is the name of the template'
+        uuid = 'uuid'
+        vm = Mock()
 
-        pvService = Mock()
-        pvService.connect = Mock(return_value=si)
-        pvService.destroy_vm_by_name = MagicMock()
+        pv_service.destory_mv = Mock(return_value=True)
+        disconnector.remove_interfaces_from_vm = Mock(return_value=True)
+        resource_remover.remove_resource = Mock(return_value=True)
+        pv_service.find_by_uuid = Mock(return_value=vm)
 
-        csRetrieverService = Mock()
-        csRetrieverService.getVCenterTemplateAttributeData = Mock(
-            return_value=VCenterTemplateModel(template_name='test', vm_folder='Alex', vcenter_resource_name='vCenter'))
-        csRetrieverService.getPowerStateAttributeData = Mock(return_value=True)
-        csRetrieverService.getVMClusterAttributeData = Mock(
-            return_value=VMClusterModel(cluster_name="cluster1", resource_pool="resourcePool1"))
-        csRetrieverService.getVMStorageAttributeData = Mock(return_value="datastore")
-        csRetrieverService.getVCenterConnectionDetails = Mock(
-            return_value=VCenterConnectionDetails("vCenter", "user1", "pass1"))
+        destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
-        resource_att = Mock()
-        vm_name = Mock(return_value='test')
-        resource_att.name = vm_name
-        helpers.get_resource_context_details = Mock(return_value=resource_att)
-        helpers.get_api_session = Mock()
+        # act
+        res = destroyer.destroy(si, uuid, resource_name)
 
-        context_att = Mock()
-        vm_id = Mock(return_value='id')
-        context_att.id = vm_id
-        helpers.get_reservation_context_details = Mock(return_value=context_att)
-
-        command = DestroyVirtualMachineCommand(pvService, csRetrieverService)
-        command.execute()
-
-        self.assertTrue(pvService.connect.called)
-        self.assertTrue(pvService.destroy_vm_by_name.called)
-        self.assertTrue(si.RetrieveContent.called)
-        pvService.destroy_vm_by_name.assert_called_with(content, si, vm_name)
-        self.assertTrue(helpers.get_api_session().DeleteResource.called)
+        # assert
+        self.assertTrue(res)
+        self.assertTrue(pv_service.destory_mv.called_with(vm))
+        self.assertTrue(disconnector.remove_interfaces_from_vm.called_with(si, vm))
+        self.assertTrue(resource_remover.remove_resource.called_with(resource_name))
+        self.assertTrue(pv_service.find_by_uuid.called_with(si, uuid))
