@@ -106,7 +106,7 @@ class VirtualSwitchToMachineConnector(object):
                                                  vlan_spec)
             vnic_mapping[vnic_name] = network
 
-        self.virtual_machine_port_group_configurer.connect_by_mapping(vm, vnic_mapping)
+        return self.virtual_machine_port_group_configurer.connect_by_mapping(vm, vnic_mapping)
 
     def get_or_create_network(self,
                               si,
