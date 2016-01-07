@@ -51,7 +51,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         self.dv_switch_name = 'dvSwitch-SergiiT'
         #self.dv_port_group_name = 'aa-dvPortGroup2A'
-        self.dv_port_group_name = 'aa-dvPortGroup2A'
+        #self.dv_port_group_name = 'aa-dvPortGroup2A'
+        self.dv_port_group_name = 'aa-dvPortGroup3B'
 
         self.standard_network_name = "Anetwork"
         try:
@@ -107,7 +108,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         pass
 
-    def integrationtest_disconnect(self):
+    def integrationtest_disconnect_all(self):
         dv_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
         connector = VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
                                                             self.resource_connection_details_retriever,
@@ -119,6 +120,22 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         result = connector.disconnect_all(self.vcenter_name, self.vm_uuid)
 
         print result
+
+
+    def integrationtest_disconnect(self):
+        dv_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
+        connector = VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
+                                                            self.resource_connection_details_retriever,
+                                                            dv_port_group_configurer)
+
+        self.vm_uuid = self.vm_uuid or self.get_vm_uuid(self.py_vmomi_service,  self.virtual_machine_name)
+        print "DISCONNECT. Machine: '{}' UUID: [{}]".format(self.virtual_machine_name, self.vm_uuid)
+
+        result = connector.disconnect(self.vcenter_name, self.vm_uuid, self.dv_port_group_name)
+
+        print result
+
+    #disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
 
     def integrationtest_attach_vnic(self, network):
         nicspes = vnic_new_attached_to_network(network)
@@ -154,7 +171,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         #self.integrationtest_attach_vnic()
         # self.integrationtest_attach_vnic_portgroup()
         # self.integrationtest_attach_vnic_portgroup()
-        # self.integrationtest_attach_vnic_portgroup()
+        #self.integrationtest_attach_vnic_portgroup()
         #self.integrationtest_attach_vnic_standard()
         print "Integration Testing COMPLETED"
         #self.port_group_destroy()
