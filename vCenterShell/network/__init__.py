@@ -11,7 +11,8 @@ _logger = getLogger("vCenterCommon")
 
 
 def network_is_standard(network):
-    return True if network and str(network).startswith("vim.Network:") else False
+    return True if isinstance(network, vim.Network) \
+                   or network and str(network).startswith("vim.Network:") else False
 
 
 #todo need to be cleared
