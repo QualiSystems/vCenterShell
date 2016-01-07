@@ -73,7 +73,6 @@ class TestDvPortGroupConfigurer(TestCase):
         res = self.configurer.erase_network_by_mapping(self.vm, [mapping])
         self.assertIsNone(res)
 
-
     def test_update_vnic_by_mapping(self):
         mapping = [self.vnic, self.network, False, None]
         res = self.configurer.update_vnic_by_mapping(self.vm, [mapping])
@@ -85,4 +84,13 @@ class TestDvPortGroupConfigurer(TestCase):
 
     def test_disconnect_network(self):
         res = self.configurer.disconnect_network(self.vm, self.network)
+        self.assertIsNone(res)
+
+    def test_connect_first_available_vnic(self):
+        res = self.configurer.connect_first_available_vnic(self.vm, self.network)
+        self.assertEquals(res, "TASK OK")
+
+    def test_connect_vinc_port_group(self):
+
+        res = self.configurer.connect_vinc_port_group(self.vm, "name", self.network)
         self.assertIsNone(res)
