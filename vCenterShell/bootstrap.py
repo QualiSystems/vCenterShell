@@ -1,23 +1,21 @@
 import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
-
-from common.cloudshell.resource_creator import CloudshellResourceCreator
-from common.logger import getLogger
-from common.model_factory import ResourceModelParser
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.logger import getLogger
+from common.model_factory import ResourceModelParser
 from common.utilites.common_name import generate_unique_name
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from vCenterShell.command_executer import CommandExecuterService
-from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
+from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory
@@ -36,10 +34,8 @@ class Bootstrapper(object):
         command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
         name_generator = generate_unique_name
         template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
-        cloudshell_resource_creater = CloudshellResourceCreator(helpers)
 
-        deploy_from_template_command = DeployFromTemplateCommand(template_deployer,
-                                                                 cloudshell_resource_creater)
+        deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
 
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        cloudshell_data_retriever_service)

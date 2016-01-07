@@ -1,3 +1,4 @@
+from models.DeployResultModel import DeployResult
 
 
 class VirtualMachineDeployer(object):
@@ -22,10 +23,5 @@ class VirtualMachineDeployer(object):
         if clone_vm_result.error:
             raise ValueError(clone_vm_result.error)
 
-        result = {
-            'vm_name': vm_name,
-            'uuid': clone_vm_result.vm.summary.config.uuid,
-            'vm_path': data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder
-        }
-
-        return result
+        resource_path = data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder
+        return DeployResult(vm_name, clone_vm_result.vm.summary.config.uuid, resource_path)

@@ -14,7 +14,6 @@ from vCenterShell.vm.deploy import VirtualMachineDeployer
 class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
     def test_deploy_template(self):
         # arrange
-        resource_creator = Mock()
 
         cred = TestCredentials()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
@@ -37,7 +36,7 @@ class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
             "power_on": False
         })
 
-        deploy_command = DeployFromTemplateCommand(deployer, resource_creator)
+        deploy_command = DeployFromTemplateCommand(deployer)
 
         # act
         result = deploy_command.execute_deploy_from_template(si, deploy_params)

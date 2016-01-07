@@ -1,13 +1,12 @@
-import sys
-import os.path
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 
 class ResourceConnectionDetailsRetriever:
     def __init__(self, qualipy_helpers, cs_retriever_service):
+        """
+        :param qualipy.scripts.cloudshell_scripts_helpers qualipy_helpers:
+        :param cs_retriever_service:
+        :return:
+        """
         self.qualipy_helpers = qualipy_helpers
         self.csRetrieverService = cs_retriever_service
 
@@ -17,13 +16,9 @@ class ResourceConnectionDetailsRetriever:
         :param resource_name: Resource name to get connection details from
         :rtype VCenterConnectionDetails:
         """
-        # gets the name of the vcenter to connect
-        resource_att = self.qualipy_helpers.get_resource_context_details()
-        inventory_path_data = self.connection_retriever.getVCenterInventoryPathAttributeData(resource_att)
-        vcenter_resource_name = inventory_path_data['vCenter_resource_name']
-
-        session = helpers.get_api_session()
-        resource_details = session.GetResourceDetails(vcenter_resource_name)
+        # gets the vcenter resource context to connect. We assume this will only run on a cloud prodvider resource
+        session = self.qualipy_helpers.get_api_session()
+        resource_context = self.qualipy_helpers.get_resource_context_details()
 
         # get vCenter connection details from vCenter resource
-        return self.csRetrieverService.getVCenterConnectionDetails(session, resource_details)
+        return self.csRetrieverService.getVCenterConnectionDetails(session, resource_context)
