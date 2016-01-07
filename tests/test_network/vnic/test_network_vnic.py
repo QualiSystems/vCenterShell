@@ -59,7 +59,7 @@ class TestNetwork(TestCase):
 
         nicspec.device = device
         res = vnic_attach_to_network_distributed(nicspec, port_group)
-        self.assertEquals(res.device.backing.port.portgroupKey, "6686")
+        self.assertEquals(res.device.backing.port.portgroupKey, "group_net")
 
 
     def test_xx(self):
