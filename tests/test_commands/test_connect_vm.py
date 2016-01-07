@@ -7,28 +7,9 @@ from pyVmomi import vim
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 from common.logger.service import LoggingService
-from vCenterShell.network.vnic.vnic_common import *
-from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-
-
-from vCenterShell.command_executer import CommandExecuterService
-from common.logger.service import LoggingService
-from common.utilites.debug import print_attributes
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.utils.testing_credentials import TestCredentials
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-
-
 from qualipy.api.cloudshell_api import ResourceInfo
 
 from common.model_factory import ResourceModelParser
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vlan.factory import VlanSpecFactory
-
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever

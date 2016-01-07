@@ -2,29 +2,11 @@ from unittest import TestCase
 
 from mock import Mock
 
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-
-
-from utils.command_context_mocker import CommandContextMocker
-from utils.vm_context import VmContext
-from vCenterShell.command_executer import CommandExecuterService
-from common.logger.service import LoggingService
-from common.utilites.debug import print_attributes
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.utils.testing_credentials import TestCredentials
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-
-from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
-from vCenterShell.network.vnic.vnic_common import *
+from pyVmomi import vim
 from vCenterShell.vm.portgroup_configurer import *
 
 
-
 class TestDvPortGroupConfigurer(TestCase):
-
-
     def setUp(self):
         self._si = None
         self.virtual_machine_path = 'SergiiT'
