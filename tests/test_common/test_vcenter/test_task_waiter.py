@@ -45,8 +45,8 @@ class TestTaskWaiter(unittest.TestCase):
 
     @patch('time.sleep', helper.change_to_error)
     def test_wait_for_task_fail(self):
-
         task.info = Mock(spec=vim.TaskInfo)
+        task.info.error = 'error'
         task.info.state = vim.TaskInfo.State.running
         result = 'result'
         task.info.result = result
