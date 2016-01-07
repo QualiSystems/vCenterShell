@@ -1,13 +1,15 @@
 ﻿import json
+import os
 import unittest
 
+import sys
 from mock import Mock, create_autospec
 from pyVmomi import vim
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VCenterTemplateModel import VCenterTemplateModel
 
 from models.VMClusterModel import VMClusterModel
-from vCenterShell.commands.deploy_vm import *
+from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

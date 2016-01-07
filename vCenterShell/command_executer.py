@@ -1,12 +1,12 @@
 ﻿
-
 class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
     def __init__(self,
+                 serializer,
                  qualipy_helpers,
                  logger_retriever,
-                 py_vmomi_service,
+                 pv_service,
                  command_wrapper,
                  connection_retriever,
                  destroy_virtual_machine_command,
@@ -14,13 +14,10 @@ class CommandExecuterService(object):
                  virtual_switch_connect_command,
                  virtual_switch_disconnect_command,
                  vm_power_management_command):
-        """
-        :param py_vmomi_service:  PyVmomi service
-        :param network_adapter_retriever_command:  Network adapter retriever command
-        """
+        self.serializer = serializer
         self.qualipy_helpers = qualipy_helpers
         self.get_logger = logger_retriever
-        self.pyVmomiService = py_vmomi_service
+        self.pv_service = pv_service
         self.command_wrappper = command_wrapper
         self.connection_retriever = connection_retriever
         self.destroyVirtualMachineCommand = destroy_virtual_machine_command
@@ -28,12 +25,6 @@ class CommandExecuterService(object):
         self.virtual_switch_connect_command = virtual_switch_connect_command
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
         self.vm_power_management_command = vm_power_management_command
-
-    def deploy_from_template(self):
-        self.deployFromTemplateCommand.execute_deploy_from_template()
-
-    def deploy(self):
-        self.deployFromTemplateCommand.execute()
 
     def destroy(self):
         self.disconnect_all()
@@ -56,6 +47,22 @@ class CommandExecuterService(object):
         virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
         network_name = self.qualipy_helpers.get_user_param('NETWORK_NAME')
         self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
+
+    def deploy_from_template(self):
+        # get command parameters from the environment
+        deployment_params = self.qualipy_helpers.get_user_param('DEPLOY_DATA')
+        data = self.serializer.decode(deployment_params)
+
+        # prepare for execute command
+        command_wrapper = self.init_command_wrapper('DeployFromTemplate')
+        connection_details = self.get_vcenter_connection_details()
+
+        # execute command
+        result = command_wrapper.execute_command_with_connection(
+                                                            connection_details,
+                                                            self.deployFromTemplateCommand.execute_deploy_from_template,
+                                                            data)
+        print self.serializer.encode(result)
 
     def power_off(self):
         # get command parameters from the environment
@@ -85,7 +92,7 @@ class CommandExecuterService(object):
 
     def init_command_wrapper(self, command_name):
         logger = self.get_logger(command_name)
-        command_wrapper = self.command_wrappper(logger, self.pyVmomiService)
+        command_wrapper = self.command_wrappper(logger, self.pv_service)
         return command_wrapper
 
     def get_vcenter_connection_details(self):
