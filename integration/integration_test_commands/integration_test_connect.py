@@ -14,7 +14,7 @@ from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisc
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
-    def integration_test_delete_all(self):
+    def integration_test_disconnect_all(self):
         # arrange
         cred = TestCredentials()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
@@ -29,7 +29,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
             VirtualSwitchToMachineDisconnectCommand(pv_service,
                                                     resource_connection_details_retriever,
                                                     task_waiter.SynchronousTaskWaiter())
-        uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', 'New Virtual Machine').config.uuid
+        uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
 
         virtual_switch_to_machine_connector.disconnect_all('name of the vCenter',
                                                            uuid)
