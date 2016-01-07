@@ -23,10 +23,6 @@
         self.vm_power_management_command = vm_power_management_command
         self.refresh_ip_command = refresh_ip_command
 
-    def destroy(self):
-        self.disconnect_all()
-        self.destroyVirtualMachineCommand.execute()
-
     def connect(self):
         vlan_id = self.qualipy_helpers.get_user_param('VLAN_ID')
         vlan_spec_type = self.qualipy_helpers.get_user_param('VLAN_SPEC_TYPE')
@@ -44,6 +40,10 @@
         virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
         network_name = self.qualipy_helpers.get_user_param('NETWORK_NAME')
         self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name)
+
+    def destroy(self):
+        self.disconnect_all()
+        self.destroyVirtualMachineCommand.execute()
 
     def deploy_from_template(self):
         # get command parameters from the environment
