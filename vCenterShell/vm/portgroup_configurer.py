@@ -104,7 +104,7 @@ class VirtualMachinePortGroupConfigurer(object):
         """
         mapping = dict()
         mapping[vnic_name] = network
-        self.connect_by_mapping(vm, mapping)
+        return self.connect_by_mapping(vm, mapping)
 
     def connect_by_mapping(self, vm, mapping):
         """
