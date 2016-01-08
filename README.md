@@ -19,3 +19,4 @@ A lightweight CloudShell 'shell' that allows integrating with vCenter as an app 
 ## License
 [Apache License 2.0](https://github.com/QualiSystems/vCenterShell/blob/master/LICENSE)
 
+[![Analytics](https://ga-beacon.appspot.com/UA-72194260-1/QualiSystems/vCenterShell)](https://github.com/QualiSystems/vCenterShell/)
