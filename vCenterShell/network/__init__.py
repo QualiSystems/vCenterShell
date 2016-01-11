@@ -11,11 +11,9 @@ _logger = getLogger("vCenterCommon")
 
 
 def network_is_standard(network):
-    return True if isinstance(network, vim.Network) \
-                   or network and str(network).startswith("vim.Network:") else False
+    return isinstance(network, vim.Network) or (network and str(network).startswith("vim.Network:"))
 
 
-#todo need to be cleared
 def network_is_portgroup(network):
     return isinstance(network, vim.dvs.DistributedVirtualPortgroup) \
            or network and str(network).startswith("vim.dvs.VmwareDistributedVirtualSwitch:")
