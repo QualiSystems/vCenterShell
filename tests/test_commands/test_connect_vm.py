@@ -18,31 +18,11 @@ from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.network.vnic.vnic_common import *
 from vCenterShell.vm.portgroup_configurer import *
 
-def update_environment():
-    os.environ["RESOURCECONTEXT"] = \
-            '{' \
-            ' "name":"VCenter Template Request", ' \
-            ' "address":"Service",' \
-            ' "model":"VCenter Template Request", ' \
-            ' "family":"VM Request", ' \
-            ' "description":"", ' \
-            ' "fullname":"", ' \
-            ' "attributes":{"vCenter Template":"vCenter/QualiSB/Alex/test",' \
-                            '"VM Power State":"True",' \
-                            '"VM Storage":"eric ds cluster", ' \
-                            '"VM Cluster":"QualiSB Cluster/LiverPool"}}'
-
-    os.environ["qualiConnectivityContext"] = '{}'
-    os.environ["reservationContext"] = '{}'
-    os.environ["QUALICONNECTIVITYCONTEXT"] = '{}'
-    os.environ["RESERVATIONCONTEXT"] = '{}'
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
     def setUp(self):
-
-        update_environment()
 
         self._si = None
         self.virtual_machine_path = 'SergiiT'
