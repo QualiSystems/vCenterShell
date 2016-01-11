@@ -1,6 +1,6 @@
 class VmNetworkMapping(object):
     def __init__(self):
-        self.vnic_name
+        self.vnic_name = ''
         self.dv_port_name = ''
         self.dv_switch_name = ''
         self.dv_switch_path = ''
@@ -22,17 +22,15 @@ class ConnectRequest(object):
 
 class VirtualSwitchToMachineConnector(object):
     def __init__(self,
-                 pyvmomi_service,
                  dv_port_group_creator,
                  virtual_machine_port_group_configurer):
-        self.pyvmomi_service = pyvmomi_service
         self.dv_port_group_creator = dv_port_group_creator
         self.virtual_machine_port_group_configurer = virtual_machine_port_group_configurer
 
-    def connect(self,
-                si,
-                vm_uuid,
-                mapping):
+    def connect_by_mapping(self,
+                           si,
+                           vm,
+                           mapping):
         """
         gets the mapping to the vnics and connects it to the vm
         :param si: ServiceInstance
@@ -40,7 +38,6 @@ class VirtualSwitchToMachineConnector(object):
         :param mapping: [VmNetworkMapping]
         """
         request_mapping = []
-        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         for network_map in mapping:
             network = self.dv_port_group_creator.get_or_create_network(si,
@@ -53,4 +50,4 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_spec)
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
-        self.virtual_machine_port_group_configurer.connect(request_mapping)
+        self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping)

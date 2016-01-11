@@ -14,7 +14,7 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_to_network_mapper = vnic_to_network_mapper
         self.vnic_common = vnic_common
 
-    def connect(self, vm, mapping):
+    def connect_vnic_to_networks(self, vm, mapping):
         vnic_mapping = self.map_vnics(vm)
         vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(mapping, vnic_mapping, vm.network)
         update_mapping = []
@@ -26,7 +26,7 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def erase_network_by_mapping(self, vm, update_mapping):
         for item in update_mapping:
-            network = item[1] or vnic_get_network_attached(vm, item[0], self.pyvmomi_service)
+            network = item[1] or self.vnic_common.vnic_get_network_attached(vm, item[0], self.pyvmomi_service)
             if network:
                 task = self.destroy_port_group_task(network)
                 if task:

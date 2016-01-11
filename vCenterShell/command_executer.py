@@ -29,14 +29,12 @@
         self.virtual_switch_connect_command.connect_vm_to_vlan(vlan_id, vlan_spec_type)
 
     def disconnect_all(self):
-        # todo: the vcenter param should be getting inside the command from resource
         vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')
         virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
         default_network_name = self.qualipy_helpers.get_user_param('DEFAULT_NETWORK_FULL_NAME')
         self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id, default_network_name)
 
     def disconnect(self):
-        # todo: the vcenter param should be getting inside the command from resource
         vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')
         virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
         network_name = self.qualipy_helpers.get_user_param('NETWORK_NAME')
