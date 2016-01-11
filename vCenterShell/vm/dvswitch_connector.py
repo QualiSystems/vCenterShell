@@ -34,7 +34,7 @@ class VirtualSwitchToMachineConnector(object):
         """
         gets the mapping to the vnics and connects it to the vm
         :param si: ServiceInstance
-        :param vm_uuid: str
+        :param vm: vim.VirtualMachine
         :param mapping: [VmNetworkMapping]
         """
         request_mapping = []

@@ -21,6 +21,8 @@ from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
+from vCenterShell.network.vnic import vnic_common
+from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
@@ -39,11 +41,15 @@ class Bootstrapper(object):
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
 
+        vnic_to_network_mapper = VnicToNetworkMapper(name_generator,'' )
+
         # Virtual Switch Connect
         synchronous_task_waiter = SynchronousTaskWaiter()
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
-                                                                                  synchronous_task_waiter)
+                                                                                  synchronous_task_waiter,
+                                                                                  vnic_to_network_mapper,
+                                                                                  vnic_common)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
                                                                               resource_connection_details_retriever,
                                                                               dv_port_group_creator,

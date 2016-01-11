@@ -3,8 +3,7 @@ from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 
 class VirtualSwitchConnectCommand:
     def __init__(self, pv_service, virtual_switch_to_machine_connector,
-                 dv_port_group_name_generator, vlan_spec_factory, vlan_id_range_parser, vcenter_resource_model,
-                 helpers):
+                 dv_port_group_name_generator, vlan_spec_factory, vlan_id_range_parser, vcenter_resource_model):
         """
         :type pv_service: object
         :param virtual_switch_to_machine_connector:
@@ -17,23 +16,6 @@ class VirtualSwitchConnectCommand:
         self.vlan_spec_factory = vlan_spec_factory  # type: VlanSpecFactory
         self.vlan_id_range_parser = vlan_id_range_parser
         self.vcenter_resource_model = vcenter_resource_model
-        self.helpers = helpers
-
-    def connect_vnic_to_network(self,
-                                si,
-                                vm_uuid,
-                                vlan_id,
-                                vlan_spec_type,
-                                vnic_name=None,
-                                dv_switch_path=None,
-                                dv_switch_name=None,
-                                port_group_path=None):
-        vm = self.pv_service.find_by_uuid(si, vm_uuid)
-
-        vnic_to_network_map = self.get_vnic_to_network_map(vnic_name, dv_switch_name, dv_switch_path, port_group_path,
-                                                           vlan_id, vlan_spec_type)
-
-        self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, [vnic_to_network_map])
 
     def connect_to_networks(self, si, vm_uuid, vm_network_mappings):
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
@@ -44,7 +26,7 @@ class VirtualSwitchConnectCommand:
                                                          vm_network_mapping.dv_switch_path,
                                                          vm_network_mapping.port_group_path,
                                                          vm_network_mapping.vlan_id,
-                                                         vm_network_mapping.vlan_spec_type))
+                                                         vm_network_mapping.vlan_spec))
 
         self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, mappings)
 

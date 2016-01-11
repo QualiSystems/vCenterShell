@@ -205,7 +205,6 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
                                                           Mock())
