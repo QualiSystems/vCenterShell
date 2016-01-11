@@ -8,23 +8,11 @@
 from pyVmomi import vim
 
 from common.vcenter.vmomi_service import *
+from common.utilites.io import get_path_and_name
 from vCenterShell.vm import vm_reconfig_task
 from vCenterShell.network.vnic.vnic_common import device_is_attached_to_network
 from common.logger import getLogger
 _logger = getLogger("vCenterShell")
-
-
-#todo move to some 'common' module
-def get_path_and_name(full_name):
-    """
-    Split Whole Patch onto 'Patch' and 'Name'
-    :param full_name: <str> Full Resource Name - likes 'Root/Folder/Folder2/Name'
-    :return: tuple (Patch, Name)
-    """
-    if full_name:
-        parts = full_name.split("/")
-        return ("/".join(parts[0:-1]), parts[-1]) if len(parts) > 1 else ("/", full_name)
-    return None, None
 
 
 class VirtualSwitchToMachineDisconnectCommand(object):

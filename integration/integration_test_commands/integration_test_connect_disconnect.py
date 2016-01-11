@@ -169,7 +169,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.integrationtest_disconnect()
         #self.integrationtest_attach_vnic()
         # self.integrationtest_attach_vnic_portgroup()
-        # self.integrationtest_attach_vnic_portgroup()
+        #self.integrationtest_attach_vnic_portgroup()
         #self.integrationtest_attach_vnic_portgroup()
         #self.integrationtest_attach_vnic_standard()
         print "Integration Testing COMPLETED"
