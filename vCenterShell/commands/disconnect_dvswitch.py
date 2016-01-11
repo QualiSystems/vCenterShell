@@ -106,12 +106,12 @@ class VirtualSwitchToMachineDisconnectCommand(object):
             return self.port_group_configurer.disconnect_all_networks(vm, default_network, erase_network=True)
 
 
-    #todo NOT USED but work OK - move to COMMON
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """
+        Remove interface from VM
         @see https://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/vim.VirtualMachine.html#reconfigure
-        :param filter_function: function that gets the device and decide if it should be deleted
         :param virtual_machine: <vim.vm object>
+        :param filter_function: function that gets the device and decide if it should be deleted
         :return:
         """
         device_change = []
