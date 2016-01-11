@@ -59,7 +59,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                 return network
         return None
 
-    #todo move to COMMON
     def get_network_by_full_name(self, si, default_network_full_name):
         """
         Find network by a Full Name
@@ -70,7 +69,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
 
-    def disconnect_all(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
+    def disconnect_all(self, vcenter_name, vm_uuid, default_network_full_name=None):
         return self.disconnect(vcenter_name, vm_uuid, None, default_network_full_name)
 
     def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
