@@ -448,8 +448,8 @@ class pyVmomiService:
                 return network
         return None
 
-    def get_network_by_key_from_vm(self, vm, network_name):
+    def get_network_by_key_from_vm(self, vm, network_key):
         for network in vm.network:
-            if network_name == network.key:
+            if network_key == network.key:
                 return network
         return None
