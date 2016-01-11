@@ -117,7 +117,7 @@ class VirtualSwitchConnectCommand:
                                                                   networks_mapping)
 
     def connect_by_mapping(self, vlan_id, vlan_spec_type):
-        self.create_context(hconnectelpers)
+        self.create_context(helpers)
         vcenter_resource_name = self.inventory_path_data.vCenter_resource_name
         vcenter_resource_details = self.session.GetResourceDetails(vcenter_resource_name)
 

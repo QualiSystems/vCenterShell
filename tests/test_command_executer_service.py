@@ -5,7 +5,6 @@ from utils.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
 
-
 class TestCommandExecuterService(unittest.TestCase):
     def setUp(self):
         self.serializer = Mock()
@@ -82,7 +81,6 @@ class TestCommandExecuterService(unittest.TestCase):
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
-
         # act
         command_executer_service.power_off()
 
@@ -120,7 +118,6 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           power_manager)
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-
 
         # act
         command_executer_service.power_on()
@@ -186,7 +183,6 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
                                                           Mock())
-
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
