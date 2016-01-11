@@ -1,5 +1,4 @@
 from common.utilites.common_utils import represents_int
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 
 class VlanResolverProvider(object):
@@ -47,6 +46,11 @@ class VlanResolverProvider(object):
 
         return result.VlanId
 
+    def is_vlan_resolved(self):
+        if not self.vlan_resource_model.virtual_network.strip():
+            return False
+        return True
+
     def _ensure_vlan_id_value_is_ok(self):
         """ validate that the vlan id value is ok """
         if not self.vlan_resource_model.vlan_id:
@@ -69,9 +73,6 @@ class VlanResolverProvider(object):
 
     def _is_vlan_id_range(self):
         return self.vlan_resource_model.vlan_id.find('-') > 0
-
-    def is_vlan_resolved(self):
-        return self.vlan_resource_model.virtual_network
 
     def _get_vlan_range_from_vlan_id(self):
         range_arr = self.vlan_resource_model.vlan_id.split("-", 2)
