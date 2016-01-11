@@ -7,6 +7,7 @@ from common.cloudshell.resource_remover import CloudshellResourceRemover
 from common.logger import getLogger
 from common.model_factory import ResourceModelParser
 from common.utilites.common_name import generate_unique_name
+from common.vcenter.data_model_retriever import VCenterDataModelRetriever
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
@@ -41,7 +42,9 @@ class Bootstrapper(object):
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
 
-        vnic_to_network_mapper = VnicToNetworkMapper(name_generator,'' )
+        vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
+        vc_data_model = vc_model_retriever.get_vcenter_data_model()
+        vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
 
         # Virtual Switch Connect
         synchronous_task_waiter = SynchronousTaskWaiter()
