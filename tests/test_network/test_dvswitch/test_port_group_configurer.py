@@ -65,12 +65,6 @@ class TestDvPortGroupConfigurer(TestCase):
         res = self.configurer.get_device_spec(self.vnic, False)
         self.assertIsInstance(res, vim.vm.device.VirtualDeviceSpec)
 
-    # def test_create_vnic_spec(self):
-    #     nic_spec = Mock()
-    #     self.configurer.set_vnic_connectivity_status(nic_spec, True)
-    #     self.assertEquals(nic_spec.device.connectable.startConnected, True)
-
-
     def test_erase_network_by_mapping(self):
         mapping = [self.vnic, self.network, False, None]
         res = self.configurer.erase_network_by_mapping(self.vm, [mapping])
