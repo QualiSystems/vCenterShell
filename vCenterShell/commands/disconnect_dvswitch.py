@@ -9,7 +9,7 @@ from pyVmomi import vim
 
 from common.vcenter.vmomi_service import *
 from common.utilites.io import get_path_and_name
-from vCenterShell.vm import vm_reconfig_task
+from vCenterShell.vm import vm_reconfig_task, vm_get_network_by_name
 from vCenterShell.network.vnic.vnic_common import device_is_attached_to_network
 from common.logger import getLogger
 _logger = getLogger("vCenterShell")
@@ -46,19 +46,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         condition = lambda device: device_is_attached_to_network(device, network_name) if network_name else lambda x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
-    #todo move to COMMON
-    def get_network_by_name(self, vm, network_name):
-        """
-        Try to find Network scanning all attached to VM networks
-        :param vm: <vim.vm>
-        :param network_name: <str> name of network
-        :return: <vim.vm.Network or None>
-        """
-        for network in vm.network:
-            if network_name == network.name:
-                return network
-        return None
-
     def get_network_by_full_name(self, si, default_network_full_name):
         """
         Find network by a Full Name
@@ -92,7 +79,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if network_name:
-            network = self.get_network_by_name(vm, network_name)
+            network = vm_get_network_by_name(vm, network_name)
             if network is None:
                 raise KeyError(u'Network not found ({0})'.format(network_name))
         else:

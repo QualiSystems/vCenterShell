@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mock import Mock
+from mock import Mock, patch
 from pyVmomi import vim
 
 from common.logger.service import LoggingService
@@ -51,10 +51,13 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         # arrange
         uuid = 'uuid'
         vcenter_name = 'vcenter_name'
-        network_name = 'vcenter_name'
+        network_name = 'network_name'
 
+        network = Mock()
+        network.name = network_name
         si = Mock()
         vm = Mock()
+        vm.network = [network]
 
         connection_detail = Mock()
         connection_detail.host = Mock()
@@ -70,7 +73,6 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         pv_service.find_by_uuid = Mock(return_value=vm)
 
         connector = VirtualSwitchToMachineDisconnectCommand(pv_service, connection_retriever, Mock())
-        connector.get_network_by_name = Mock(return_value=Mock())
 
         # act
         res = connector.disconnect(vcenter_name, uuid, network_name)
