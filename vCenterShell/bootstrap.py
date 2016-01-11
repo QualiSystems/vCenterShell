@@ -50,9 +50,7 @@ class Bootstrapper(object):
                                                                                   synchronous_task_waiter,
                                                                                   vnic_to_network_mapper,
                                                                                   vnic_common)
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
-                                                                              resource_connection_details_retriever,
-                                                                              dv_port_group_creator,
+        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
 
         resource_model_parser = ResourceModelParser()
