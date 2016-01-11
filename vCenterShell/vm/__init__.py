@@ -8,6 +8,12 @@ from pyVmomi import vim
 
 
 def vm_reconfig_task(vm, device_change):
+    """
+
+    :param vm: <vim.vm> VM for which reconfigure Task will be started
+    :param device_change: <list>
+    :return:
+    """
     config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
     task = vm.ReconfigVM_Task(config_spec)
     return task

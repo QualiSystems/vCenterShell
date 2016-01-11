@@ -8,7 +8,12 @@ from vCenterShell.network.vnic.vnic_common import (vnic_compose_empty,
                                                    vnic_attached_to_network)
 
 from vCenterShell.network import network_is_portgroup
-from vCenterShell.network.vnic.vnic_common import vnic_add_new_to_vm_task, vnic_get_network_attached
+from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+
+from vCenterShell.network.vnic.vnic_common import \
+    vnic_add_new_to_vm_task, \
+    vnic_get_network_attached, \
+    vnic_set_connectivity_status
 from vCenterShell.vm import vm_reconfig_task
 
 from common.logger import getLogger
@@ -84,6 +89,13 @@ class VirtualMachinePortGroupConfigurer(object):
         return sorted_by_name
 
     def connect_first_available_vnic(self, vm, network):
+        """
+        Connect Network to the first available interface (vNIC).
+        Add a new vNIC if no free in the moment
+        :param vm: <vim.vm> VM for which the particular network will be connected to
+        :param network: <Network obj>
+        :return: result of PERFORMED tASK
+        """
         vnic_mapping = self.map_vnics(vm)
         update_mapping = []
         sorted_by_name = self.sort_vnics_by_name(vnic_mapping)
@@ -124,6 +136,12 @@ class VirtualMachinePortGroupConfigurer(object):
         return None
 
     def erase_network_by_mapping(self, vm, update_mapping):
+        """
+        Erase Networks. Skipping if it is not possible to remove it
+        :param vm: <vim.vm> VM for which networks will be erased
+        :param update_mapping:
+        :return:
+        """
         for item in update_mapping:
             network = item[1] or vnic_get_network_attached(vm, item[0], self.pyvmomi_service)
             if network:
@@ -137,6 +155,13 @@ class VirtualMachinePortGroupConfigurer(object):
 
 
     def disconnect_all_networks(self, vm, default_network=None, erase_network=False):
+        """
+        Disconnect all Networks from particular VM
+        :param vm: <vim.vm>
+        :param default_network: <Network obj> Network for which disconnected vNIC will be re-attached
+        :param erase_network: <bool> True - if Network should be destroyed
+        :return: result of performed Task or None
+        """
         vnics = self.map_vnics(vm)
         update_mapping = [(vnic, None, False, default_network, ) for vnic in vnics.values()]
         self.update_vnic_by_mapping(vm, update_mapping)
@@ -145,6 +170,14 @@ class VirtualMachinePortGroupConfigurer(object):
         return None
 
     def disconnect_network(self, vm, network, default_network=None, erase_network=False):
+        """
+        Disconnect Network from VM
+        :param vm: <vim.vm>
+        :param network: <Network obj> Network which will be disconnected
+        :param default_network: <Network obj> Network for which disconnected vNIC will be re-attached
+        :param erase_network: <bool> True - if Network should be destroyed
+        :return: result of performed Task or None
+        """
         condition = lambda vnic: True if default_network else not self.is_vnic_disconnected(vnic)
         vnics = self.map_vnics(vm)
 
@@ -158,6 +191,12 @@ class VirtualMachinePortGroupConfigurer(object):
         return None
 
     def update_vnic_by_mapping(self, vm, mapping):
+        """
+        Perfgorm vNIC update
+        :param vm:  <vim.vm>
+        :param mapping: <list of dict> data for update
+        :return: Result of performed Task or None
+        """
         if not vm or not mapping:
             return None
 
@@ -183,45 +222,36 @@ class VirtualMachinePortGroupConfigurer(object):
                 mapping[device.deviceInfo.label] = device
         return mapping
 
-    #todo move to vNIC module
     def get_device_spec(self, vnic, set_connected):
         """
-        this function creates the device change spec,
+        This function creates the device change spec,
         :param vnic: vnic
         :param set_connected: bool, set as connected or not, default: True
         :rtype: device_spec
         """
-        nic_spec = self.create_vnic_spec(vnic)
-        self.set_vnic_connectivity_status(nic_spec, to_connect=set_connected)
+        nic_spec = vnic_compose_empty(vnic)
+        vnic_set_connectivity_status(nic_spec, set_connected)
+        #nic_spec = self.create_vnic_spec(vnic)
+        #self.set_vnic_connectivity_status(nic_spec, to_connect=set_connected)
         return nic_spec
-
-    def create_vnic_spec(self, device):
-        """
-        create device spec for existing device and the mode of edit for the vcenter to update
-        :param device:
-        :rtype: device spec
-        """
-        nic_spec = vim.vm.device.VirtualDeviceSpec()
-        nic_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
-        nic_spec.device = device
-        return nic_spec
-
-    def set_vnic_connectivity_status(self, nic_spec, to_connect):
-        """
-        sets the device spec as connected or disconnected
-        :param nic_spec: the specification
-        :param to_connect: bool
-        """
-        nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
-        nic_spec.device.connectable.connected = to_connect
-        nic_spec.device.connectable.startConnected = to_connect
 
     def reconfig_vm(self, device_change, vm):
+        """
+        :param device_change: <list> List of nic_spec for changing devices
+        :param vm: <vim.vm>
+        :return:
+        """
         logger.info("Changing network...")
         task = vm_reconfig_task(vm, device_change)
         return self.synchronous_task_waiter.wait_for_task(task)
 
     def is_vnic_attached_to_network(self, device, network):
+        """
+        Check if device is attached to Network
+        :param device: <vim.vm.device>
+        :param network:
+        :return:
+        """
         if hasattr(device, 'backing'):
             has_port_group_key = hasattr(device.backing, 'port') and hasattr(device.backing.port, 'portgroupKey')
             has_network_name = hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name')
@@ -230,12 +260,21 @@ class VirtualMachinePortGroupConfigurer(object):
         return False
 
     def is_vnic_disconnected(self, vnic):
+        """
+        Check if a particular vNIC disconnected in the moment
+        :param vnic:
+        :return:
+        """
         is_disconnected = not (hasattr(vnic, 'connectable') and vnic.connectable.connected)
         return is_disconnected
 
     @staticmethod
     def destroy_port_group_task(network):
-        from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+        """
+        Destroy Port Group if it not used in the moment
+        :param network:
+        :return: Task or None
+        """
         if network_is_portgroup(network):
             task = DvPortGroupCreator.dv_port_group_destroy_task(network)
             return task
