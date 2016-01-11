@@ -1,7 +1,7 @@
 import os
 import sys
 import zipfile
-from driver_packager import zip_dir
+from driver_packager import zip_dir, add_version_file_to_zip
 
 
 def get_package_dir_name(package_name):
@@ -19,6 +19,8 @@ def main(args):
 
     package_full_name = get_package_dir_name(package_name)
     zip_dir(package_full_name, zip_file, False)
+
+    add_version_file_to_zip(zip_file)
 
     zip_file.close()
     print 'done!'
