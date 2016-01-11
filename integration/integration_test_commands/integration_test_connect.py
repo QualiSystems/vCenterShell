@@ -31,8 +31,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
                                                     task_waiter.SynchronousTaskWaiter())
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', 'New Virtual Machine').config.uuid
 
-        virtual_switch_to_machine_connector.disconnect_all('name of the vCenter',
-                                                           uuid)
+        virtual_switch_to_machine_connector.disconnect_all('name of the vCenter', uuid)
 
     def integration_test_delete_specific(self):
         # arrange

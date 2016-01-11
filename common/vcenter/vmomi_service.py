@@ -419,11 +419,9 @@ class pyVmomiService:
         """
         if vm_name is not None:
             vm = self.find_vm_by_name(si, vm_path, vm_name)
-
-        if vm is None:
-            raise ValueError('vm not found')
-
-        return self.destroy_vm(vm)
+            if vm:
+                return self.destroy_vm(vm)
+        raise ValueError('vm not found')
 
     def destroy_vm_by_uuid(self, si, vm_uuid, vm_path):
         """
@@ -434,8 +432,24 @@ class pyVmomiService:
         """
         if vm_uuid is not None:
             vm = self.find_by_uuid(si, vm_uuid, vm_path)
+            if vm:
+                return self.destroy_vm(vm)
+        #return 'vm not found'
+        # for apply the same Interface as for 'destroy_vm_by_name'
+        raise ValueError('vm not found')
 
-        if vm is None:
-            return 'vm not found'
+    def get_vm_by_uuid(self, si, vm_uuid):
+        return self.find_by_uuid(si, vm_uuid, True)
 
-        return self.destroy_vm(vm)
+
+    def get_network_by_name_from_vm(self, vm, network_name):
+        for network in vm.network:
+            if network_name == network.name:
+                return network
+        return None
+
+    def get_network_by_key_from_vm(self, vm, network_key):
+        for network in vm.network:
+            if network_key == network.key:
+                return network
+        return None

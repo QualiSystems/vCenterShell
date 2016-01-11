@@ -16,3 +16,7 @@ class TestVLanIdRangeParser(TestCase):
 
         self.assertEqual(vlan_id[0].start, 11)
         self.assertEqual(vlan_id[0].end, 100)
+
+    def test_parse_vlan_id(self):
+        v_lan_id_range_parser = VLanIdRangeParser()
+        self.assertRaises(Exception, v_lan_id_range_parser.parse_vlan_id, None)
