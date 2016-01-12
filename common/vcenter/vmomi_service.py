@@ -275,8 +275,7 @@ class pyVmomiService:
             if task.info.state == 'error':
                 logger.info("error type: %s" % task.info.error.__class__.__name__)
                 logger.info("found cause: %s" % task.info.error.faultCause)
-                task_done = True
-                return None
+                raise Exception(task.info.error.faultCause)
             time.sleep(1)
 
     class CloneVmParameters:

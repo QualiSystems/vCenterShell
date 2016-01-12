@@ -41,9 +41,11 @@ class Bootstrapper(object):
         template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
+
         resource_model_parser = ResourceModelParser()
         vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
         vc_data_model = vc_model_retriever.get_vcenter_data_model()
+
         vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
 
         # Virtual Switch Connect
@@ -56,20 +58,18 @@ class Bootstrapper(object):
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
 
-        resource_model_parser = ResourceModelParser()
-
         virtual_switch_connect_command = VirtualSwitchConnectCommand(cloudshell_data_retriever_service,
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
-                                                                     VLanIdRangeParser(),
-                                                                     resource_model_parser)
+                                                                     VLanIdRangeParser())
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
             VirtualSwitchToMachineDisconnectCommand(pyVmomiService,
                                                     cloudshell_data_retriever_service,
-                                                    synchronous_task_waiter)
+                                                    synchronous_task_waiter,
+                                                    vc_data_model.default_network)
 
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        resource_remover,
@@ -86,6 +86,7 @@ class Bootstrapper(object):
                                                              helpers,
                                                              command_wrapper,
                                                              resource_connection_details_retriever,
+                                                             vc_data_model,
                                                              destroy_virtual_machine_command,
                                                              deploy_from_template_command,
                                                              virtual_switch_connect_command,

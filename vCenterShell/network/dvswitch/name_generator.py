@@ -9,5 +9,5 @@ class DvPortGroupNameGenerator(object):
         return NAME_FORMAT.format(QS_NAME_PREFIX, VLAN, str(vlan_id))
 
     @staticmethod
-    def is_generaed_name(name):
+    def is_generated_name(name):
         return str(name).startswith(QS_NAME_PREFIX)

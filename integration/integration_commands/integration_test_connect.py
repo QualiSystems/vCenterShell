@@ -28,7 +28,8 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_switch_to_machine_connector = \
             VirtualSwitchToMachineDisconnectCommand(pv_service,
                                                     resource_connection_details_retriever,
-                                                    task_waiter.SynchronousTaskWaiter())
+                                                    task_waiter.SynchronousTaskWaiter(),
+                                                    'anetwork')
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
 
         virtual_switch_to_machine_connector.disconnect_all('name of the vCenter', uuid)
@@ -47,7 +48,8 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_switch_to_machine_connector = \
             VirtualSwitchToMachineDisconnectCommand(pv_service,
                                                     resource_connection_details_retriever,
-                                                    task_waiter.SynchronousTaskWaiter())
+                                                    task_waiter.SynchronousTaskWaiter(),
+                                                    'anetwork')
         uuid = pv_service.find_vm_by_name(si, 'QualiSB/Raz/', '2').config.uuid
 
         virtual_switch_to_machine_connector.disconnect('name of the vCenter',

@@ -9,6 +9,7 @@ class CommandExecuterService(object):
                  qualipy_helpers,
                  command_wrapper,
                  connection_retriever,
+                 vcenter_resource_model,
                  destroy_virtual_machine_command,
                  deploy_from_template_command,
                  virtual_switch_connect_command,
@@ -19,6 +20,7 @@ class CommandExecuterService(object):
         self.qualipy_helpers = qualipy_helpers
         self.command_wrapper = command_wrapper
         self.connection_retriever = connection_retriever
+        self.vcenter_resource_model = vcenter_resource_model
         self.destroyVirtualMachineCommand = destroy_virtual_machine_command
         self.deployFromTemplateCommand = deploy_from_template_command
         self.virtual_switch_connect_command = virtual_switch_connect_command
@@ -33,9 +35,11 @@ class CommandExecuterService(object):
         vlan_spec_type = self.qualipy_helpers.get_user_param('VLAN_SPEC_TYPE')
         vnic_name = self.qualipy_helpers.get_user_param('VNIC_NAME')
         dv_port_name = self.qualipy_helpers.get_user_param('DV_PORT_NAME')
-        dv_switch_path = self.qualipy_helpers.get_user_param('DV_SWITCH_PATH')
-        dv_switch_name = self.qualipy_helpers.get_user_param('DV_SWITCH_NAME')
-        port_group_path = self.qualipy_helpers.get_user_param('PORT_GROUP_PATH')
+
+        # load default params
+        dv_switch_path = self.vcenter_resource_model.default_dvswitch_path
+        dv_switch_name = self.vcenter_resource_model.default_dvswitch_name
+        port_group_path = self.vcenter_resource_model.default_port_group_path
 
         vnic_to_network = self.create_vnic_to_network_map(dv_port_name,
                                                           dv_switch_name,
@@ -54,44 +58,6 @@ class CommandExecuterService(object):
             self.virtual_switch_connect_command.connect_to_networks,
             uuid,
             [vnic_to_network])
-
-    def connect_networks(self):
-        # get command parameters from the environment
-        uuid = self.qualipy_helpers.get_user_param('UUID')
-        request_mapping = self.get_mappings_param()
-
-        # prepare for execute command
-        connection_details = self.connection_retriever.connection_details()
-
-        # execute command
-        self.command_wrapper.execute_command_with_connection(
-            connection_details,
-            self.virtual_switch_connect_command.connect_to_networks,
-            uuid,
-            request_mapping)
-
-    def get_mappings_param(self):
-        mapping = self.qualipy_helpers.get_user_param('NETWORKS_MAPPINGS')
-        request_mapping = []
-        for dv_switch_name, dv_port_name, dv_switch_path, port_group_path, vlan_id, vlan_spec, vnic_name in mapping:
-            vnic_to_network = self.create_vnic_to_network_map(dv_port_name, dv_switch_name, dv_switch_path,
-                                                              port_group_path, vlan_id, vlan_spec, vnic_name)
-
-            request_mapping.append(vnic_to_network)
-
-        return request_mapping
-
-    def create_vnic_to_network_map(self, dv_port_name, dv_switch_name, dv_switch_path, port_group_path, vlan_id,
-                                   vlan_spec, vnic_name):
-        vnic_to_network = VmNetworkMapping()
-        vnic_to_network.dv_switch_name = dv_switch_name
-        vnic_to_network.dv_port_name = dv_port_name
-        vnic_to_network.dv_switch_path = dv_switch_path
-        vnic_to_network.port_group_path = port_group_path
-        vnic_to_network.vlan_id = vlan_id
-        vnic_to_network.vlan_spec = vlan_spec
-        vnic_to_network.vnic_name = vnic_name
-        return vnic_to_network
 
     def disconnect_all(self):
         vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')

@@ -13,7 +13,8 @@ class TestCommandExecuterService(unittest.TestCase):
         self.command_wrapper = Mock()
         self.connection_retriever.connection_details = Mock(return_value=self.connection_details)
         self.quali_helpers = Mock()
-        CommandContextMocker.set_vm_uuid_param(VmContext.DEFAULT_NETWORK_FULL_NAME)
+        self.vc_center_model = Mock()
+        self.vc_center_model.default_network = 'Anetwork'
 
     def test_deploy_from_template(self):
         # arrange
@@ -33,6 +34,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           self.quali_helpers,
                                                           self.command_wrapper,
                                                           self.connection_retriever,
+                                                          self.vc_center_model,
                                                           Mock(),
                                                           Mock(),
                                                           deploy_from_template,
@@ -72,6 +74,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           self.quali_helpers,
                                                           self.command_wrapper,
                                                           connection_retriever,
+                                                          self.vc_center_model,
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -110,6 +113,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           self.quali_helpers,
                                                           self.command_wrapper,
                                                           connection_retriever,
+                                                          self.vc_center_model,
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -149,6 +153,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           self.quali_helpers,
                                                           self.command_wrapper,
                                                           connection_retriever,
+                                                          self.vc_center_model,
                                                           Destroyer,
                                                           Mock(),
                                                           Mock(),
@@ -180,6 +185,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
+                                                          Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
                                                           Mock())
@@ -199,6 +205,7 @@ class TestCommandExecuterService(unittest.TestCase):
         virtual_switch_disconnect_command = Mock()
         virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),

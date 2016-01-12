@@ -15,12 +15,12 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_common = vnic_common
 
     def connect_vnic_to_networks(self, vm, mapping):
-        vnic_mapping = self.map_vnics(vm)
+        vnic_mapping = self.vnic_common.map_vnics(vm)
         vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(mapping, vnic_mapping, vm.network)
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append((vnic, network, True))
+            update_mapping.append([(vnic, network, True)])
 
         self.update_vnic_by_mapping(vm, update_mapping)
 
@@ -36,12 +36,12 @@ class VirtualMachinePortGroupConfigurer(object):
                         pass
                         logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
 
-    def disconnect_all_networks(self, vm, default_network=None, erase_network=False):
-        vnics = self.map_vnics(vm)
+    def disconnect_all_networks(self, vm, default_network):
+        vnics = self.vnic_common.map_vnics(vm)
         update_mapping = [(vnic, None, False, default_network,) for vnic in vnics.values()]
         self.update_vnic_by_mapping(vm, update_mapping)
-        if erase_network:
-            self.erase_network_by_mapping(vm, update_mapping)
+        # if erase_network:
+        #     self.erase_network_by_mapping(vm, update_mapping)
         return None
 
     def disconnect_network(self, vm, network, default_network=None, erase_network=False):

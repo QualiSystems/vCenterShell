@@ -19,10 +19,12 @@ class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
                  connection_retriever,
-                 port_group_configurer):
+                 port_group_configurer,
+                 default_network):
         self.pyvmomi_service = pyvmomi_service
         self.connection_retriever = connection_retriever
         self.port_group_configurer = port_group_configurer
+        self.default_network = default_network
 
         #self.synchronous_task_waiter = synchronous_task_waiter
 
@@ -56,12 +58,13 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
 
-    def disconnect_all(self, vcenter_name, vm_uuid, default_network_full_name=None):
-        return self.disconnect(vcenter_name, vm_uuid, None, default_network_full_name)
+    def disconnect_all(self, vcenter_name, vm_uuid):
+        return self.disconnect(vcenter_name, vm_uuid, None)
 
-    def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
+    def disconnect(self, vcenter_name, vm_uuid, network_name=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
+        :param default_network_full_name:
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
         :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
@@ -85,7 +88,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             network = None
 
-        default_network = self.get_network_by_full_name(si, default_network_full_name)
+        default_network = self.get_network_by_full_name(si, self.default_network)
         if network:
             return self.port_group_configurer.disconnect_network(vm, network, default_network, erase_network=True)
         else:
