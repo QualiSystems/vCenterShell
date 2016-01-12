@@ -94,24 +94,24 @@
         <Rule Name="Link Configurations" />
       </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="Allocation Ranges" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
-      <Tags>
-        <TagName Name="Configuration" />
-        <TagName Name="Setting" />
-        <TagName Name="Admin Only" />
-      </Tags>
+    <AttributeInfo Name="Allocation Ranges" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Admin Only" />
+      </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="Virtual Network" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
-      <Tags>
-        <TagName Name="Configuration" />
-        <TagName Name="Setting" />
-      </Tags>
+    <AttributeInfo Name="Virtual Network" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="Isolation Level" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
-      <Tags>
-        <TagName Name="Configuration" />
-        <TagName Name="Setting" />
-      </Tags>
+    <AttributeInfo Name="Isolation Level" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
     </AttributeInfo>
   </Attributes>
   <ResourceFamilies>
@@ -277,30 +277,26 @@
     </ResourceFamily>
     <ResourceFamily Name="Virtual Network" Description="" IsService="true" ServiceType="Regular">
       <AttachedAttributes/>
-      <AttributeValues>
-        <AttributeValue Name="Access Mode" Value="Trunk" />
-        <AttributeValue Name="VLAN Id" Value="" />
-        <AttributeValue Name="Virtual Network" Value="" />
-      </AttributeValues>
+      <AttributeValues/>
       <Models>
         <ResourceModel Name="VLAN Auto" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="Allocation Ranges" IsOverridable="true" IsLocal="true" UserInput="false">
+            <AttachedAttribute Name="Allocation Ranges" IsOverridable="true" IsLocal="true" UserInput="false" >
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Isolation Level" IsOverridable="true" IsLocal="true" IsRequired="true" UserInput="false">
+            <AttachedAttribute Name="Isolation Level" IsOverridable="true" IsLocal="true" UserInput="false">
               <AllowedValues>
                 <AllowedValue>Shared</AllowedValue>
                 <AllowedValue>Exclusive</AllowedValue>
               </AllowedValues>
             </AttachedAttribute>
-            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" IsRequired="true">
+            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true">
               <AllowedValues>
                 <AllowedValue>Access</AllowedValue>
                 <AllowedValue>Trunk</AllowedValue>
               </AllowedValues>
             </AttachedAttribute>
-            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" IsRequired="true">
+            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" >
               <AllowedValues />
             </AttachedAttribute>
             <AttachedAttribute Name="Virtual Network" IsOverridable="true" IsLocal="true" UserInput="false">
