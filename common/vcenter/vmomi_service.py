@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from pyVmomi import vim
 from common.logger import getLogger
+from common.utilites.io import get_path_and_name
 
 logger = getLogger(__name__)
 
@@ -239,6 +240,15 @@ class pyVmomiService:
                 child = None
 
         return sub_folder
+
+    def get_network_by_full_name(self, si, default_network_full_name):
+        """
+        Find network by a Full Name
+        :param default_network_full_name: <str> Full Network Name - likes 'Root/Folder/Network'
+        :return:
+        """
+        path, name = get_path_and_name(default_network_full_name)
+        return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
     def get_obj(self, content, vimtype, name):
         """

@@ -38,8 +38,10 @@ class TestDvPortGroupConfigurer(TestCase):
         self.synchronous_task_waiter.wait_for_task = Mock(return_value="TASK OK")
         self.si = Mock()
 
+        mapping = {'vnic 1': Mock(spec=vim.Network)}
         self.vnic_common = Mock()
         self.vnic_to_network_mapper = Mock()
+        self.vnic_to_network_mapper.map_request_to_vnics = Mock(return_value=mapping)
         self.vnics = {'vnic 1': self.vnic}
 
         self.vnic_common.map_vnics = Mock(return_value=self.vnics)
@@ -52,15 +54,15 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertIsNone(res)
 
     def test_disconnect_all_networks(self):
-        res = self.configurer.disconnect_all_networks(self.vm, 'anetwork')
+        res = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network))
         self.assertIsNone(res)
 
     def test_disconnect_network(self):
-        res = self.configurer.disconnect_network(self.vm, self.network, 'anetwork')
+        res = self.configurer.disconnect_network(self.vm, self.network,  Mock(spec=vim.Network))
         self.assertIsNone(res)
 
-    def connect_vnic_to_networks(self):
+    def test_connect_vnic_to_networks(self):
         ConnectRequest('vnic 1', Mock(spec=vim.Network))
         mapping = [ConnectRequest('vnic 1', Mock(spec=vim.Network))]
-        res = self.configurer.connect_vnic_to_networks(self.vm, mapping)
+        res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network))
         self.assertIsNone(res)

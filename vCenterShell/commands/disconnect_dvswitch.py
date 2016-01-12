@@ -49,15 +49,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
             x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
-    def get_network_by_full_name(self, si, default_network_full_name):
-        """
-        Find network by a Full Name
-        :param default_network_full_name: <str> Full Network Name - likes 'Root/Folder/Network'
-        :return:
-        """
-        path, name = get_path_and_name(default_network_full_name)
-        return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
-
     def disconnect_all(self, vcenter_name, vm_uuid):
         return self.disconnect(vcenter_name, vm_uuid, None)
 
@@ -88,7 +79,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             network = None
 
-        default_network = self.get_network_by_full_name(si, self.default_network)
+        default_network = self.pyvmomi_service.get_network_by_full_name(si, self.default_network)
         if network:
             return self.port_group_configurer.disconnect_network(vm, network, default_network)
         else:

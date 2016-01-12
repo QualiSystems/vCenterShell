@@ -12,11 +12,13 @@ class VirtualSwitchConnectCommand:
         self.pv_service = pv_service
         self.virtual_switch_to_machine_connector = virtual_switch_to_machine_connector
         self.dv_port_group_name_generator = dv_port_group_name_generator
-        self.vlan_spec_factory = vlan_spec_factory  # type: VlanSpecFactory
+        self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
 
-    def connect_to_networks(self, si, vm_uuid, vm_network_mappings):
+    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network):
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
+        default_network_instance = self.pv_service.get_network_by_full_name(si, default_network)
+
         mappings = []
         # create mapping
         for vm_network_mapping in vm_network_mappings:
@@ -28,5 +30,4 @@ class VirtualSwitchConnectCommand:
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
             mappings.append(vm_network_mapping)
 
-        self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, mappings)
-
+        self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, mappings, default_network_instance)

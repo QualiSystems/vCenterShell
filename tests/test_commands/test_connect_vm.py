@@ -45,7 +45,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.dv_port_name = 'port_name'
 
         # act
-        connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping])
+        connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
 
         mapping.dv_switch_path = self.vcenter_context.default_dvswitch_path
         mapping.dv_switch_name = self.vcenter_context.default_dvswitch_name
