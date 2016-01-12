@@ -33,31 +33,30 @@ class CommandExecuterService(object):
         uuid = self.qualipy_helpers.get_user_param('UUID')
         vlan_id = self.qualipy_helpers.get_user_param('VLAN_ID')
         vlan_spec_type = self.qualipy_helpers.get_user_param('VLAN_SPEC_TYPE')
-        vnic_name = self.qualipy_helpers.get_user_param('VNIC_NAME')
-        dv_port_name = self.qualipy_helpers.get_user_param('DV_PORT_NAME')
+        # vnic_name = self.qualipy_helpers.get_user_param('VNIC_NAME')
+        # dv_port_name = self.qualipy_helpers.get_user_param('DV_PORT_NAME')
 
         # load default params
         dv_switch_path = self.vcenter_resource_model.default_dvswitch_path
         dv_switch_name = self.vcenter_resource_model.default_dvswitch_name
         port_group_path = self.vcenter_resource_model.default_port_group_path
 
-        vnic_to_network = self.create_vnic_to_network_map(dv_port_name,
-                                                          dv_switch_name,
-                                                          dv_switch_path,
-                                                          port_group_path,
-                                                          vlan_id,
-                                                          vlan_spec_type,
-                                                          vnic_name)
+        vnic_to_network = VmNetworkMapping()
+        vnic_to_network.dv_switch_path = dv_switch_path
+        vnic_to_network.dv_switch_name = dv_switch_name
+        vnic_to_network.port_group_path = port_group_path
+        vnic_to_network.vlan_id = vlan_id
+        vnic_to_network.vlan_spec = vlan_spec_type
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
-            connection_details,
-            self.virtual_switch_connect_command.connect_to_networks,
-            uuid,
-            [vnic_to_network])
+                connection_details,
+                self.virtual_switch_connect_command.connect_to_networks,
+                uuid,
+                [vnic_to_network])
 
     def disconnect_all(self):
         vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')
@@ -83,10 +82,10 @@ class CommandExecuterService(object):
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
-            connection_details,
-            self.destroyVirtualMachineCommand.destroy,
-            uuid,
-            resource.fullname)
+                connection_details,
+                self.destroyVirtualMachineCommand.destroy,
+                uuid,
+                resource.fullname)
 
     def deploy_from_template(self):
         # get command parameters from the environment
@@ -98,9 +97,9 @@ class CommandExecuterService(object):
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
-            connection_details,
-            self.deployFromTemplateCommand.execute_deploy_from_template,
-            data)
+                connection_details,
+                self.deployFromTemplateCommand.execute_deploy_from_template,
+                data)
         print self.serializer.encode(result)
 
     def power_off(self):
