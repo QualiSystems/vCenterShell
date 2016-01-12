@@ -37,6 +37,12 @@
         <Rule Name="Setting" />
       </Rules>
     </AttributeInfo>
+    <AttributeInfo Name="Default Network" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
     <AttributeInfo Name="vCenter Inventory Path" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
@@ -137,6 +143,9 @@
               <AllowedValues />
             </AttachedAttribute>
 			<AttachedAttribute Name="Default dvSwitch Name" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Default Network" IsOverridable="true" IsLocal="true">
               <AllowedValues />
             </AttachedAttribute>
           </AttachedAttributes>
