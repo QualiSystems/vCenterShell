@@ -20,3 +20,7 @@ class TestVLanIdRangeParser(TestCase):
     def test_parse_vlan_id(self):
         v_lan_id_range_parser = VLanIdRangeParser()
         self.assertRaises(Exception, v_lan_id_range_parser.parse_vlan_id, None)
+
+    def test_too_big_number_of_parts(self):
+        v_lan_id_range_parser = VLanIdRangeParser()
+        self.assertRaises(Exception, v_lan_id_range_parser.parse_vlan_id, '11-100-xxx-aaa')
