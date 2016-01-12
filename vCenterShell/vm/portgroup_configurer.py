@@ -20,7 +20,7 @@ class VirtualMachinePortGroupConfigurer(object):
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append([(vnic, network, True)])
+            update_mapping.append((vnic, network, True))
 
         self.update_vnic_by_mapping(vm, update_mapping)
 
@@ -62,8 +62,8 @@ class VirtualMachinePortGroupConfigurer(object):
             return None
 
         vnics_change = []
-        for vnic, network, connect, default_network in mapping:
-            network = default_network if default_network else network
+        for vnic, network, connect in mapping:
+            network = network
             vnic_spec = self.vnic_common.vnic_compose_empty(vnic)
             self.vnic_common.vnic_attached_to_network(vnic_spec, network)
             vnic_spec = self.vnic_common.get_device_spec(vnic, connect)

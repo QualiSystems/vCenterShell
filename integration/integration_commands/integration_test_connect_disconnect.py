@@ -10,9 +10,12 @@ from tests.utils.testing_credentials import TestCredentials
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
+from vCenterShell.network.vnic import vnic_common
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector, VmNetworkMapping
 from vCenterShell.network.vnic.vnic_common import *
 from vCenterShell.vm.portgroup_configurer import *
+from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
@@ -74,34 +77,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         vm_uuid = vm.config.uuid
         return vm_uuid
 
-    def integrationtest_connect(self):
-
-        py_vmomi_service = self.py_vmomi_service
-        synchronous_task_waiter = SynchronousTaskWaiter()
-        dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
-        virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
-                                                                                  synchronous_task_waiter,
-                                                                                  VnicToNetworkMapper)
-
-        mapping = VmNetworkMapping()
-        mapping.vlan_id = 65
-        mapping.dv_port_name = 'raz_abadi'
-        mapping.dv_switch_name = 'dvSwitch'
-        mapping.dv_switch_path = 'QualiSB'
-        mapping.port_group_path = 'QualiSB'
-        mapping.vlan_spec = 'Trunc'
-        connector = VirtualSwitchToMachineConnector(
-                                                    dv_port_group_creator,
-                                                    virtual_machine_port_group_configurer)
-
-        vm = self.py_vmomi_service.find_vm_by_name(self.si, 'QualiSB/Raz', '2')
-        print "CONNECT    Machine: '{}' UUID: [{}]".format(self.virtual_machine_name, self.vm_uuid)
-
-        # Act
-        connector.connect_by_mapping(self.si, vm,[mapping])
-
-        pass
-
     def integrationtest_disconnect_all(self):
         dv_port_group_configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service,
                                                                      self.synchronous_task_waiter)
@@ -160,7 +135,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
     def test_integration(self):
         # self.integrationtest_attach_vnic()
-        self.integrationtest_connect()
+        #self.integrationtest_connect()
         # self.integrationtest_disconnect()
         # self.integrationtest_attach_vnic()
         # self.integrationtest_attach_vnic_portgroup()

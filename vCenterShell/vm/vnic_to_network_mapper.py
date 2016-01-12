@@ -13,7 +13,7 @@ class VnicToNetworkMapper(object):
                 mapping[request.vnic] = request.network_spec
             else:
                 vnic_name = self.find_available_vnic(vnics_to_network_mapping)
-                mapping[vnic_name] = request.network_spec
+                mapping[vnic_name] = request.network
 
         return mapping
 
@@ -26,6 +26,7 @@ class VnicToNetworkMapper(object):
     def map_vnic_to_network(self, vnics, existing_network):
         mapping = dict()
         for vnic_name, vnic in vnics.items():
+            network_to_map = ''
             if hasattr(vnic, 'backing'):
                 if hasattr(vnic.backing, 'network') and hasattr(vnic.backing.network, 'name'):
                     network_to_map = vnic.backing.name
