@@ -33,7 +33,7 @@ def ensure_dir(f):
         os.makedirs(d)
 
 
-def add_version_file_to_zip(ziph):
+def add_version_file_to_zip(ziph, driver_path=None):
     if not os.path.exists(VERSION_FILENAME):
         raise Exception('no version file found')
     ziph.write(VERSION_FILENAME)
@@ -41,9 +41,6 @@ def add_version_file_to_zip(ziph):
 
 def main(args):
     config_file_name = args[1]
-    #driver = args[2]
-    #target_name = args[3]
-
 
     with open(config_file_name) as f_config:
         if f_config is None:
@@ -72,6 +69,14 @@ def main(args):
     os.chdir(os.path.join(os.getcwd(), driver))
     zip_dir('.', zip_file)
     os.chdir(os.path.join(os.getcwd(), '../'))
+
+    if driver.find("\\") != -1:
+        path_parts = len(driver.split("\\")) - 1
+        if path_parts > 0:
+            path_fixer = ''
+            for i in range(path_parts):
+                path_fixer += '../'
+            os.chdir(os.path.join(os.getcwd(), path_fixer))
 
     add_version_file_to_zip(zip_file)
 
