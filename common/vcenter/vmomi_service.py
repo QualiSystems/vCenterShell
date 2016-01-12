@@ -248,7 +248,7 @@ class pyVmomiService:
         :return:
         """
         path, name = get_path_and_name(default_network_full_name)
-        return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
+        return self.find_network_by_name(si, path, name) if name else None
 
     def get_obj(self, content, vimtype, name):
         """

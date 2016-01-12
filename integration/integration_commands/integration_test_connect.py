@@ -75,4 +75,4 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         connector = VirtualSwitchToMachineConnector(dv_port_group_creator, virtual_machine_port_group_configurer)
         command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac)
 
-        command.connect_to_networks(si, vm_uuid, [mapping])
+        command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork')
