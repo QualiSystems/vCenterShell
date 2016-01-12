@@ -89,12 +89,14 @@ class VlanResolverProvider(object):
         return self.vlan_resource_model.vlan_id.find('-') > 0
 
     def _get_vlan_range_from_vlan_id(self):
-        range_arr = self.vlan_resource_model.vlan_id.split("-", 2)
-        return self.VlanRange(int(range_arr[0]), int(range_arr[1]))
+        return self._get_numeric_range_from_range_string(self.vlan_resource_model.vlan_id)
 
     def _get_allocation_range(self):
-        range_arr = self.vlan_resource_model.allocation_ranges.split("-", 2)
-        return self.VlanRange(int(range_arr[0]), int(range_arr[1]))
+        return self._get_numeric_range_from_range_string(self.vlan_resource_model.allocation_ranges)
+
+    def _get_numeric_range_from_range_string(self, range_string):
+        start, end = range_string.split("-", 2)
+        return self.VlanRange(int(start), int(end))
 
     class VlanRange(object):
         """

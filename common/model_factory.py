@@ -121,4 +121,5 @@ class ResourceModelParser:
         :param attribute_name: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
-        return attribute_name.lower().replace(' ', '_') + ResourceModelParser.ATTRIBUTE_NAME_POSTFIX.lower()
+        return ResourceModelParser.get_property_name_from_attribute_name(
+            attribute_name) + ResourceModelParser.ATTRIBUTE_NAME_POSTFIX.lower()
