@@ -304,11 +304,8 @@
             </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
-            <AttributeValue Name="Access Mode" Value="" />
             <AttributeValue Name="Allocation Ranges" Value="2-4094" />
-            <AttributeValue Name="VLAN Id" Value="" />
             <AttributeValue Name="Isolation Level" Value="Exclusive" />
-            <AttributeValue Name="Virtual Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
