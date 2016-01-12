@@ -10,15 +10,12 @@ from vlan_service.resolver.provider import VlanResolverProvider
 
 
 def main():
-    # get resource model
+    # get vlan auto resource model
     resource_context = helpers.get_resource_context_details()
-
     resource_model_parser = ResourceModelParser()
     vlan_auto_resource_model = resource_model_parser.convert_to_resource_model(resource_context)
-
     # get reservation details
     reservation_context = helpers.get_reservation_context_details()
-
     # Start api session
     api = helpers.get_api_session()
 
