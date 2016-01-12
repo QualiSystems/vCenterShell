@@ -33,13 +33,14 @@ class CommandWrapper:
 
         try:
             command_name = command.__name__
-            self.logger.info(LOG_FORMAT.format(START, command_name))
+            logger = self.logger(command_name)
+            logger.info(LOG_FORMAT.format(START, command_name))
             command_args = []
             si = None
 
             if connection_details:
-                self.logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
-                self.logger.debug(
+                logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
+                logger.debug(
                     DEBUG_CONNECTION_INFO.format(connection_details.host,
                                                  connection_details.username,
                                                  connection_details.password,
@@ -47,26 +48,26 @@ class CommandWrapper:
 
                 si = self.pv_service.connect(connection_details)
             if si:
-                self.logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
+                logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
 
                 command_args.append(si)
 
             command_args.extend(args)
 
-            self.logger.info(EXECUTING_COMMAND.format(command_name))
-            self.logger.debug(DEBUG_COMMAND_PARAMS.format(COMMA.join([str(x) for x in command_args])))
+            logger.info(EXECUTING_COMMAND.format(command_name))
+            logger.debug(DEBUG_COMMAND_PARAMS.format(COMMA.join([str(x) for x in command_args])))
 
             results = command(*tuple(command_args))
 
-            self.logger.info(FINISHED_EXECUTING_COMMAND.format(command_name))
-            self.logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
+            logger.info(FINISHED_EXECUTING_COMMAND.format(command_name))
+            logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
 
             return results
         except Exception as e:
-            self.logger.error(COMMAND_ERROR.format(command_name, e))
+            logger.error(COMMAND_ERROR.format(command_name, e))
             raise
         finally:
             if si:
-                self.logger.info(DISCONNCTING_VCENERT.format(connection_details.host))
+                logger.info(DISCONNCTING_VCENERT.format(connection_details.host))
                 self.pv_service.disconnect(si)
-            self.logger.info(LOG_FORMAT.format(END, command_name))
+            logger.info(LOG_FORMAT.format(END, command_name))

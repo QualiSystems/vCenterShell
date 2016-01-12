@@ -26,46 +26,24 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         py_vmomi_service = Mock()
         py_vmomi_service.connect = Mock(return_value=si)
 
-        resource_connection_details_retriever = Mock()
+
         dv_port_group_creator = MagicMock()
         virtual_machine_port_group_configurer = MagicMock()
         vlan_spec = Mock()
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
-                                                                              resource_connection_details_retriever,
-                                                                              dv_port_group_creator,
+        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
 
-        virtual_machine_path = 'ParentFlder\\ChildFolder'
-        virtual_machine_name = 'MachineName'
-        vm_uuid = uuid.UUID('{12345678-1234-5678-1234-567812345678}')
-        port_group_path = 'QualiSB'
-        dv_switch_path = 'QualiSB'
-        dv_switch_name = 'dvSwitch'
-        dv_port_name = 'dv_port_name'
+        vm = Mock()
 
+        network_map = Mock()
+        network_map.dv_port_name = 'dv_port_name'
+        network_map.dv_switch_name = 'dvSwitch'
+        network_map.dv_switch_path = 'QualiSB'
+        network_map.port_group_path = 'QualiSB'
+        network_map.vlan_id = '100'
+        network_map.vlan_spec = 'Access'
         # Act
-        virtual_switch_to_machine_connector.connect(virtual_machine_name,
-                                                    dv_switch_path,
-                                                    dv_switch_name,
-                                                    dv_port_name,
-                                                    #virtual_machine_path,
-                                                    vm_uuid,
-                                                    port_group_path,
-                                                    11,
-                                                    vlan_spec)
-
-        # Assert
-        # dv_port_group_creator.create_dv_port_group.assert_called_with(dv_port_name,
-        #                                                               dv_switch_name,
-        #                                                               dv_switch_path,
-        #                                                               si,
-        #                                                               vlan_spec,
-        #                                                               11)
-        # virtual_machine_port_group_configurer.configure_port_group_on_vm.assert_called_with(si,
-        #                                                                                     virtual_machine_path,
-        #                                                                                     vm_uuid,
-        #                                                                                     port_group_path,
-        #                                                                                     dv_port_name)
+        virtual_switch_to_machine_connector.connect_by_mapping(si, vm, [network_map])
 
     def integrationtest(self):
         resource_connection_details_retriever = Mock()
@@ -77,9 +55,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter)
-        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(py_vmomi_service,
-                                                                              resource_connection_details_retriever,
-                                                                              dv_port_group_creator,
+        virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
 
         si = py_vmomi_service.connect(credentials.host, credentials.username,

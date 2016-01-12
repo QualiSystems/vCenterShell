@@ -6,11 +6,9 @@ _logger = getLogger("vCenterShell")
 class VirtualMachinePowerManagementCommand(object):
     def __init__(self,
                  pyvmomi_service,
-                 synchronous_task_waiter,
-                 qualipy_helpers):
+                 synchronous_task_waiter):
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
-        self.qualipy_helpers = qualipy_helpers
 
     def power_off(self, si, vm_uuid):
         """

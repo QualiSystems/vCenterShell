@@ -11,4 +11,4 @@ class TestDvPortGroupCreator(TestCase):
         name = gen.generate_port_group_name('id')
 
         # assert
-        self.assertEqual('VLAN id', name)
+        self.assertEqual('QS_VLAN_id', name)
