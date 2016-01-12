@@ -36,6 +36,5 @@ class TestVlanResolver(TestCase):
 
         self.assertTrue(result)
 
-    def test_
 
 

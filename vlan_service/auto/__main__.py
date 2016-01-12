@@ -1,35 +1,26 @@
 import os
+import models
+from time import sleep
 
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from qualipy.api.testshell_api import ResourceAttributesUpdateRequest, AttributeNameValue
+from qualipy.api.testshell_api import AttributeNameValue
 
-from models.VLANAutoResourceModel import VLANAutoResourceModel
+from common.model_factory import ResourceModelParser
 from vlan_service.resolver.provider import VlanResolverProvider
 
 
 def main():
-
     # get resource model
     resource_context = helpers.get_resource_context_details()
 
-    vlan_auto_resource_model = VLANAutoResourceModel()
-    vlan_auto_resource_model.access_mode = resource_context.attributes["Access Mode"]
-    vlan_auto_resource_model.allocation_ranges = resource_context.attributes["Allocation Ranges"]
-    vlan_auto_resource_model.isolation_level = resource_context.attributes["Isolation Level"]
-    vlan_auto_resource_model.vlan_id = resource_context.attributes["VLAN Id"]
-    vlan_auto_resource_model.virtual_network = resource_context.attributes["Virtual Network"]
-    vlan_auto_resource_model.virtual_network_attribute = "Virtual Network"
+    resource_model_parser = ResourceModelParser()
+    vlan_auto_resource_model = resource_model_parser.convert_to_resource_model(resource_context)
 
     # get reservation details
     reservation_context = helpers.get_reservation_context_details()
 
     # Start api session
     api = helpers.get_api_session()
-
-    api.WriteMessageToReservationOutput(reservation_context.id, os.environ["reservationContext".upper()])
-
-    #reservation_details = api.GetReservationDetails(reservation_context.id)
-
 
     vlan_service_provider = VlanResolverProvider(vlan_resource_model=vlan_auto_resource_model,
                                                  pool_id=reservation_context.domain,

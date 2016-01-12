@@ -25,10 +25,10 @@ class VlanResolverProvider(object):
         if self.is_vlan_resolved():
             return self.vlan_resource_model.virtual_network
 
-        self._ensure_vlan_id_value_is_ok()
+        requested_vlan = self._get_requested_vlan()
 
-        if self._is_vlan_id_range():
-            vlan_range = self._get_vlan_range_from_vlan_id()
+        if isinstance(requested_vlan, self.VlanRange):
+            vlan_range = requested_vlan
             result = self.api.GetVlanAutoSelectFirstNumericFromRange(
                     self.pool_id,
                     self.reservation_id,
@@ -42,7 +42,7 @@ class VlanResolverProvider(object):
                     self.reservation_id,
                     self.owner_id,
                     self.vlan_resource_model.isolation_level,
-                    self.vlan_resource_model.vlan_id)
+                    requested_vlan)
 
         return result.VlanId
 
@@ -51,25 +51,39 @@ class VlanResolverProvider(object):
             return False
         return True
 
-    def _ensure_vlan_id_value_is_ok(self):
-        """ validate that the vlan id value is ok """
-        if not self.vlan_resource_model.vlan_id:
-            raise ValueError("VLAN Id attribute is empty")
+    def _get_requested_vlan(self):
+        """
+        returns the requested vlan (specific numeric OR numeric range)
+        :return: numeric vlan id OR numeric vlan range
+        """
+        self._ensure_vlan_id_not_empty()
 
         allocation_range = self._get_allocation_range()
 
         if self._is_vlan_id_range():
             vlan_range = self._get_vlan_range_from_vlan_id()
-            if vlan_range.start < allocation_range.start or vlan_range.end > allocation_range.end:
-                raise ValueError("VLAN Id range is outside of the allocated range {0}".format(
-                        self.vlan_resource_model.allocation_ranges))
+            self._ensure_vlan_range_valid(vlan_range, allocation_range)
+            return vlan_range
         else:
-            if not represents_int(self.vlan_resource_model.vlan_id):
-                raise ValueError("VLAN Id attribute value is not numeric")
-            numeric_vlan = int(self.vlan_resource_model.vlan_id)
-            if numeric_vlan < allocation_range.start or numeric_vlan > allocation_range.end:
-                raise ValueError("VLAN Id is outside of the allocated range {0}".format(
-                        self.vlan_resource_model.allocation_ranges))
+            self._ensure_numeric_vlan_valid(allocation_range)
+            return int(self.vlan_resource_model.vlan_id)
+
+    def _ensure_vlan_id_not_empty(self):
+        if not self.vlan_resource_model.vlan_id:
+            raise ValueError("VLAN Id attribute is empty")
+
+    def _ensure_vlan_range_valid(self, requested_range, allocation_range):
+        if requested_range.start < allocation_range.start or requested_range.end > allocation_range.end:
+            raise ValueError("VLAN Id range is outside of the allocated range {0}"
+                             .format(self.vlan_resource_model.allocation_ranges))
+
+    def _ensure_numeric_vlan_valid(self, allocation_range):
+        if not represents_int(self.vlan_resource_model.vlan_id):
+            raise ValueError("VLAN Id attribute value is not numeric")
+        numeric_vlan = int(self.vlan_resource_model.vlan_id)
+        if numeric_vlan < allocation_range.start or numeric_vlan > allocation_range.end:
+            raise ValueError("VLAN Id is outside of the allocated range {0}"
+                             .format(self.vlan_resource_model.allocation_ranges))
 
     def _is_vlan_id_range(self):
         return self.vlan_resource_model.vlan_id.find('-') > 0
