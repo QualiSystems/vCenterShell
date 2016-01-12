@@ -6,12 +6,12 @@
 """
 
 from pyVmomi import vim
-
 from common.vcenter.vmomi_service import *
 from common.utilites.io import get_path_and_name
 from vCenterShell.vm import vm_reconfig_task, vm_get_network_by_name
 from vCenterShell.network.vnic.vnic_common import device_is_attached_to_network
 from common.logger import getLogger
+
 _logger = getLogger("vCenterShell")
 
 
@@ -19,12 +19,14 @@ class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
                  connection_retriever,
-                 port_group_configurer):
+                 port_group_configurer,
+                 default_network):
         self.pyvmomi_service = pyvmomi_service
         self.connection_retriever = connection_retriever
         self.port_group_configurer = port_group_configurer
+        self.default_network = default_network
 
-        #self.synchronous_task_waiter = synchronous_task_waiter
+        # self.synchronous_task_waiter = synchronous_task_waiter
 
     def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
         """
@@ -43,7 +45,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        condition = lambda device: device_is_attached_to_network(device, network_name) if network_name else lambda x: True
+        condition = lambda device: device_is_attached_to_network(device, network_name) if network_name else lambda \
+            x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
     def get_network_by_full_name(self, si, default_network_full_name):
@@ -55,13 +58,13 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         path, name = get_path_and_name(default_network_full_name)
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
+    def disconnect_all(self, vcenter_name, vm_uuid):
+        return self.disconnect(vcenter_name, vm_uuid, None)
 
-    def disconnect_all(self, vcenter_name, vm_uuid, default_network_full_name=None):
-        return self.disconnect(vcenter_name, vm_uuid, None, default_network_full_name)
-
-    def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
+    def disconnect(self, vcenter_name, vm_uuid, network_name=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
+        :param default_network_full_name:
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
         :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
@@ -85,12 +88,11 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             network = None
 
-        default_network = self.get_network_by_full_name(si, default_network_full_name)
+        default_network = self.get_network_by_full_name(si, self.default_network)
         if network:
-            return self.port_group_configurer.disconnect_network(vm, network, default_network, erase_network=True)
+            return self.port_group_configurer.disconnect_network(vm, network, default_network)
         else:
-            return self.port_group_configurer.disconnect_all_networks(vm, default_network, erase_network=True)
-
+            return self.port_group_configurer.disconnect_all_networks(vm, default_network)
 
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """
@@ -112,4 +114,3 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         if len(device_change) > 0:
             return vm_reconfig_task(virtual_machine, device_change)
         return None
-

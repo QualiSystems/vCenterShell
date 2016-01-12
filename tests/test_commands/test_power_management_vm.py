@@ -23,7 +23,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         synchronous_task_waiter = Mock()
         synchronous_task_waiter.wait_for_task = Mock(return_value=True)
 
-        power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter, MagicMock())
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
 
         # act
         res = power_manager.power_on(si, vm_uuid)
@@ -48,7 +48,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         synchronous_task_waiter = Mock()
         synchronous_task_waiter.wait_for_task = Mock(return_value=True)
 
-        power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter, Mock())
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
         power_manager._connect_to_vcenter = Mock(return_value=si)
         power_manager._get_vm = Mock(return_value=vm)
 
