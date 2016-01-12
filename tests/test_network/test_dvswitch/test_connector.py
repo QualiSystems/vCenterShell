@@ -90,32 +90,25 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         #pyvmomi_service, synchronous_task_waiter, vnic_to_network_mapper, vnic_common
 
         self.creator = DvPortGroupCreator(self.py_vmomi_service, self.synchronous_task_waiter)
-        # self.connector = VirtualSwitchToMachineConnector(self.py_vmomi_service,
-        #                                                   self.connection_details_retriever,
-        #                                                   self.creator,
-        #                                                   self.configurer)
-        #
-        self.connector = VirtualSwitchToMachineConnector(self.creator, self.configurer)
-
-        # self.configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service, self.synchronous_task_waiter)
-
         self.connector = VirtualSwitchToMachineConnector(self.creator, self.configurer)
 
 
     def test_map_vnc(self):
-        network_spec = {}
-        network_spec['dv_port_name'] = ""
-        network_spec['dv_switch_name'] = ""
-        network_spec['dv_switch_path'] = ""
-        network_spec['port_group_path'] = ""
-        network_spec['vlan_id'] = ""
-        mapp = {"AAA": network_spec}
+        network_spec = Mock()
+        network_spec.dv_port_name = ""
+        network_spec.dv_switch_name = ""
+        network_spec.dv_switch_path = ""
+        network_spec.port_group_path = ""
+        network_spec.vlan_id = ""
+        network_spec.vlan_spec = ""
+        mapp = [network_spec]
+
+        self.configurer.connect_vnic_to_networks = Mock(return_value="OK")
         self.connector.virtual_machine_port_group_configurer.connect_by_mapping = Mock(return_value="OK")
         self.connector.connect_and_get_vm = Mock(return_value=(1, 1,))
-        # res = self.connector.connect_by_mapping(self.vcenter_name,
-        #                                   self.vm_uuid,
-        #                                   Mock(),
-        #                                   mapp)
-        #self.assertEquals(res, "OK")
 
+        res = self.connector.connect_by_mapping(self.si, self.vm, [])
+        self.assertIsNone(res)
 
+        res = self.connector.connect_by_mapping(self.si, self.vm, mapp)
+        self.assertIsNone(res)
