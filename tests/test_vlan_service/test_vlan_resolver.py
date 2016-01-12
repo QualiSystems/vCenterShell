@@ -188,7 +188,7 @@ class TestVlanResolver(TestCase):
         vlan_resource_model.virtual_network = ""
         vlan_resource_model.allocation_ranges = "10-100"
 
-        resolved_vlan_info = create_autospec(VlanPoolSingleNumericInfo)
+        resolved_vlan_info = Mock()
         resolved_vlan_info.VlanId = 20
 
         api = MagicMock()
@@ -213,7 +213,7 @@ class TestVlanResolver(TestCase):
         vlan_resource_model.virtual_network = ""
         vlan_resource_model.allocation_ranges = "10-100"
 
-        resolved_vlan_info = create_autospec(VlanPoolSingleNumericInfo)
+        resolved_vlan_info = Mock()
         resolved_vlan_info.VlanId = 20
 
         api = MagicMock()
