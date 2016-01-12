@@ -4,7 +4,6 @@ from pyVmomi import vim
 
 from common.vcenter.vmomi_service import *
 from vCenterShell.network import network_is_portgroup
-from vCenterShell.vm import vm_reconfig_task
 
 
 class VirtualMachinePortGroupConfigurer(object):
@@ -38,23 +37,23 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def disconnect_all_networks(self, vm, default_network):
         vnics = self.vnic_common.map_vnics(vm)
-        update_mapping = [(vnic, None, False, default_network,) for vnic in vnics.values()]
+        update_mapping = [(vnic, default_network, False) for vnic in vnics.values()]
         self.update_vnic_by_mapping(vm, update_mapping)
         # if erase_network:
         #     self.erase_network_by_mapping(vm, update_mapping)
         return None
 
-    def disconnect_network(self, vm, network, default_network=None, erase_network=False):
+    def disconnect_network(self, vm, network, default_network):
         condition = lambda vnic: True if default_network else not self.vnic_common.is_vnic_disconnected(vnic)
         vnics = self.vnic_common.map_vnics(vm)
 
-        update_mapping = [(vnic, network, False, default_network,)
+        update_mapping = [(vnic, default_network, False)
                           for vnic_name, vnic in vnics.items()
                           if self.vnic_common.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
         self.update_vnic_by_mapping(vm, update_mapping)
-        if erase_network:
-            self.erase_network_by_mapping(vm, update_mapping)
+        # if erase_network:
+        #     self.erase_network_by_mapping(vm, update_mapping)
         return None
 
     def update_vnic_by_mapping(self, vm, mapping):
