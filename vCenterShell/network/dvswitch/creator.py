@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from pyVmomi import vim
 
+from common.logger import getLogger
+logger = getLogger("vCenterCommon")
+
 
 class DvPortGroupCreator(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
@@ -13,9 +16,26 @@ class DvPortGroupCreator(object):
         if dv_switch is None:
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
+        task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
+        port_group = self.synchronous_task_waiter.wait_for_task(task)
+        return port_group
+
+
+    @staticmethod
+    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, num_ports=32):
+        """
+        Create ' Distributed Virtual Portgroup' Task
+        :param dv_port_name: <str>  Distributed Virtual Portgroup Name
+        :param dv_switch: <vim.dvs.VmwareDistributedVirtualSwitch> Switch this Portgroup will be belong to
+        :param spec:
+        :param vlan_id: <int>
+        :param num_ports: <int> number of ports in this Group
+        :return: <vim.Task> Task which really provides update
+        """
+
         dv_pg_spec = vim.dvs.DistributedVirtualPortgroup.ConfigSpec()
         dv_pg_spec.name = dv_port_name
-        dv_pg_spec.numPorts = 32
+        dv_pg_spec.numPorts = num_ports
         dv_pg_spec.type = vim.dvs.DistributedVirtualPortgroup.PortgroupType.earlyBinding
 
         dv_pg_spec.defaultPortConfig = vim.dvs.VmwareDistributedVirtualSwitch.VmwarePortConfigPolicy()
@@ -32,6 +52,16 @@ class DvPortGroupCreator(object):
 
         task = dv_switch.AddDVPortgroup_Task([dv_pg_spec])
 
-        port_group = self.synchronous_task_waiter.wait_for_task(task)
+        logger.info(u"DV Port Group '{}' CREATE Task ...".format(dv_port_name))
+        return task
 
-        return port_group
+    @staticmethod
+    def dv_port_group_destroy_task(port_group):
+        """
+        Creates 'Destroy Distributed Virtual Portgroup' Task
+        The current Portgoriup should be 'Unused' if you wanted this task will be successfully performed
+        :param port_group: <vim.dvs.DistributedVirtualPortgroup>
+        :return: <vim.Task> Task which really provides update
+        """
+        return port_group.Destroy()
+

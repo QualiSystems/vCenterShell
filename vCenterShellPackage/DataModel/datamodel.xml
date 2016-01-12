@@ -94,6 +94,25 @@
         <Rule Name="Link Configurations" />
       </Rules>
     </AttributeInfo>
+    <AttributeInfo Name="Allocation Ranges" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+        <TagName Name="Admin Only" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Virtual Network" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
+    <AttributeInfo Name="Isolation Level" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="false">
+      <Tags>
+        <TagName Name="Configuration" />
+        <TagName Name="Setting" />
+      </Tags>
+    </AttributeInfo>
   </Attributes>
   <ResourceFamilies>
     <ResourceFamily Name="Cloud Provider" Description="" IsSearchable="true">
@@ -257,31 +276,50 @@
       </Categories>
     </ResourceFamily>
     <ResourceFamily Name="Virtual Network" Description="" IsService="true" ServiceType="Regular">
-      <AttachedAttributes />
-      <AttributeValues />
+      <AttachedAttributes/>
+      <AttributeValues>
+        <AttributeValue Name="Access Mode" Value="Trunk" />
+        <AttributeValue Name="VLAN Id" Value="" />
+        <AttributeValue Name="Virtual Network" Value="" />
+      </AttributeValues>
       <Models>
-        <ResourceModel Name="VLAN" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="VLAN Auto" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="Allocation Ranges" IsOverridable="true" IsLocal="true" UserInput="false">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Isolation Level" IsOverridable="true" IsLocal="true" IsRequired="true" UserInput="false">
+              <AllowedValues>
+                <AllowedValue>Shared</AllowedValue>
+                <AllowedValue>Exclusive</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" IsRequired="true">
               <AllowedValues>
                 <AllowedValue>Access</AllowedValue>
                 <AllowedValue>Trunk</AllowedValue>
               </AllowedValues>
             </AttachedAttribute>
-            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" UserInput="true">
+            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" IsRequired="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Virtual Network" IsOverridable="true" IsLocal="true" UserInput="false">
               <AllowedValues />
             </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
             <AttributeValue Name="Access Mode" Value="" />
+            <AttributeValue Name="Allocation Ranges" Value="2-4094" />
             <AttributeValue Name="VLAN Id" Value="" />
+            <AttributeValue Name="Isolation Level" Value="Exclusive" />
+            <AttributeValue Name="Virtual Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
           <Scripts>
-            <ScriptName>Connect All</ScriptName>
+            <ScriptName>Auto Resolve Vlan</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -340,6 +378,9 @@
         <ScriptInput Name="COMMAND" DefaultValue="deploy_from_template" />
         <ScriptInput Name="DEPLOY_DATA" />
       </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Auto Resolve Vlan">
+      <ScriptInputs />
     </ScriptDescriptor>
   </ScriptDescriptors>
 </DataModelInfo>

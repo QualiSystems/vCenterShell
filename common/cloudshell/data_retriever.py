@@ -1,4 +1,4 @@
-﻿from common.utilites.common_collection import first_or_default
+﻿from common.utilites.common_utils import first_or_default
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
 from models.VCenterTemplateModel import *

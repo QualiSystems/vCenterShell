@@ -1,4 +1,6 @@
 class ResourceModelParser:
+    ATTRIBUTE_NAME_POSTFIX = "_attribute"
+
     def __init__(self):
         pass
 
@@ -12,16 +14,30 @@ class ResourceModelParser:
 
         instance = ResourceModelParser.create_resource_model_instance(resource_instance)
         props = ResourceModelParser.get_public_properties(instance)
-        for attrib in resource_instance.attrib:
+        for attrib in ResourceModelParser.get_resource_attributes(resource_instance):
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
+            property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
             if props.__contains__(property_name):
-                setattr(instance, property_name, resource_instance.attrib[attrib])
+                setattr(instance, property_name, ResourceModelParser.get_resource_attributes(resource_instance)[attrib])
+                if hasattr(instance, property_name_for_attribute_name):
+                    setattr(instance, property_name_for_attribute_name, attrib)
+                    props.remove(property_name_for_attribute_name)
                 props.remove(property_name)
 
         if props:
             raise ValueError('Property(ies) {0} not found on resource with attributes {1}'
-                             .format(','.join(props), ','.join(resource_instance.attrib)))
+                             .format(','.join(props),
+                                     ','.join(ResourceModelParser.get_resource_attributes(resource_instance))))
         return instance
+
+    @staticmethod
+    def get_resource_attributes(resource_instance):
+        if hasattr(resource_instance, "attrib"):
+            return resource_instance.attrib
+        if hasattr(resource_instance, "ResourceAttributes"):
+            return resource_instance.ResourceAttributes
+        if hasattr(resource_instance, "attributes"):
+            return resource_instance.attributes
 
     @staticmethod
     def get_public_properties(instance):
@@ -40,9 +56,19 @@ class ResourceModelParser:
         :param resource_instance: Resource with ResourceModelName property
         :return: instance of ResourceModel class
         """
-        resource_class_name = ResourceModelParser.get_resource_model_class_name(resource_instance.ResourceModelName)
+        resource_model = ResourceModelParser.get_resource_model(resource_instance)
+        resource_class_name = ResourceModelParser.get_resource_model_class_name(
+                resource_model)
+        # print 'Family name is ' + resource_class_name
         instance = ResourceModelParser.get_class('models.' + resource_class_name)
         return instance
+
+    @staticmethod
+    def get_resource_model(resource_instance):
+        if hasattr(resource_instance, "model"):
+            return resource_instance.model
+        if hasattr(resource_instance, "ResourceModelName"):
+            return resource_instance.ResourceModelName
 
     @staticmethod
     def get_resource_model_class_name(resource_family):
@@ -63,7 +89,7 @@ class ResourceModelParser:
         module_path, class_name = class_path.rsplit(".", 1)
 
         try:
-            module = __import__(module_path, fromlist=[class_name])
+            module = __import__(class_path, fromlist=[class_name])
         except ImportError:
             raise ValueError("Module '%s' could not be imported" % (module_path,))
 
@@ -73,7 +99,7 @@ class ResourceModelParser:
             raise ValueError("Module '%s' has no class '%s'" % (module_path, class_name,))
 
         try:
-            instance = getattr(cls, class_name)()
+            instance = cls()
         except TypeError as type_error:
             raise ValueError('Failed to instantiate class {0}. Error: {1}'.format(class_name, type_error.message))
 
@@ -87,3 +113,13 @@ class ResourceModelParser:
         :return: string
         """
         return attribute_name.lower().replace(' ', '_')
+
+    @staticmethod
+    def get_property_name_with_attribute_name_postfix(attribute_name):
+        """
+        Returns property name from attribute name
+        :param attribute_name: Attribute name, may contain upper and lower case and spaces
+        :return: string
+        """
+        return ResourceModelParser.get_property_name_from_attribute_name(
+            attribute_name) + ResourceModelParser.ATTRIBUTE_NAME_POSTFIX.lower()
