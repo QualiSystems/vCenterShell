@@ -73,7 +73,8 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def reconfig_vm(self, device_change, vm):
         logger.info("Changing network...")
-        task = vm_reconfig_task(vm, device_change)
+        #task = vm_reconfig_task(vm, device_change)
+        task = self.pyvmomi_service.vm_reconfig_task(vm, device_change)
         return self.synchronous_task_waiter.wait_for_task(task)
 
     @staticmethod
