@@ -1,7 +1,5 @@
 from unittest import TestCase
-from mock import Mock, MagicMock, create_autospec
-from qualipy.api.cloudshell_api import VlanPoolSingleNumericInfo
-
+from mock import Mock, MagicMock
 from models.VLANAutoResourceModel import VLANAutoResourceModel
 from vlan_service.resolver.provider import VlanResolverProvider
 
