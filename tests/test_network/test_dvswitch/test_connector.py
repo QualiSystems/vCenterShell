@@ -13,7 +13,8 @@ from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
-from vCenterShell.network.vnic.vnic_common import *
+#from vCenterShell.network.vnic.vnic_common import *
+from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from common.utilites.common_name import generate_unique_name

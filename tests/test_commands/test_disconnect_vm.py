@@ -2,7 +2,8 @@ from unittest import TestCase
 from mock import Mock, patch
 from pyVmomi import vim
 from common.logger.service import LoggingService
-from vCenterShell.network.vnic.vnic_common import *
+#from vCenterShell.network.vnic.vnic_common import *
+from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 
 
@@ -99,7 +100,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         # act
         # res = virtual_switch_to_machine_connector.is_device_match_network(device, port.portgroupKey)
-        res = device_is_attached_to_network(device, port.portgroupKey)
+        res = VNicService.device_is_attached_to_network(device, port.portgroupKey)
 
         # assert
         self.assertTrue(res)
@@ -119,7 +120,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         # act
         # res = virtual_switch_to_machine_connector.is_device_match_network(device, nerwork.name)
-        res = device_is_attached_to_network(device, nerwork.name)
+        res = VNicService.device_is_attached_to_network(device, nerwork.name)
 
         # assert
         self.assertTrue(res)
@@ -134,7 +135,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         # act
         # res = virtual_switch_to_machine_connector.is_device_match_network(device, 'Fake name')
-        res = device_is_attached_to_network(device, 'Fake name')
+        res = VNicService.device_is_attached_to_network(device, 'Fake name')
 
         # assert
         self.assertFalse(res)
