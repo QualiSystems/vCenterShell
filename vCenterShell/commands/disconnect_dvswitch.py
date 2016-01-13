@@ -21,12 +21,19 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                  connection_retriever,
                  port_group_configurer,
                  default_network):
+        """
+        Disconnect Distributed Virtual Switch from VM Command
+        :param pyvmomi_service: vCenter API wrapper
+        :param connection_retriever: Service which provides connecting to vCenter
+        :param port_group_configurer: Port Group Configurer Service
+        :param <Network obj> default_network: Network which disconnected interface will be attached to
+        :return:
+        """
         self.pyvmomi_service = pyvmomi_service
         self.connection_retriever = connection_retriever
         self.port_group_configurer = port_group_configurer
         self.default_network = default_network
 
-        # self.synchronous_task_waiter = synchronous_task_waiter
 
     def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
         """
@@ -38,7 +45,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         """
         connection_details = self.connection_retriever.connection_details(vcenter_name)
 
-        si = self.pyvmomi_service.connect(connection_details.host, connection_details.username,
+        si = self.pyvmomi_service.connect(connection_details.host,
+                                          connection_details.username,
                                           connection_details.password,
                                           connection_details.port)
         _logger.debug("Revoking ALL Interfaces from VM '{}'".format(vm_uuid))
@@ -58,7 +66,6 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         :param default_network_full_name:
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
-        :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
         :param <str | None> network_name: the name of the specific network to disconnect
         :return: Started Task
         """
@@ -91,7 +98,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         @see https://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/vim.VirtualMachine.html#reconfigure
         :param virtual_machine: <vim.vm object>
         :param filter_function: function that gets the device and decide if it should be deleted
-        :return:
+        :return: Task or None
         """
         device_change = []
         for device in virtual_machine.config.hardware.device:
