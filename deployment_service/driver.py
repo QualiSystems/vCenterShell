@@ -46,9 +46,7 @@ class DeploymentServiceDriver(object):
         return DeployDataHolder.create_from_params(template_model=template_model,
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
-                                                   power_on=power_on,
-                                                   connection_details=None,
-                                                   resource_context=None)
+                                                   power_on=power_on)
 
     def _get_command_inputs_list(self, json_data_holder):
         return [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),

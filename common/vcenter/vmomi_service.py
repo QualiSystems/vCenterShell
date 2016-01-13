@@ -275,8 +275,7 @@ class pyVmomiService:
             if task.info.state == 'error':
                 logger.info("error type: %s" % task.info.error.__class__.__name__)
                 logger.info("found cause: %s" % task.info.error.faultCause)
-                task_done = True
-                return None
+                raise Exception(task.info.error.faultCause)
             time.sleep(1)
 
     class CloneVmParameters:
@@ -453,3 +452,14 @@ class pyVmomiService:
             if network_key == network.key:
                 return network
         return None
+
+    def vm_reconfig_task(self, vm, device_change):
+        """
+        Create Task for VM re-configure
+        :param vm: <vim.vm obj> VM which will be re-configure
+        :param device_change:
+        :return: Task
+        """
+        config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
+        task = vm.ReconfigVM_Task(config_spec)
+        return task
