@@ -6,13 +6,11 @@ The most common network/vNIC staff
 """
 
 from pyVmomi import vim
-
 from common.vcenter.vmomi_service import pyVmomiService
-
 from vCenterShell.network import *
 from vCenterShell.vm import vm_reconfig_task
-
 from common.logger import getLogger
+
 logger = getLogger("vCenterCommon")
 
 
@@ -64,7 +62,7 @@ def vnic_remove_from_vm_list(virtual_machine, filter_function=None):
 
 
 def _network_get_network_by_connection(vm, port_connection, pyvmomi_service):
-    #vim.dvs.PortConnection
+    # vim.dvs.PortConnection
     network_key = port_connection.portgroupKey
     network = pyvmomi_service.get_network_by_key_from_vm(vm, network_key)
     return network
@@ -171,7 +169,7 @@ def vnic_attach_to_network_standard(nicspec, network):
 
         logger.debug(u"Assigning network '{}' for vNIC".format(network_name))
     else:
-        #logger.warn(u"Cannot assigning network '{}' for vNIC {}".format(network, nicspec))
+        # logger.warn(u"Cannot assigning network '{}' for vNIC {}".format(network, nicspec))
         logger.warn(u"Cannot assigning network  for vNIC ".format(network, nicspec))
     return nicspec
 
@@ -185,7 +183,7 @@ def vnic_attach_to_network_distributed(nicspec, port_group):
     """
     if nicspec and network_is_portgroup(port_group):
         network_name = port_group.name
-        #port.portgroupKey
+        # port.portgroupKey
         nicspec.device.deviceInfo.label = network_name
         nicspec.device.deviceInfo.summary = network_name
 
@@ -195,10 +193,10 @@ def vnic_attach_to_network_distributed(nicspec, port_group):
 
         nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
         nicspec.device.backing.port = dvs_port_connection
-        #nicspec.device.backing.deviceName - only for Standard Network makes sense
-        logger.debug (u"Assigning portgroup '{}' for vNIC".format(network_name))
+        # nicspec.device.backing.deviceName - only for Standard Network makes sense
+        logger.debug(u"Assigning portgroup '{}' for vNIC".format(network_name))
     else:
-        #logger.warn(u"Cannot assigning portgroup '{}' for vNIC {}".format(port_group, nicspec))
+        # logger.warn(u"Cannot assigning portgroup '{}' for vNIC {}".format(port_group, nicspec))
         logger.warn(u"Cannot assigning portgroup for vNIC")
     return nicspec
 
@@ -242,40 +240,63 @@ def vnic_add_new_to_vm_task(vm, network=None):
     return task
 
 
+def is_vnic_attached_to_network(device, network):
+    if hasattr(device, 'backing'):
+        has_port_group_key = hasattr(device.backing, 'port') and hasattr(device.backing.port, 'portgroupKey')
+        has_network_name = hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name')
+        return (has_port_group_key and device.backing.port.portgroupKey == network.key) or \
+               (has_network_name and device.backing.network.name == network.name)
+    return False
 
-# (vim.vm.device.VirtualVmxnet3) {
-#    dynamicType = <unset>,
-#    dynamicProperty = (vmodl.DynamicProperty) [],
-#    key = 4000,
-#    deviceInfo = (vim.Description) {
-#       dynamicType = <unset>,
-#       dynamicProperty = (vmodl.DynamicProperty) [],
-#       label = 'Network adapter 1',
-#       summary = 'Anetwork'
-#    },
-#    backing = (vim.vm.device.VirtualEthernetCard.NetworkBackingInfo) {
-#       dynamicType = <unset>,
-#       dynamicProperty = (vmodl.DynamicProperty) [],
-#       deviceName = 'Anetwork',
-#       useAutoDetect = false,
-#       network = 'vim.Network:network-2554',
-#       inPassthroughMode = <unset>
-#    },
-#    connectable = (vim.vm.device.VirtualDevice.ConnectInfo) {
-#       dynamicType = <unset>,
-#       dynamicProperty = (vmodl.DynamicProperty) [],
-#       startConnected = true,
-#       allowGuestControl = true,
-#       connected = false,
-#       status = 'untried'
-#    },
-#    slotInfo = <unset>,
-#    controllerKey = 100,
-#    unitNumber = 7,
-#    addressType = 'assigned',
-#    macAddress = '00:50:56:a2:11:0d',
-#    wakeOnLanEnabled = true,
-#    resourceAllocation = <unset>,
-#    externalId = <unset>,
-#    uptCompatibilityEnabled = <unset>
-# }
+
+def is_vnic_disconnected(vnic):
+    is_disconnected = not (hasattr(vnic, 'connectable') and vnic.connectable.connected)
+    return is_disconnected
+
+
+def map_vnics(vm):
+    """
+    maps the vnic on the vm by name
+    :param vm: virtual machine
+    :return: dictionary: {'vnic_name': vnic}
+    """
+    mapping = dict()
+    for device in vm.config.hardware.device:
+        if isinstance(device, vim.vm.device.VirtualEthernetCard):
+            mapping[device.deviceInfo.label] = device
+    return mapping
+
+
+def get_device_spec(vnic, set_connected):
+    """
+    this function creates the device change spec,
+    :param vnic: vnic
+    :param set_connected: bool, set as connected or not, default: True
+    :rtype: device_spec
+    """
+    nic_spec = create_vnic_spec(vnic)
+    set_vnic_connectivity_status(nic_spec, to_connect=set_connected)
+    return nic_spec
+
+
+def create_vnic_spec( device):
+    """
+    create device spec for existing device and the mode of edit for the vcenter to update
+    :param device:
+    :rtype: device spec
+    """
+    nic_spec = vim.vm.device.VirtualDeviceSpec()
+    nic_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.edit
+    nic_spec.device = device
+    return nic_spec
+
+
+def set_vnic_connectivity_status(nic_spec, to_connect):
+    """
+        sets the device spec as connected or disconnected
+        :param nic_spec: the specification
+        :param to_connect: bool
+        """
+    nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+    nic_spec.device.connectable.connected = to_connect
+    nic_spec.device.connectable.startConnected = to_connect

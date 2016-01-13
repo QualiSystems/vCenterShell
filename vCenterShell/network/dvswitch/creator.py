@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyVmomi import vim
-
 from common.logger import getLogger
+
 logger = getLogger("vCenterCommon")
 
 
@@ -19,7 +19,6 @@ class DvPortGroupCreator(object):
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
         port_group = self.synchronous_task_waiter.wait_for_task(task)
         return port_group
-
 
     @staticmethod
     def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, num_ports=32):
@@ -65,3 +64,29 @@ class DvPortGroupCreator(object):
         """
         return port_group.Destroy()
 
+    def get_or_create_network(self,
+                              si,
+                              vm,
+                              dv_port_name,
+                              dv_switch_name,
+                              dv_switch_path,
+                              port_group_path,
+                              vlan_id,
+                              vlan_spec):
+        # check if the network is attached to the vm and gets it, the function doesn't goes to the vcenter
+        network = self.pyvmomi_service.get_network_by_name_from_vm(vm, dv_port_name)
+
+        # if we didn't found the network on the vm
+        if network is None:
+            # try to get it from the vcenter
+            network = self.pyvmomi_service.find_network_by_name(si, port_group_path, dv_port_name)
+
+        # if we still couldn't get the network ---> create it(can't find it, play god!)
+        if network is None:
+            network = self.create_dv_port_group(dv_port_name,
+                                                dv_switch_name,
+                                                dv_switch_path,
+                                                si,
+                                                vlan_spec,
+                                                vlan_id)
+        return network
