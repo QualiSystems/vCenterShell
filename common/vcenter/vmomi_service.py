@@ -476,7 +476,7 @@ class pyVmomiService:
         return task
 
     @staticmethod
-    def vm_get_network_by_name(self, vm, network_name):
+    def vm_get_network_by_name(vm, network_name):
         """
         Try to find Network scanning all attached to VM networks
         :param vm: <vim.vm>

@@ -194,10 +194,9 @@ class VNicService(object):
 
             nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
             nicspec.device.backing.port = dvs_port_connection
-            # nicspec.device.backing.deviceName - only for Standard Network makes sense
+
             logger.debug(u"Assigning portgroup '{}' for vNIC".format(network_name))
         else:
-            # logger.warn(u"Cannot assigning portgroup '{}' for vNIC {}".format(port_group, nicspec))
             logger.warn(u"Cannot assigning portgroup for vNIC")
         return nicspec
 
@@ -243,17 +242,17 @@ class VNicService(object):
     @staticmethod
     def is_vnic_attached_to_network(device, network):
         if hasattr(device, 'backing'):
-            has_port_group_key = hasattr(device.backing, 'port') and hasattr(device.backing.port, 'portgroupKey')
-            has_network_name = hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name')
-            return (has_port_group_key and device.backing.port.portgroupKey == network.key) or \
-                   (has_network_name and device.backing.network.name == network.name)
+            if hasattr(device.backing, 'port') and hasattr(device.backing.port, 'portgroupKey'):
+                return device.backing.port.portgroupKey == network.key
+            if hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name'):
+                return device.backing.network.name == network.name
         return False
 
 
     @staticmethod
-    def is_vnic_disconnected(vnic):
-        is_disconnected = not (hasattr(vnic, 'connectable') and vnic.connectable.connected)
-        return is_disconnected
+    def is_vnic_connected(vnic):
+        is_connected = hasattr(vnic, 'connectable') and vnic.connectable.connected
+        return is_connected
 
     @staticmethod
     def map_vnics(vm):
@@ -262,11 +261,9 @@ class VNicService(object):
         :param vm: virtual machine
         :return: dictionary: {'vnic_name': vnic}
         """
-        mapping = dict()
-        for device in vm.config.hardware.device:
-            if isinstance(device, vim.vm.device.VirtualEthernetCard):
-                mapping[device.deviceInfo.label] = device
-        return mapping
+        return {device.deviceInfo.label: device
+                for device in vm.config.hardware.device
+                if isinstance(device, vim.vm.device.VirtualEthernetCard)}
 
     @staticmethod
     def get_device_spec(vnic, set_connected):
@@ -281,7 +278,7 @@ class VNicService(object):
         return nic_spec
 
     @staticmethod
-    def create_vnic_spec( device):
+    def create_vnic_spec(device):
         """
         create device spec for existing device and the mode of edit for the vcenter to update
         :param device:

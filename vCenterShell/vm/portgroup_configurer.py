@@ -7,6 +7,14 @@ from vCenterShell.network import network_is_portgroup
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 
 
+class VNicDeviceMapper(object):
+    def __init__(self, vnic, network, connect, default_network=None):
+        self.vnic = vnic
+        self.network = network
+        self.connect = connect
+        self.default_network = default_network
+
+
 class VirtualMachinePortGroupConfigurer(object):
     def __init__(self, 
                  pyvmomi_service, 
@@ -20,7 +28,6 @@ class VirtualMachinePortGroupConfigurer(object):
         :param vnic_service: VNicService
         :return:
         """
-        
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
         self.vnic_to_network_mapper = vnic_to_network_mapper
@@ -28,12 +35,14 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def connect_vnic_to_networks(self, vm, mapping, default_network):
         vnic_mapping = self.vnic_service.map_vnics(vm)
+
         vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
             mapping, vnic_mapping, vm.network, default_network)
+
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append((vnic, network, True))
+            update_mapping.append(VNicDeviceMapper(vnic, network, True))
 
         self.update_vnic_by_mapping(vm, update_mapping)
 
@@ -51,30 +60,27 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def disconnect_all_networks(self, vm, default_network):
         vnics = self.vnic_service.map_vnics(vm)
-        update_mapping = [(vnic, default_network, False) for vnic in vnics.values()]
+        update_mapping = [VNicDeviceMapper(vnic, None, False, default_network) for vnic in vnics.values()]
         return self.update_vnic_by_mapping(vm, update_mapping)
 
     def disconnect_network(self, vm, network, default_network):
-        condition = lambda vnic: True if default_network else not self.vnic_service.is_vnic_disconnected(vnic)
+        condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
 
-        update_mapping = [(vnic, default_network, False)
-                          for vnic_name, vnic in vnics.items()
-                          if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
+        mapping = [VNicDeviceMapper(vnic, network, False, default_network)
+                        for vnic_name, vnic in vnics.items()
+                        if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
-        return self.update_vnic_by_mapping(vm, update_mapping)
+        return self.update_vnic_by_mapping(vm, mapping)
 
     def update_vnic_by_mapping(self, vm, mapping):
-        if not vm or not mapping:
-            return None
-
         vnics_change = []
-        for vnic, network, connect in mapping:
-            network = network
-            vnic_spec = self.vnic_service.vnic_compose_empty(vnic)
-            self.vnic_service.vnic_attached_to_network(vnic_spec, network)
-            vnic_spec = self.vnic_service.get_device_spec(vnic, connect)
-            vnics_change.append(vnic_spec)
+        for item in mapping:
+            spec = self.vnic_service.vnic_compose_empty(item.vnic)
+            if item.network:
+                self.vnic_service.vnic_attached_to_network(spec, item.network)
+            spec = self.vnic_service.get_device_spec(item.vnic, item.connect)
+            vnics_change.append(spec)
 
         return self.reconfig_vm(vnics_change, vm)
 

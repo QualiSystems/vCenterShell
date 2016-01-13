@@ -44,7 +44,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         vm = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Raz', '2')
 
         # Act
-        connector.connect_by_mapping(si, vm, [mapping])
+        connector.connect_by_mapping(si, vm, [mapping], None)
 
         pass
 
