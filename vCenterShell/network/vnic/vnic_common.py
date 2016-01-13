@@ -17,6 +17,12 @@ logger = getLogger("vCenterCommon")
 
 
 def vnic_set_connectivity_status(nicspec, is_connected):
+    """
+    Sets the device spec as connected or disconnected
+    :param nic_spec: the specification
+    :param to_connect: bool
+    :return updated 'nicspec'
+    """
     if not nicspec.device.connectable:
         nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
         nicspec.device.connectable.startConnected = is_connected

@@ -24,15 +24,13 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.connection_retriever = connection_retriever
         self.port_group_configurer = port_group_configurer
 
-        #self.synchronous_task_waiter = synchronous_task_waiter
-
     def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
         """
-        disconnect all of the network adapter of the vm
+        Disconnect all of the network adapter of the vm
         :param <str> network_name: the name of the specific network to disconnect & vNic remove
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
-        :return:
+        :return: Task which should be performed or None
         """
         connection_details = self.connection_retriever.connection_details(vcenter_name)
 
@@ -46,22 +44,29 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         condition = lambda device: device_is_attached_to_network(device, network_name) if network_name else lambda x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
-    def get_network_by_full_name(self, si, default_network_full_name):
+    def get_network_by_full_name(self, si, network_full_name):
         """
         Find network by a Full Name
-        :param default_network_full_name: <str> Full Network Name - likes 'Root/Folder/Network'
-        :return:
+        :param network_full_name: <str> Full Network Name - likes 'Root/Folder/Network'
+        :return: <network obj or None>
         """
-        path, name = get_path_and_name(default_network_full_name)
+        path, name = get_path_and_name(network_full_name)
         return self.pyvmomi_service.find_network_by_name(si, path, name) if name else None
 
 
     def disconnect_all(self, vcenter_name, vm_uuid, default_network_full_name=None):
+        """
+        Disconnect all networks connected to vm. Just wraps 'disconnect' method
+        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> vm_uuid: the uuid of the vm
+        :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
+        :return: Started Task
+        """
         return self.disconnect(vcenter_name, vm_uuid, None, default_network_full_name)
 
     def disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
         """
-        disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
+        Disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
         :param <str | None> default_network_name: the name of the network which will be attached against a disconnected one
@@ -91,14 +96,13 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             return self.port_group_configurer.disconnect_all_networks(vm, default_network, erase_network=True)
 
-
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """
         Remove interface from VM
         @see https://www.vmware.com/support/developer/vc-sdk/visdk41pubs/ApiReference/vim.VirtualMachine.html#reconfigure
         :param virtual_machine: <vim.vm object>
         :param filter_function: function that gets the device and decide if it should be deleted
-        :return:
+        :return: Task for next performing or None
         """
         device_change = []
         for device in virtual_machine.config.hardware.device:

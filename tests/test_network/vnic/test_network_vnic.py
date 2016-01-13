@@ -62,7 +62,7 @@ class TestNetwork(TestCase):
         self.assertEquals(res.device.backing.port.portgroupKey, "group_net")
 
 
-    def test_xx(self):
+    def test_add_to_vm_task(self):
         vm = Mock()
         vm.ReconfigVM_Task = lambda x: isinstance(x,  vim.vm.ConfigSpec)
         nicspec = Mock()
@@ -74,10 +74,18 @@ class TestNetwork(TestCase):
         # pass
 
 
-    def test_set_connectiv(self):
+
+    def test_set_connectiv_A(self):
         nicspec = Mock()
         nicspec.device = Mock()
         connect_status = True
+        nicspec = vnic_set_connectivity_status(nicspec, connect_status)
+        self.assertEquals(nicspec.device.connectable.connected, connect_status)
+
+    def test_set_connectiv_B(self):
+        nicspec = Mock()
+        nicspec.device = Mock()
+        connect_status = False
         nicspec = vnic_set_connectivity_status(nicspec, connect_status)
         self.assertEquals(nicspec.device.connectable.connected, connect_status)
 
