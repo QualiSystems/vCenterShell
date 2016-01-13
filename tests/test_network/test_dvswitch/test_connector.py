@@ -1,20 +1,11 @@
 from unittest import TestCase
 from mock import Mock
 from pyVmomi import vim
-from vCenterShell.vm.portgroup_configurer import *
-from vCenterShell.vm.dvswitch_connector import *
-from qualipy.api.cloudshell_api import ResourceInfo
+
 from common.model_factory import ResourceModelParser
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vlan.factory import VlanSpecFactory
-from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
-#from vCenterShell.network.vnic.vnic_common import *
-from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from common.utilites.common_name import generate_unique_name
@@ -77,8 +68,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                             self.synchronous_task_waiter,
                                                             vnic_to_network_mapper,
                                                             Mock())
-
-        # pyvmomi_service, synchronous_task_waiter, vnic_to_network_mapper, vnic_common
 
         self.creator = DvPortGroupCreator(self.py_vmomi_service, self.synchronous_task_waiter)
         self.connector = VirtualSwitchToMachineConnector(self.creator, self.configurer)

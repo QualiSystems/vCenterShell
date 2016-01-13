@@ -22,7 +22,7 @@ from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
-#from vCenterShell.network.vnic import vnic_common
+
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
@@ -74,7 +74,6 @@ class Bootstrapper(object):
 
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
                                                                        resource_remover,
-                                                                       # todo: merge with sergaiiT
                                                                        virtual_switch_disconnect_command)
         # Power Command
         vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,

@@ -9,13 +9,9 @@ from models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils.testing_credentials import TestCredentials
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vnic import vnic_common
-from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector, VmNetworkMapping
-from vCenterShell.network.vnic.vnic_common import *
+from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.portgroup_configurer import *
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
+
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
@@ -108,9 +104,9 @@ class TestVirtualSwitchToMachineConnector(TestCase):
     # disconnect(self, vcenter_name, vm_uuid, network_name=None, default_network_full_name=None):
 
     def integrationtest_attach_vnic(self, network):
-        nicspes = vnic_new_attached_to_network(network)
+        nicspes = VNicService.vnic_new_attached_to_network(network)
         vm = self.py_vmomi_service.get_vm_by_uuid(self.si, self.vm_uuid)
-        task = vnic_add_to_vm_task(nicspes, vm)
+        task = VNicService.vnic_add_to_vm_task(nicspes, vm)
         self.synchronous_task_waiter.wait_for_task(task)
 
     def integrationtest_attach_vnic_standard(self):

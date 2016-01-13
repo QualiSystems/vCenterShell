@@ -2,7 +2,6 @@ from unittest import TestCase
 from mock import Mock, patch
 from pyVmomi import vim
 from common.logger.service import LoggingService
-#from vCenterShell.network.vnic.vnic_common import *
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 

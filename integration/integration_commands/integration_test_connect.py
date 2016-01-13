@@ -11,7 +11,7 @@ from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
-from vCenterShell.network.vnic import vnic_common
+from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
@@ -28,7 +28,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter,
                                                                                   mapper,
-                                                                                  vnic_common)
+                                                                                  VNicService())
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = [vim.NumericRange(start=65, end=65)]
@@ -71,7 +71,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter,
                                                                                   mapper,
-                                                                                  vnic_common)
+                                                                                  VNicService())
         connector = VirtualSwitchToMachineConnector(dv_port_group_creator, virtual_machine_port_group_configurer)
         command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac)
 
