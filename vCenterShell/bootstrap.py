@@ -23,6 +23,7 @@ from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerato
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic import vnic_common
+from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
@@ -62,7 +63,8 @@ class Bootstrapper(object):
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
-                                                                     VLanIdRangeParser())
+                                                                     VLanIdRangeParser(),
+                                                                     VnicUpdater(helpers))
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
