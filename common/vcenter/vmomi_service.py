@@ -461,9 +461,10 @@ class pyVmomiService:
         for network in vm.network:
             if network_key == network.key:
                 return network
-        return None
+        return
 
-    def vm_reconfig_task(self, vm, device_change):
+    @staticmethod
+    def vm_reconfig_task(vm, device_change):
         """
         Create Task for VM re-configure
         :param vm: <vim.vm obj> VM which will be re-configure
@@ -473,3 +474,17 @@ class pyVmomiService:
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
         task = vm.ReconfigVM_Task(config_spec)
         return task
+
+    @staticmethod
+    def vm_get_network_by_name(self, vm, network_name):
+        """
+        Try to find Network scanning all attached to VM networks
+        :param vm: <vim.vm>
+        :param network_name: <str> name of network
+        :return: <vim.vm.Network or None>
+        """
+        #return None
+        for network in vm.network:
+            if hasattr(network, "name") and network_name == network.name:
+                return network
+        return None

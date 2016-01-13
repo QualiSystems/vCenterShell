@@ -3,8 +3,9 @@
 from pyVmomi import vim
 from common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.network import *
-from vCenterShell.vm import vm_reconfig_task
+#from vCenterShell.vm import vm_reconfig_task
 from common.logger import getLogger
+
 
 logger = getLogger("vCenterCommon")
 
@@ -35,7 +36,7 @@ class VNicService(object):
             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
             VNicService.vnic_set_connectivity_status(nicspec, True)
             logger.debug(u"Attaching new vNIC '{}' to VM '{}'...".format(nicspec, virtual_machine))
-            task = vm_reconfig_task(virtual_machine, [nicspec])
+            task = pyVmomiService.vm_reconfig_task(virtual_machine, [nicspec])
             return task
         else:
             logger.warn(u"Cannot attach new vNIC '{}' to VM '{}'".format(nicspec, virtual_machine))

@@ -6,9 +6,6 @@
 """
 
 from pyVmomi import vim
-from common.vcenter.vmomi_service import *
-from common.utilites.io import get_path_and_name
-from vCenterShell.vm import vm_reconfig_task, vm_get_network_by_name
 from vCenterShell.network.vnic.vnic_service import VNicService
 from common.logger import getLogger
 
@@ -79,7 +76,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if network_name:
-            network = vm_get_network_by_name(vm, network_name)
+            network = self.pyvmomi_service.vm_get_network_by_name(vm, network_name)
             if network is None:
                 raise KeyError(u'Network not found ({0})'.format(network_name))
         else:
@@ -109,5 +106,5 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                 device_change.append(nicspec)
 
         if len(device_change) > 0:
-            return vm_reconfig_task(virtual_machine, device_change)
+            return self.pyvmomi_service.vm_reconfig_task(virtual_machine, device_change)
         return None
