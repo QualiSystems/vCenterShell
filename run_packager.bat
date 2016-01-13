@@ -6,6 +6,7 @@ python driver_packager.py packeger_configs\\deployment_service_driver.ini
 python driver_packager.py packeger_configs\\connect_command.ini
 python driver_packager.py packeger_configs\\deploy_from_template_command.ini
 python driver_packager.py packeger_configs\\destroy_vm_command.ini
+python driver_packager.py packeger_configs\\power_on_command.ini
 python driver_packager.py packeger_configs\\vlan_auto_service.ini
 
 copy orchestration_service\driver.py "vCenterShellPackage\\Resource Scripts\\Deploy App.py" /Y
