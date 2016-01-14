@@ -45,7 +45,7 @@ class Bootstrapper(object):
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
 
         resource_model_parser = ResourceModelParser()
-        vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
+        vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser)
         vc_data_model = vc_model_retriever.get_vcenter_data_model()
 
         #vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)

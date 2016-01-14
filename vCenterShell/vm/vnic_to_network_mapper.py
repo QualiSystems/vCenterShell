@@ -38,7 +38,7 @@ class VnicToNetworkMapper(object):
             network_to_map = ''
             if hasattr(vnic, 'backing'):
                 if hasattr(vnic.backing, 'network') and hasattr(vnic.backing.network, 'name'):
-                    network_to_map = vnic.backing.name
+                    network_to_map = vnic.backing.network.name
                 elif hasattr(vnic.backing, 'port') and hasattr(vnic.backing.port, 'key'):
                     network_to_map = self._get_network_name_from_key(vnic.backing.port.key,
                                                                      existing_network, default_network)

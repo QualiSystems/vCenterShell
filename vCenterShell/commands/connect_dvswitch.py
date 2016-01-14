@@ -1,7 +1,12 @@
 
 class VirtualSwitchConnectCommand:
-    def __init__(self, pv_service, virtual_switch_to_machine_connector,
-                 dv_port_group_name_generator, vlan_spec_factory, vlan_id_range_parser, vnic_updater):
+    def __init__(self,
+                 pv_service,
+                 virtual_switch_to_machine_connector,
+                 dv_port_group_name_generator,
+                 vlan_spec_factory,
+                 vlan_id_range_parser,
+                 vnic_updater):
         """
         :param py_service: vCenter API wrapper
         :param virtual_switch_to_machine_connector:
@@ -17,17 +22,17 @@ class VirtualSwitchConnectCommand:
         self.vlan_id_range_parser = vlan_id_range_parser
         self.vnic_updater = vnic_updater
 
-    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network):
+    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter
         :param vm_uuid: <str> UUID for VM
         :param vm_network_mappings: <collection of 'VmNetworkMapping'>
-        :param default_network: <Network obj>
+        :param default_network_name: <str> Full Network name - likes 'DataCenterName/NetworkName'
         :return: None
         """
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
-        default_network_instance = self.pv_service.get_network_by_full_name(si, default_network)
+        default_network_instance = self.pv_service.get_network_by_full_name(si, default_network_name)
 
         mappings = []
         # create mapping
@@ -40,7 +45,7 @@ class VirtualSwitchConnectCommand:
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
             mappings.append(vm_network_mapping)
 
-        update_mapping = self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm,
-                                                                                     mappings, default_network_instance)
+        return self.virtual_switch_to_machine_connector.connect_by_mapping(
+            si, vm, mappings, default_network_instance)
 
         # self.vnic_updater.update_vnics(update_mapping, vm.name)

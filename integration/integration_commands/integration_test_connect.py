@@ -19,12 +19,12 @@ from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
-    def integration_test_connect(self):
+    def integration_test_connect_A(self):
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cred = TestCredentials()
         si = py_vmomi_service.connect(cred.host, cred.username, cred.password, cred.port)
         synchronous_task_waiter = SynchronousTaskWaiter()
-        mapper = VnicToNetworkMapper(DvPortGroupNameGenerator(), 'anetwork')
+        mapper = VnicToNetworkMapper(DvPortGroupNameGenerator())
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter,
@@ -49,11 +49,11 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
 
         pass
 
-    def integration_test_connect(self):
+    def integration_test_connect_B(self):
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cred = TestCredentials()
         si = py_vmomi_service.connect(cred.host, cred.username, cred.password, cred.port)
-        vm_uuid = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
+        vm_uuid = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Boris', 'Boris2-win7').config.uuid
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = 65
@@ -79,3 +79,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac, vnic_updater)
 
         command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork')
+
+    def test_integration(self):
+        self.integration_test_connect_A()
+        self.integration_test_connect_B()

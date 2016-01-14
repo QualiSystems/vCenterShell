@@ -3,6 +3,10 @@ import time
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
 
+import pydevd
+pydevd.settrace('127.0.0.1', port=51234,
+              stdoutToServer=True, stderrToServer=True)
+
 # Retrieve environment variables
 reservationId = helpers.get_reservation_context_details().id
 resourceDetails = helpers.get_resource_context_details_dict()
