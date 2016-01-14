@@ -28,7 +28,7 @@ class VnicToNetworkMapper(object):
 
     def _find_available_vnic(self, vnics_to_network_mapping, default_network):
         for vnic_name, network_name in vnics_to_network_mapping.items():
-            if network_name == default_network:
+            if network_name == default_network.name:
                 return vnic_name
         raise Exception('no vnic available')
 
@@ -39,12 +39,12 @@ class VnicToNetworkMapper(object):
             if hasattr(vnic, 'backing'):
                 if hasattr(vnic.backing, 'network') and hasattr(vnic.backing.network, 'name'):
                     network_to_map = vnic.backing.network.name
-                elif hasattr(vnic.backing, 'port') and hasattr(vnic.backing.port, 'key'):
-                    network_to_map = self._get_network_name_from_key(vnic.backing.port.key,
+                elif hasattr(vnic.backing, 'port') and hasattr(vnic.backing.port, 'portgroupKey'):
+                    network_to_map = self._get_network_name_from_key(vnic.backing.port.portgroupKey,
                                                                      existing_network, default_network)
 
             if not self.quali_name_generator.is_generated_name(network_to_map):
-                network_to_map = default_network
+                network_to_map = default_network.name
             mapping[vnic_name] = network_to_map
 
         if mapping:
@@ -54,6 +54,6 @@ class VnicToNetworkMapper(object):
     @staticmethod
     def _get_network_name_from_key(key, existing_network, default_network):
         for network in existing_network:
-            if hasattr(network, 'name') and hasattr(network, 'portgroupKey') and network.portgroupKey == key:
+            if hasattr(network, 'name') and hasattr(network, 'key') and network.key == key:
                 return network.name
         return default_network
