@@ -191,10 +191,7 @@ class pyVmomiService:
 
         search_index = si.content.searchIndex
         '#searches for the specific vm in the folder'
-        res = search_index.FindChild(look_in, name)
-        if res:
-            return res
-        raise KeyError('vmomi managed object not found at: {0}'.format(path))
+        return search_index.FindChild(look_in, name)
 
     def get_folder(self, si, path):
         """

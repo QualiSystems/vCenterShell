@@ -6,7 +6,6 @@ from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 from common.cloudshell.resource_remover import CloudshellResourceRemover
 from common.logger import getLogger
 from common.model_factory import ResourceModelParser
-from common.utilites.common_name import generate_unique_name
 from common.vcenter.data_model_retriever import VCenterDataModelRetriever
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
@@ -39,7 +38,7 @@ class Bootstrapper(object):
                                                                                    cloudshell_data_retriever_service)
         resource_remover = CloudshellResourceRemover(helpers)
         command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
-        name_generator = generate_unique_name
+        name_generator = DvPortGroupNameGenerator()
         template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
