@@ -127,9 +127,6 @@
       <Models>
         <ResourceModel Name="vCenter" ImagePath="vCenter_Model.png" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
 			<AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
               <AllowedValues />
             </AttachedAttribute>
