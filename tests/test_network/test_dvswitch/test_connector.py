@@ -52,7 +52,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         #vc_data_model = vc_model_retriever.get_vcenter_data_model()
         vc_data_model = Mock()
         name_generator = generate_unique_name
-        vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
+        #vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
+        vnic_to_network_mapper = VnicToNetworkMapper(name_generator)
 
 
         helpers = Mock()
@@ -94,10 +95,12 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         res = self.connector.connect_by_mapping(self.si, self.vm, [], 'default_network')
         self.assertIsNone(res)
-        res = self.connector.connect_by_mapping(self.si, self.vm, [])
-        self.assertEqual(res, 'OK')
+        res = self.connector.connect_by_mapping(self.si, self.vm, [], None)
+        #self.assertEqual(res, 'OK')
+        self.assertIsNone(res)
 
         res = self.connector.connect_by_mapping(self.si, self.vm, mapp, 'default_network')
         self.assertIsNone(res)
-        res = self.connector.connect_by_mapping(self.si, self.vm, mapp)
-        self.assertEqual(res, 'OK')
+        res = self.connector.connect_by_mapping(self.si, self.vm, mapp, None)
+        #self.assertEqual(res, 'OK')
+        self.assertIsNone(res)

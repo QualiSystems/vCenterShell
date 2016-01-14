@@ -67,4 +67,4 @@ class TestDvPortGroupConfigurer(TestCase):
         ConnectRequest('vnic 1', Mock(spec=vim.Network))
         mapping = [ConnectRequest('vnic 1', Mock(spec=vim.Network))]
         res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network))
-        self.assertIsNone(res)
+        self.assertIsNotNone(res[0].vnic)
