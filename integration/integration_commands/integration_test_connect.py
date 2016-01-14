@@ -53,7 +53,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
         cred = TestCredentials()
         si = py_vmomi_service.connect(cred.host, cred.username, cred.password, cred.port)
-        vm_uuid = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Raz', '2').config.uuid
+        vm_uuid = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Boris', 'Boris2-win7').config.uuid
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = 65
