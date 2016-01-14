@@ -203,7 +203,6 @@
           <AttributeValues>
             <AttributeValue Name="UUID" Value="" />
             <AttributeValue Name="vCenter Inventory Path" Value="" />
-            <AttributeValue Name="Default Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
@@ -364,6 +363,7 @@
         <ScriptInput Name="COMMAND" DefaultValue="connect" />
         <ScriptInput Name="VLAN_ID" />
         <ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ScriptInput Name="UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect All">
