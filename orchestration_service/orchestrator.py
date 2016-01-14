@@ -23,7 +23,7 @@ def execute_app_orchestration():
     # TODO
 
     # logical resource execute "Power On"
-    power_on_deployed_app(api, deployment_result, reservation_id)
+    power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
     # if install service exists on app execute it
     # TODO
@@ -37,6 +37,8 @@ def execute_app_orchestration():
 def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
     try:
         logger.info("Powering on deployed app {0}".format(deployment_result.LogicalResourceName))
+        logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
+                                                                         deployment_result.VmUuid))
         api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "Power On",
                            [InputNameValue("COMMAND", "power_on"), InputNameValue("VM_UUID", deployment_result.VmUuid)])
     except Exception as exc:
@@ -54,4 +56,3 @@ def deploy_app(api, app_name, deployment_service, reservation_id):
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
         exit(1)
-

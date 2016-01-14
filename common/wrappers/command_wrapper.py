@@ -12,7 +12,7 @@ COMMAND_CANNOT_BE_NONE = 'command cannot be None'
 INFO_CONNECTING_TO_VCENTER = 'connecting to vcenter: {0}'
 START = 'START'
 END = 'END'
-LOG_FORMAT = 'action:{0} command_name:{0}'
+LOG_FORMAT = 'action:{0} command_name:{1}'
 
 
 class CommandWrapper:

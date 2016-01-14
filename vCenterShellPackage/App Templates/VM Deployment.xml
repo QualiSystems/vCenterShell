@@ -14,7 +14,7 @@
         <DeploymentService Name="vCenter VM From Template">
           <Attributes>
             <Attribute Name="VM Cluster" Value="QualiSB Cluster/LiverPool" />
-            <Attribute Name="VM Power State" Value="True" />
+            <Attribute Name="VM Power State" Value="False" />
             <Attribute Name="VM Storage" Value="eric ds cluster" />
             <Attribute Name="vCenter Template" Value="vCenter/QualiSB/Alex/test" />
           </Attributes>
