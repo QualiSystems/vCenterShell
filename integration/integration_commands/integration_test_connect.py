@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
@@ -12,6 +12,7 @@ from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerato
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic.vnic_service import VNicService
+from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
@@ -73,6 +74,8 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
                                                                                   mapper,
                                                                                   VNicService())
         connector = VirtualSwitchToMachineConnector(dv_port_group_creator, virtual_machine_port_group_configurer)
-        command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac)
+
+        vnic_updater = VnicUpdater(helpers)
+        command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac, vnic_updater)
 
         command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork')
