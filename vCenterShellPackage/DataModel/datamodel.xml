@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DataModelInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <Attributes>
-    <AttributeInfo Name="UUID" Type="String" DefaultValue="" IsReadOnly="false">
+    <AttributeInfo Name="VM_UUID" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
         <Rule Name="Setting" />
@@ -43,7 +43,7 @@
         <Rule Name="Setting" />
       </Rules>
     </AttributeInfo>
-    <AttributeInfo Name="vCenter Inventory Path" Type="String" DefaultValue="" IsReadOnly="false">
+    <AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
         <Rule Name="Setting" />
@@ -160,6 +160,8 @@
           <Scripts>
             <ScriptName>Deploy From Template</ScriptName>
             <ScriptName>Power On</ScriptName>
+            <ScriptName>Power Off</ScriptName>
+            <ScriptName>Destroy VM</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -184,30 +186,29 @@
     </ResourceFamily>
     <ResourceFamily Name="Deployed App" Description="" IsSearchable="true">
       <AttachedAttributes>
-        <AttachedAttribute Name="UUID" IsOverridable="true" IsLocal="true">
+        <AttachedAttribute Name="VM_UUID" IsOverridable="true" IsLocal="true">
           <AllowedValues />
         </AttachedAttribute>
-        <AttachedAttribute Name="vCenter Inventory Path" IsOverridable="true" IsLocal="true">
+        <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true">
           <AllowedValues />
         </AttachedAttribute>
       </AttachedAttributes>
       <AttributeValues>
-        <AttributeValue Name="UUID" Value="" />
-        <AttributeValue Name="vCenter Inventory Path" Value="" />
+        <AttributeValue Name="VM_UUID" Value="" />
+        <AttributeValue Name="Cloud Provider" Value="" />
       </AttributeValues>
       <Models>
         <ResourceModel Name="Generic Deployed App" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues>
-            <AttributeValue Name="UUID" Value="" />
-            <AttributeValue Name="vCenter Inventory Path" Value="" />
+            <AttributeValue Name="VM_UUID" Value="" />
+            <AttributeValue Name="Cloud Provider" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
             <DriverName>Generic Driver</DriverName>
           </Drivers>
           <Scripts>
-            <ScriptName>Destroy VM</ScriptName>
             <ScriptName>Connect</ScriptName>
           </Scripts>
         </ResourceModel>
@@ -353,12 +354,20 @@
   <ScriptDescriptors>
     <ScriptDescriptor Name="Destroy VM">
       <ScriptInputs>
-        <ScriptInput Name="command" DefaultValue="destroy" />
+        <ScriptInput Name="COMMAND" DefaultValue="destroy" />
+        <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Power On">
       <ScriptInputs>
-        <ScriptInput Name="command" DefaultValue="power_on" />
+        <ScriptInput Name="COMMAND" DefaultValue="power_on" />
+        <ScriptInput Name="VM_UUID" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power Off">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="power_of" />
+        <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect">
@@ -366,7 +375,7 @@
         <ScriptInput Name="COMMAND" DefaultValue="connect" />
         <ScriptInput Name="VLAN_ID" />
         <ScriptInput Name="VLAN_SPEC_TYPE" />
-        <ScriptInput Name="UUID" />
+        <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect All">

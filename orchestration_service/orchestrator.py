@@ -22,6 +22,13 @@ def execute_app_orchestration():
     # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
     # TODO
 
+    # TODO this is temporary until we move to drivers
+    api.SetAttributesValues(
+            [ResourceAttributesUpdateRequest(
+                    deployment_result.LogicalResourceName,
+                    [AttributeNameValue("VM UUID", deployment_result.VmUuid),
+                     AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
+
     # logical resource execute "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
