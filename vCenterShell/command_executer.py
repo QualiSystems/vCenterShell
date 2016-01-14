@@ -147,4 +147,4 @@ class CommandExecuterService(object):
                                              resource_name)
 
     def _prepare_command_result(self, output):
-        return self.COMMAND_RESULT_PREFIX + output + self.COMMAND_RESULT_POSTFIX
+        return self.COMMAND_RESULT_PREFIX + str(output) + self.COMMAND_RESULT_POSTFIX
