@@ -150,7 +150,6 @@
             </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
-            <AttributeValue Name="Domain Selector" Value="" />
 			<AttributeValue Name="User" Value="" />
 			<AttributeValue Name="Password" Value="" />
 			<AttributeValue Name="Default port group path" Value="" />
