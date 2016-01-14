@@ -64,11 +64,10 @@ class CloudshellDataRetrieverService:
         :param vCenter_resource_details:   the ResourceDetails object of a vCenter resource
         :param session:                    the cloushell api session, its needed in order to decrypt the password
         """
-        user = first_or_default(vCenter_resource_details.ResourceAttributes, lambda att: att.Name == "User").Value
-        encryptedPass = first_or_default(vCenter_resource_details.ResourceAttributes,
-                                         lambda att: att.Name == "Password").Value
-        vcenter_url = vCenter_resource_details.Address
-        password = session.DecryptPassword(encryptedPass).Value
+        user = vCenter_resource_details.attributes["User"]
+        encrypted_pass = vCenter_resource_details.attributes["Password"]
+        vcenter_url = vCenter_resource_details.address
+        password = session.DecryptPassword(encrypted_pass).Value
 
         return VCenterConnectionDetails(vcenter_url, user, password)
 

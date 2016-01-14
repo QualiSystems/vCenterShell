@@ -1,4 +1,5 @@
-﻿from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
+﻿from models.DeployDataHolder import DeployDataHolder
+from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 
 
 class CommandExecuterService(object):
@@ -92,6 +93,7 @@ class CommandExecuterService(object):
         # get command parameters from the environment
         deployment_params = self.qualipy_helpers.get_user_param('DEPLOY_DATA')
         data = self.serializer.decode(deployment_params)
+        data_holder = DeployDataHolder(data)
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -100,8 +102,8 @@ class CommandExecuterService(object):
         result = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.deployFromTemplateCommand.execute_deploy_from_template,
-            data)
-        print self.serializer.encode(result)
+            data_holder)
+        print self.serializer.encode(result, unpicklable=False)
 
     def power_off(self):
         # get command parameters from the environment

@@ -21,7 +21,8 @@ class VirtualMachineDeployer(object):
 
         clone_vm_result = self.pv_service.clone_vm(params)
         if clone_vm_result.error:
-            raise ValueError(clone_vm_result.error)
+            raise Exception(clone_vm_result.error)
 
-        resource_path = data_holder.template_model.vCenter_resource_name + "/" + data_holder.template_model.vm_folder
-        return DeployResult(vm_name, clone_vm_result.vm.summary.config.uuid, resource_path)
+        return DeployResult(vm_name,
+                            clone_vm_result.vm.summary.config.uuid,
+                            data_holder.template_model.vCenter_resource_name)
