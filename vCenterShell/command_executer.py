@@ -5,6 +5,9 @@ from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
+    COMMAND_RESULT_PREFIX = "command_json_result="
+    COMMAND_RESULT_POSTFIX = "=command_json_result_end"
+
     def __init__(self,
                  serializer,
                  qualipy_helpers,
@@ -101,8 +104,9 @@ class CommandExecuterService(object):
         result = self.command_wrapper.execute_command_with_connection(
                 connection_details,
                 self.deployFromTemplateCommand.execute_deploy_from_template,
-            data_holder)
-        print self.serializer.encode(result, unpicklable=False)
+                data_holder)
+
+        print self._prepare_command_result(self.serializer.encode(result, unpicklable=False))
 
     def power_off(self):
         # get command parameters from the environment
@@ -141,3 +145,6 @@ class CommandExecuterService(object):
                                              self.refresh_ip_command.refresh_ip,
                                              vm_uuid,
                                              resource_name)
+
+    def _prepare_command_result(self, output):
+        return self.COMMAND_RESULT_PREFIX + output + self.COMMAND_RESULT_POSTFIX
