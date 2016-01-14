@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from pyVmomi import vim
 from common.logger import getLogger
+from common.utilites.io import get_path_and_name
 
 logger = getLogger(__name__)
 
@@ -240,6 +241,15 @@ class pyVmomiService:
 
         return sub_folder
 
+    def get_network_by_full_name(self, si, default_network_full_name):
+        """
+        Find network by a Full Name
+        :param default_network_full_name: <str> Full Network Name - likes 'Root/Folder/Network'
+        :return:
+        """
+        path, name = get_path_and_name(default_network_full_name)
+        return self.find_network_by_name(si, path, name) if name else None
+
     def get_obj(self, content, vimtype, name):
         """
         Return an object by name for a specific type, if name is None the
@@ -451,9 +461,10 @@ class pyVmomiService:
         for network in vm.network:
             if network_key == network.key:
                 return network
-        return None
+        return
 
-    def vm_reconfig_task(self, vm, device_change):
+    @staticmethod
+    def vm_reconfig_task(vm, device_change):
         """
         Create Task for VM re-configure
         :param vm: <vim.vm obj> VM which will be re-configure
@@ -463,3 +474,17 @@ class pyVmomiService:
         config_spec = vim.vm.ConfigSpec(deviceChange=device_change)
         task = vm.ReconfigVM_Task(config_spec)
         return task
+
+    @staticmethod
+    def vm_get_network_by_name(vm, network_name):
+        """
+        Try to find Network scanning all attached to VM networks
+        :param vm: <vim.vm>
+        :param network_name: <str> name of network
+        :return: <vim.vm.Network or None>
+        """
+        #return None
+        for network in vm.network:
+            if hasattr(network, "name") and network_name == network.name:
+                return network
+        return None

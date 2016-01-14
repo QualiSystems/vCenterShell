@@ -30,9 +30,11 @@ class VirtualSwitchToMachineConnector(object):
     def connect_by_mapping(self,
                            si,
                            vm,
-                           mapping):
+                           mapping,
+                           default_network):
         """
         gets the mapping to the vnics and connects it to the vm
+        :param default_network:
         :param si: ServiceInstance
         :param vm: vim.VirtualMachine
         :param mapping: [VmNetworkMapping]
@@ -50,4 +52,4 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_spec)
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
-        return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping)
+        self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)
