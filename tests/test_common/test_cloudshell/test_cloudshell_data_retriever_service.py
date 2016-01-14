@@ -103,8 +103,11 @@ class test_cloudshellDataRetrieverService(unittest.TestCase):
         session = Mock()
         session.DecryptPassword = Mock(return_value=Mock(Value=password))
 
-        attributes = [Mock(Name="User",Value="user1"),Mock(Name="Password",Value=password)]
-        vCenter_resource_details = Mock(ResourceAttributes=attributes, Address="vCenterIP")
+        attributes = {"User": "user1", "Password": password}
+        vCenter_resource_details = Mock()
+        vCenter_resource_details.attributes = attributes
+        vCenter_resource_details.address = 'vCenterIP'
+
 
          # Act
         conn_details = self.csRetrieverService.getVCenterConnectionDetails(session, vCenter_resource_details)

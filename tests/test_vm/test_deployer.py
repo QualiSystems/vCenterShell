@@ -43,8 +43,8 @@ class TestVirtualMachineDeployer(TestCase):
 
         self.assertEqual(res.vm_name, name)
         self.assertEqual(res.uuid, uuid)
-        self.assertEqual(res.vm_path,
-                         params.template_model.vCenter_resource_name + "/" + params.template_model.vm_folder)
+        self.assertEqual(res.cloud_provider_resource_name,
+                         params.template_model.vCenter_resource_name)
         self.assertTrue(pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_error(self):

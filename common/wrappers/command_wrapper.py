@@ -41,12 +41,15 @@ class CommandWrapper:
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                    DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                 connection_details.username,
-                                                 connection_details.password,
-                                                 connection_details.port))
+                        DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                     connection_details.username,
+                                                     connection_details.password,
+                                                     connection_details.port))
 
-                si = self.pv_service.connect(connection_details)
+                si = self.pv_service.connect(connection_details.host,
+                                             connection_details.username,
+                                             connection_details.password,
+                                             connection_details.port)
             if si:
                 logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
 
