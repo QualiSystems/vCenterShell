@@ -851,10 +851,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         si.content = create_autospec(spec=vim.ServiceInstanceContent())
 
         '#act'
-        result = pv_service.find_obj_by_path(si, '', '', '')
-
-        '#assert'
-        self.assertIsNone(result)
+        self.assertRaises(KeyError, pv_service.find_obj_by_path,si, '', '', '')
 
     def test_get_object_by_path_no_folder_found(self):
         """
@@ -874,10 +871,9 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_folder = Mock(return_value=None)
 
         '#act'
-        result = pv_service.find_obj_by_path(si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
+        self.assertRaises(KeyError, pv_service.find_obj_by_path, si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
 
         '#assert'
-        self.assertIsNone(result)
         self.assertTrue(pv_service.get_folder.called)
 
     def test_find_item_in_path_by_type_not_found(self):

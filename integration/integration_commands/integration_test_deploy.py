@@ -26,7 +26,7 @@ class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
             "template_model": {
                 "vCenter_resource_name": "QualiSB",
                 "vm_folder": "QualiSB/Raz",
-                "template_name": "a1"
+                "template_name": "2"
             },
             "vm_cluster_model": {
                 "cluster_name": "QualiSB Cluster",

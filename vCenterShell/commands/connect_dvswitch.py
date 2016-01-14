@@ -40,7 +40,7 @@ class VirtualSwitchConnectCommand:
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
             mappings.append(vm_network_mapping)
 
-        update_mapping = self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, mappings)
+        update_mapping = self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm,
+                                                                                     mappings, default_network_instance)
 
-        self.vnic_updater.update_vnics(update_mapping)
-        self.virtual_switch_to_machine_connector.connect_by_mapping(si, vm, mappings, default_network_instance)
+        # self.vnic_updater.update_vnics(update_mapping, vm.name)
