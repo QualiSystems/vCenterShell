@@ -24,7 +24,6 @@ from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 
 from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.network.vnic import vnic_common
 from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
