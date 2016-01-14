@@ -37,6 +37,12 @@
         <Rule Name="Setting" />
       </Rules>
     </AttributeInfo>
+    <AttributeInfo Name="Default Network" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
     <AttributeInfo Name="vCenter Inventory Path" Type="String" DefaultValue="" IsReadOnly="false">
       <Rules>
         <Rule Name="Configuration" />
@@ -139,9 +145,11 @@
 			<AttachedAttribute Name="Default dvSwitch Name" IsOverridable="true" IsLocal="true">
               <AllowedValues />
             </AttachedAttribute>
+            <AttachedAttribute Name="Default Network" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>
-            <AttributeValue Name="Domain Selector" Value="" />
 			<AttributeValue Name="User" Value="" />
 			<AttributeValue Name="Password" Value="" />
 			<AttributeValue Name="Default port group path" Value="" />
@@ -196,7 +204,6 @@
           <AttributeValues>
             <AttributeValue Name="UUID" Value="" />
             <AttributeValue Name="vCenter Inventory Path" Value="" />
-            <AttributeValue Name="Default Network" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
@@ -362,6 +369,7 @@
         <ScriptInput Name="COMMAND" DefaultValue="connect" />
         <ScriptInput Name="VLAN_ID" />
         <ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ScriptInput Name="UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect All">

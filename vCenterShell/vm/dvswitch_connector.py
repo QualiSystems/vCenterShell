@@ -24,15 +24,18 @@ class VirtualSwitchToMachineConnector(object):
     def __init__(self,
                  dv_port_group_creator,
                  virtual_machine_port_group_configurer):
+        """
+        :param dv_port_group_creator: <DvPortGroupCreator> instance/interface
+        :param virtual_machine_port_group_configurer: <VirtualMachinePortGroupConfigurer> instance/interface
+        :return:
+        """
         self.dv_port_group_creator = dv_port_group_creator
         self.virtual_machine_port_group_configurer = virtual_machine_port_group_configurer
 
-    def connect_by_mapping(self,
-                           si,
-                           vm,
-                           mapping):
+    def connect_by_mapping(self, si, vm, mapping, default_network):
         """
         gets the mapping to the vnics and connects it to the vm
+        :param default_network:
         :param si: ServiceInstance
         :param vm: vim.VirtualMachine
         :param mapping: [VmNetworkMapping]
@@ -50,4 +53,4 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_spec)
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
-        return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping)
+        self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)
