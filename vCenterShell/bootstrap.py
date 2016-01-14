@@ -69,7 +69,7 @@ class Bootstrapper(object):
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
-            VirtualSwitchToMachineDisconnectCommand(pyVmomiService,
+            VirtualSwitchToMachineDisconnectCommand(py_vmomi_service,
                                                     cloudshell_data_retriever_service,
                                                     synchronous_task_waiter,
                                                     vc_data_model.default_network)
@@ -78,10 +78,10 @@ class Bootstrapper(object):
                                                                        resource_remover,
                                                                        virtual_switch_disconnect_command)
         # Power Command
-        vm_power_management_command = VirtualMachinePowerManagementCommand(pyVmomiService,
+        vm_power_management_command = VirtualMachinePowerManagementCommand(py_vmomi_service,
                                                                            synchronous_task_waiter)
         # Refresh IP command
-        refresh_ip_command = RefreshIpCommand(pyVmomiService, cloudshell_data_retriever_service, helpers,
+        refresh_ip_command = RefreshIpCommand(py_vmomi_service, cloudshell_data_retriever_service, helpers,
                                               resource_model_parser)
 
         self.commandExecuterService = CommandExecuterService(jsonpickle,
