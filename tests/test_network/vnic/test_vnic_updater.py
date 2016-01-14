@@ -12,7 +12,7 @@ class TestVnicUpdater(TestCase):
         vnic_updater = VnicUpdater(helpers)
 
         # Act
-        vnic_updater.update_vnics([(vim.vm.device.VirtualEthernetCard(), Mock(), Mock())], "VM1", "VLAN1")
+        vnic_updater.update_vnics([(vim.vm.device.VirtualEthernetCard(), Mock(), Mock())], "VM1")
 
         # Assert
         self.assertTrue(helpers.SetConnectorAttributes.called)
