@@ -44,8 +44,10 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.dv_switch_path = 'QualiSB'
         self.network_path = 'QualiSB'
 
-        self.dv_switch_name = 'dvSwitch-SergiiT'
-        self.dv_port_group_name = 'aa-dvPortGroup3B'
+        #self.dv_switch_name = 'dvSwitch-SergiiT'
+        self.dv_switch_name = 'dvSwitch'
+        #self.dv_port_group_name = 'aa-dvPortGroup3B'
+        self.dv_port_group_name = 'dvPortGroup'
         self.standard_network_name = "Anetwork"
 
         try:
@@ -181,8 +183,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         #self.integrationtest_remove_interface()
         # self.integrationtest_attach_vnic()
         #self.integrationtest_attach_vnic_portgroup()
-        # self.integrationtest_attach_vnic_portgroup()
         self.integrationtest_attach_vnic_portgroup()
+        #self.integrationtest_attach_vnic_portgroup()
 
         #self.integrationtest_attach_vnic_standard()
         print "Integration Testing COMPLETED"
