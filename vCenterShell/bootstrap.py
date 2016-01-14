@@ -24,6 +24,8 @@ from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 
 from vCenterShell.network.vnic.vnic_service import VNicService
+from vCenterShell.network.vnic import vnic_common
+from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
@@ -47,7 +49,7 @@ class Bootstrapper(object):
         vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
         vc_data_model = vc_model_retriever.get_vcenter_data_model()
 
-        vnic_to_network_mapper = VnicToNetworkMapper(name_generator)
+        vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
 
         # Virtual Switch Connect
         synchronous_task_waiter = SynchronousTaskWaiter()
@@ -63,7 +65,8 @@ class Bootstrapper(object):
                                                                      virtual_switch_to_machine_connector,
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
-                                                                     VLanIdRangeParser())
+                                                                     VLanIdRangeParser(),
+                                                                     VnicUpdater(helpers))
 
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \

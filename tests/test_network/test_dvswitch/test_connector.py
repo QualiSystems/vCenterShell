@@ -18,10 +18,10 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.virtual_machine_name = 'JustTestNeedToBeRemoved'
         self.vm_uuid = "422254d5-5226-946e-26fb-60c21898b731"
 
-        self.vcenter_name = "QualiSB"
+        self.vcenter_name    = "QualiSB"
         self.port_group_path = 'QualiSB'
-        self.dv_switch_path = 'QualiSB'
-        self.network_path = 'QualiSB'
+        self.dv_switch_path  = 'QualiSB'
+        self.network_path    = 'QualiSB'
 
         self.dv_switch_name = 'dvSwitch-SergiiT'
         self.dv_port_group_name = 'aa-dvPortGroup3B'
@@ -40,16 +40,20 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.py_vmomi_service.find_by_uuid = lambda a, b, c: self.vm
         self.py_vmomi_service.find_network_by_name = Mock(return_value=self.network)
 
+
         self.synchronous_task_waiter = Mock()
         self.synchronous_task_waiter.wait_for_task = Mock(return_value="TASK OK")
         self.si = Mock()
 
+
+
         resource_model_parser = ResourceModelParser()
-        # vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
-        # vc_data_model = vc_model_retriever.get_vcenter_data_model()
+        #vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
+        #vc_data_model = vc_model_retriever.get_vcenter_data_model()
         vc_data_model = Mock()
         name_generator = generate_unique_name
-        vnic_to_network_mapper = VnicToNetworkMapper(name_generator)
+        vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
+
 
         helpers = Mock()
         cs_retriever_service = Mock()
@@ -68,6 +72,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                             self.synchronous_task_waiter,
                                                             vnic_to_network_mapper,
                                                             Mock())
+
+        # pyvmomi_service, synchronous_task_waiter, vnic_to_network_mapper, vnic_common
 
         self.creator = DvPortGroupCreator(self.py_vmomi_service, self.synchronous_task_waiter)
         self.connector = VirtualSwitchToMachineConnector(self.creator, self.configurer)
@@ -88,6 +94,10 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         res = self.connector.connect_by_mapping(self.si, self.vm, [], 'default_network')
         self.assertIsNone(res)
+        res = self.connector.connect_by_mapping(self.si, self.vm, [])
+        self.assertEqual(res, 'OK')
 
         res = self.connector.connect_by_mapping(self.si, self.vm, mapp, 'default_network')
         self.assertIsNone(res)
+        res = self.connector.connect_by_mapping(self.si, self.vm, mapp)
+        self.assertEqual(res, 'OK')

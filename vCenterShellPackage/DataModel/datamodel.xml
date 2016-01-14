@@ -315,6 +315,7 @@
           <AttributeValues>
             <AttributeValue Name="Allocation Ranges" Value="2-4094" />
             <AttributeValue Name="Isolation Level" Value="Exclusive" />
+            <AttributeValue Name="Access Mode" Value="Access" />
           </AttributeValues>
           <ParentModels />
           <Drivers>

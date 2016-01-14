@@ -37,7 +37,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
     def test_connect_vnic_to_network(self):
         # arrange
         connect_command = VirtualSwitchConnectCommand(self.pv_service, self.dv_connector, self.dv_port_name_gen,
-                                                      self.vlan_spec_factory, self.vlan_id_range_parser)
+                                                      self.vlan_spec_factory, self.vlan_id_range_parser, Mock())
         mapping = VmNetworkMapping()
         mapping.vnic_name = 'name'
         mapping.vlan_id = 'vlan_id'

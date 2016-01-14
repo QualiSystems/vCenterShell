@@ -45,6 +45,7 @@ class VirtualMachinePortGroupConfigurer(object):
             update_mapping.append(VNicDeviceMapper(vnic, network, True))
 
         self.update_vnic_by_mapping(vm, update_mapping)
+        return update_mapping
 
     def erase_network_by_mapping(self, vm, update_mapping):
         for item in update_mapping:
