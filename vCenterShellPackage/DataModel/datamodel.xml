@@ -127,9 +127,6 @@
       <Models>
         <ResourceModel Name="vCenter" ImagePath="vCenter_Model.png" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes>
-            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
 			<AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
               <AllowedValues />
             </AttachedAttribute>
@@ -162,6 +159,7 @@
           </Drivers>
           <Scripts>
             <ScriptName>Deploy From Template</ScriptName>
+            <ScriptName>Power On</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -356,6 +354,11 @@
     <ScriptDescriptor Name="Destroy VM">
       <ScriptInputs>
         <ScriptInput Name="command" DefaultValue="destroy" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power On">
+      <ScriptInputs>
+        <ScriptInput Name="command" DefaultValue="power_on" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect">

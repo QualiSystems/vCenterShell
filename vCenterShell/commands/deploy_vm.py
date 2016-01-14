@@ -5,7 +5,7 @@ class DeployFromTemplateCommand(object):
 
     def __init__(self, deployer):
         """
-        :param pvService:   pv_service Instance
+        :param deployer:   pv_service Instance
         """
         self.deployer = deployer
 
