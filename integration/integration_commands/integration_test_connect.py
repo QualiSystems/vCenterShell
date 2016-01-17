@@ -56,7 +56,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         vm_uuid = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Boris', 'Boris2-win7').config.uuid
 
         mapping = VmNetworkMapping()
-        mapping.vlan_id = 65
+        mapping.vlan_id = '114'
         # mapping.dv_port_name = 65
         mapping.dv_switch_name = 'dvSwitch'
         mapping.dv_switch_path = 'QualiSB'

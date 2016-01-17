@@ -44,6 +44,7 @@ class CommandExecuterService(object):
         dv_switch_path = self.vcenter_resource_model.default_dvswitch_path
         dv_switch_name = self.vcenter_resource_model.default_dvswitch_name
         port_group_path = self.vcenter_resource_model.default_port_group_path
+        default_network = self.vcenter_resource_model.default_network
 
         vnic_to_network = VmNetworkMapping()
         vnic_to_network.dv_switch_path = dv_switch_path
@@ -60,7 +61,8 @@ class CommandExecuterService(object):
                 connection_details,
                 self.virtual_switch_connect_command.connect_to_networks,
                 uuid,
-                [vnic_to_network])
+                [vnic_to_network],
+                default_network)
 
     def disconnect_all(self):
         vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')

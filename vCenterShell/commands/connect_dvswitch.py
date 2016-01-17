@@ -37,12 +37,15 @@ class VirtualSwitchConnectCommand:
         mappings = []
         # create mapping
         for vm_network_mapping in vm_network_mappings:
-            vm_network_mapping.vlan_id_range = \
-                self.vlan_id_range_parser.parse_vlan_id(vm_network_mapping.vlan_id)
             vm_network_mapping.dv_port_name = \
                 self.dv_port_group_name_generator.generate_port_group_name(vm_network_mapping.vlan_id)
+
+            vm_network_mapping.vlan_id = \
+                self.vlan_id_range_parser.parse_vlan_id(vm_network_mapping.vlan_spec, vm_network_mapping.vlan_id)
+
             vm_network_mapping.vlan_spec = \
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
+
             mappings.append(vm_network_mapping)
 
         return self.virtual_switch_to_machine_connector.connect_by_mapping(
