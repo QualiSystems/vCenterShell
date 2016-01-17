@@ -16,16 +16,17 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
-    def destroy(self, si, uuid, resource_full_name):
+    def destroy(self, si, vm_uuid, resource_full_name):
         # find vm
-        vm = self.pv_service.find_by_uuid(si, uuid)
+        vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
         # todo: change it with the function form SergaiiT Branch
-        #disconnect all vnics
-        self.disconnector.disconnect_all(vm)
+        # todo: alexa: check if I can refactor the disconnector so it will not request the vCenter resource name
+        # disconnect all vnics before destroy
+        self.disconnector.disconnect_all("", vm_uuid, vm)
 
         # destroy vm
-        result = self.pv_service.destory_mv(si, vm)
+        result = self.pv_service.destroy_vm(vm)
 
         # delete resources
         self.resource_remover.remove_resource(resource_full_name)

@@ -4,8 +4,8 @@
     <AppResources>
       <AppResource ModelName="Generic Deployed App" Driver="">
         <Attributes>
-          <Attribute Name="UUID" Value="" />
-          <Attribute Name="vCenter Inventory Path" Value="" />
+          <Attribute Name="VM_UUID" Value="" />
+          <Attribute Name="Cloud Provider" Value="" />
         </Attributes>
       </AppResource>
     </AppResources>

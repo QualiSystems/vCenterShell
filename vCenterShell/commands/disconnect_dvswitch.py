@@ -31,17 +31,16 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.port_group_configurer = port_group_configurer
         self.default_network = default_network
 
-    def get_service_instance(self, vcenter_name):
+    def _get_service_instance(self, vcenter_name):
         """
         Get vCenter connection
-        :param vcenter_name:
         :return: VmWare SI (Service Instance)
         """
-        connection_details = self.connection_retriever.connection_details(vcenter_name)
+        connection_details = self.connection_retriever.connection_details()
         si = self.pyvmomi_service.connect(connection_details.host,
-                                  connection_details.username,
-                                  connection_details.password,
-                                  connection_details.port)
+                                          connection_details.username,
+                                          connection_details.password,
+                                          connection_details.port)
         return si
 
     def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
@@ -53,27 +52,30 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         :return:
         """
         _logger.debug(u"Revoking ALL Interfaces from VM '{}'...".format(vm_uuid))
-        si = self.get_service_instance(vcenter_name)
+        si = self._get_service_instance(vcenter_name)
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        condition = lambda device: VNicService.device_is_attached_to_network(device, network_name) if network_name else lambda \
-            x: True
+        condition = lambda device: VNicService.device_is_attached_to_network(device,
+                                                                             network_name) if network_name else lambda \
+                x: True
         return self.remove_interfaces_from_vm_task(vm, condition)
 
-    def disconnect_all(self, vcenter_name, vm_uuid):
+    def disconnect_all(self, vcenter_name, vm_uuid, vm=None):
         return self.disconnect(vcenter_name, vm_uuid, None)
 
-    def disconnect(self, vcenter_name, vm_uuid, network_name=None):
+    def disconnect(self, vcenter_name, vm_uuid, network_name=None, vm=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
         :param <str> vcenter_name: the name of the vCenter to connect to
         :param <str> vm_uuid: the uuid of the vm
         :param <str | None> network_name: the name of the specific network to disconnect
+        :param <pyvmomi vm object> vm: If the vm obj is None will use vm_uuid to fetch the object
         :return: Started Task
         """
         _logger.debug(u"Disconnect Interface VM: '{}' Network: '{}' ...".format(vm_uuid, network_name or "ALL"))
-        si = self.get_service_instance(vcenter_name)
-        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        si = self._get_service_instance(vcenter_name)
+        if vm is None:
+            vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if network_name:
             network = self.pyvmomi_service.vm_get_network_by_name(vm, network_name)
