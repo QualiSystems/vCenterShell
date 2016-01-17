@@ -50,9 +50,9 @@ class TestCommandExecuterService(unittest.TestCase):
         self.assertTrue(self.serializer.decode.called_with(deploy_param))
         self.assertTrue(self.connection_retriever.connection_details.called)
         self.assertTrue(self.command_wrapper.execute_command_with_connection.called_with(
-            self.connection_details,
-            deploy_from_template.execute_deploy_from_template,
-            deploy_data))
+                self.connection_details,
+                deploy_from_template.execute_deploy_from_template,
+                deploy_data))
         self.assertTrue(self.serializer.encode.called_with(deploy_result))
 
     def test_power_off(self):
@@ -140,7 +140,6 @@ class TestCommandExecuterService(unittest.TestCase):
         Destroyer = Mock()
         connection_retriever = Mock()
         connection_details = Mock()
-        command_wrapper = Mock()
 
         resource_att.fullname = 'full_name'
         connection_retriever.getVCenterInventoryPathAttributeData = \
@@ -168,19 +167,20 @@ class TestCommandExecuterService(unittest.TestCase):
 
         # assert
         self.assertTrue(connection_retriever.getVCenterInventoryPathAttributeData.called_with(resource_att))
-        self.assertTrue(command_wrapper.execute_command_with_connection.called_with(connection_details,
-                                                                                    Destroyer.destroy,
-                                                                                    VmContext.VM_UUID,
-                                                                                    resource_att.fullname))
+        self.assertTrue(self.command_wrapper.execute_command_with_connection.called_with(connection_details,
+                                                                                         Destroyer.destroy,
+                                                                                         VmContext.VM_UUID,
+                                                                                         resource_att.fullname))
         self.assertTrue(connection_retriever.connection_details.called_with(vcenter_name))
 
     def test_disconnect(self):
         # arrange
+        connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
         virtual_switch_disconnect_command.disconnect = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
                                                           Mock(),
-                                                          Mock(),
+                                                          self.command_wrapper,
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -191,22 +191,26 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-        CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
-        CommandContextMocker.set_vm_uuid_param(VmContext.NETWORK_NAME)
+        CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
 
         # act
         command_executer_service.disconnect()
 
         # assert
-        self.assertTrue(virtual_switch_disconnect_command.disconnect.called)
+        self.assertTrue(self.command_wrapper.execute_command_with_connection
+                        .called_with(connection_details,
+                                     virtual_switch_disconnect_command.disconnect,
+                                     VmContext.VM_UUID,
+                                     VmContext.NETWORK_NAME))
 
     def test_disconnect_all(self):
         # arrange
+        connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
         virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
                                                           Mock(),
-                                                          Mock(),
+                                                          self.command_wrapper,
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -215,11 +219,15 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
                                                           Mock())
+
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
-        CommandContextMocker.set_vm_uuid_param(VmContext.VCENTER_NAME)
+        CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
 
         # act
         command_executer_service.disconnect_all()
 
         # assert
-        self.assertTrue(virtual_switch_disconnect_command.disconnect_all.called)
+        self.assertTrue(self.command_wrapper.execute_command_with_connection
+                        .called_with(connection_details,
+                                     virtual_switch_disconnect_command.disconnect_all,
+                                     VmContext.VM_UUID))

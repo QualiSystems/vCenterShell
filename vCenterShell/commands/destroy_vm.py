@@ -23,7 +23,7 @@ class DestroyVirtualMachineCommand(object):
         # todo: change it with the function form SergaiiT Branch
         # todo: alexa: check if I can refactor the disconnector so it will not request the vCenter resource name
         # disconnect all vnics before destroy
-        self.disconnector.disconnect_all("", vm_uuid, vm)
+        self.disconnector.disconnect_all(si, vm_uuid, vm)
 
         # destroy vm
         result = self.pv_service.destroy_vm(vm)
