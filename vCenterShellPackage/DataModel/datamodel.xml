@@ -297,13 +297,13 @@
                 <AllowedValue>Exclusive</AllowedValue>
               </AllowedValues>
             </AttachedAttribute>
-            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true">
+            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues>
                 <AllowedValue>Access</AllowedValue>
                 <AllowedValue>Trunk</AllowedValue>
               </AllowedValues>
             </AttachedAttribute>
-            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" >
+            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues />
             </AttachedAttribute>
             <AttachedAttribute Name="Virtual Network" IsOverridable="true" IsLocal="true" UserInput="false">
@@ -357,6 +357,7 @@
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="destroy" />
         <ScriptInput Name="VM_UUID" />
+        <ScriptInput RESOURCE_FULLNAME=""
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Power On">

@@ -28,7 +28,7 @@ from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
-
+from common.utilites.common_name import generate_unique_name
 
 class Bootstrapper(object):
     def __init__(self):
@@ -38,8 +38,7 @@ class Bootstrapper(object):
                                                                                    cloudshell_data_retriever_service)
         resource_remover = CloudshellResourceRemover(helpers)
         command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
-        name_generator = DvPortGroupNameGenerator()
-        template_deployer = VirtualMachineDeployer(py_vmomi_service, name_generator)
+        template_deployer = VirtualMachineDeployer(py_vmomi_service, generate_unique_name)
 
         deploy_from_template_command = DeployFromTemplateCommand(template_deployer)
 
@@ -48,7 +47,8 @@ class Bootstrapper(object):
         vc_data_model = vc_model_retriever.get_vcenter_data_model()
 
         #vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
-        vnic_to_network_mapper = VnicToNetworkMapper(name_generator)
+        port_group_name_generator = DvPortGroupNameGenerator()
+        vnic_to_network_mapper = VnicToNetworkMapper(port_group_name_generator)
 
         # Virtual Switch Connect
         synchronous_task_waiter = SynchronousTaskWaiter()
@@ -70,7 +70,6 @@ class Bootstrapper(object):
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
             VirtualSwitchToMachineDisconnectCommand(py_vmomi_service,
-                                                    resource_connection_details_retriever,
                                                     virtual_machine_port_group_configurer,
                                                     vc_data_model.default_network)
 
