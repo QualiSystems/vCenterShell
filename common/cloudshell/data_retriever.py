@@ -71,6 +71,7 @@ class CloudshellDataRetrieverService:
 
         return VCenterConnectionDetails(vcenter_url, user, password)
 
+    # obsolete
     def getVCenterInventoryPathAttributeData(self, resource_attributes):
         """ get vCenter resource name & virtual machine folder path """
 
@@ -78,7 +79,7 @@ class CloudshellDataRetrieverService:
         path_components = path_att.split("/")
 
         vm_folder = ""
-        if (len(path_components) > 1):
+        if len(path_components) > 1:
             vm_folder = "/".join(path_components[1:])
 
         return VCenterInventoryPathAttribute(

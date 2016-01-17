@@ -80,7 +80,7 @@ class CommandExecuterService(object):
 
     def destroy(self):
         # get command parameters from the environment
-        uuid = self.qualipy_helpers.get_user_param('uuid')
+        uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         resource = self.qualipy_helpers.get_resource_context_details()
 
         # prepare for execute command
