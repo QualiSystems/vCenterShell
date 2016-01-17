@@ -1,5 +1,4 @@
 class GenericDeployedAppResourceModel(object):
     def __init__(self):
-        self.location = ''
-        self.uuid = ''
+        self.vm_uuid = ''
         self.cloud_provider = ''

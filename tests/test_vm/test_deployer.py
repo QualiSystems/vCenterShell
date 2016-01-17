@@ -42,7 +42,7 @@ class TestVirtualMachineDeployer(TestCase):
         res = deployer.deploy_from_template(si, params)
 
         self.assertEqual(res.vm_name, name)
-        self.assertEqual(res.uuid, uuid)
+        self.assertEqual(res.vm_uuid, uuid)
         self.assertEqual(res.cloud_provider_resource_name,
                          params.template_model.vCenter_resource_name)
         self.assertTrue(pv_service.CloneVmParameters.called)
