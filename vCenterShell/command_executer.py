@@ -34,7 +34,7 @@ class CommandExecuterService(object):
 
     def connect(self):
         # get command parameters from the environment
-        uuid = self.qualipy_helpers.get_user_param('UUID')
+        uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         vlan_id = self.qualipy_helpers.get_user_param('VLAN_ID')
         vlan_spec_type = self.qualipy_helpers.get_user_param('VLAN_SPEC_TYPE')
         # vnic_name = self.qualipy_helpers.get_user_param('VNIC_NAME')
