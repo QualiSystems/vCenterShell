@@ -211,6 +211,7 @@
           </Drivers>
           <Scripts>
             <ScriptName>Connect</ScriptName>
+            <ScriptName>Deployed App Service</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -395,6 +396,9 @@
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Auto Resolve Vlan">
+      <ScriptInputs />
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Deployed App Service">
       <ScriptInputs />
     </ScriptDescriptor>
   </ScriptDescriptors>

@@ -10,8 +10,10 @@ python driver_packager.py packeger_configs\\power_off_command.ini
 python driver_packager.py packeger_configs\\connect_command.ini
 python driver_packager.py packeger_configs\\vlan_auto_service.ini
 python driver_packager.py packeger_configs\\orchestration_service.ini
+python driver_packager.py packeger_configs\\deployed_app_service.ini
+python driver_packager.py packeger_configs\\environment_scripts.ini
 
-copy environment_scripts\connect_all.py "vCenterShellPackage\\Resource Scripts\\Connect All.py" /Y
+REM copy environment_scripts\connect_all.py "vCenterShellPackage\\Resource Scripts\\Connect All.py" /Y
 
 
 REM build vCenterShell package
