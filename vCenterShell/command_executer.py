@@ -81,7 +81,7 @@ class CommandExecuterService(object):
     def destroy(self):
         # get command parameters from the environment
         uuid = self.qualipy_helpers.get_user_param('VM_UUID')
-        resource = self.qualipy_helpers.get_resource_context_details()
+        resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -91,7 +91,7 @@ class CommandExecuterService(object):
                 connection_details,
                 self.destroyVirtualMachineCommand.destroy,
                 uuid,
-                resource.fullname)
+                resource_fullname)
 
     def deploy_from_template(self):
         # get command parameters from the environment

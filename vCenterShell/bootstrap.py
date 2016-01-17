@@ -70,8 +70,8 @@ class Bootstrapper(object):
         # Virtual Switch Revoke
         virtual_switch_disconnect_command = \
             VirtualSwitchToMachineDisconnectCommand(py_vmomi_service,
-                                                    cloudshell_data_retriever_service,
-                                                    synchronous_task_waiter,
+                                                    resource_connection_details_retriever,
+                                                    virtual_machine_port_group_configurer,
                                                     vc_data_model.default_network)
 
         destroy_virtual_machine_command = DestroyVirtualMachineCommand(py_vmomi_service,
