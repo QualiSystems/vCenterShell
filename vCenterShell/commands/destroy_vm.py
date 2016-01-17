@@ -22,7 +22,7 @@ class DestroyVirtualMachineCommand(object):
 
         # todo: change it with the function form SergaiiT Branch
         #disconnect all vnics
-        self.disconnector.remove_interfaces_from_vm(vm)
+        self.disconnector.disconnect_all(vm)
 
         # destroy vm
         result = self.pv_service.destory_mv(si, vm)
