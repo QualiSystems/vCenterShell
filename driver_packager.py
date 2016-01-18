@@ -1,13 +1,15 @@
 import os
 import sys
 import zipfile
+import ConfigParser
 
-DRIVER_FILE_NAME_FORMAT = 'vCenterShellPackage/Resource Scripts/{0}.zip'
+DRIVER_FILE_BASE_DIR = 'vCenterShellPackage'
 STRIPING_CHARS = ' \t\n\r'
 DRIVER_FOLDER = 'driver_folder'
 INCLUDE_DIRS = 'include_dirs'
 TARGET_NAME = 'target_name'
 VERSION_FILENAME = 'version.txt'
+TARGET_DIR = 'target_dir'
 
 
 def zip_dir(path, zip_handler, include_dir=True):
@@ -42,21 +44,17 @@ def add_version_file_to_zip(ziph, driver_path=None):
 def main(args):
     config_file_name = args[1]
 
-    with open(config_file_name) as f_config:
-        if f_config is None:
-            raise Exception('no packager config file found')
-        config = dict()
-        config_raw = f_config.read().splitlines()
-        for att in config_raw:
-            cnf_att = att.split(':')
-            config[cnf_att[0].strip(' \t\n\r')] = cnf_att[1].strip(STRIPING_CHARS).split(',')
+    config = ConfigParser.ConfigParser()
+    config.readfp(open(config_file_name))
 
-    target_name = config[TARGET_NAME][0]
-    driver = config[DRIVER_FOLDER][0]
+    driver = config.get('Packaging', DRIVER_FOLDER)
+    include_dirs = config.get('Packaging', INCLUDE_DIRS).split(',')
+    target_name = config.get('Packaging', TARGET_NAME)
+    target_dir = config.get('Packaging', TARGET_DIR)
 
-    print 'packing driver: {0}'.format(target_name)
+    zip_name = os.path.join(DRIVER_FILE_BASE_DIR, target_dir, target_name + '.zip')
 
-    zip_name = DRIVER_FILE_NAME_FORMAT.format(target_name)
+    print 'Packing driver {0} into {1}'.format(target_name, zip_name)
 
     ensure_dir(zip_name)
 
@@ -80,13 +78,10 @@ def main(args):
 
     add_version_file_to_zip(zip_file)
 
-    for dir_to_include in config[INCLUDE_DIRS]:
+    for dir_to_include in include_dirs:
         zip_dir(dir_to_include, zip_file)
 
     zip_file.close()
-
-    print 'done!'
-
 
 if __name__ == "__main__":
     main(sys.argv)

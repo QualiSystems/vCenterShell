@@ -34,11 +34,18 @@ class CommandExecuterService(object):
 
     def connect(self):
         # get command parameters from the environment
-        uuid = self.qualipy_helpers.get_user_param('UUID')
+        uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         vlan_id = self.qualipy_helpers.get_user_param('VLAN_ID')
         vlan_spec_type = self.qualipy_helpers.get_user_param('VLAN_SPEC_TYPE')
-        # vnic_name = self.qualipy_helpers.get_user_param('VNIC_NAME')
-        # dv_port_name = self.qualipy_helpers.get_user_param('DV_PORT_NAME')
+
+        if not uuid:
+            raise ValueError('VM_UUID is missing')
+
+        if not vlan_id:
+            raise ValueError('VLAN_ID is missing')
+
+        if not vlan_spec_type:
+            raise ValueError('VLAN_SPEC_TYPE is missing')
 
         # load default params
         dv_switch_path = self.vcenter_resource_model.default_dvswitch_path
