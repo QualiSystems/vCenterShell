@@ -12,6 +12,7 @@ def execute_app_orchestration():
     helpers.get_resource_context_details()
     app_name = resource_details["name"]
     deployment_service = resource_details["appData"]["deploymentService"]["name"]
+    installation_service_data = resource_details["appData"]["installationService"]
 
     # Start api session
     api = helpers.get_api_session()
@@ -33,13 +34,55 @@ def execute_app_orchestration():
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
     # if install service exists on app execute it
-    # TODO
-    #api.ExecuteInstallAppCommand(reservation_id, )
-    
+    execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id)
+
+    # refresh ip
+    refresh_ip(api, deployment_result, reservation_id)
+
     # Set live status - deployment done
     api.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
     logger.info("Deployed {0} Successfully".format(app_name))
+
+
+def refresh_ip(api, deployment_result, reservation_id):
+    logger.info("Waiting to get IP fro deployed app resource {0}...".format(deployment_result.LogicalResourceName))
+    try:
+        # TODO update the script inputs with data from the installation service
+        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName,
+                           "Resource" "Refresh IP", [InputNameValue('VM_UUID',
+                                                                    deployment_result.VmUuid),
+                                                     InputNameValue('RESOURCE_NAME',
+                                                                    deployment_result.LogicalResourceName)])
+    except CloudShellAPIError as exc:
+        logger.error("Error refreshing ip for deployed app {0}. Error: {1}"
+                     .format(deployment_result.LogicalResourceName, exc.rawxml))
+        exit(1)
+    except Exception as exc:
+        logger.error("Error refreshing ip for deployed app {0}. Error: {1}"
+                     .format(deployment_result.LogicalResourceName, str(exc)))
+        exit(1)
+
+
+def execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id):
+    if not installation_service_data:
+        return
+    installation_service_name = installation_service_data["name"]
+    logger.info("Executing installation '{0}' on deployed app resource '{1}'..."
+                .format(installation_service_name, deployment_result.LogicalResourceName))
+    try:
+        # TODO update the script inputs with data from the installation service
+        installation_result = api.ExecuteInstallAppCommand(reservation_id, deployment_result.LogicalResourceName,
+                                                           "Install", [InputNameValue('STAM', "- its just a demo")])
+        logger.debug("installation_result: " + installation_result.Output)
+    except CloudShellAPIError as exc:
+        logger.error("Error installing deployed app {0}. Error: {1}"
+                     .format(deployment_result.LogicalResourceName, exc.rawxml))
+        exit(1)
+    except Exception as exc:
+        logger.error(
+                "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName, str(exc)))
+        exit(1)
 
 
 def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
