@@ -26,7 +26,7 @@ def execute_app_orchestration():
     api.SetAttributesValues(
             [ResourceAttributesUpdateRequest(
                     deployment_result.LogicalResourceName,
-                    [AttributeNameValue("VM UUID", deployment_result.VmUuid),
+                    [AttributeNameValue("VM_UUID", deployment_result.VmUuid),
                      AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
 
     # logical resource execute "Power On"
