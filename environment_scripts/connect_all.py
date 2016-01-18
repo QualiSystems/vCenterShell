@@ -12,8 +12,6 @@ class EnvironmentConnector(object):
         Connects all the VLAN Auto services to all the Deployed Apps in the same Environment
         :return:
         """
-
-        resource_model_parser = ResourceModelParser()
         session = helpers.get_api_session()
         reservation_id = helpers.get_reservation_context_details().id
 
@@ -56,8 +54,7 @@ class EnvironmentConnector(object):
     def _execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id, session,
                                                        virtual_network):
         session.ExecuteCommand(reservation_id, connected_resource, 'Resource', 'Connect',
-                               [InputNameValue('COMMAND', "connect"),
-                                InputNameValue('VLAN_ID', virtual_network),
+                               [InputNameValue('VLAN_ID', virtual_network),
                                 InputNameValue('VLAN_SPEC_TYPE', access_mode)],
                                True)
 

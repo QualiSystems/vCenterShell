@@ -161,7 +161,7 @@
             <ScriptName>Deploy From Template</ScriptName>
             <ScriptName>Power On</ScriptName>
             <ScriptName>Power Off</ScriptName>
-            <ScriptName>Connect</ScriptName>
+            <ScriptName>Connect VM</ScriptName>
             <ScriptName>Destroy VM</ScriptName>
           </Scripts>
         </ResourceModel>
@@ -211,7 +211,6 @@
           </Drivers>
           <Scripts>
             <ScriptName>Connect</ScriptName>
-            <ScriptName>Deployed App Service</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -372,16 +371,13 @@
         <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
-    <ScriptDescriptor Name="Connect">
+    <ScriptDescriptor Name="Connect VM">
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="connect" />
         <ScriptInput Name="VLAN_ID" />
         <ScriptInput Name="VLAN_SPEC_TYPE" />
         <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
-    </ScriptDescriptor>
-    <ScriptDescriptor Name="Connect All">
-      <ScriptInputs />
     </ScriptDescriptor>
     <ScriptDescriptor Name="Deploy" Description="Used by App deployment service">
       <ScriptInputs />
@@ -398,7 +394,14 @@
     <ScriptDescriptor Name="Auto Resolve Vlan">
       <ScriptInputs />
     </ScriptDescriptor>
-    <ScriptDescriptor Name="Deployed App Service">
+    <ScriptDescriptor Name="Connect">
+      <ScriptInputs>
+        <ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ScriptInput Name="VLAN_ID" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+        <!-- Environment script -->
+    <ScriptDescriptor Name="Connect All">
       <ScriptInputs />
     </ScriptDescriptor>
   </ScriptDescriptors>

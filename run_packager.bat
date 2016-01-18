@@ -13,8 +13,5 @@ python driver_packager.py packeger_configs\\orchestration_service.ini
 python driver_packager.py packeger_configs\\deployed_app_service.ini
 python driver_packager.py packeger_configs\\environment_scripts.ini
 
-REM copy environment_scripts\connect_all.py "vCenterShellPackage\\Resource Scripts\\Connect All.py" /Y
-
-
 REM build vCenterShell package
 python shell_packager.py vCenterShell

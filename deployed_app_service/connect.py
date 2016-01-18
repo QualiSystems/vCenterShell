@@ -30,7 +30,7 @@ class DeployedAppService(object):
         reservation_id = helpers.get_reservation_context_details().id
         session.ExecuteCommand(reservation_id, generic_deployed_app_resource_model.cloud_provider,
                                'Resource',
-                               'Connect',
+                               'Connect VM',
                                [InputNameValue('COMMAND', "connect"),
                                 InputNameValue('VLAN_ID', virtual_network),
                                 InputNameValue('VLAN_SPEC_TYPE', access_mode),
