@@ -6,7 +6,7 @@ DEBUG_COMMAND_PARAMS = 'command params: {0}'
 COMMA = ','
 EXECUTING_COMMAND = 'executing command: {0}'
 CONNECTED_TO_CENTER = 'connected to vcenter: {0}'
-DEBUG_CONNECTION_INFO = 'connection params: host: {0} username: {1} password: {2} port: {3}'
+DEBUG_CONNECTION_INFO = 'connection params: host: {0} username: {1} port: {2}'
 LOGGER_CANNOT_BE_NONE = 'logger cannot be None'
 COMMAND_CANNOT_BE_NONE = 'command cannot be None'
 INFO_CONNECTING_TO_VCENTER = 'connecting to vcenter: {0}'
@@ -43,7 +43,6 @@ class CommandWrapper:
                 logger.debug(
                         DEBUG_CONNECTION_INFO.format(connection_details.host,
                                                      connection_details.username,
-                                                     connection_details.password,
                                                      connection_details.port))
 
                 si = self.pv_service.connect(connection_details.host,

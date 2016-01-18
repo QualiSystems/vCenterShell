@@ -23,7 +23,6 @@ def main(args):
     add_version_file_to_zip(zip_file)
 
     zip_file.close()
-    print 'done!'
 
 
 if __name__ == "__main__":

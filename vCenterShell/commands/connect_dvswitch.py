@@ -6,7 +6,8 @@ class VirtualSwitchConnectCommand:
                  dv_port_group_name_generator,
                  vlan_spec_factory,
                  vlan_id_range_parser,
-                 vnic_updater):
+                 vnic_updater,
+                 logger):
         """
         :param py_service: vCenter API wrapper
         :param virtual_switch_to_machine_connector:
@@ -21,6 +22,7 @@ class VirtualSwitchConnectCommand:
         self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
         self.vnic_updater = vnic_updater
+        self.logger = logger
 
     def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name):
         """
@@ -34,6 +36,14 @@ class VirtualSwitchConnectCommand:
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         default_network_instance = self.pv_service.get_network_by_full_name(si, default_network_name)
 
+        mappings = self._prepare_mappings(vm_network_mappings)
+
+        return self.virtual_switch_to_machine_connector.connect_by_mapping(
+            si, vm, mappings, default_network_instance)
+
+        # self.vnic_updater.update_vnics(update_mapping, vm.name)
+
+    def _prepare_mappings(self, vm_network_mappings):
         mappings = []
         # create mapping
         for vm_network_mapping in vm_network_mappings:
@@ -46,9 +56,10 @@ class VirtualSwitchConnectCommand:
             vm_network_mapping.vlan_spec = \
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
 
+            self.logger.debug('Vlan Id: {0}, VLAN Spec: {1}, Port Name {2}',
+                              vm_network_mapping.vlan_id,
+                              vm_network_mapping.vlan_spec,
+                              vm_network_mapping.dv_port_name)
+
             mappings.append(vm_network_mapping)
-
-        return self.virtual_switch_to_machine_connector.connect_by_mapping(
-            si, vm, mappings, default_network_instance)
-
-        # self.vnic_updater.update_vnics(update_mapping, vm.name)
+        return mappings

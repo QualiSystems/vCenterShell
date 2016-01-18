@@ -3,7 +3,7 @@ import models
 from time import sleep
 
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from qualipy.api.testshell_api import AttributeNameValue
+from qualipy.api.cloudshell_api import AttributeNameValue
 
 from common.model_factory import ResourceModelParser
 from vlan_service.resolver.provider import VlanResolverProvider

@@ -107,3 +107,6 @@ def deploy_app(api, app_name, deployment_service, reservation_id):
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
         exit(1)
+
+
+

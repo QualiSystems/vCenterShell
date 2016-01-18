@@ -9,6 +9,9 @@ class VLanIdRangeParser(object):
 
     @staticmethod
     def parse_vlan_id(vlan_type, vlan_id):
+        if not vlan_type or not vlan_id:
+            raise ValueError('vlan_id is empty')
+
         if vlan_type == 'Access':
             if represents_int(vlan_id):
                 return int(vlan_id)
