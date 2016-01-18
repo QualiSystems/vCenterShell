@@ -1,8 +1,5 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue
-from common.utilites.common_utils import first_or_default
-
-from common.model_factory import ResourceModelParser
 
 
 class EnvironmentConnector(object):
@@ -37,6 +34,8 @@ class EnvironmentConnector(object):
 
             if not connected_resources:
                 continue
+
+            session.ExecuteCommand(reservation_id, vlan_service.ServiceName, 'Service', 'Auto Resolve Vlan',[], True)
 
             for connected_resource in connected_resources:
                 self._execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id,
