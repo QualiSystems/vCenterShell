@@ -357,6 +357,7 @@
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="destroy" />
         <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Power On">

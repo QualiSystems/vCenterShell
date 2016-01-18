@@ -72,18 +72,30 @@ class CommandExecuterService(object):
                 default_network)
 
     def disconnect_all(self):
-        vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')
-        virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
-        default_network_name = self.qualipy_helpers.get_user_param('DEFAULT_NETWORK_FULL_NAME')
-        self.virtual_switch_disconnect_command.disconnect_all(vcener_name, virtual_machine_id, default_network_name)
+        vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+
+        # prepare for execute command
+        connection_details = self.connection_retriever.connection_details()
+
+        # execute command
+        self.command_wrapper.execute_command_with_connection(
+                connection_details,
+                self.virtual_switch_disconnect_command.disconnect_all,
+                vm_uuid)
 
     def disconnect(self):
-        vcener_name = self.qualipy_helpers.get_user_param('VCENTER_NAME')
-        virtual_machine_id = self.qualipy_helpers.get_user_param('VM_UUID')
+        vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         network_name = self.qualipy_helpers.get_user_param('NETWORK_NAME')
-        default_network_name = self.qualipy_helpers.get_user_param('DEFAULT_NETWORK_FULL_NAME')
-        self.virtual_switch_disconnect_command.disconnect(vcener_name, virtual_machine_id, network_name,
-                                                          default_network_name)
+
+        # prepare for execute command
+        connection_details = self.connection_retriever.connection_details()
+
+        # execute command
+        self.command_wrapper.execute_command_with_connection(
+                connection_details,
+                self.virtual_switch_disconnect_command.disconnect,
+                vm_uuid,
+                network_name)
 
     def destroy(self):
         # get command parameters from the environment

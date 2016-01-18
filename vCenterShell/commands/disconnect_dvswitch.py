@@ -15,72 +15,55 @@ _logger = getLogger("vCenterShell")
 class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
-                 connection_retriever,
                  port_group_configurer,
                  default_network):
         """
         Disconnect Distributed Virtual Switch from VM Command
         :param pyvmomi_service: vCenter API wrapper
-        :param connection_retriever: Service which provides connecting to vCenter
         :param port_group_configurer: Port Group Configurer Service
         :param <Network obj> default_network: Network which disconnected interface will be attached to
         :return:
         """
         self.pyvmomi_service = pyvmomi_service
-        self.connection_retriever = connection_retriever
         self.port_group_configurer = port_group_configurer
         self.default_network = default_network
 
-    def _get_service_instance(self, vcenter_name):
-        """
-        Get vCenter connection
-        :return: VmWare SI (Service Instance)
-        """
-        connection_details = self.connection_retriever.connection_details()
-        si = self.pyvmomi_service.connect(connection_details.host,
-                                          connection_details.username,
-                                          connection_details.password,
-                                          connection_details.port)
-        return si
-
-    def remove_vnic(self, vcenter_name, vm_uuid, network_name=None):
+    def remove_vnic(self, si, vm_uuid, network_name=None):
         """
         disconnect all of the network adapter of the vm
-        :param <str> network_name: the name of the specific network to disconnect & vNic remove
-        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> si:
         :param <str> vm_uuid: the uuid of the vm
+        :param <str> network_name: the name of the specific network to disconnect & vNic remove
         :return:
         """
         _logger.debug(u"Revoking ALL Interfaces from VM '{}'...".format(vm_uuid))
-        si = self._get_service_instance(vcenter_name)
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        condition = lambda device: VNicService.device_is_attached_to_network(device,
-                                                                             network_name) if network_name else lambda \
-                x: True
+        condition = lambda device: \
+            VNicService.device_is_attached_to_network(device, network_name) if network_name else lambda x: True
+
         return self.remove_interfaces_from_vm_task(vm, condition)
 
-    def disconnect_all(self, vcenter_name, vm_uuid, vm=None):
-        return self.disconnect(vcenter_name, vm_uuid, None)
+    def disconnect_all(self, si, vm_uuid, vm=None):
+        return self.disconnect(si, vm_uuid, None)
 
-    def disconnect(self, vcenter_name, vm_uuid, network_name=None, vm=None):
+    def disconnect(self, si, vm_uuid, network_name=None, vm=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
-        :param <str> vcenter_name: the name of the vCenter to connect to
+        :param <str> si:
         :param <str> vm_uuid: the uuid of the vm
         :param <str | None> network_name: the name of the specific network to disconnect
         :param <pyvmomi vm object> vm: If the vm obj is None will use vm_uuid to fetch the object
         :return: Started Task
         """
-        _logger.debug(u"Disconnect Interface VM: '{}' Network: '{}' ...".format(vm_uuid, network_name or "ALL"))
-        si = self._get_service_instance(vcenter_name)
+        _logger.debug("Disconnect Interface VM: '{0}' Network: '{1}' ...".format(vm_uuid, network_name or "ALL"))
         if vm is None:
             vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if network_name:
             network = self.pyvmomi_service.vm_get_network_by_name(vm, network_name)
             if network is None:
-                raise KeyError(u'Network not found ({0})'.format(network_name))
+                raise KeyError('Network not found ({0})'.format(network_name))
         else:
             network = None
 
