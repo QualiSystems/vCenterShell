@@ -258,16 +258,12 @@
 			<AttachedAttribute Name="VM Storage" IsOverridable="true" IsLocal="true" UserInput="true">
               <AllowedValues />
             </AttachedAttribute>
-            <AttachedAttribute Name="Domain Selector" IsOverridable="true" IsLocal="true" UserInput="true">
-              <AllowedValues />
-            </AttachedAttribute>
           </AttachedAttributes>
           <AttributeValues>            
             <AttributeValue Name="vCenter Template" Value="" />
 			<AttributeValue Name="VM Cluster" Value="" />
 			<AttributeValue Name="VM Power State" Value="" />
 			<AttributeValue Name="VM Storage" Value="" />
-            <AttributeValue Name="Domain Selector" Value="" />
           </AttributeValues>
           <ParentModels />
           <Drivers>
