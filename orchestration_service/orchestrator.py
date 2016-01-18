@@ -37,7 +37,7 @@ def execute_app_orchestration():
     execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id)
 
     # refresh ip
-    refresh_ip(api, deployment_result, reservation_id)
+    #refresh_ip(api, deployment_result, reservation_id)
 
     # Set live status - deployment done
     api.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
@@ -46,7 +46,7 @@ def execute_app_orchestration():
 
 
 def refresh_ip(api, deployment_result, reservation_id):
-    logger.info("Waiting to get IP fro deployed app resource {0}...".format(deployment_result.LogicalResourceName))
+    logger.info("Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
     try:
         # TODO update the script inputs with data from the installation service
         api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName,

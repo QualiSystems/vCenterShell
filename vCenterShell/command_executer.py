@@ -162,10 +162,10 @@ class CommandExecuterService(object):
         connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        self.execute_command_with_connection(connection_details,
-                                             self.refresh_ip_command.refresh_ip,
-                                             vm_uuid,
-                                             resource_name)
+        self.command_wrapper.execute_command_with_connection(connection_details,
+                                                             self.refresh_ip_command.refresh_ip,
+                                                             vm_uuid,
+                                                             resource_name)
 
     def _prepare_command_result(self, output):
         return self.COMMAND_RESULT_PREFIX + str(output) + self.COMMAND_RESULT_POSTFIX
