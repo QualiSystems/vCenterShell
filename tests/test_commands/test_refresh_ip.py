@@ -32,8 +32,10 @@ class TestRefreshIpCommand(TestCase):
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, Mock(), qualipy_helpers, resource_model_parser)
 
+        si = Mock()
+
         # Act
-        refresh_ip_command.refresh_ip('1234-5678', 'machine1')
+        refresh_ip_command.refresh_ip(si, '1234-5678', 'machine1')
 
         # Assert
         session.UpdateResourceAddress.assert_called_with('machine1', '192.168.1.1')

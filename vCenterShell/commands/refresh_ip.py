@@ -1,4 +1,3 @@
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
 import time
 
 
@@ -19,7 +18,7 @@ class RefreshIpCommand(object):
         """
 
         api = self.qualipy_helpers.get_api_session()
-        vcenter_resource_context = helpers.get_resource_context_details()
+        vcenter_resource_context = self.qualipy_helpers.get_resource_context_details()
 
         # vCenterResourceModel
         vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_resource_context)
