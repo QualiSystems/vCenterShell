@@ -30,7 +30,10 @@ def execute_app_orchestration():
                     [AttributeNameValue("VM_UUID", deployment_result.VmUuid),
                      AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
 
-    # logical resource execute "Power On"
+    # connect all
+    connect_all(api, reservation_id)
+
+    # "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
     # if install service exists on app execute it
@@ -43,6 +46,17 @@ def execute_app_orchestration():
     api.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
     logger.info("Deployed {0} Successfully".format(app_name))
+
+
+def connect_all(api, reservation_id):
+    try:
+        api.ExecuteEnvironmentCommand(reservation_id, "Connect All")
+    except CloudShellAPIError as exc:
+        logger.error("Error executing connect all. Error: {0}".format(exc.rawxml))
+        exit(1)
+    except Exception as exc:
+        logger.error("Error executing connect all. Error: {0}".format(str(exc)))
+        exit(1)
 
 
 def refresh_ip(api, deployment_result, reservation_id):
