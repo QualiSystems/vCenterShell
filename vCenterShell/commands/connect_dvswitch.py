@@ -34,14 +34,22 @@ class VirtualSwitchConnectCommand:
         :return: None
         """
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
+
+        if not vm:
+            raise ValueError('VM having UUID {0} not found'.format(vm_uuid))
+
         default_network_instance = self.pv_service.get_network_by_full_name(si, default_network_name)
 
         mappings = self._prepare_mappings(vm_network_mappings)
 
-        return self.virtual_switch_to_machine_connector.connect_by_mapping(
+        updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
             si, vm, mappings, default_network_instance)
 
-        # self.vnic_updater.update_vnics(update_mapping, vm.name)
+        macAddresses = []
+        for updated_mapping in updated_mappings:
+            macAddresses.append(updated_mapping.vnic.macAddress)
+
+        return macAddresses
 
     def _prepare_mappings(self, vm_network_mappings):
         mappings = []

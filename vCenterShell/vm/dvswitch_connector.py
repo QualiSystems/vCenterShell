@@ -53,4 +53,4 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_spec)
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
-        self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)
+        return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)

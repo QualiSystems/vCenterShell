@@ -1,9 +1,13 @@
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from qualipy.api.cloudshell_api import InputNameValue
+import re
 
+import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from qualipy.api.cloudshell_api import InputNameValue, AttributeNameValue
+from common.utilites.command_result import get_result_from_command_output
+
+from common.logger.service import getLogger
+_logger  = getLogger('EnvironmentConnector')
 
 class EnvironmentConnector(object):
-
     def connect_all(self):
         """
         Connects all the VLAN Auto services to all the Deployed Apps in the same Environment
@@ -35,11 +39,11 @@ class EnvironmentConnector(object):
             if not connected_resources:
                 continue
 
-            session.ExecuteCommand(reservation_id, vlan_service.ServiceName, 'Service', 'Auto Resolve Vlan',[], True)
+            session.ExecuteCommand(reservation_id, vlan_service.ServiceName, 'Service', 'Auto Resolve Vlan', [], True)
 
             for connected_resource in connected_resources:
                 self._execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id,
-                                                                    session, virtual_network)
+                                                                    session, virtual_network, vlan_service.ServiceName)
 
     @staticmethod
     def _get_attribute(attributes, attribute_name):
@@ -61,11 +65,27 @@ class EnvironmentConnector(object):
 
     @staticmethod
     def _execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id, session,
-                                                       virtual_network):
-        session.ExecuteCommand(reservation_id, connected_resource, 'Resource', 'Connect',
-                               [InputNameValue('VLAN_ID', virtual_network),
-                                InputNameValue('VLAN_SPEC_TYPE', access_mode)],
-                               True)
+                                                       virtual_network, vlan_service_name):
+
+        _logger.debug('Executing Connect command on: ' + connected_resource)
+
+        command_result = session.ExecuteCommand(reservation_id, connected_resource, 'Resource', 'Connect',
+                                                [InputNameValue('VLAN_ID', virtual_network),
+                                                 InputNameValue('VLAN_SPEC_TYPE', access_mode)], True)
+
+        result = get_result_from_command_output(command_result.Output)
+
+        if not result:
+            _logger.debug('Connect command did not return any result')
+            return
+
+        mac_address = result.replace('[\'', '').replace('\']', '')
+        _logger.debug('Setting Target Interface to: ' + mac_address)
+
+        session.SetConnectorAttributes(reservation_id,
+                                       connected_resource,
+                                       vlan_service_name,
+                                       [AttributeNameValue('Target Interface', mac_address)])
 
     @staticmethod
     def _get_connected_resources(connectors, vlan_service):

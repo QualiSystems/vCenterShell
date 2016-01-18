@@ -65,7 +65,7 @@ class Bootstrapper(object):
                                                                      DvPortGroupNameGenerator(),
                                                                      VlanSpecFactory(),
                                                                      VLanIdRangeParser(),
-                                                                     VnicUpdater(helpers),
+                                                                     VnicUpdater(helpers, getLogger('VnicUpdater')),
                                                                      getLogger('VirtualSwitchConnectCommand'))
 
         # Virtual Switch Revoke
