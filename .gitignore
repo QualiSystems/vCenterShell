@@ -65,8 +65,8 @@ tests/config.ini
 *.cache
 *.whl
 *.tar.gz
-vCenterShell/vCenterShell/vCenterShell.zip
 *.orig
 vCenterShell.zip
 vCenterShellPackage/Resource Scripts/*
+vCenterShellPackage/Topology Scripts/*.*
 debug.txt

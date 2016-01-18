@@ -26,8 +26,11 @@ class EnvironmentConnector(object):
 
         for vlan_service in vlan_services:
 
-            access_mode = next(item for item in vlan_service.Attributes if item.Name == 'Access Mode')
-            virtual_network = next(item for item in vlan_service.Attributes if item.Name == 'Virtual Network')
+            if not len(vlan_service.Attributes):
+                raise ValueError('No attributes on service {0}'.format(vlan_service.ServiceName))
+
+            access_mode = self._get_attribute(vlan_service.Attributes, 'Access Mode')
+            virtual_network = self._get_attribute(vlan_service.Attributes, 'Virtual Network')
 
             # Get Deployed App connected to VLAN Auto service
             connected_resources = self._get_connected_resources(connectors, vlan_service)
@@ -38,6 +41,13 @@ class EnvironmentConnector(object):
             for connected_resource in connected_resources:
                 self._execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id,
                                                                     session, virtual_network)
+
+    @staticmethod
+    def _get_attribute(attributes, attribute_name):
+        attribute = next(item for item in attributes if item.Name == attribute_name)
+        if not attribute or not attribute.Value:
+            raise ValueError('Attribute {0} is missing'.format(attribute_name))
+        return attribute.Value
 
     @staticmethod
     def _get_connectors(reservation_details):
