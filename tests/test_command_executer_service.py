@@ -231,3 +231,61 @@ class TestCommandExecuterService(unittest.TestCase):
                         .called_with(connection_details,
                                      virtual_switch_disconnect_command.disconnect_all,
                                      VmContext.VM_UUID))
+
+    def test_refresh_ip(self):
+        #arrange
+        connection_details = Mock()
+        virtual_switch_disconnect_command = Mock()
+        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
+        command_executer_service = CommandExecuterService(Mock(),
+                                                          Mock(),
+                                                          self.command_wrapper,
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          virtual_switch_disconnect_command,
+                                                          Mock(),
+                                                          Mock())
+
+        CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
+        CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
+
+        #act
+        command_executer_service.refresh_ip()
+
+        #assert
+        self.assertTrue(self.command_wrapper.execute_command_with_connection
+                        .called_with(connection_details,
+                                     virtual_switch_disconnect_command.refresh_ip,
+                                     VmContext.VM_UUID))
+
+    def test_connect(self):
+        #arrange
+        connection_details = Mock()
+        virtual_switch_disconnect_command = Mock()
+        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
+        command_executer_service = CommandExecuterService(Mock(),
+                                                          Mock(),
+                                                          self.command_wrapper,
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          virtual_switch_disconnect_command,
+                                                          Mock(),
+                                                          Mock())
+
+        CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
+        CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
+
+        #act
+        command_executer_service.connect()
+
+        #assert
+        self.assertTrue(self.command_wrapper.execute_command_with_connection
+                        .called_with(connection_details,
+                                     virtual_switch_disconnect_command.connect,
+                                     VmContext.VM_UUID))
