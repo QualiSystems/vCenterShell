@@ -364,7 +364,7 @@
     </ScriptDescriptor>
     <ScriptDescriptor Name="Power Off">
       <ScriptInputs>
-        <ScriptInput Name="COMMAND" DefaultValue="power_of" />
+        <ScriptInput Name="COMMAND" DefaultValue="power_off" />
         <ScriptInput Name="VM_UUID" />
       </ScriptInputs>
     </ScriptDescriptor>
