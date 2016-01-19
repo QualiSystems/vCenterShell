@@ -158,9 +158,9 @@ class CommandExecuterService(object):
         connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        self.execute_command_with_connection(connection_details,
-                                             self.refresh_ip_command.refresh_ip,
-                                             vm_uuid,
-                                             resource_name)
+        self.command_wrapper.execute_command_with_connection(connection_details,
+                                                             self.refresh_ip_command.refresh_ip,
+                                                             vm_uuid,
+                                                             resource_name)
 
 
