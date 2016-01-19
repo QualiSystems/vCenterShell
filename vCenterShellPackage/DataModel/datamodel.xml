@@ -163,6 +163,7 @@
             <ScriptName>Power Off</ScriptName>
             <ScriptName>Connect VM</ScriptName>
             <ScriptName>Destroy VM</ScriptName>
+            <ScriptName>Refresh IP</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -366,6 +367,13 @@
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="power_off" />
         <ScriptInput Name="VM_UUID" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Refresh IP">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="refresh_ip" />
+        <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_NAME" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect VM">
