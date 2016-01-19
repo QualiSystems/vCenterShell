@@ -62,10 +62,5 @@ class VirtualSwitchConnectCommand:
             vm_network_mapping.vlan_spec = \
                 self.vlan_spec_factory.get_vlan_spec(vm_network_mapping.vlan_spec)
 
-            self.logger.debug('Vlan Id: {0}, VLAN Spec: {1}, Port Name {2}',
-                              vm_network_mapping.vlan_id,
-                              vm_network_mapping.vlan_spec,
-                              vm_network_mapping.dv_port_name)
-
             mappings.append(vm_network_mapping)
         return mappings

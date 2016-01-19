@@ -5,7 +5,11 @@ from qualipy.api.cloudshell_api import InputNameValue, AttributeNameValue
 from common.utilites.command_result import get_result_from_command_output
 
 from common.logger.service import getLogger
-_logger  = getLogger('EnvironmentConnector')
+_logger = getLogger('EnvironmentConnector')
+
+VIRTUAL_NETWORK_ATTRIBUTE = 'Virtual Network'
+ACCESS_MODE_ATTRIBUTE = 'Access Mode'
+
 
 class EnvironmentConnector(object):
     def connect_all(self):
@@ -27,11 +31,10 @@ class EnvironmentConnector(object):
 
         for vlan_service in vlan_services:
 
-            if not len(vlan_service.Attributes):
-                raise ValueError('No attributes on service {0}'.format(vlan_service.ServiceName))
+            _logger.debug('Connecting \'{0}\' '.format(vlan_service.ServiceName))
 
-            access_mode = self._get_attribute(vlan_service.Attributes, 'Access Mode')
-            virtual_network = self._get_attribute(vlan_service.Attributes, 'Virtual Network')
+            access_mode = self._get_attribute(vlan_service.Attributes, ACCESS_MODE_ATTRIBUTE)
+            virtual_network = self._get_attribute(vlan_service.Attributes, VIRTUAL_NETWORK_ATTRIBUTE)
 
             # Get Deployed App connected to VLAN Auto service
             connected_resources = self._get_connected_resources(connectors, vlan_service)
@@ -39,7 +42,19 @@ class EnvironmentConnector(object):
             if not connected_resources:
                 continue
 
-            session.ExecuteCommand(reservation_id, vlan_service.ServiceName, 'Service', 'Auto Resolve Vlan', [], True)
+            if not virtual_network or virtual_network == '':
+
+                _logger.debug('Executing Auto Resolve Vlan on \'{0}\''.format(vlan_service.ServiceName))
+
+                command_result = session.ExecuteCommand(reservation_id, vlan_service.ServiceName, 'Service',
+                                                        'Auto Resolve Vlan', [], True)
+
+                virtual_network = get_result_from_command_output(command_result.Output)
+
+                _logger.debug('Auto Resolve Vlan returned Virtual Network \'{0}\''.format(virtual_network))
+
+                if not virtual_network or virtual_network == '':
+                    raise ValueError('Auto Resolve Vlan command did not return Virtual Network')
 
             for connected_resource in connected_resources:
                 self._execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id,
@@ -48,7 +63,7 @@ class EnvironmentConnector(object):
     @staticmethod
     def _get_attribute(attributes, attribute_name):
         attribute = next(item for item in attributes if item.Name == attribute_name)
-        if not attribute or not attribute.Value:
+        if not attribute:
             raise ValueError('Attribute {0} is missing'.format(attribute_name))
         return attribute.Value
 
@@ -60,7 +75,7 @@ class EnvironmentConnector(object):
     @staticmethod
     def _get_vlan_auto_services(reservation_details):
         vlan_services = [service for service in reservation_details.ReservationDescription.Services
-                         if service.ServiceName == 'VLAN Auto']
+                         if VIRTUAL_NETWORK_ATTRIBUTE in [attr.Name for attr in service.Attributes]]
         return vlan_services
 
     @staticmethod
