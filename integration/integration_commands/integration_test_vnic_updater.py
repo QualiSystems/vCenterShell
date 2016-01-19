@@ -6,7 +6,6 @@ from pyVim.connect import SmartConnect, Disconnect
 from common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.bootstrap import Bootstrapper
-from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVmomi import vim
 

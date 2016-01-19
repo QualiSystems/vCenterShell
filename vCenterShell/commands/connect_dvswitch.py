@@ -6,7 +6,6 @@ class VirtualSwitchConnectCommand:
                  dv_port_group_name_generator,
                  vlan_spec_factory,
                  vlan_id_range_parser,
-                 vnic_updater,
                  logger):
         """
         :param py_service: vCenter API wrapper
@@ -14,14 +13,13 @@ class VirtualSwitchConnectCommand:
         :param dv_port_group_name_generator: DvPortGroupNameGenerator
         :param vlan_spec_factory: VlanSpecFactory
         :param vlan_id_range_parser: VLanIdRangeParser
-        :param vnic_updater: VnicUpdater
+        :param logger Logger
         """
         self.pv_service = pv_service
         self.virtual_switch_to_machine_connector = virtual_switch_to_machine_connector
         self.dv_port_group_name_generator = dv_port_group_name_generator
         self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
-        self.vnic_updater = vnic_updater
         self.logger = logger
 
     def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name):

@@ -12,7 +12,6 @@ from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerato
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.network.vnic.vnic_updater import VnicUpdater
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
