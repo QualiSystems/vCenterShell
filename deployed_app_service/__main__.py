@@ -15,7 +15,7 @@ def main():
 
     vlan_id = helpers.get_user_param('VLAN_ID')
     if not vlan_id:
-        raise ValueError('VLAN_ID is missoing')
+        raise ValueError('VLAN_ID is missing')
 
     deployed_app_service.connect(vlan_spec_type, vlan_id)
 

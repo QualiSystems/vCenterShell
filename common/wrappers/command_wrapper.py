@@ -1,5 +1,5 @@
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
-COMMAND_ERROR = 'error has occurred while executing command: {0} error: {1}'
+COMMAND_ERROR = 'error has occurred while executing command: {0}'
 DEBUG_COMMAND_RESULT = 'finished executing with the result: {0}'
 FINISHED_EXECUTING_COMMAND = 'finished executing command: {0}'
 DEBUG_COMMAND_PARAMS = 'command params: {0}'
@@ -66,7 +66,8 @@ class CommandWrapper:
 
             return results
         except Exception as e:
-            logger.error(COMMAND_ERROR.format(command_name, e))
+            logger.error(COMMAND_ERROR.format(command_name))
+            logger.exception(e)
             raise
         finally:
             if si:

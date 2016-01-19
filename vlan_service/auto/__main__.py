@@ -1,12 +1,11 @@
 import os
 import models
 from time import sleep
-
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import AttributeNameValue
-
 from common.model_factory import ResourceModelParser
 from vlan_service.resolver.provider import VlanResolverProvider
+from common.utilites.command_result import set_command_result
 
 
 def main():
@@ -40,10 +39,12 @@ def main():
                                                                                            str(vlan_id)))
     else:
         # write already resolved message to reservation output
+        vlan_id = str(vlan_auto_resource_model.virtual_network)
         api.WriteMessageToReservationOutput(reservation_context.id,
                                             "{0} already has a resolved vlan id: {1}"
                                             .format(resource_context.name,
-                                                    str(vlan_auto_resource_model.virtual_network)))
+                                                    vlan_id))
+    set_command_result(vlan_id)
 
 
 if __name__ == "__main__":

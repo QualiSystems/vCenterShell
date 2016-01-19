@@ -1,6 +1,9 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue
+from common.utilites.command_result import get_result_from_command_output, set_command_result
+from common.logger import getLogger
 
+_logger  = getLogger('DeployedAppService')
 
 class DeployedAppService(object):
     def __init__(self, resource_model_parser):
@@ -28,7 +31,10 @@ class DeployedAppService(object):
     def execute_command_on_vcenter_resource(access_mode, generic_deployed_app_resource_model, virtual_network):
         session = helpers.get_api_session()
         reservation_id = helpers.get_reservation_context_details().id
-        session.ExecuteCommand(reservation_id, generic_deployed_app_resource_model.cloud_provider,
+
+        _logger.debug('Executing Connect VM command on ' + generic_deployed_app_resource_model.cloud_provider)
+
+        command_result = session.ExecuteCommand(reservation_id, generic_deployed_app_resource_model.cloud_provider,
                                'Resource',
                                'Connect VM',
                                [InputNameValue('COMMAND', "connect"),
@@ -36,3 +42,7 @@ class DeployedAppService(object):
                                 InputNameValue('VLAN_SPEC_TYPE', access_mode),
                                 InputNameValue('VM_UUID', generic_deployed_app_resource_model.vm_uuid)],
                                True)
+
+        result = get_result_from_command_output(command_result.Output)
+        _logger.debug('Transferring result to the caller ' + result)
+        set_command_result(result)
