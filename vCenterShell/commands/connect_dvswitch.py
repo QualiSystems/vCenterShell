@@ -45,11 +45,11 @@ class VirtualSwitchConnectCommand:
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
             si, vm, mappings, default_network_instance)
 
-        macAddresses = []
+        mac_addresses = []
         for updated_mapping in updated_mappings:
-            macAddresses.append(updated_mapping.vnic.macAddress)
+            mac_addresses.append(updated_mapping.vnic.macAddress)
 
-        return macAddresses
+        return mac_addresses
 
     def _prepare_mappings(self, vm_network_mappings):
         mappings = []

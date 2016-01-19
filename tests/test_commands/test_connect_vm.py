@@ -1,10 +1,10 @@
 from unittest import TestCase
-
-from mock import Mock
-
+from mock import Mock, create_autospec
 from common.logger.service import LoggingService
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
+from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
+from pyVmomi import vim
 
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
@@ -25,8 +25,13 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.vcenter_context.default_dvswitch_path = 'default_dvswitch_path'
         self.vcenter_context.default_dvswitch_name = 'default_dvswitch_name'
         self.vcenter_context.default_port_group_path = 'default_port_group_path'
+
+        vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)
+        vnic_device_mapper.vnic = create_autospec(spec=vim.vm.device.VirtualEthernetCard)
+        vnic_device_mapper.vnic.macAddress = 'AA-BB'
+
         self.dv_connector = Mock()
-        self.dv_connector.connect_by_mapping = Mock(return_value=True)
+        self.dv_connector.connect_by_mapping = Mock(return_value=[vnic_device_mapper])
         self.dv_port_name_gen = Mock()
         self.vlan_spec_factory = Mock()
         self.vlan_id_range_parser = Mock()
@@ -45,14 +50,15 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.dv_port_name = 'port_name'
 
         # act
-        connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
+        mac_addresses = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
 
         mapping.dv_switch_path = self.vcenter_context.default_dvswitch_path
         mapping.dv_switch_name = self.vcenter_context.default_dvswitch_name
         mapping.port_group_path = self.vcenter_context.default_port_group_path
+
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
         self.assertTrue(self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id))
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
-
         self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping]))
+        self.assertSequenceEqual(mac_addresses, ['AA-BB'])
