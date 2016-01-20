@@ -5,18 +5,17 @@ runs command defined with 'COMMAND' OS environment variable
 
 import os
 import sys
-
+import time
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
 from bootstrap import Bootstrapper
 from common.logger.service import LoggingService
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
-DEFAULT_LOG_FILENAME = "..\\logs\\vCenter.log"
 
 
 def main():
-    filename = os.path.join(os.path.dirname(__file__), DEFAULT_LOG_FILENAME)
+    filename = _get_log_filename()
     LoggingService(INITIAL_LOG_LEVEL, INITIAL_LOG_LEVEL, filename)
     bootstrapper = Bootstrapper()
     ces = bootstrapper.get_command_executer_service()
@@ -39,6 +38,10 @@ def main():
 
     # execute the command
     getattr(ces, command_to_run)()
+
+
+def _get_log_filename():
+    return os.path.join(os.path.dirname(__file__), '..\\logs\\', 'vCenterShell_' + time.strftime("%Y%m%d-%H%M%S") + '.log')
 
 
 # for debug

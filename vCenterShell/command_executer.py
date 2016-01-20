@@ -1,12 +1,9 @@
 ﻿from models.DeployDataHolder import DeployDataHolder
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
-
+from common.utilites.command_result import set_command_result
 
 class CommandExecuterService(object):
     """ main class that publishes all available commands """
-
-    COMMAND_RESULT_PREFIX = "command_json_result="
-    COMMAND_RESULT_POSTFIX = "=command_json_result_end"
 
     def __init__(self,
                  serializer,
@@ -64,12 +61,11 @@ class CommandExecuterService(object):
         connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.virtual_switch_connect_command.connect_to_networks,
-                uuid,
-                [vnic_to_network],
-                default_network)
+        mac_addresses = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                          self.virtual_switch_connect_command.connect_to_networks,
+                                                                          uuid, [vnic_to_network], default_network)
+
+        set_command_result(','.join(mac_addresses))
 
     def disconnect_all(self):
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
@@ -97,7 +93,7 @@ class CommandExecuterService(object):
                 vm_uuid,
                 network_name)
 
-    def destroy(self):
+    def destroy_vm(self):
         # get command parameters from the environment
         uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
@@ -127,11 +123,12 @@ class CommandExecuterService(object):
                 self.deployFromTemplateCommand.execute_deploy_from_template,
                 data_holder)
 
-        print self._prepare_command_result(self.serializer.encode(result, unpicklable=False))
+        set_command_result(self.serializer.encode(result, unpicklable=False))
 
     def power_off(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+        resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -139,11 +136,13 @@ class CommandExecuterService(object):
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_off,
-                                                             vm_uuid)
+                                                             vm_uuid,
+                                                             resource_fullname)
 
     def power_on(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+        resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -151,12 +150,13 @@ class CommandExecuterService(object):
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_on,
-                                                             vm_uuid)
+                                                             vm_uuid,
+                                                             resource_fullname)
 
     def refresh_ip(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
-        resource_name = self.qualipy_helpers.get_user_param('RESOURCE_NAME')
+        resource_name = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -167,5 +167,4 @@ class CommandExecuterService(object):
                                                              vm_uuid,
                                                              resource_name)
 
-    def _prepare_command_result(self, output):
-        return self.COMMAND_RESULT_PREFIX + str(output) + self.COMMAND_RESULT_POSTFIX
+
