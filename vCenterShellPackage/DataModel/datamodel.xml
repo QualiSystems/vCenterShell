@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DataModelInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
+  <Attributes>
+    <AttributeInfo Name="VM_UUID" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="User" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Password" Type="Password" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Default port group path" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Default dvSwitch Path" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Default dvSwitch Name" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Default Network" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Domain Selector" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Execution Server Selector" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Generic Input" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules />
+    </AttributeInfo>
+    <AttributeInfo Name="vCenter Template" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="VM Cluster" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="VM Power State" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="VM Storage" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Access Mode" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="VLAN Id" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+	<AttributeInfo Name="Target Interface" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Link Configurations" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Allocation Ranges" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+        <Rule Name="Admin Only" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Virtual Network" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+    <AttributeInfo Name="Isolation Level" Type="String" DefaultValue="" IsReadOnly="false">
+      <Rules>
+        <Rule Name="Configuration" />
+        <Rule Name="Setting" />
+      </Rules>
+    </AttributeInfo>
+  </Attributes>
+  <ResourceFamilies>
+    <ResourceFamily Name="Cloud Provider" Description="" IsSearchable="true">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="vCenter" ImagePath="vCenter_Model.png" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+			<AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="Password" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="Default port group path" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="Default dvSwitch Path" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="Default dvSwitch Name" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Default Network" IsOverridable="true" IsLocal="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+			<AttributeValue Name="User" Value="" />
+			<AttributeValue Name="Password" Value="" />
+			<AttributeValue Name="Default port group path" Value="" />
+			<AttributeValue Name="Default dvSwitch Path" Value="" />
+			<AttributeValue Name="Default dvSwitch Name" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts>
+            <ScriptName>Deploy From Template</ScriptName>
+            <ScriptName>Power On</ScriptName>
+            <ScriptName>Power Off</ScriptName>
+            <ScriptName>Connect VM</ScriptName>
+            <ScriptName>Destroy VM</ScriptName>
+            <ScriptName>Refresh IP</ScriptName>
+          </Scripts>
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Temp Command Connector" IsConnectable="true" Description="" IsSearchable="true">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Temp Command Connector Model" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels>
+            <ParentModelName>Generic Deployed App</ParentModelName>
+            <ParentModelName>vCenter</ParentModelName>
+          </ParentModels>
+          <Drivers />
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Deployed App" Description="" IsSearchable="true">
+      <AttachedAttributes>
+        <AttachedAttribute Name="VM_UUID" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+        <AttachedAttribute Name="Cloud Provider" IsOverridable="true" IsLocal="true">
+          <AllowedValues />
+        </AttachedAttribute>
+      </AttachedAttributes>
+      <AttributeValues>
+        <AttributeValue Name="VM_UUID" Value="" />
+        <AttributeValue Name="Cloud Provider" Value="" />
+      </AttributeValues>
+      <Models>
+        <ResourceModel Name="Generic Deployed App" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="VM_UUID" Value="" />
+            <AttributeValue Name="Cloud Provider" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts>
+            <ScriptName>Connect</ScriptName>
+            <ScriptName>Power On Proxy</ScriptName>
+            <ScriptName>Power Off Proxy</ScriptName>
+            <ScriptName>Destroy VM Proxy</ScriptName>
+            <ScriptName>Refresh IP Proxy</ScriptName>
+          </Scripts>
+        </ResourceModel>
+      </Models>
+      <Categories />
+    </ResourceFamily>
+    <ResourceFamily Name="Installation Options" Description="" IsService="true" ServiceType="Installation">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Generic Installation Option" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Generic Input" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Generic Input" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts />
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Deployment Options" Description="" IsService="true" ServiceType="Deployment">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="vCenter VM From Template" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>            
+            <AttachedAttribute Name="vCenter Template" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="VM Cluster" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="VM Power State" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+			<AttachedAttribute Name="VM Storage" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>            
+            <AttributeValue Name="vCenter Template" Value="" />
+			<AttributeValue Name="VM Cluster" Value="" />
+			<AttributeValue Name="VM Power State" Value="" />
+			<AttributeValue Name="VM Storage" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts>
+            <ScriptName>Deploy</ScriptName>
+          </Scripts>
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Virtual Network" Description="" IsService="true" ServiceType="Regular">
+      <AttachedAttributes/>
+      <AttributeValues/>
+      <Models>
+        <ResourceModel Name="VLAN Auto" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Allocation Ranges" IsOverridable="true" IsLocal="true" UserInput="false" >
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Isolation Level" IsOverridable="true" IsLocal="true" UserInput="false">
+              <AllowedValues>
+                <AllowedValue>Shared</AllowedValue>
+                <AllowedValue>Exclusive</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Access Mode" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues>
+                <AllowedValue>Access</AllowedValue>
+                <AllowedValue>Trunk</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="VLAN Id" IsOverridable="true" IsLocal="true" UserInput="true">
+              <AllowedValues />
+            </AttachedAttribute>
+            <AttachedAttribute Name="Virtual Network" IsOverridable="true" IsLocal="true" UserInput="false">
+              <AllowedValues />
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Allocation Ranges" Value="2-4094" />
+            <AttributeValue Name="Isolation Level" Value="Exclusive" />
+            <AttributeValue Name="Access Mode" Value="Access" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts>
+            <ScriptName>Auto Resolve Vlan</ScriptName>
+          </Scripts>
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+    <ResourceFamily Name="Apps Orchestration" Description="" IsService="true" ServiceType="Orchestration">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="Simple" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels />
+          <Drivers>
+            <DriverName>Generic Driver</DriverName>
+          </Drivers>
+          <Scripts>
+            <ScriptName>Deploy App</ScriptName>
+          </Scripts>
+        </ResourceModel>
+      </Models>
+      <Categories>
+        <Category>Virtualization</Category>
+      </Categories>
+    </ResourceFamily>
+  </ResourceFamilies>
+  <DriverDescriptors>
+    <DriverDescriptor Name="Generic Driver" DriverType="TestShellDriver" />
+  </DriverDescriptors>
+  <ScriptDescriptors>
+    <ScriptDescriptor Name="Destroy VM">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="destroy_vm" />
+        <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power On">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="power_on" />
+        <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power Off">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="power_off" />
+        <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Refresh IP">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="refresh_ip" />
+        <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Connect VM">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="connect" />
+        <ScriptInput Name="VLAN_ID" />
+        <ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ScriptInput Name="VM_UUID" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Deploy" Description="Used by App deployment service">
+      <ScriptInputs />
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Deploy App" Description="Orchestration Driver Deployment Script">
+      <ScriptInputs />
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Deploy From Template">
+      <ScriptInputs>
+        <ScriptInput Name="COMMAND" DefaultValue="deploy_from_template" />
+        <ScriptInput Name="DEPLOY_DATA" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Auto Resolve Vlan">
+      <ScriptInputs />
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Connect">
+      <ScriptInputs>
+        <ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ScriptInput Name="VLAN_ID" />
+      </ScriptInputs>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power On Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power Off Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Destroy VM Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Refresh IP Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+      <!-- Environment script -->
+    <ScriptDescriptor Name="Connect All">
+      <ScriptInputs />
+    </ScriptDescriptor>
+  </ScriptDescriptors>
+</DataModelInfo>

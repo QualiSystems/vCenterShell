@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppTemplateInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <AppResourceInfo Name="VM Deployment" ImagePath="VM Deployment.png">
+    <AppResources>
+      <AppResource ModelName="Generic Deployed App" Driver="">
+        <Attributes>
+          <Attribute Name="VM_UUID" Value="" />
+          <Attribute Name="Cloud Provider" Value="" />
+        </Attributes>
+      </AppResource>
+    </AppResources>
+    <DeploymentPaths>
+      <DeploymentPath Name="vCenter VM From Template" Default="true">
+        <DeploymentService Name="vCenter VM From Template">
+          <Attributes>
+            <Attribute Name="VM Cluster" Value="QualiSB Cluster/LiverPool" />
+            <Attribute Name="VM Power State" Value="False" />
+            <Attribute Name="VM Storage" Value="eric ds cluster" />
+            <Attribute Name="vCenter Template" Value="vCenter/QualiSB/YOUR_FOLDER/YOUR_TEMPLATE" />
+          </Attributes>
+        </DeploymentService>
+      </DeploymentPath>
+    </DeploymentPaths>
+  </AppResourceInfo>
+  <Categories>
+    <Category>Virtualization</Category>
+  </Categories>
+</AppTemplateInfo>

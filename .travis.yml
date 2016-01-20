@@ -9,7 +9,10 @@ install:
     - pip install coveralls
 
 script:
-    nosetests --with-coverage --cover-package=vCenterShell
+    nosetests --with-coverage  --cover-package=vCenterShell,common,models --exclude-dir=integration
 
 after_success:
     coveralls
+    
+notifications:
+    webhools: https://qualisystems.getbadges.io/api/app/webhook/63350e33-4119-49c3-8127-075aaa022926
