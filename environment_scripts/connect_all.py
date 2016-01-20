@@ -1,10 +1,8 @@
-import re
-
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue, AttributeNameValue
+from common.logger.service import getLogger
 from common.utilites.command_result import get_result_from_command_output
 
-from common.logger.service import getLogger
 _logger = getLogger('EnvironmentConnector')
 
 VIRTUAL_NETWORK_ATTRIBUTE = 'Virtual Network'
@@ -88,19 +86,20 @@ class EnvironmentConnector(object):
                                                 [InputNameValue('VLAN_ID', virtual_network),
                                                  InputNameValue('VLAN_SPEC_TYPE', access_mode)], True)
 
-        result = get_result_from_command_output(command_result.Output)
+        connect_results = get_result_from_command_output(command_result.Output)
 
-        if not result:
-            _logger.debug('Connect command did not return any result')
+        if not connect_results:
+            _logger.debug('Connect command did not return any results')
             return
 
-        mac_address = result.replace('[\'', '').replace('\']', '')
-        _logger.debug('Setting Target Interface to: ' + mac_address)
-
-        session.SetConnectorAttributes(reservation_id,
-                                       connected_resource,
-                                       vlan_service_name,
-                                       [AttributeNameValue('Target Interface', mac_address)])
+        for connect_result in connect_results:
+            mac_address = connect_result['mac_address']
+            _logger.debug('Setting Target Interface to: ' + mac_address)
+            session.SetConnectorAttributes(reservation_id,
+                                           connected_resource,
+                                           vlan_service_name,
+                                           [AttributeNameValue('Target Interface', mac_address)])
+            break
 
     @staticmethod
     def _get_connected_resources(connectors, vlan_service):

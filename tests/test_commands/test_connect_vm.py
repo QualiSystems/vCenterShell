@@ -50,7 +50,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.dv_port_name = 'port_name'
 
         # act
-        mac_addresses = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
+        connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
 
         mapping.dv_switch_path = self.vcenter_context.default_dvswitch_path
         mapping.dv_switch_name = self.vcenter_context.default_dvswitch_name
@@ -61,4 +61,4 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.assertTrue(self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id))
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
         self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping]))
-        self.assertSequenceEqual(mac_addresses, ['AA-BB'])
+        self.assertEqual(connect_results[0].mac_address, 'AA-BB')
