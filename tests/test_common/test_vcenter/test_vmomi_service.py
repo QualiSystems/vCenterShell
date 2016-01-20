@@ -1162,3 +1162,15 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         #assert
         self.assertTrue(pv_service.pyvmomi_connect.called)
+
+    def test_disconnect(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        si = create_autospec(spec=vim.ServiceInstance)
+        pv_service.pyvmomi_disconnect = Mock()
+
+        #act
+        pv_service.disconnect(si)
+
+        #assert
+        self.assertTrue(pv_service.pyvmomi_disconnect.called)
