@@ -146,7 +146,7 @@ class TestVlanResolver(TestCase):
 
         self.assertRaises(ValueError, resolver._ensure_numeric_vlan_valid, allocation_range)
 
-    def test_vlan_service_get_requested_vlan_returns_range(self):
+    def test_vlan_service_get_requested_vlan_range_throws_not_supported(self):
         vlan_resource_model = VLANAutoResourceModel()
         vlan_resource_model.vlan_id = "20-30"
         vlan_resource_model.virtual_network = ""
@@ -158,10 +158,7 @@ class TestVlanResolver(TestCase):
                                         owner_id="VLAN Auto",
                                         api=Mock())
 
-        requested_range = resolver._get_requested_vlan()
-
-        self.assertEquals(requested_range.start, 20)
-        self.assertEquals(requested_range.end, 30)
+        self.assertRaises(ValueError, resolver._get_requested_vlan_auto)
 
     def test_vlan_service_get_requested_vlan_returns_numeric(self):
         vlan_resource_model = VLANAutoResourceModel()
@@ -175,7 +172,7 @@ class TestVlanResolver(TestCase):
                                         owner_id="VLAN Auto",
                                         api=Mock())
 
-        vlan = resolver._get_requested_vlan()
+        vlan = resolver._get_requested_vlan_auto()
 
         self.assertEquals(vlan, 20)
 
@@ -204,15 +201,15 @@ class TestVlanResolver(TestCase):
                                                       "VLAN Auto", "Exclusive", 20)
         self.assertEquals(resolved_vlan, 20)
 
-    def test_vlan_service_resolves_first_numeric_from_range(self):
+    def test_vlan_service_resolves_first_numeric_when_vlan_id_empty(self):
         vlan_resource_model = VLANAutoResourceModel()
-        vlan_resource_model.vlan_id = "20-30"
+        vlan_resource_model.vlan_id = ""
         vlan_resource_model.isolation_level = "Exclusive"
         vlan_resource_model.virtual_network = ""
         vlan_resource_model.allocation_ranges = "10-100"
 
         resolved_vlan_info = Mock()
-        resolved_vlan_info.VlanId = 20
+        resolved_vlan_info.VlanId = 10
 
         api = MagicMock()
         api.GetVlanAutoSelectFirstNumericFromRange = Mock(return_value=resolved_vlan_info)
@@ -226,5 +223,5 @@ class TestVlanResolver(TestCase):
         resolved_vlan = resolver.resolve_vlan_auto()
 
         api.GetVlanAutoSelectFirstNumericFromRange.assert_called_with("Global", "c5144273-c456-4885-a9b7-f5b058f02678",
-                                                                      "VLAN Auto", "Exclusive", 20, 30)
-        self.assertEquals(resolved_vlan, 20)
+                                                                      "VLAN Auto", "Exclusive", 10, 100)
+        self.assertEquals(resolved_vlan, 10)
