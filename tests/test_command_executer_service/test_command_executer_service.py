@@ -1,7 +1,7 @@
 import unittest
 from mock import MagicMock, Mock
-from utils.command_context_mocker import CommandContextMocker
-from utils.vm_context import VmContext
+from tests.utils.command_context_mocker import CommandContextMocker
+from tests.utils.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
 
@@ -236,7 +236,7 @@ class TestCommandExecuterService(unittest.TestCase):
         #arrange
         connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
-        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
+        virtual_switch_disconnect_command.refresh_ip = Mock(return_value=True)
         command_executer_service = CommandExecuterService(Mock(),
                                                           Mock(),
                                                           self.command_wrapper,
@@ -265,7 +265,8 @@ class TestCommandExecuterService(unittest.TestCase):
         #arrange
         connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
-        virtual_switch_disconnect_command.disconnect_all = Mock(return_value=True)
+        # virtual_switch_disconnect_command.connect_to_networks = Mock(return_value=['00:0a:95:9d:68:16'])
+        self.command_wrapper.execute_command_with_connection = Mock(return_value=['00:0a:95:9d:68:16'])
         command_executer_service = CommandExecuterService(Mock(),
                                                           Mock(),
                                                           self.command_wrapper,
