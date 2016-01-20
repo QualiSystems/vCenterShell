@@ -406,13 +406,12 @@ class pyVmomiService:
         :param vm: virutal machine pyvmomi object
         """
 
-        logger.info(
-                ("The current powerState is: {0}. Attempting to power off {1}".format(vm.runtime.powerState, vm.name)))
+        if vm.runtime.powerState == 'poweredOn':
+            logger.info(("The current powerState is: {0}. Attempting to power off {1}"
+                         .format(vm.runtime.powerState, vm.name)))
+            task = vm.PowerOffVM_Task()
+            self.wait_for_task(task)
 
-        task = vm.PowerOffVM_Task()
-        self.wait_for_task(task)
-
-        logger.info(("{0}".format(task.info.state)))
         logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
