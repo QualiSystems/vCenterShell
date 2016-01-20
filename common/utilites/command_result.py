@@ -7,7 +7,7 @@ def get_result_from_command_output(output):
 
     match = search(COMMAND_RESULT_PREFIX + '(?P<result>.*)' + COMMAND_RESULT_POSTFIX, output)
     if not match:
-        return None
+        return output
     return match.group('result')
 
 def set_command_result(output):
