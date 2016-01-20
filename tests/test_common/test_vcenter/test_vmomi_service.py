@@ -1148,3 +1148,17 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         '#assert'
         self.assertTrue(result)
+
+    def test_connect(self):
+        #arrange
+        pv_service = pyVmomiService(SmartConnect, Disconnect)
+        address = Mock()
+        user = Mock()
+        password = Mock()
+        pv_service.pyvmomi_connect = Mock()
+
+        #act
+        pv_service.connect(address, user, password)
+
+        #assert
+        self.assertTrue(pv_service.pyvmomi_connect.called)
