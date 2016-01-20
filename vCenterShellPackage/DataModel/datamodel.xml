@@ -212,6 +212,10 @@
           </Drivers>
           <Scripts>
             <ScriptName>Connect</ScriptName>
+            <ScriptName>Power On Proxy</ScriptName>
+            <ScriptName>Power Off Proxy</ScriptName>
+            <ScriptName>Destroy VM Proxy</ScriptName>
+            <ScriptName>Refresh IP Proxy</ScriptName>
           </Scripts>
         </ResourceModel>
       </Models>
@@ -352,7 +356,7 @@
   <ScriptDescriptors>
     <ScriptDescriptor Name="Destroy VM">
       <ScriptInputs>
-        <ScriptInput Name="COMMAND" DefaultValue="destroy" />
+        <ScriptInput Name="COMMAND" DefaultValue="destroy_vm" />
         <ScriptInput Name="VM_UUID" />
         <ScriptInput Name="RESOURCE_FULLNAME" />
       </ScriptInputs>
@@ -361,19 +365,21 @@
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="power_on" />
         <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Power Off">
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="power_off" />
         <ScriptInput Name="VM_UUID" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Refresh IP">
       <ScriptInputs>
         <ScriptInput Name="COMMAND" DefaultValue="refresh_ip" />
         <ScriptInput Name="VM_UUID" />
-        <ScriptInput Name="RESOURCE_NAME" />
+        <ScriptInput Name="RESOURCE_FULLNAME" />
       </ScriptInputs>
     </ScriptDescriptor>
     <ScriptDescriptor Name="Connect VM">
@@ -405,7 +411,19 @@
         <ScriptInput Name="VLAN_ID" />
       </ScriptInputs>
     </ScriptDescriptor>
-        <!-- Environment script -->
+    <ScriptDescriptor Name="Power On Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Power Off Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Destroy VM Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+    <ScriptDescriptor Name="Refresh IP Proxy">
+      <ScriptInputs/>
+    </ScriptDescriptor>
+      <!-- Environment script -->
     <ScriptDescriptor Name="Connect All">
       <ScriptInputs />
     </ScriptDescriptor>

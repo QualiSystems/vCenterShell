@@ -25,7 +25,7 @@ class VlanResolverProvider(object):
         if self.is_vlan_resolved():
             return self.vlan_resource_model.virtual_network
 
-        requested_vlan = self._get_requested_vlan()
+        requested_vlan = self._get_requested_vlan_auto()
 
         if isinstance(requested_vlan, self.VlanRange):
             vlan_range = requested_vlan
@@ -51,19 +51,25 @@ class VlanResolverProvider(object):
             return False
         return True
 
-    def _get_requested_vlan(self):
+    def _get_requested_vlan_auto(self):
         """
         returns the requested vlan (specific numeric OR numeric range)
         :return: numeric vlan id OR numeric vlan range
         """
-        self._ensure_vlan_id_not_empty()
 
         allocation_range = self._get_allocation_range()
 
+        if not self.vlan_resource_model.vlan_id:
+            # Vlan Id empty, get first available from allocation range
+            return allocation_range
+
+        # self._ensure_vlan_id_not_empty()
+
         if self._is_vlan_id_range():
-            vlan_range = self._get_vlan_range_from_vlan_id()
-            self._ensure_vlan_range_valid(vlan_range, allocation_range)
-            return vlan_range
+            raise ValueError("Vlan range is not supported")
+            # vlan_range = self._get_vlan_range_from_vlan_id()
+            # self._ensure_vlan_range_valid(vlan_range, allocation_range)
+            # return vlan_range
         else:
             self._ensure_numeric_vlan_valid(allocation_range)
             return int(self.vlan_resource_model.vlan_id)

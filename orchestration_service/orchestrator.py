@@ -105,7 +105,9 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
         logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
                                                                          deployment_result.VmUuid))
         api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "Power On",
-                           [InputNameValue("COMMAND", "power_on"), InputNameValue("VM_UUID", deployment_result.VmUuid)])
+                           [InputNameValue("COMMAND", "power_on"),
+                            InputNameValue("VM_UUID", deployment_result.VmUuid),
+                            InputNameValue("RESOURCE_FULLNAME", "")])
     except Exception as exc:
         logger.error("Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc)))
         exit(1)

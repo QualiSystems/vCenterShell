@@ -95,7 +95,7 @@ class CommandExecuterService(object):
                 vm_uuid,
                 network_name)
 
-    def destroy(self):
+    def destroy_vm(self):
         # get command parameters from the environment
         uuid = self.qualipy_helpers.get_user_param('VM_UUID')
         resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
@@ -130,6 +130,7 @@ class CommandExecuterService(object):
     def power_off(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+        resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -137,11 +138,13 @@ class CommandExecuterService(object):
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_off,
-                                                             vm_uuid)
+                                                             vm_uuid,
+                                                             resource_fullname)
 
     def power_on(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
+        resource_fullname = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
@@ -149,12 +152,13 @@ class CommandExecuterService(object):
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_on,
-                                                             vm_uuid)
+                                                             vm_uuid,
+                                                             resource_fullname)
 
     def refresh_ip(self):
         # get command parameters from the environment
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
-        resource_name = self.qualipy_helpers.get_user_param('RESOURCE_NAME')
+        resource_name = self.qualipy_helpers.get_user_param('RESOURCE_FULLNAME')
 
         # prepare for execute command
         connection_details = self.connection_retriever.connection_details()
