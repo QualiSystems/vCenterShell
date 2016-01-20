@@ -1174,3 +1174,16 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         #assert
         self.assertTrue(pv_service.pyvmomi_disconnect.called)
+
+    def test_get_network_by_full_name(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        si = create_autospec(spec=vim.ServiceInstance)
+        default_network_full_name = 'Root/Folder/Folder2/Name'
+        pv_service.find_network_by_name = Mock()
+
+        #act
+        pv_service.get_network_by_full_name(si, default_network_full_name)
+
+        #assert
+        self.assertTrue(pv_service.find_network_by_name.called)
