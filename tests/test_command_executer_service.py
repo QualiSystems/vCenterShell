@@ -163,7 +163,7 @@ class TestCommandExecuterService(unittest.TestCase):
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
         # act
-        command_executer_service.destroy()
+        command_executer_service.destroy_vm()
 
         # assert
         self.assertTrue(connection_retriever.getVCenterInventoryPathAttributeData.called_with(resource_att))

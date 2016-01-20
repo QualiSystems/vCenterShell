@@ -100,15 +100,17 @@ class DeployedAppService(object):
                                                 inputs,
                                                 True)
 
-        result = get_result_from_command_output(command_result.Output)
-        _logger.info('Command ' + command + ' result: ' + result)
-        return result
+        _logger.info('Command ' + command + ' result: ' + command_result.Output)
+
+        return command_result
 
     @staticmethod
-    def execute_command_on_vcenter_resource_and_passthrough_result(generic_deployed_app_resource_model, command, inputs):
-        result = DeployedAppService.execute_command_on_vcenter_resource(generic_deployed_app_resource_model,
-                                                                        command,
-                                                                        inputs)
+    def execute_command_on_vcenter_resource_and_passthrough_result(generic_deployed_app_resource_model, command,
+                                                                   inputs):
+        command_result = DeployedAppService.execute_command_on_vcenter_resource(generic_deployed_app_resource_model,
+                                                                                command,
+                                                                                inputs)
 
+        result = get_result_from_command_output(command_result.Output)
         _logger.debug('Transferring result to the caller ' + result)
         set_command_result(result)
