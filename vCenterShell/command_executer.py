@@ -2,6 +2,7 @@
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 from common.utilites.command_result import set_command_result
 
+
 class CommandExecuterService(object):
     """ main class that publishes all available commands """
 
@@ -61,11 +62,12 @@ class CommandExecuterService(object):
         connection_details = self.connection_retriever.connection_details()
 
         # execute command
-        mac_addresses = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                          self.virtual_switch_connect_command.connect_to_networks,
-                                                                          uuid, [vnic_to_network], default_network)
-
-        set_command_result(','.join(mac_addresses))
+        connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                                  self.virtual_switch_connect_command.connect_to_networks,
+                                                                                  uuid,
+                                                                                  [vnic_to_network],
+                                                                                  default_network)
+        set_command_result(result=connection_results, unpicklable=False)
 
     def disconnect_all(self):
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
@@ -123,7 +125,7 @@ class CommandExecuterService(object):
                 self.deployFromTemplateCommand.execute_deploy_from_template,
                 data_holder)
 
-        set_command_result(self.serializer.encode(result, unpicklable=False))
+        set_command_result(result=result, unpicklable=False)
 
     def power_off(self):
         # get command parameters from the environment
@@ -162,5 +164,3 @@ class CommandExecuterService(object):
                                                              self.refresh_ip_command.refresh_ip,
                                                              vm_uuid,
                                                              resource_name)
-
-

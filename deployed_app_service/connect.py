@@ -1,9 +1,11 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue
-from common.utilites.command_result import get_result_from_command_output, set_command_result
+from common.utilites.command_result import get_result_from_command_output, set_command_result, transfer_command_result
 from common.logger import getLogger
+from common.utilites.common_utils import get_object_as_string
 
-_logger  = getLogger('DeployedAppService')
+_logger = getLogger('DeployedAppService')
+
 
 class DeployedAppService(object):
     def __init__(self, resource_model_parser):
@@ -35,14 +37,13 @@ class DeployedAppService(object):
         _logger.debug('Executing Connect VM command on ' + generic_deployed_app_resource_model.cloud_provider)
 
         command_result = session.ExecuteCommand(reservation_id, generic_deployed_app_resource_model.cloud_provider,
-                               'Resource',
-                               'Connect VM',
-                               [InputNameValue('COMMAND', "connect"),
-                                InputNameValue('VLAN_ID', virtual_network),
-                                InputNameValue('VLAN_SPEC_TYPE', access_mode),
-                                InputNameValue('VM_UUID', generic_deployed_app_resource_model.vm_uuid)],
-                               True)
+                                                'Resource',
+                                                'Connect VM',
+                                                [InputNameValue('COMMAND', "connect"),
+                                                 InputNameValue('VLAN_ID', virtual_network),
+                                                 InputNameValue('VLAN_SPEC_TYPE', access_mode),
+                                                 InputNameValue('VM_UUID',
+                                                                generic_deployed_app_resource_model.vm_uuid)],
+                                                True)
 
-        result = get_result_from_command_output(command_result.Output)
-        _logger.debug('Transferring result to the caller ' + result)
-        set_command_result(result)
+        transfer_command_result(command_result.Output)

@@ -20,7 +20,7 @@ class TestCommandExecuterService(unittest.TestCase):
         # arrange
         deploy_param = 'deploy_param'
         deploy_data = {'mock': Mock()}
-        deploy_result = Mock()
+        deploy_result = 'deploy_result'
 
         self.quali_helpers.get_user_param = Mock(return_value=deploy_param)
         self.serializer.decode = Mock(return_value=deploy_data)
