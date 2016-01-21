@@ -1187,3 +1187,18 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         #assert
         self.assertTrue(pv_service.find_network_by_name.called)
+
+    def test_destroy_vm(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        pv_service.wait_for_task = Mock()
+        vm = Mock()
+        vm.PowerOffVM_Task = Mock()
+        vm.Destroy_Task = Mock()
+
+        #act
+        pv_service.destroy_vm(vm)
+
+        #assert
+        self.assertTrue(vm.PowerOffVM_Task.called)
+        self.assertTrue(vm.Destroy_Task.called)
