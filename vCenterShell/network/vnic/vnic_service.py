@@ -200,22 +200,23 @@ class VNicService(object):
             logger.warn(u"Cannot assigning portgroup for vNIC")
         return nicspec
 
-    def add_or_update_vnic_network(device, network):
-        """
-        attach network to vnic
-        :param network: vim.network port group
-        :param vnic: vnic
-        """
-
-        dvs_port_connection = vim.dvs.PortConnection()
-        dvs_port_connection.portgroupKey = network.key
-        dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
-
-        # checking if the vnic is not assigned or assign to a different network
-        if not hasattr(device, 'backing') or not hasattr(device.backing, 'networking'):
-            device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-
-        device.backing.port = dvs_port_connection
+    ### NOT USED:
+    # def add_or_update_vnic_network(device, network):
+    #     """
+    #     attach network to vnic
+    #     :param network: vim.network port group
+    #     :param vnic: vnic
+    #     """
+    #
+    #     dvs_port_connection = vim.dvs.PortConnection()
+    #     dvs_port_connection.portgroupKey = network.key
+    #     dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
+    #
+    #     # checking if the vnic is not assigned or assign to a different network
+    #     if not hasattr(device, 'backing') or not hasattr(device.backing, 'networking'):
+    #         device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
+    #
+    #     device.backing.port = dvs_port_connection
 
     @staticmethod
     def vnic_attached_to_network(nicspec, network):
