@@ -1193,6 +1193,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service = pyVmomiService(None, None)
         pv_service.wait_for_task = Mock()
         vm = Mock()
+        vm.runtime = Mock()
+        vm.runtime.powerState = 'poweredOn'
         vm.PowerOffVM_Task = Mock()
         vm.Destroy_Task = Mock()
 
