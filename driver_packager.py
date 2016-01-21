@@ -2,6 +2,7 @@ import os
 import sys
 import zipfile
 import ConfigParser
+import xml.etree.ElementTree as ET
 
 DRIVER_FILE_BASE_DIR = 'vCenterShellPackage'
 STRIPING_CHARS = ' \t\n\r'
@@ -51,10 +52,13 @@ def main(args):
     include_dirs = config.get('Packaging', INCLUDE_DIRS).split(',')
     target_name = config.get('Packaging', TARGET_NAME)
     target_dir = config.get('Packaging', TARGET_DIR)
+    version = _get_version()
+
+    _update_version(target_name, version)
 
     zip_name = os.path.join(DRIVER_FILE_BASE_DIR, target_dir, target_name + '.zip')
 
-    print 'Packing driver {0} into {1}'.format(target_name, zip_name)
+    print 'Packaging {0} version {1}'.format(zip_name, version)
 
     ensure_dir(zip_name)
 
@@ -82,6 +86,31 @@ def main(args):
         zip_dir(dir_to_include, zip_file)
 
     zip_file.close()
+
+
+def _update_version(script_name, version):
+
+    ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
+    datamodel_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                  'vCenterShellPackage/DataModel/datamodel.xml')
+
+    tree = ET.parse(datamodel_path)
+    scripts = tree.getroot().findall('.//default:ScriptDescriptors/default:ScriptDescriptor/[@Name="{0}"]'
+                                     .format(script_name), ns)
+
+    if not len(scripts):
+        raise Exception('Script {0} not found in datamodel.xml'.format(script_name))
+
+    print 'Setting version of {0} to {1}'.format(script_name, version)
+    scripts[0].set('Version', version)
+    print 'Saving modified datamodel.xml at {0}'.format(datamodel_path)
+    tree.write(datamodel_path)
+
+
+def _get_version():
+    with open('version.txt', 'r') as version_file:
+        version = version_file.read().replace('\n', '')
+    return version
 
 if __name__ == "__main__":
     main(sys.argv)

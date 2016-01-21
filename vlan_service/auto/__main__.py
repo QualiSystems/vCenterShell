@@ -1,11 +1,11 @@
-import os
-import models
-from time import sleep
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import AttributeNameValue
 from common.model_factory import ResourceModelParser
 from vlan_service.resolver.provider import VlanResolverProvider
 from common.utilites.command_result import set_command_result
+from common.logger import getLogger
+
+_logger = getLogger('VlanAuto')
 
 
 def main():
@@ -27,23 +27,20 @@ def main():
     if not vlan_service_provider.is_vlan_resolved():
         # resolve vlan id
         vlan_id = vlan_service_provider.resolve_vlan_auto()
+        vlan_id = str(vlan_id)
         # set resolved vlan id to virtual network attribute
         api.SetServiceAttributesValues(reservation_context.id,
                                        resource_context.name,
                                        [AttributeNameValue(
                                                vlan_auto_resource_model.virtual_network_attribute,
                                                vlan_id)])
-        # write success message to reservation output
-        api.WriteMessageToReservationOutput(reservation_context.id,
-                                            "{0} resolved vlan id {1} successfully".format(resource_context.name,
-                                                                                           str(vlan_id)))
+        _logger.info("{0} resolved vlan id {1} successfully".format(resource_context.name, vlan_id))
+
     else:
-        # write already resolved message to reservation output
         vlan_id = str(vlan_auto_resource_model.virtual_network)
-        api.WriteMessageToReservationOutput(reservation_context.id,
-                                            "{0} already has a resolved vlan id: {1}"
-                                            .format(resource_context.name,
-                                                    vlan_id))
+        _logger.info("{0} already has a resolved vlan id: {1}".format(resource_context.name, vlan_id))
+
+    # command result for programmatic use
     set_command_result(vlan_id)
 
 

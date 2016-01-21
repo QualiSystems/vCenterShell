@@ -20,7 +20,7 @@ class TestCommandExecuterService(unittest.TestCase):
         # arrange
         deploy_param = 'deploy_param'
         deploy_data = {'mock': Mock()}
-        deploy_result = Mock()
+        deploy_result = 'deploy_result'
 
         self.quali_helpers.get_user_param = Mock(return_value=deploy_param)
         self.serializer.decode = Mock(return_value=deploy_data)
@@ -163,7 +163,7 @@ class TestCommandExecuterService(unittest.TestCase):
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
         # act
-        command_executer_service.destroy()
+        command_executer_service.destroy_vm()
 
         # assert
         self.assertTrue(connection_retriever.getVCenterInventoryPathAttributeData.called_with(resource_att))

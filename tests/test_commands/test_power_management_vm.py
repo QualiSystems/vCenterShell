@@ -26,7 +26,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
 
         # act
-        res = power_manager.power_on(si, vm_uuid)
+        res = power_manager.power_on(si, vm_uuid, None)
 
         # assert
         self.assertTrue(res)
@@ -53,7 +53,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager._get_vm = Mock(return_value=vm)
 
         # act
-        res = power_manager.power_off(si, vm_uuid)
+        res = power_manager.power_off(si, vm_uuid, None)
 
         # assert
         self.assertTrue(res)
