@@ -1,3 +1,6 @@
+from models.ConnectionResult import ConnectionResult
+from common.utilites.common_utils import get_object_as_string
+
 
 class VirtualSwitchConnectCommand:
     def __init__(self,
@@ -43,11 +46,15 @@ class VirtualSwitchConnectCommand:
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
             si, vm, mappings, default_network_instance)
 
-        mac_addresses = []
+        connection_results = []
         for updated_mapping in updated_mappings:
-            mac_addresses.append(updated_mapping.vnic.macAddress)
 
-        return mac_addresses
+            connection_result = ConnectionResult(mac_address=updated_mapping.vnic.macAddress,
+                                                 vm_uuid=vm_uuid,
+                                                 network_name=default_network_name)
+            connection_results.append(connection_result)
+
+        return connection_results
 
     def _prepare_mappings(self, vm_network_mappings):
         mappings = []

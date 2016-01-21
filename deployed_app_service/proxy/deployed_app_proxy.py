@@ -1,6 +1,6 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue
-from common.utilites.command_result import get_result_from_command_output, set_command_result
+from common.utilites.command_result import get_result_from_command_output, set_command_result, transfer_command_result
 from common.logger import getLogger
 
 _logger = getLogger('DeployedAppService')
@@ -111,6 +111,4 @@ class DeployedAppService(object):
                                                                                 command,
                                                                                 inputs)
 
-        result = get_result_from_command_output(command_result.Output)
-        _logger.debug('Transferring result to the caller ' + result)
-        set_command_result(result)
+        transfer_command_result(command_result.Output)
