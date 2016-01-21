@@ -38,3 +38,17 @@ class TestDvPortGroupCreator(TestCase):
         # Assert
         self.assertTrue(dv_port_group_creator.dv_port_group_create_task.called)
 
+    def test_dv_port_group_create_task(self):
+        #arrange
+        pyvmomy_service = Mock()
+        synchronous_task_waiter = Mock()
+        dv_port_group_creator = DvPortGroupCreator(pyvmomy_service, synchronous_task_waiter)
+        dv_switch = create_autospec(spec=vim.DistributedVirtualSwitch)
+        dv_switch.AddDVPortgroup_Task = Mock()
+        spec = create_autospec(spec=vim.dvs.VmwareDistributedVirtualSwitch.VlanSpec)
+
+        #act
+        dv_port_group_creator.dv_port_group_create_task('dv_port_name', dv_switch, spec, 1001)
+
+        #assert
+        self.assertTrue(dv_switch.AddDVPortgroup_Task.called)
