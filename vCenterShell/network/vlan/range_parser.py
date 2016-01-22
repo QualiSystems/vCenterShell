@@ -17,8 +17,6 @@ class VLanIdRangeParser(object):
                 return int(vlan_id)
             raise KeyError('Access supports only int vlan id')
         elif vlan_type == 'Trunk':
-            if not vlan_id:
-                raise Exception('VLAN should be a number or range in format 1-100')
             vlan_parts = str(vlan_id).split("-")
             if len(vlan_parts) > 2:
                 raise Exception('VLAN should be a number or range in format 1-100')
