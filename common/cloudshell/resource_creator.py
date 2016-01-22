@@ -1,4 +1,4 @@
-from qualipy.api.cloudshell_api import ResourceAttributesUpdateRequest, AttributeNameValue
+# from qualipy.api.cloudshell_api import ResourceAttributesUpdateRequest, AttributeNameValue
 
 ### NOT USED:
 # class CloudshellResourceCreator(object):
