@@ -1,3 +1,4 @@
-class LinkModel(object):
-    def __init__(self):
-        self.target_interface = ''
+### NOT USED:
+# class LinkModel(object):
+#     def __init__(self):
+#         self.target_interface = ''
