@@ -74,6 +74,19 @@ class TestNetwork(TestCase):
         # res = vnic_add_to_vm_task(nicspec, vm)
         # pass
 
+    def test_vnic_add_to_vm_task(self):
+        #arrange
+        nicspec = vim.vm.device.VirtualDeviceSpec()
+        vm = Mock()
+        VNicService.vnic_set_connectivity_status = Mock()
+        pyVmomiService.vm_reconfig_task = Mock()
+
+        #act
+        res = VNicService.vnic_add_to_vm_task(nicspec, vm)
+
+        #assert
+        self.assertTrue(VNicService.vnic_set_connectivity_status.called)
+        self.assertTrue(pyVmomiService.vm_reconfig_task.called)
 
     def test_set_connectiv(self):
         nicspec = Mock()
