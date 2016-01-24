@@ -9,7 +9,7 @@ VIRTUAL_NETWORK_ATTRIBUTE = 'Virtual Network'
 ACCESS_MODE_ATTRIBUTE = 'Access Mode'
 
 
-class EnvironmentConnector(object):
+class EnvironmentService(object):
     def connect_all(self):
         """
         Connects all the VLAN Auto services to all the Deployed Apps in the same Environment

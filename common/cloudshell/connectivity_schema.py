@@ -55,6 +55,7 @@ class ActionResult(object):
 
 class SetVlanAction(Action):
     def __init__(self):
+        super(SetVlanAction, self).__init__()
         self.conenctionId = ''
         self.connectionParams = SetVlanParameters()
         self.connectorAttributes = [ConnectorAttribute()]

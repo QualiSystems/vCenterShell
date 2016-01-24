@@ -13,7 +13,8 @@ def get_package_dir_name(package_name):
 
 def main(args):
     package_name = 'vCenterShell' #args[1]
-    print "Building {0} package".format(package_name)
+
+    print "Packaging {0}.zip".format(package_name)
 
     zip_file = zipfile.ZipFile(package_name + ".zip", 'w')
 
