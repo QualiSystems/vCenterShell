@@ -1,0 +1,91 @@
+{
+  "$schema": "baseschema.json",
+  "definitions": {
+    "actionTarget": {
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string"
+        },
+        "fullAddress": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "fullName","fullAddress"
+      ]
+    },
+    "action": {
+      "type": "object",
+      "properties": {
+        "actionId": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "actionTarget": {
+          "$ref": "#/definitions/actionTarget"
+        }
+      },
+      "required": [
+        "actionId",
+        "type",
+        "actionTarget"
+      ]
+    },
+    "actionResult": {
+      "type": "object",
+      "properties": {
+        "type" : {
+          "type" : "string"
+        },
+        "actionId": {
+          "type": "string"
+        },
+        "infoMessage": {
+          "type": "string"
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "success" : {
+          "type" : "boolean"
+        }
+      },
+      "required": [
+        "actionId",
+        "type",
+        "infoMessage",
+        "errorMessage",
+        "success"
+      ]
+    }
+
+  },
+  "type" : "object",
+  "properties" : {
+    "driverRequest": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/action"
+          }
+        }
+      }
+    },
+    "driverResponse": {
+      "type": "object",
+      "properties": {
+        "actionResults": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/actionResult"
+          }
+        }
+      }
+    }
+  }
+}
