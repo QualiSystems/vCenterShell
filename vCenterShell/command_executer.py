@@ -32,10 +32,39 @@ class CommandExecuterService(object):
         self.refresh_ip_command = refresh_ip_command
 
     def connect_bulk(self):
+
+        dv_switch_path = self.vcenter_resource_model.default_dvswitch_path
+        dv_switch_name = self.vcenter_resource_model.default_dvswitch_name
+        port_group_path = self.vcenter_resource_model.default_port_group_path
+        default_network = self.vcenter_resource_model.default_network
+
         request_json = self.qualipy_helpers.get_user_param('REQUEST')
         request = jsonpickle.decode(request_json)
         holder = DeployDataHolder(request)
-        return holder
+
+        mappings = []
+        
+        for action in holder.driverRequest.actions:
+            if action.type == 'setVlan':
+                vnic_to_network = VmNetworkMapping()
+                vnic_to_network.dv_switch_path = dv_switch_path
+                vnic_to_network.dv_switch_name = dv_switch_name
+                vnic_to_network.port_group_path = port_group_path
+                vnic_to_network.vlan_id = action.connectionParams.vlanIds
+                vnic_to_network.vlan_spec = action.connectionParams.mode
+                mappings.append(vnic_to_network)
+
+        if mappings:
+            connection_details = self.connection_retriever.connection_details()
+
+            connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                            self.virtual_switch_connect_command.connect_to_networks,
+                                                            vm_uuid,
+                                                            mappings,
+                                                            default_network)
+
+            set_command_result(result=connection_results, unpicklable=False)
+
 
     def connect(self):
         # get command parameters from the environment
