@@ -11,19 +11,19 @@ class DeployDataHolder(object):
 
     @staticmethod
     def _create_obj_by_type(obj):
-        ret_obj = obj
-        if isinstance(obj, dict):
-            ret_obj = DeployDataHolder(obj)
-        if isinstance(obj, str):
-            ret_obj = str(obj)
-        if isinstance(obj, unicode):
-            ret_obj = unicode(obj)
-        if isinstance(obj, int):
-            ret_obj = int(obj)
-        if isinstance(obj, float):
-            ret_obj = float(obj)
-        return ret_obj
+        obj_type = type(obj)
+        if obj_type == dict:
+            return DeployDataHolder(obj)
+        if obj_type == list:
+            return [DeployDataHolder._create_obj_by_type(item) for item in obj]
+        if DeployDataHolder._is_primitive(obj):
+            return obj_type(obj)
+        return obj
 
+    @staticmethod
+    def _is_primitive(thing):
+        primitive = (int, str, bool, float, unicode)
+        return isinstance(thing, primitive)
 
     @classmethod
     def create_from_params(cls, template_model, datastore_name, vm_cluster_model, power_on):

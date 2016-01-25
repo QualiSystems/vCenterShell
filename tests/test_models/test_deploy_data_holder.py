@@ -54,3 +54,27 @@ class TestDeployDataHolder(TestCase):
         self.assertEqual(holder.driverRequest.actions[0].connectorAttributes[0].type, 'connectorAttribute')
         self.assertEqual(holder.driverRequest.actions[0].connectorAttributes[0].attributeName, 'QNQ')
         self.assertEqual(holder.driverRequest.actions[0].connectorAttributes[0].attributeValue, 'Enabled')
+
+    def test_deploy_data_holder_with_inner_list(self):
+        # Arrange
+        json = '''
+            {
+              "driverRequest": {
+                "actions": [
+                      [
+                        "setVlanParameter",
+                        ["100-200", "300"]
+                      ]
+                ]
+              }
+            }   '''
+
+        dictionary = jsonpickle.decode(json)
+
+        # Act
+        holder = DeployDataHolder(dictionary)
+
+        # Assert
+        self.assertEqual(holder.driverRequest.actions[0][1][0], '100-200')
+        self.assertEqual(holder.driverRequest.actions[0][1][1], '300')
+
