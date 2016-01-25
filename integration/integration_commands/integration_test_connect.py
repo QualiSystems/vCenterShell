@@ -74,8 +74,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
                                                                                   VNicService())
         connector = VirtualSwitchToMachineConnector(dv_port_group_creator, virtual_machine_port_group_configurer)
 
-        vnic_updater = VnicUpdater(helpers)
-        command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac, vnic_updater)
+        command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac, Mock())
 
         command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork')
 
