@@ -1,6 +1,5 @@
 from unittest import TestCase
-from mock import Mock, MagicMock
-
+from mock import Mock, MagicMock, create_autospec
 
 from pyVmomi import vim
 from common.vcenter.vmomi_service import *
@@ -75,6 +74,19 @@ class TestNetwork(TestCase):
         # res = vnic_add_to_vm_task(nicspec, vm)
         # pass
 
+    def test_vnic_add_to_vm_task(self):
+        #arrange
+        nicspec = vim.vm.device.VirtualDeviceSpec()
+        vm = Mock()
+        VNicService.vnic_set_connectivity_status = Mock()
+        pyVmomiService.vm_reconfig_task = Mock()
+
+        #act
+        res = VNicService.vnic_add_to_vm_task(nicspec, vm)
+
+        #assert
+        self.assertTrue(VNicService.vnic_set_connectivity_status.called)
+        self.assertTrue(pyVmomiService.vm_reconfig_task.called)
 
     def test_set_connectiv(self):
         nicspec = Mock()
@@ -89,3 +101,67 @@ class TestNetwork(TestCase):
         nicspec.device = Mock()
         res = VNicService.vnic_is_attachet_to_network(nicspec, Mock())
         self.assertFalse(res)
+
+    def test_vnic_remove_from_vm_list(self):
+        #arrange
+        vm = create_autospec(spec=vim.vm)
+        vm.config = Mock()
+        vm.config.hardware = Mock()
+        vm.config.hardware.device = [create_autospec(spec=vim.vm.device.VirtualEthernetCard)]
+
+        #act
+        device_change = VNicService.vnic_remove_from_vm_list(vm)
+
+        #assert
+        self.assertTrue(len(device_change) == 1)
+
+    def test_get_device_spec(self):
+        #arrange
+        vnic = Mock()
+        VNicService.create_vnic_spec = Mock()
+        VNicService.set_vnic_connectivity_status = Mock()
+
+        #act
+        VNicService.get_device_spec(vnic, True)
+
+        #assert
+        self.assertTrue(VNicService.create_vnic_spec.called)
+        self.assertTrue(VNicService.set_vnic_connectivity_status.called)
+
+    def test_vnic_add_new_to_vm_task(self):
+        #arrange
+
+        vm = create_autospec(spec=vim.vm)
+        VNicService.vnic_new_attached_to_network = Mock()
+        #VNicService.vnic_add_to_vm_task = Mock()
+
+        #act
+        VNicService.vnic_add_new_to_vm_task(vm)
+
+        #assert
+        self.assertTrue(VNicService.vnic_new_attached_to_network.called)
+        # self.assertTrue(VNicService.vnic_add_to_vm_task.called)
+
+    def test_vnic_attached_to_network_1(self):
+        #arrange
+        network = create_autospec(spec=vim.dvs.DistributedVirtualPortgroup)
+        nicspec = create_autospec(spec=vim.vm.device.VirtualDeviceSpec)
+        VNicService.vnic_attach_to_network_distributed = Mock()
+
+        #act
+        VNicService.vnic_attached_to_network(nicspec, network)
+
+        #assert
+        self.assertTrue(VNicService.vnic_attach_to_network_distributed.called)
+
+    def test_vnic_attached_to_network_2(self):
+        #arrange
+        network = create_autospec(spec=vim.Network)
+        nicspec = create_autospec(spec=vim.vm.device.VirtualDeviceSpec)
+        VNicService.vnic_attach_to_network_standard = Mock()
+
+        #act
+        VNicService.vnic_attached_to_network(nicspec, network)
+
+        #assert
+        self.assertTrue(VNicService.vnic_attach_to_network_standard.called)
