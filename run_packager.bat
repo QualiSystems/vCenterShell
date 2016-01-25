@@ -20,7 +20,8 @@ python driver_packager.py packeger_configs\\deployed_app_proxy_power_off.ini
 python driver_packager.py packeger_configs\\deployed_app_proxy_destroy_vm.ini
 python driver_packager.py packeger_configs\\deployed_app_proxy_refresh_ip.ini
 
-python driver_packager.py packeger_configs\\environment_scripts.ini
+python driver_packager.py packeger_configs\\environment_connect_all.ini
+python driver_packager.py packeger_configs\\environment_connect_bulk.ini
 
 REM build vCenterShell package
 python shell_packager.py vCenterShell
