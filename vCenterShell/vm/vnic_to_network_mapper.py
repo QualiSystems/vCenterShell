@@ -44,7 +44,7 @@ class VnicToNetworkMapper(object):
                                                                      existing_network, default_network)
 
             if not self.quali_name_generator.is_generated_name(network_to_map):
-                network_to_map = default_network
+                network_to_map = default_network.name
             mapping[vnic_name] = network_to_map
 
         if mapping:
