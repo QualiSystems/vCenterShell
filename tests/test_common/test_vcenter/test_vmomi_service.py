@@ -1148,3 +1148,59 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
 
         '#assert'
         self.assertTrue(result)
+
+    def test_connect(self):
+        #arrange
+        pv_service = pyVmomiService(SmartConnect, Disconnect)
+        address = Mock()
+        user = Mock()
+        password = Mock()
+        pv_service.pyvmomi_connect = Mock()
+
+        #act
+        pv_service.connect(address, user, password)
+
+        #assert
+        self.assertTrue(pv_service.pyvmomi_connect.called)
+
+    def test_disconnect(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        si = create_autospec(spec=vim.ServiceInstance)
+        pv_service.pyvmomi_disconnect = Mock()
+
+        #act
+        pv_service.disconnect(si)
+
+        #assert
+        self.assertTrue(pv_service.pyvmomi_disconnect.called)
+
+    def test_get_network_by_full_name(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        si = create_autospec(spec=vim.ServiceInstance)
+        default_network_full_name = 'Root/Folder/Folder2/Name'
+        pv_service.find_network_by_name = Mock()
+
+        #act
+        pv_service.get_network_by_full_name(si, default_network_full_name)
+
+        #assert
+        self.assertTrue(pv_service.find_network_by_name.called)
+
+    def test_destroy_vm(self):
+        #arrange
+        pv_service = pyVmomiService(None, None)
+        pv_service.wait_for_task = Mock()
+        vm = Mock()
+        vm.runtime = Mock()
+        vm.runtime.powerState = 'poweredOn'
+        vm.PowerOffVM_Task = Mock()
+        vm.Destroy_Task = Mock()
+
+        #act
+        pv_service.destroy_vm(vm)
+
+        #assert
+        self.assertTrue(vm.PowerOffVM_Task.called)
+        self.assertTrue(vm.Destroy_Task.called)
