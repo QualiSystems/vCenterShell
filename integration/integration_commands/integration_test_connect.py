@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
