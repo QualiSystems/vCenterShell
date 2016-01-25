@@ -28,7 +28,7 @@ class VnicToNetworkMapper(object):
 
     def _find_available_vnic(self, vnics_to_network_mapping, default_network):
         for vnic_name, network_name in vnics_to_network_mapping.items():
-            if network_name == default_network:
+            if network_name == default_network.name:
                 return vnic_name
         raise Exception('no vnic available')
 
