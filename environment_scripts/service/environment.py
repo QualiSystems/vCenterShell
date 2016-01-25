@@ -1,5 +1,7 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue, AttributeNameValue
+
+from common.cloudshell.connectivity_schema import SetVlanAction
 from common.logger.service import getLogger
 from common.utilites.command_result import get_result_from_command_output
 
@@ -10,6 +12,13 @@ ACCESS_MODE_ATTRIBUTE = 'Access Mode'
 
 
 class EnvironmentService(object):
+    @staticmethod
+    def connect_bulk():
+        """
+
+        """
+        raise Exception('Not implemented')
+
     def connect_all(self):
         """
         Connects all the VLAN Auto services to all the Deployed Apps in the same Environment
