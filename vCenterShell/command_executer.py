@@ -1,6 +1,7 @@
 ﻿from models.DeployDataHolder import DeployDataHolder
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 from common.utilites.command_result import set_command_result
+import jsonpickle
 
 
 class CommandExecuterService(object):
@@ -29,6 +30,12 @@ class CommandExecuterService(object):
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
         self.vm_power_management_command = vm_power_management_command
         self.refresh_ip_command = refresh_ip_command
+
+    def connect_bulk(self):
+        request_json = self.qualipy_helpers.get_user_param('REQUEST')
+        request = jsonpickle.decode(request_json)
+        holder = DeployDataHolder(request)
+        return holder
 
     def connect(self):
         # get command parameters from the environment

@@ -16,6 +16,56 @@ class TestCommandExecuterService(unittest.TestCase):
         self.vc_center_model = Mock()
         self.vc_center_model.default_network = 'Anetwork'
 
+    def test_connect_bulk(self):
+
+        json = '''
+            {
+              "driverRequest": {
+                "actions": [
+                  {
+                      "actionId": "vlan1%<=>%resourceA",
+                      "type": "setVlan",
+                      "actionTarget": {
+                        "fullName": "Chassis1/Blade1/port1",
+                        "fullAddress" : "1/2/3"
+                      },
+                      "connectionId" : "vlan1%<=>%resourceA",
+                      "connectionParams" : {
+                        "type" : "setVlanParameter",
+                        "vlanIds" : ["100-200", "300"],
+                        "mode" : "Trunk"
+                      },
+                      "connectorAttributes" : [
+                            {
+                                "type": "connectorAttribute",
+                                "attributeName" : "QNQ",
+                                "attributeValue" : "Enabled"
+                            }
+                      ]
+
+                  }
+                ]
+              }
+            }   '''
+
+        self.quali_helpers.get_user_param = Mock(return_value=json)
+
+        command_executer_service = CommandExecuterService(self.serializer,
+                                                          self.quali_helpers,
+                                                          self.command_wrapper,
+                                                          self.connection_retriever,
+                                                          self.vc_center_model,
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock(),
+                                                          Mock())
+
+        command_executer_service.connect_bulk()
+        print 'ended'
+        pass
+
     def test_deploy_from_template(self):
         # arrange
         deploy_param = 'deploy_param'
