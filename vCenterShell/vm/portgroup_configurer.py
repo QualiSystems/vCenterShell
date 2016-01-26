@@ -54,7 +54,8 @@ class VirtualMachinePortGroupConfigurer(object):
                 task = self.destroy_port_group_task(network)
                 if task:
                     try:
-                        self.synchronous_task_waiter.wait_for_task(task)
+                        self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                   action_name='Erase dv Port Group')
                     except vim.fault.ResourceInUse:
                         pass
                         logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
@@ -88,7 +89,8 @@ class VirtualMachinePortGroupConfigurer(object):
     def reconfig_vm(self, device_change, vm):
         logger.info("Changing network...")
         task = self.pyvmomi_service.vm_reconfig_task(vm, device_change)
-        return self.synchronous_task_waiter.wait_for_task(task)
+        return self.synchronous_task_waiter.wait_for_task(task=task,
+                                                          action_name='Reconfigure VM')
 
     @staticmethod
     def destroy_port_group_task(network):

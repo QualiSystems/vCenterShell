@@ -10,11 +10,11 @@ class SynchronousTaskWaiter(object):
         pass
 
     # noinspection PyMethodMayBeStatic
-    def wait_for_task(self, task, actionName='job', hideResult=False):
+    def wait_for_task(self, task, action_name='job', hideResult=False):
         """
         Waits and provides updates on a vSphere task
         :param hideResult:
-        :param actionName:
+        :param action_name:
         :param task:
         """
 
@@ -23,13 +23,13 @@ class SynchronousTaskWaiter(object):
 
         if task.info.state == vim.TaskInfo.State.success:
             if task.info.result is not None and not hideResult:
-                out = '%s completed successfully, result: %s' % (actionName, task.info.result)
+                out = '%s completed successfully, result: %s' % (action_name, task.info.result)
                 logger.info(out)
             else:
-                out = '%s completed successfully.' % actionName
+                out = '%s completed successfully.' % action_name
                 logger.info(out)
         else:
-            out = '%s did not complete successfully: %s' % (actionName, task.info.error)
+            out = '%s did not complete successfully: %s' % (action_name, task.info.error)
             logger.info(out)
             raise task.info.error
 

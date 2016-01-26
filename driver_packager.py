@@ -58,7 +58,7 @@ def main(args):
 
     zip_name = os.path.join(DRIVER_FILE_BASE_DIR, target_dir, target_name + '.zip')
 
-    print 'Packaging {0} version {1}'.format(zip_name, version)
+    print 'Creating script {0} version {1}'.format(zip_name, version)
 
     ensure_dir(zip_name)
 
@@ -101,9 +101,7 @@ def _update_version(script_name, version):
     if not len(scripts):
         raise Exception('Script {0} not found in datamodel.xml'.format(script_name))
 
-    print 'Setting version of {0} to {1}'.format(script_name, version)
     scripts[0].set('Version', version)
-    print 'Saving modified datamodel.xml at {0}'.format(datamodel_path)
     tree.write(datamodel_path)
 
 

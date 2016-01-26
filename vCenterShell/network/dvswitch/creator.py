@@ -17,7 +17,8 @@ class DvPortGroupCreator(object):
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
-        port_group = self.synchronous_task_waiter.wait_for_task(task)
+        port_group = self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                action_name='Create dv port group')
         return port_group
 
     @staticmethod

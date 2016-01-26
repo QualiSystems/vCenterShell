@@ -1,2 +1,5 @@
 pyvmomi==6.0.0
 jsonpickle
+jsonschema
+enum
+python_jsonschema_objects

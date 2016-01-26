@@ -70,3 +70,4 @@ vCenterShell.zip
 vCenterShellPackage/Resource Scripts/*
 vCenterShellPackage/Topology Scripts/*.*
 debug.txt
+tests/utils/config.ini
