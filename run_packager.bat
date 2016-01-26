@@ -11,6 +11,7 @@ python driver_packager.py package_specs\\power_on_command.ini
 python driver_packager.py package_specs\\power_off_command.ini
 python driver_packager.py package_specs\\refresh_ip_command.ini
 python driver_packager.py package_specs\\connect_command.ini
+python driver_packager.py package_specs\\connect_bulk_command.ini
 python driver_packager.py package_specs\\vlan_auto_service.ini
 python driver_packager.py package_specs\\orchestration_service.ini
 
@@ -21,7 +22,6 @@ python driver_packager.py package_specs\\deployed_app_proxy_destroy_vm.ini
 python driver_packager.py package_specs\\deployed_app_proxy_refresh_ip.ini
 
 python driver_packager.py package_specs\\environment_connect_all.ini
-python driver_packager.py package_specs\\environment_connect_bulk.ini
 
 REM build vCenterShell package
 python shell_packager.py vCenterShell

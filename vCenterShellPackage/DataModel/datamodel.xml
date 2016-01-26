@@ -163,6 +163,7 @@
             <ns0:ScriptName>Connect VM</ns0:ScriptName>
             <ns0:ScriptName>Destroy VM</ns0:ScriptName>
             <ns0:ScriptName>Refresh IP</ns0:ScriptName>
+            <ns0:ScriptName>Connect Bulk</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
@@ -426,7 +427,10 @@
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Name="Connect Bulk" Version="1.0.0">
-      <ns0:ScriptInputs />
+      <ns0:ScriptInputs>
+        <ns0:ScriptInput DefaultValue="connect_bulk" Name="COMMAND" />
+        <ns0:ScriptInput Name="REQUEST" />
+      </ns0:ScriptInputs>
     </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>
 </ns0:DataModelInfo>

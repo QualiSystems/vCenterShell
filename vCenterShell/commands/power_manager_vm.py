@@ -29,7 +29,8 @@ class VirtualMachinePowerManagementCommand(object):
             # hard power off
             _logger.info('hard powering of vm')
             task = vm.PowerOff()
-            task_result = self.synchronous_task_waiter.wait_for_task(task)
+            task_result = self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                     action_name='Power Off')
 
         # Set live status - deployment done
         if resource_fullname:
@@ -55,7 +56,8 @@ class VirtualMachinePowerManagementCommand(object):
         else:
             _logger.info('powering on vm')
             task = vm.PowerOn()
-            task_result = self.synchronous_task_waiter.wait_for_task(task)
+            task_result = self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                     action_name='Power On')
 
         # Set live status - deployment done
         if resource_fullname:
