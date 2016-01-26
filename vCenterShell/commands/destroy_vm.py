@@ -16,7 +16,7 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
-    def destroy(self, si, vm_uuid, resource_full_name):
+    def destroy(self, si, session, vm_uuid, resource_full_name):
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
@@ -29,5 +29,5 @@ class DestroyVirtualMachineCommand(object):
         result = self.pv_service.destroy_vm(vm)
 
         # delete resources
-        self.resource_remover.remove_resource(resource_full_name)
+        self.resource_remover.remove_resource(session=session, resource_full_name=resource_full_name)
         return result
