@@ -29,26 +29,25 @@ from qualipy.api.cloudshell_api import CloudShellAPISession
 
 
 class VCenterShellDriver:
-    @staticmethod
-    def _get_session(context):
+
+    def _get_session(self, context):
         """
         gets the current session
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         """
+
         return CloudShellAPISession(host=context.connectivity.serverAddress,
                                     token=context.connectivity.adminAuthToken,
-                                    user=None,
-                                    password=None,
+                                    user='admin',   # Todo: remove this
+                                    password='admin',   # Todo: remove this
                                     domain=context.reservation.domain)
 
-    def _get_connection_details(self, context):
+    def _get_connection_details(self, session, context):
         """
         Receives the context of the command and returns a cloudshell session
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         """
-        # get session
-        session = self._get_session(context=context)
         # get connection details
         connection_details = \
             self.cloudshell_data_retriever_service.getVCenterConnectionDetails(session=session,
@@ -74,8 +73,11 @@ class VCenterShellDriver:
         Initialize the driver session, this function is called everytime a new instance of the driver is created
         in here the driver is going to be bootstrapped
 
-        :type context: models.QualiDriverModels.InitCommandContext
+        :param context: models.QualiDriverModels.InitCommandContext
         """
+        self.init(context)
+
+    def init(self, context):
         pv_service = pyVmomiService(SmartConnect, Disconnect)
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.cloudshell_data_retriever_service = CloudshellDataRetrieverService()
@@ -154,7 +156,8 @@ class VCenterShellDriver:
         vnic_to_network.vlan_spec = vlan_spec_type
 
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         connection_results = \
@@ -177,7 +180,8 @@ class VCenterShellDriver:
             raise ValueError('VM_UUID is missing')
 
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
@@ -196,7 +200,8 @@ class VCenterShellDriver:
         """
 
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
@@ -214,7 +219,7 @@ class VCenterShellDriver:
         """
         # get connection details
         session = self._get_session(context)
-        connection_details = self._get_connection_details(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
@@ -222,7 +227,7 @@ class VCenterShellDriver:
             self.destroy_virtual_machine_command.destroy,
             session,
             vm_uuid,
-            context.resource.fullname)
+            context.resource.fullName)
 
     def deploy_from_template(self, context, deploy_data):
         """
@@ -245,7 +250,8 @@ class VCenterShellDriver:
         :return str deploy results
         """
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -266,13 +272,15 @@ class VCenterShellDriver:
         :param str vm_uuid: the vm uuid to turn off
         """
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_off,
+                                                             session,
                                                              vm_uuid,
-                                                             context.resource.fullname)
+                                                             context.resource.fullName)
 
     def power_on(self, context, vm_uuid):
         """
@@ -281,13 +289,15 @@ class VCenterShellDriver:
         :param str vm_uuid: the vm uuid to turn on
         """
         # get connection details
-        connection_details = self._get_connection_details(context)
+        session = self._get_session(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.vm_power_management_command.power_on,
+                                                             session,
                                                              vm_uuid,
-                                                             context.resource.fullname)
+                                                             context.resource.fullName)
 
     def refresh_ip(self, context, vm_uuid):
         """
@@ -297,12 +307,12 @@ class VCenterShellDriver:
         """
         # get connection details
         session = self._get_session(context)
-        connection_details = self._get_connection_details(context)
+        connection_details = self._get_connection_details(session, context)
 
         # execute command
         self.command_wrapper.execute_command_with_connection(connection_details,
                                                              self.refresh_ip_command.refresh_ip,
                                                              session,
                                                              vm_uuid,
-                                                             context.resource.fullname,
+                                                             context.resource.fullName,
                                                              self.vc_data_model.default_network)

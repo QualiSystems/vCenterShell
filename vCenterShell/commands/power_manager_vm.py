@@ -1,5 +1,4 @@
 from common.logger import getLogger
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
 
 _logger = getLogger("vCenterShell")
 
@@ -9,7 +8,7 @@ class VirtualMachinePowerManagementCommand(object):
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
 
-    def power_off(self, si, vm_uuid, resource_fullname):
+    def power_off(self, si, session, vm_uuid, resource_fullname):
         """
         hard power of the specified on the vcenter
         :param si: Service Instance
@@ -34,12 +33,11 @@ class VirtualMachinePowerManagementCommand(object):
 
         # Set live status - deployment done
         if resource_fullname:
-            helpers.get_api_session()\
-                .SetResourceLiveStatus(resource_fullname, "Offline", "Powered Off")
+            session.SetResourceLiveStatus(resource_fullname, "Offline", "Powered Off")
 
         return task_result
 
-    def power_on(self, si, vm_uuid, resource_fullname):
+    def power_on(self, si, session, vm_uuid, resource_fullname):
         """
         power on the specified vm
         :param vcenter_name: vcenter name
@@ -61,7 +59,6 @@ class VirtualMachinePowerManagementCommand(object):
 
         # Set live status - deployment done
         if resource_fullname:
-            helpers.get_api_session()\
-                .SetResourceLiveStatus(resource_fullname, "Online", "Active")
+            session.SetResourceLiveStatus(resource_fullname, "Online", "Active")
 
         return task_result

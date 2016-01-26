@@ -37,7 +37,7 @@ class ResourceContextDetails:
         """:type : str"""
         self.name = name  # The name of the resource
         """:type : str"""
-        self.fullname = fullname  # The full name (path) of the resource
+        self.fullName = fullname  # The full name (path) of the resource
         """:type : str"""
         self.type = type  # The type of the resource  (Service, App, Resource)
         """:type : str"""
