@@ -1,6 +1,9 @@
 import unittest
 from mock import MagicMock, Mock
+
+from models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils.command_context_mocker import CommandContextMocker
+from tests.utils.testing_credentials import TestCredentials
 from tests.utils.vm_context import VmContext
 from vCenterShell.command_executer import CommandExecuterService
 
@@ -17,7 +20,6 @@ class TestCommandExecuterService(unittest.TestCase):
         self.vc_center_model.default_network = 'Anetwork'
 
     def test_connect_bulk(self):
-
         json = '''
             {
               "driverRequest": {
@@ -27,13 +29,14 @@ class TestCommandExecuterService(unittest.TestCase):
                       "type": "setVlan",
                       "actionTarget": {
                         "fullName": "Chassis1/Blade1/port1",
-                        "fullAddress" : "1/2/3"
+                        "fullAddress" : "1/2/3",
+                        "vm_uuid" : "42228d96-23a0-710d-dd0c-1eb79a986aae"
                       },
                       "connectionId" : "vlan1%<=>%resourceA",
                       "connectionParams" : {
                         "type" : "setVlanParameter",
-                        "vlanIds" : ["100-200", "300"],
-                        "mode" : "Trunk"
+                        "vlanIds" : ["100"],
+                        "mode" : "Access"
                       },
                       "connectorAttributes" : [
                             {
@@ -49,6 +52,16 @@ class TestCommandExecuterService(unittest.TestCase):
             }   '''
 
         self.quali_helpers.get_user_param = Mock(return_value=json)
+        self.vc_center_model.default_dvswitch_name = 'dvSwitch'
+        self.vc_center_model.default_dvswitch_path = 'QualiSB'
+        self.vc_center_model.default_network = 'QualiSB/anetwork'
+        self.vc_center_model.default_port_group_path = 'QualiSB'
+        credentials = TestCredentials()
+        connection_details = VCenterConnectionDetails(credentials.host, credentials.username, credentials.password)
+        self.connection_retriever.connection_details = Mock(return_value=connection_details)
+
+        self.command_wrapper = MagicMock()
+        self.command_wrapper.execute_command_with_connection = Mock(return_value=[])
 
         command_executer_service = CommandExecuterService(self.serializer,
                                                           self.quali_helpers,
@@ -63,8 +76,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock())
 
         command_executer_service.connect_bulk()
-        print 'ended'
-        pass
+
+        self.assertTrue(self.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_template(self):
         # arrange
@@ -283,7 +296,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                      VmContext.VM_UUID))
 
     def test_refresh_ip(self):
-        #arrange
+        # arrange
         connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
         virtual_switch_disconnect_command.refresh_ip = Mock(return_value=True)
@@ -302,17 +315,17 @@ class TestCommandExecuterService(unittest.TestCase):
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
 
-        #act
+        # act
         command_executer_service.refresh_ip()
 
-        #assert
+        # assert
         self.assertTrue(self.command_wrapper.execute_command_with_connection
                         .called_with(connection_details,
                                      virtual_switch_disconnect_command.refresh_ip,
                                      VmContext.VM_UUID))
 
     def test_connect(self):
-        #arrange
+        # arrange
         connection_details = Mock()
         virtual_switch_disconnect_command = Mock()
         # virtual_switch_disconnect_command.connect_to_networks = Mock(return_value=['00:0a:95:9d:68:16'])
@@ -332,10 +345,10 @@ class TestCommandExecuterService(unittest.TestCase):
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
 
-        #act
+        # act
         command_executer_service.connect()
 
-        #assert
+        # assert
         self.assertTrue(self.command_wrapper.execute_command_with_connection
                         .called_with(connection_details,
                                      virtual_switch_disconnect_command.connect,

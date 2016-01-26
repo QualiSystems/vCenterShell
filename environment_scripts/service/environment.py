@@ -1,9 +1,8 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import InputNameValue, AttributeNameValue
-
-from common.cloudshell.connectivity_schema import SetVlanAction
 from common.logger.service import getLogger
 from common.utilites.command_result import get_result_from_command_output
+from common.cloudshell.resource_helper import get_attribute
 
 _logger = getLogger('EnvironmentConnector')
 
@@ -40,8 +39,8 @@ class EnvironmentService(object):
 
             _logger.debug('Connecting \'{0}\' '.format(vlan_service.ServiceName))
 
-            access_mode = self._get_attribute(vlan_service.Attributes, ACCESS_MODE_ATTRIBUTE)
-            virtual_network = self._get_attribute(vlan_service.Attributes, VIRTUAL_NETWORK_ATTRIBUTE)
+            access_mode = get_attribute(vlan_service.Attributes, ACCESS_MODE_ATTRIBUTE)
+            virtual_network = get_attribute(vlan_service.Attributes, VIRTUAL_NETWORK_ATTRIBUTE)
 
             # Get Deployed App connected to VLAN Auto service
             connected_resources = self._get_connected_resources(connectors, vlan_service)
@@ -66,13 +65,6 @@ class EnvironmentService(object):
             for connected_resource in connected_resources:
                 self._execute_connect_command_on_connected_resource(access_mode, connected_resource, reservation_id,
                                                                     session, virtual_network, vlan_service.ServiceName)
-
-    @staticmethod
-    def _get_attribute(attributes, attribute_name):
-        attribute = next(item for item in attributes if item.Name == attribute_name)
-        if not attribute:
-            raise ValueError('Attribute {0} is missing'.format(attribute_name))
-        return attribute.Value
 
     @staticmethod
     def _get_connectors(reservation_details):

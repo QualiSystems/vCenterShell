@@ -1,6 +1,7 @@
 ﻿from models.DeployDataHolder import DeployDataHolder
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 from common.utilites.command_result import set_command_result
+from common.cloudshell.resource_helper import get_attribute
 import jsonpickle
 
 
@@ -42,29 +43,43 @@ class CommandExecuterService(object):
         request = jsonpickle.decode(request_json)
         holder = DeployDataHolder(request)
 
-        mappings = []
-        
+        results = []
         for action in holder.driverRequest.actions:
+
             if action.type == 'setVlan':
-                vnic_to_network = VmNetworkMapping()
-                vnic_to_network.dv_switch_path = dv_switch_path
-                vnic_to_network.dv_switch_name = dv_switch_name
-                vnic_to_network.port_group_path = port_group_path
-                vnic_to_network.vlan_id = action.connectionParams.vlanIds
-                vnic_to_network.vlan_spec = action.connectionParams.mode
-                mappings.append(vnic_to_network)
+                vm_uuid = self._get_vm_uuid(action.actionTarget)
+                if vm_uuid == '':
+                    continue
 
-        if mappings:
-            connection_details = self.connection_retriever.connection_details()
+                mappings = []
+                for vlan in action.connectionParams.vlanIds:
+                    vnic_to_network = VmNetworkMapping()
+                    vnic_to_network.dv_switch_path = dv_switch_path
+                    vnic_to_network.dv_switch_name = dv_switch_name
+                    vnic_to_network.port_group_path = port_group_path
+                    vnic_to_network.vlan_id = vlan
+                    vnic_to_network.vlan_spec = action.connectionParams.mode
 
-            connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                            self.virtual_switch_connect_command.connect_to_networks,
-                                                            vm_uuid,
-                                                            mappings,
-                                                            default_network)
+                    mappings.append(vnic_to_network)
 
-            set_command_result(result=connection_results, unpicklable=False)
+                if mappings:
+                    connection_details = self.connection_retriever.connection_details()
 
+                    connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                                              self.virtual_switch_connect_command.connect_to_networks,
+                                                                                              vm_uuid,
+                                                                                              mappings,
+                                                                                              default_network)
+                    results += connection_results
+
+        set_command_result(result=results, unpicklable=False)
+
+    def _get_vm_uuid(self, action_target):
+        if hasattr(action_target, 'vm_uuid'):
+            return action_target.vm_uuid
+        else:
+            resource_details = self.qualipy_helpers.GetResourceDetails(action_target.fullName)
+            return get_attribute(resource_details.attrib, 'vm_uuid', '')
 
     def connect(self):
         # get command parameters from the environment
