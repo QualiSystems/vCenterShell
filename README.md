@@ -5,17 +5,20 @@ A lightweight CloudShell 'shell' that allows integrating with vCenter as an app 
 ## Requirements
 * [QualiSystems CloudShell 7.0](http://www.qualisystems.com/products/cloudshell/cloudshell-overview/)
 * [pyvmomi 6.0](https://github.com/vmware/pyvmomi)
+* [jsonpickle latest](https://jsonpickle.github.io/)
 
 ## Getting Started
 
 1. Download vCenterShell.zip from Releases page
 2. Drag it into your CloudShell Portal
-3. Reserve Virtualisation Starter environment
-4. Add VM Deployment from App/Services for each required virtual application
-5. Add VLAN Auto from App/Services for each required virtual network
-6. Connect them as needed
-7. Run Deploy command on each VM Deployment
-8. Run Connect All command
+3. Set vCenter connection details on the vCenter resource according to your enviorment.
+4. Update VM Deployment App to set correct "vCenter Template" attribute according to your enviorment.
+4. Reserve Virtualisation Starter environment
+5. Add VM Deployment from App/Services for each required virtual application
+6. Add VLAN Auto from App/Services for each required virtual network
+7. Connect them as needed
+8. Run Deploy command on each VM Deployment
+9. Run Connect All command
 
 ## Links
 [VmWare vCenter] (https://github.com/vmware/pyvmomi/tree/master/docs)
