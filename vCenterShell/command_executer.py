@@ -1,8 +1,10 @@
-﻿from models.DeployDataHolder import DeployDataHolder
-from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
+﻿import jsonpickle
+
 from common.utilites.command_result import set_command_result
-from common.cloudshell.resource_helper import get_attribute
-import jsonpickle
+from models.DeployDataHolder import DeployDataHolder
+from models.DriverResponse import DriverResponse, DriverResponseRoot
+from models.ActionResult import ActionResult
+from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 
 
 class CommandExecuterService(object):
@@ -19,7 +21,8 @@ class CommandExecuterService(object):
                  virtual_switch_connect_command,
                  virtual_switch_disconnect_command,
                  vm_power_management_command,
-                 refresh_ip_command):
+                 refresh_ip_command,
+                 resource_model_parser):
         self.serializer = serializer
         self.qualipy_helpers = qualipy_helpers
         self.command_wrapper = command_wrapper
@@ -31,6 +34,7 @@ class CommandExecuterService(object):
         self.virtual_switch_disconnect_command = virtual_switch_disconnect_command
         self.vm_power_management_command = vm_power_management_command
         self.refresh_ip_command = refresh_ip_command
+        self.resource_model_parser = resource_model_parser
 
     def connect_bulk(self):
 
@@ -44,10 +48,13 @@ class CommandExecuterService(object):
         holder = DeployDataHolder(request)
 
         results = []
+
+        session = self.qualipy_helpers.get_api_session()
+
         for action in holder.driverRequest.actions:
 
             if action.type == 'setVlan':
-                vm_uuid = self._get_vm_uuid(action.actionTarget)
+                vm_uuid = self._get_vm_uuid(action, session)
                 if vm_uuid == '':
                     continue
 
@@ -70,16 +77,29 @@ class CommandExecuterService(object):
                                                                                               vm_uuid,
                                                                                               mappings,
                                                                                               default_network)
-                    results += connection_results
+                    action_results = [ActionResult(action_id=action.actionId,
+                                      action_type=action.type,
+                                      info_messsage='VLAN successfully set',
+                                      error_message='',
+                                      success=True,
+                                      updated_interface=result.mac_address) for result in connection_results]
+                    results += action_results
 
-        set_command_result(result=results, unpicklable=False)
+        driver_response = DriverResponse()
+        driver_response.actionResults = results
+        driver_response_root = DriverResponseRoot()
+        driver_response_root.driverResponse = driver_response
+        set_command_result(result=driver_response_root, unpicklable=False)
 
-    def _get_vm_uuid(self, action_target):
-        if hasattr(action_target, 'vm_uuid'):
-            return action_target.vm_uuid
+    def _get_vm_uuid(self, action, session):
+        vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
+                          if attr.attributeName == 'VM_UUID']
+        if vm_uuid_values:
+            return vm_uuid_values[0]
         else:
-            resource_details = self.qualipy_helpers.GetResourceDetails(action_target.fullName)
-            return get_attribute(resource_details.attrib, 'vm_uuid', '')
+            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
+            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
+            return deployed_app_resource_model.vm_uuid
 
     def connect(self):
         # get command parameters from the environment
