@@ -1,6 +1,9 @@
 ﻿import jsonpickle
+
 from common.utilites.command_result import set_command_result
 from models.DeployDataHolder import DeployDataHolder
+from models.DriverResponse import DriverResponse, DriverResponseRoot
+from models.ActionResult import ActionResult
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 
 
@@ -74,9 +77,19 @@ class CommandExecuterService(object):
                                                                                               vm_uuid,
                                                                                               mappings,
                                                                                               default_network)
-                    results += connection_results
+                    action_results = [ActionResult(action_id=action.actionId,
+                                      action_type=action.type,
+                                      info_messsage='VLAN successfully set',
+                                      error_message='',
+                                      success=True,
+                                      updated_interface=result.mac_address) for result in connection_results]
+                    results += action_results
 
-        set_command_result(result=results, unpicklable=False)
+        driver_response = DriverResponse()
+        driver_response.actionResults = results
+        driver_response_root = DriverResponseRoot()
+        driver_response_root.driverResponse = driver_response
+        set_command_result(result=driver_response_root, unpicklable=False)
 
     def _get_vm_uuid(self, action, session):
         vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
