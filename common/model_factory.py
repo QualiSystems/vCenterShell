@@ -1,3 +1,6 @@
+from qualipy.api.cloudshell_api import ResourceAttribute
+
+
 class ResourceModelParser:
     ATTRIBUTE_NAME_POSTFIX = "_attribute"
 
@@ -18,7 +21,8 @@ class ResourceModelParser:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
             property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
             if props.__contains__(property_name):
-                setattr(instance, property_name, ResourceModelParser.get_resource_attributes(resource_instance)[attrib])
+                value = self.get_attribute_value(attrib, resource_instance)
+                setattr(instance, property_name, value)
                 if hasattr(instance, property_name_for_attribute_name):
                     setattr(instance, property_name_for_attribute_name, attrib)
                     props.remove(property_name_for_attribute_name)
@@ -29,6 +33,16 @@ class ResourceModelParser:
                              .format(','.join(props),
                                      ','.join(ResourceModelParser.get_resource_attributes(resource_instance))))
         return instance
+
+    def get_attribute_value(self, attrib, resource_instance):
+        attributes = ResourceModelParser.get_resource_attributes(resource_instance)
+        if isinstance(attrib, ResourceAttribute):
+            attribute_by_name = [attribute.Value for attribute in attributes if attribute.Name == attrib.Name]
+            if attribute_by_name:
+                return attribute_by_name[0]
+            raise Exception('Attribute {0} not found'.format(attrib.Name))
+
+        return ResourceModelParser.get_resource_attributes(resource_instance)[attrib]
 
     @staticmethod
     def get_resource_attributes(resource_instance):
@@ -106,20 +120,28 @@ class ResourceModelParser:
         return instance
 
     @staticmethod
-    def get_property_name_from_attribute_name(attribute_name):
+    def get_property_name_from_attribute_name(attribute):
         """
         Returns property name from attribute name
-        :param attribute_name: Attribute name, may contain upper and lower case and spaces
+        :param attribute: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
+        print str(type(attribute))
+        if isinstance(attribute, str) or isinstance(attribute, unicode):
+            attribute_name = attribute
+        elif isinstance(attribute, ResourceAttribute):
+            attribute_name = attribute.Name
+        else:
+            raise Exception('Attribute type {0} is not supported'.format(str(type(attribute))))
+
         return attribute_name.lower().replace(' ', '_')
 
     @staticmethod
-    def get_property_name_with_attribute_name_postfix(attribute_name):
+    def get_property_name_with_attribute_name_postfix(attribute):
         """
         Returns property name from attribute name
-        :param attribute_name: Attribute name, may contain upper and lower case and spaces
+        :param attribute: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
-        return ResourceModelParser.get_property_name_from_attribute_name(
-            attribute_name) + ResourceModelParser.ATTRIBUTE_NAME_POSTFIX.lower()
+        return ResourceModelParser.get_property_name_from_attribute_name(attribute) + \
+               ResourceModelParser.ATTRIBUTE_NAME_POSTFIX.lower()

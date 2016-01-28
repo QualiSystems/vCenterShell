@@ -1,11 +1,13 @@
 import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
+
 from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 from common.cloudshell.resource_remover import CloudshellResourceRemover
 from common.logger import getLogger
 from common.model_factory import ResourceModelParser
+from common.utilites.common_name import generate_unique_name
 from common.vcenter.data_model_retriever import VCenterDataModelRetriever
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
@@ -22,11 +24,10 @@ from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerato
 from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
-from common.utilites.common_name import generate_unique_name
+from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
 
 class Bootstrapper(object):
@@ -92,7 +93,8 @@ class Bootstrapper(object):
                                                              virtual_switch_connect_command,
                                                              virtual_switch_disconnect_command,
                                                              vm_power_management_command,
-                                                             refresh_ip_command)
+                                                             refresh_ip_command,
+                                                             ResourceModelParser())
 
     def get_command_executer_service(self):
         return self.commandExecuterService

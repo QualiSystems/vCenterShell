@@ -1,6 +1,7 @@
 import unittest
 from mock import MagicMock, Mock
 
+from common.model_factory import ResourceModelParser
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils.command_context_mocker import CommandContextMocker
 from tests.utils.testing_credentials import TestCredentials
@@ -38,7 +39,7 @@ class TestCommandExecuterService(unittest.TestCase):
                         "vlanIds" : ["100"],
                         "mode" : "Access"
                       },
-                      "connectorAttributes" : [
+                      "customActionAttributes" : [
                             {
                                 "type": "connectorAttribute",
                                 "attributeName" : "QNQ",
@@ -68,6 +69,7 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           self.command_wrapper,
                                                           self.connection_retriever,
                                                           self.vc_center_model,
+                                                          Mock(),
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
@@ -103,7 +105,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           deploy_from_template,
                                                           Mock(),
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         # act
         command_executer_service.deploy_from_template()
@@ -143,7 +146,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          power_manager)
+                                                          power_manager,
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
@@ -182,7 +186,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          power_manager)
+                                                          power_manager,
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
@@ -221,7 +226,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           Mock(),
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
 
@@ -251,7 +257,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
@@ -281,7 +288,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
@@ -310,7 +318,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
@@ -340,7 +349,8 @@ class TestCommandExecuterService(unittest.TestCase):
                                                           Mock(),
                                                           virtual_switch_disconnect_command,
                                                           Mock(),
-                                                          Mock())
+                                                          Mock(),
+                                                          ResourceModelParser())
 
         CommandContextMocker.set_vm_uuid_param(VmContext.VM_UUID)
         CommandContextMocker.set_command_param(VmContext.NETWORK_NAME, VmContext.NETWORK_NAME)
