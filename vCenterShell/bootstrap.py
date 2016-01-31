@@ -36,7 +36,7 @@ class Bootstrapper(object):
         cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         resource_connection_details_retriever = ResourceConnectionDetailsRetriever(helpers,
                                                                                    cloudshell_data_retriever_service)
-        resource_remover = CloudshellResourceRemover(helpers)
+        resource_remover = CloudshellResourceRemover()
         command_wrapper = CommandWrapper(getLogger, py_vmomi_service)
         template_deployer = VirtualMachineDeployer(py_vmomi_service, generate_unique_name)
 
@@ -80,8 +80,7 @@ class Bootstrapper(object):
         vm_power_management_command = VirtualMachinePowerManagementCommand(py_vmomi_service,
                                                                            synchronous_task_waiter)
         # Refresh IP command
-        refresh_ip_command = RefreshIpCommand(py_vmomi_service, cloudshell_data_retriever_service, helpers,
-                                              resource_model_parser)
+        refresh_ip_command = RefreshIpCommand(py_vmomi_service)
 
         self.commandExecuterService = CommandExecuterService(jsonpickle,
                                                              helpers,
