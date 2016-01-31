@@ -81,7 +81,7 @@ class DvPortGroupCreator(object):
         if network is None:
             # try to get it from the vcenter
             try:
-                network = self.pyvmomi_service.find_network_by_name(si, port_group_path, dv_port_name)
+                network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
             except KeyError:
                 network = None
 
