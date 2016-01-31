@@ -29,6 +29,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)
         vnic_device_mapper.vnic = create_autospec(spec=vim.vm.device.VirtualEthernetCard)
         vnic_device_mapper.vnic.macAddress = 'AA-BB'
+        vnic_device_mapper.network = 'the network'
 
         self.dv_connector = Mock()
         self.dv_connector.connect_by_mapping = Mock(return_value=[vnic_device_mapper])
@@ -48,6 +49,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.vlan_id = 'vlan_id'
         mapping.vlan_spec = 'trunc'
         mapping.dv_port_name = 'port_name'
+        mapping.network = Mock()
 
         # act
         connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
