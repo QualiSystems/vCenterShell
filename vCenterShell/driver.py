@@ -1,6 +1,5 @@
 import jsonpickle
 from pyVim.connect import SmartConnect, Disconnect
-
 from common.cloudshell.driver_helper import CloudshellDriverHelper
 from common.cloudshell.resource_remover import CloudshellResourceRemover
 from common.logger import getLogger
@@ -10,7 +9,9 @@ from common.utilites.common_name import generate_unique_name
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
+from models.ActionResult import ActionResult
 from models.DeployDataHolder import DeployDataHolder
+from models.DriverResponse import DriverResponse, DriverResponseRoot
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
@@ -29,7 +30,6 @@ from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
 
 class VCenterShellDriver:
-
     def __init__(self):
         """
         ctor mast be without arguments, it is created with reflection at run time
@@ -43,6 +43,7 @@ class VCenterShellDriver:
         self.virtual_switch_connect_command = None
         self.virtual_switch_disconnect_command = None
         self.vm_power_management_command = None
+        self.resource_model_parser = None
 
     def initialize(self, context):
         """
@@ -57,7 +58,7 @@ class VCenterShellDriver:
         self.cs_helper = CloudshellDriverHelper()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
         synchronous_task_waiter = SynchronousTaskWaiter()
-        resource_model_parser = ResourceModelParser()
+        self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
         self.vc_data_model = resource_model_parser.convert_to_resource_model(context.resource)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
@@ -102,6 +103,84 @@ class VCenterShellDriver:
                                                  synchronous_task_waiter=synchronous_task_waiter)
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
+
+    def connect_bulk(self, context, request):
+
+        dv_switch_path = self.vc_data_model.default_dvswitch_path
+        dv_switch_name = self.vc_data_model.default_dvswitch_name
+        port_group_path = self.vc_data_model.default_port_group_path
+        default_network = self.vc_data_model.default_network
+
+        request_dejson = jsonpickle.decode(request)
+        holder = DeployDataHolder(request_dejson)
+
+        results = []
+
+        session = self.cs_helper.get_session(context)
+
+        for action in holder.driverRequest.actions:
+
+            if action.type == 'setVlan':
+                vm_uuid = self._get_vm_uuid(action, session)
+                if vm_uuid == '':
+                    continue
+
+                mappings = []
+                for vlan in action.connectionParams.vlanIds:
+                    vnic_to_network = VmNetworkMapping()
+                    vnic_to_network.dv_switch_path = dv_switch_path
+                    vnic_to_network.dv_switch_name = dv_switch_name
+                    vnic_to_network.port_group_path = port_group_path
+                    vnic_to_network.vlan_id = vlan
+                    vnic_to_network.vlan_spec = action.connectionParams.mode
+
+                    mappings.append(vnic_to_network)
+
+                if mappings:
+                    connection_details = self.cs_helper.get_connection_details(session, context)
+                    try:
+                        connection_results = self.command_wrapper.execute_command_with_connection(
+                            connection_details,
+                            self.virtual_switch_connect_command.connect_to_networks,
+                            vm_uuid,
+                            mappings,
+                            default_network)
+
+                        for connection_result in connection_results:
+                            result = ActionResult()
+                            result.actionId = str(action.actionId)
+                            result.type = str(action.type)
+                            result.infoMessage = 'VLAN successfully set'
+                            result.errorMessage = ''
+                            result.success = True
+                            result.updatedInterface = connection_result.mac_address
+                            results.append(result)
+
+                    except Exception as ex:
+                        error_result = ActionResult()
+                        error_result.actionId = str(action.actionId)
+                        error_result.type = str(action.type)
+                        error_result.infoMessage = str('')
+                        error_result.errorMessage = str(ex)
+                        error_result.success = False
+                        error_result.updatedInterface = None
+                        results.append(error_result)
+
+        driver_response = DriverResponse()
+        driver_response.actionResults = results
+        driver_response_root = DriverResponseRoot()
+        driver_response_root.driverResponse = driver_response
+        set_command_result(result=driver_response_root, unpicklable=False)
+
+    def _get_vm_uuid(self, action, session):
+        vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
+                          if attr.attributeName == 'VM_UUID']
+        if vm_uuid_values:
+            return vm_uuid_values[0]
+        else:
+            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
+            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
+            return deployed_app_resource_model.vm_uuid
 
     def connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
         """
