@@ -60,7 +60,7 @@ class VCenterShellDriver:
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = resource_model_parser.convert_to_resource_model(context.resource)
+        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         template_deployer = VirtualMachineDeployer(pv_service=pv_service, name_generator=generate_unique_name)
