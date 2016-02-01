@@ -71,19 +71,31 @@ class CommandExecuterService(object):
 
                 if mappings:
                     connection_details = self.connection_retriever.connection_details()
+                    try:
+                        connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                                                  self.virtual_switch_connect_command.connect_to_networks,
+                                                                                                  vm_uuid,
+                                                                                                  mappings,
+                                                                                                  default_network)
+                        for connection_result in connection_results:
+                            result = ActionResult()
+                            result.actionId = str(action.actionId)
+                            result.type = str(action.type)
+                            result.infoMessage = 'VLAN successfully set'
+                            result.errorMessage = ''
+                            result.success = True
+                            result.updatedInterface = connection_result.mac_address
+                            results.append(result)
 
-                    connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                                              self.virtual_switch_connect_command.connect_to_networks,
-                                                                                              vm_uuid,
-                                                                                              mappings,
-                                                                                              default_network)
-                    action_results = [ActionResult(action_id=action.actionId,
-                                      action_type=action.type,
-                                      info_messsage='VLAN successfully set',
-                                      error_message='',
-                                      success=True,
-                                      updated_interface=result.mac_address) for result in connection_results]
-                    results += action_results
+                    except Exception as ex:
+                        error_result = ActionResult()
+                        error_result.actionId = str(action.actionId)
+                        error_result.type = str(action.type)
+                        error_result.infoMessage = str('')
+                        error_result.errorMessage = str(ex)
+                        error_result.success = False
+                        error_result.updatedInterface = None
+                        results.append(error_result)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
