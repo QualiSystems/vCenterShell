@@ -1,4 +1,5 @@
 import jsonpickle
+import time
 from pyVim.connect import SmartConnect, Disconnect
 from common.cloudshell.driver_helper import CloudshellDriverHelper
 from common.cloudshell.resource_remover import CloudshellResourceRemover
@@ -266,7 +267,7 @@ class VCenterShellDriver:
             vm_uuid,
             network_name)
 
-    def destroy_vm(self, context, vm_uuid, vm_full_name):
+    def destroy_vm(self, context, vm_uuid, resource_fullname):
         """
         Destroy Vm Command, will destroy the vm and remove the resource
 
@@ -283,7 +284,7 @@ class VCenterShellDriver:
             self.destroy_virtual_machine_command.destroy,
             session,
             vm_uuid,
-            vm_full_name)
+            resource_fullname)
 
     def deploy_from_template(self, context, deploy_data):
         """
@@ -321,7 +322,7 @@ class VCenterShellDriver:
 
         return set_command_result(result=result, unpicklable=False)
 
-    def power_off(self, context, vm_uuid, vm_full_name):
+    def power_off(self, context, vm_uuid, resource_fullname):
         """
         Power off Command, will turn off the vm
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
@@ -336,9 +337,9 @@ class VCenterShellDriver:
                                                              self.vm_power_management_command.power_off,
                                                              session,
                                                              vm_uuid,
-                                                             vm_full_name)
+                                                             resource_fullname)
 
-    def power_on(self, context, vm_uuid, vm_full_name):
+    def power_on(self, context, vm_uuid, resource_fullname):
         """
         Power on Command, will turn on the vm
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
@@ -353,9 +354,9 @@ class VCenterShellDriver:
                                                              self.vm_power_management_command.power_on,
                                                              session,
                                                              vm_uuid,
-                                                             vm_full_name)
+                                                             resource_fullname)
 
-    def refresh_ip(self, context, vm_uuid, vm_full_name):
+    def refresh_ip(self, context, vm_uuid, resource_fullname):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
@@ -370,5 +371,5 @@ class VCenterShellDriver:
                                                              self.refresh_ip_command.refresh_ip,
                                                              session,
                                                              vm_uuid,
-                                                             vm_full_name,
+                                                             resource_fullname,
                                                              self.vc_data_model.default_network)
