@@ -1,10 +1,8 @@
 from unittest import TestCase
 
-from models.QualiDriverModels import *
-
 from mock import patch, Mock
 
-from vCenterShell.driver import VCenterShellDriver
+from vcentershell_driver.driver import VCenterShellDriver
 
 
 class MockResourceParser(object):

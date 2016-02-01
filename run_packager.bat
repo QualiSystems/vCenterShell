@@ -23,5 +23,8 @@ python driver_packager.py package_specs\\deployed_app_proxy_refresh_ip.ini
 
 python driver_packager.py package_specs\\environment_connect_all.ini
 
+REM vCenter Driver package
+python driver_packager.py package_specs\\vcentershell_driver.ini
+
 REM build vCenterShell package
 python shell_packager.py vCenterShell
