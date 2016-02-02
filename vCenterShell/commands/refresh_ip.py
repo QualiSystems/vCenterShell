@@ -21,6 +21,7 @@ class RefreshIpCommand(object):
 
         api = self.qualipy_helpers.get_api_session()
         vcenter_resource_context = self.qualipy_helpers.get_resource_context_details()
+        match_function = self._get_ip_match_function(api, resource_name)
 
         # vCenterResourceModel
         vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_resource_context)
@@ -30,7 +31,7 @@ class RefreshIpCommand(object):
         # where vm. is the MOR of the VM
         # guest_primary_ipaddress = vm.guest.ipAddress
 
-        ip = self._obtain_ip(vm, vcenter_resource_model.default_network)
+        ip = self._obtain_ip(vm, vcenter_resource_model.default_network, match_function)
 
         if ip is None:
             raise ValueError('IP address of VM {0} could not be obtained during {1} seconds',
@@ -39,18 +40,36 @@ class RefreshIpCommand(object):
 
         api.UpdateResourceAddress(resource_name, ip)
 
-    def _obtain_ip(self, vm, default_network):
+    @staticmethod
+    def _get_ip_match_function(api, resource_name):
+        resource = api.GetResourceDetails(resource_name)
+        ip_regexes = []
+        if resource.VmDetails:
+            ip_regexes = [custom_param.Value for custom_param
+                          in resource.VmDetails.VmCustomParams
+                          if custom_param.Name == 'IP Regex']
+        if ip_regexes:
+            filter_regex = ip_regexes[0]
+        else:
+            filter_regex = '.*'
+
+        return re.compile(filter_regex).match
+
+    def _obtain_ip(self, vm, default_network, match_function):
         time_elapsed = 0
         ip = None
         interval = self.TIMEOUT / 10
         while time_elapsed < self.TIMEOUT and ip is None:
             ips = RefreshIpCommand._get_ip_addresses(vm, default_network)
-            if len(ips) >= 1:
-                ip = RefreshIpCommand._select_ip_v4(ips)
-            else:
-                time_elapsed += interval
-                time.sleep(interval)
-        return ip
+            if ips:
+                ips = RefreshIpCommand._select_ip_by_match(ips, RefreshIpCommand.IP_V4_PATTERN.match)
+            if ips:
+                ips = RefreshIpCommand._select_ip_by_match(ips, match_function)
+            if ips:
+                return ips[0]
+            time_elapsed += interval
+            time.sleep(interval)
+        return ips[0]
 
     @staticmethod
     def _get_ip_addresses(vm, default_network):
@@ -62,7 +81,5 @@ class RefreshIpCommand(object):
         return ips
 
     @staticmethod
-    def _select_ip_v4(ips):
-        ips_v4 = [ip for ip in ips if RefreshIpCommand.IP_V4_PATTERN.match(ip)]
-        if ips_v4:
-            return ips_v4[0]
+    def _select_ip_by_match(ips, match_function):
+        return [ip for ip in ips if match_function(ip)]
