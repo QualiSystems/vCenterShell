@@ -271,6 +271,7 @@ class VCenterShellDriver:
         """
         Destroy Vm Command, will destroy the vm and remove the resource
 
+        :param str resource_fullname: name of the resource related to the command
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str vm_uuid: the vm uuid to destroy
         """
@@ -325,6 +326,8 @@ class VCenterShellDriver:
     def power_off(self, context, vm_uuid, resource_fullname):
         """
         Power off Command, will turn off the vm
+
+        :param str resource_fullname: name of the resource related to the command
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str vm_uuid: the vm uuid to turn off
         """
@@ -342,6 +345,8 @@ class VCenterShellDriver:
     def power_on(self, context, vm_uuid, resource_fullname):
         """
         Power on Command, will turn on the vm
+
+        :param str resource_fullname: name of the resource related to the command
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str vm_uuid: the vm uuid to turn on
         """
@@ -359,6 +364,8 @@ class VCenterShellDriver:
     def refresh_ip(self, context, vm_uuid, resource_fullname):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
+
+        :param str resource_fullname: name of the resource related to the command
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str vm_uuid: the vm uuid
         """

@@ -19,25 +19,25 @@ class ResourceCommandContext:
 
 
 class ConnectivityContext:
-    def __init__(self, serverAddress, tsAPIPort, qualiAPIPort, adminAuthToken):
-        self.serverAddress = serverAddress  # The address of the Quali server
+    def __init__(self, server_address, cloudshell_api_port, quali_api_port, admin_auth_token):
+        self.server_address = server_address  # The address of the Quali server
         """:type : str"""
-        self.tsAPIPort = tsAPIPort  # the port of the TestShell API
+        self.cloudshell_api_port = cloudshell_api_port  # the port of the TestShell API
         """:type : str"""
-        self.qualiAPIPort = qualiAPIPort  # The port of the Quali API
+        self.quali_api_port = quali_api_port  # The port of the Quali API
         """:type : str"""
-        self.adminAuthToken = adminAuthToken  # security token
+        self.admin_auth_token = admin_auth_token  # security token
         """:type : str"""
 
 
 class ResourceContextDetails:
-    def __init__(self, id, name, fullname, type, address, model, family, description, attributes, appDataJson,
-                 vmDataJson):
+    def __init__(self, id, name, fullname, type, address, model, family, description, attributes, appdata_json,
+                 vmdata_json):
         self.id = id  # The identifier of the resource / service / app - consistent value that can't be changed / renamed by the user
         """:type : str"""
         self.name = name  # The name of the resource
         """:type : str"""
-        self.fullName = fullname  # The full name (path) of the resource
+        self.fullname = fullname  # The full name (path) of the resource
         """:type : str"""
         self.type = type  # The type of the resource  (Service, App, Resource)
         """:type : str"""
@@ -51,26 +51,26 @@ class ResourceContextDetails:
         """:type : str"""
         self.attributes = attributes  # A dictionary that contains the resource attributes (name, value)
         """:type : dict[str,str]"""
-        self.appDataJson = appDataJson;  # In case of an app, a json serialized object that contains the app details, including the selected deployment and installation configuration
+        self.appdata_json = appdata_json;  # In case of an app, a json serialized object that contains the app details, including the selected deployment and installation configuration
         """:type : str"""
-        self.vmDataJson = vmDataJson;  # In case of a virtual machine (deployed app), a json serialized object that contains the host details
+        self.vmdata_json = vmdata_json;  # In case of a virtual machine (deployed app), a json serialized object that contains the host details
         """:type : str"""
 
 
 class Connector:
-    def __init__(self, source, target, targetFamily, targetModel, targetType, targetAttributes, direction, alias,
+    def __init__(self, source, target, target_family, target_model, target_type, target_attributes, direction, alias,
                  attributes, connection_type):
         self.source = source  # The name of the source resource (end point)
         """:type : str"""
         self.target = target  # The name of the target resource (end point)
         """:type : str"""
-        self.targetFamily = targetFamily  # The family of the target resource
+        self.target_family = target_family  # The family of the target resource
         """:type : str"""
-        self.targetModel = targetModel  # The model of the target resource
+        self.target_model = target_model  # The model of the target resource
         """:type : str"""
-        self.targetType = targetType  # The type of the target resource  (Service, App, Resource)
+        self.target_type = target_type  # The type of the target resource  (Service, App, Resource)
         """:type : str"""
-        self.targetAttributes = targetAttributes  # A dictionary with the target resource attributes (name, value)
+        self.target_attributes = target_attributes  # A dictionary with the target resource attributes (name, value)
         """:type : dict[str,str]"""
         self.direction = direction  # The direction of the connection: Uni, Bi
         """:type : str"""
@@ -146,14 +146,12 @@ class AutoLoadAttribute:
 
 
 class ResourceRemoteCommandContext:
-    def __init__(self, connectivity, resource, reservation, connectors, ports, remote_endpoints):
+    def __init__(self, connectivity, resource, remote_reservation, ports, remote_endpoints):
         self.connectivity = connectivity  # Connectivity details that can help connect to the APIs
         """:type : ConnectivityContext"""
         self.resource = resource  # The details of the resource using the driver
         """:type : ResourceContextDetails"""
-        self.reservation = reservation  # The details of the reservation
+        self.remote_reservation = remote_reservation  # The details of the remote reservation
         """:type : ReservationContextDetails"""
-        self.connectors = connectors  # The list of visual connectors and routes that are connected to the resource (the resource will be considered as the source end point)
-        """:type : list[Connector]"""
         self.remote_endpoints = remote_endpoints
         """:type : list[ResourceContextDetails]"""

@@ -1,3 +1,4 @@
+import time
 from qualipy.api.cloudshell_api import CloudShellAPISession
 
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
@@ -15,9 +16,8 @@ class CloudshellDriverHelper(object):
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :return CloudShellAPISession
         """
-
-        return self.session_class(host=context.connectivity.serverAddress,
-                                  token=context.connectivity.adminAuthToken,
+        return self.session_class(host=context.connectivity.server_address,
+                                  token=context.connectivity.admin_auth_token,
                                   user='admin',  # Todo: remove this
                                   password='admin',  # Todo: remove this
                                   domain=context.reservation.domain)

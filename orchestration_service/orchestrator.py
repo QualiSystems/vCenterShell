@@ -1,4 +1,5 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import time
 from qualipy.api.cloudshell_api import *
 from common.logger import getLogger
 
@@ -14,6 +15,7 @@ def execute_app_orchestration():
     deployment_service = resource_details["appData"]["deploymentService"]["name"]
     installation_service_data = resource_details["appData"]["installationService"]
 
+    time.sleep(20)
     # Start api session
     api = helpers.get_api_session()
 

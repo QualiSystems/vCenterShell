@@ -1,8 +1,11 @@
-﻿from driver import DeploymentServiceDriver
+﻿import time
+
+from driver import DeploymentServiceDriver
 from common.cloudshell.data_retriever import CloudshellDataRetrieverService
 
 
 def main():
+    time.sleep(20)
     cs = CloudshellDataRetrieverService()
     dsd = DeploymentServiceDriver(cs)
     dsd.execute()
