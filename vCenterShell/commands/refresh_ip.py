@@ -1,8 +1,10 @@
 import time
+import re
 
 
 class RefreshIpCommand(object):
     TIMEOUT = 600
+    IP_V4_PATTERN = re.compile('^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$')
 
     def __init__(self, pyvmomi_service, cs_retriever_rervice, qualipy_helpers, resource_model_parser):
         self.qualipy_helpers = qualipy_helpers
@@ -44,7 +46,7 @@ class RefreshIpCommand(object):
         while time_elapsed < self.TIMEOUT and ip is None:
             ips = RefreshIpCommand._get_ip_addresses(vm, default_network)
             if len(ips) >= 1:
-                ip = ips[0]
+                ip = RefreshIpCommand._select_ip_v4(ips)
             else:
                 time_elapsed += interval
                 time.sleep(interval)
@@ -58,3 +60,9 @@ class RefreshIpCommand(object):
                 for addr in nic.ipAddress:
                     ips.append(addr)
         return ips
+
+    @staticmethod
+    def _select_ip_v4(ips):
+        ips_v4 = [ip for ip in ips if RefreshIpCommand.IP_V4_PATTERN.match(ip)]
+        if ips_v4:
+            return ips_v4[0]
