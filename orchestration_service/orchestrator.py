@@ -15,7 +15,6 @@ def execute_app_orchestration():
     deployment_service = resource_details["appData"]["deploymentService"]["name"]
     installation_service_data = resource_details["appData"]["installationService"]
 
-    time.sleep(20)
     # Start api session
     api = helpers.get_api_session()
 

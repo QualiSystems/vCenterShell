@@ -53,9 +53,6 @@ class VCenterShellDriver:
 
         :param context: models.QualiDriverModels.InitCommandContext
         """
-        self.init(context)
-
-    def init(self, context):
         self.cs_helper = CloudshellDriverHelper()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
         synchronous_task_waiter = SynchronousTaskWaiter()

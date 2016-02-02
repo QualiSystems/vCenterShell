@@ -18,8 +18,8 @@ class CloudshellDriverHelper(object):
         """
         return self.session_class(host=context.connectivity.server_address,
                                   token=context.connectivity.admin_auth_token,
-                                  user='admin',  # Todo: remove this
-                                  password='admin',  # Todo: remove this
+                                  user=None,
+                                  password=None,
                                   domain=context.reservation.domain)
 
     def get_connection_details(self, session, context):
