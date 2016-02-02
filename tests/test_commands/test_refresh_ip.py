@@ -92,7 +92,7 @@ class TestRefreshIpCommand(TestCase):
         vm_details.VmCustomParams = [vm_custom_param]
 
         resource = create_autospec(ResourceInfo)
-        resource.VmDetails = vm_details
+        resource.VmDetails = [vm_details]
 
         session = MagicMock()
         session.GetResourceDetails = Mock(return_value=resource)
