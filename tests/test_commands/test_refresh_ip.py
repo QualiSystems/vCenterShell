@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import Mock, MagicMock, create_autospec
-from qualipy.api.cloudshell_api import ResourceInfo, VmCustomParam
+from qualipy.api.cloudshell_api import ResourceInfo
 from common.logger.service import LoggingService
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
 
@@ -84,7 +84,7 @@ class TestRefreshIpCommand(TestCase):
 
         qualipy_helpers = MagicMock()
 
-        vm_custom_param = create_autospec(VmCustomParam)
+        vm_custom_param = Mock()
         vm_custom_param.Name = 'IP Regex'
         vm_custom_param.Value = '255\.255\..*'
 
