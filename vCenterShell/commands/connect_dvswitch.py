@@ -62,7 +62,8 @@ class VirtualSwitchConnectCommand:
         # create mapping
         for vm_network_mapping in vm_network_mappings:
             vm_network_mapping.dv_port_name = \
-                self.dv_port_group_name_generator.generate_port_group_name(vm_network_mapping.vlan_id)
+                self.dv_port_group_name_generator.generate_port_group_name(vm_network_mapping.vlan_id,
+                                                                           vm_network_mapping.vlan_spec)
 
             vm_network_mapping.vlan_id = \
                 self.vlan_id_range_parser.parse_vlan_id(vm_network_mapping.vlan_spec, vm_network_mapping.vlan_id)
