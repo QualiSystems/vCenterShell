@@ -58,50 +58,55 @@ class CommandExecuterService(object):
                 if vm_uuid == '':
                     continue
 
-                mappings = []
-                for vlan in action.connectionParams.vlanIds:
-                    vnic_to_network = VmNetworkMapping()
-                    vnic_to_network.dv_switch_path = dv_switch_path
-                    vnic_to_network.dv_switch_name = dv_switch_name
-                    vnic_to_network.port_group_path = port_group_path
-                    vnic_to_network.vlan_id = vlan
-                    vnic_to_network.vlan_spec = action.connectionParams.mode
-
-                    mappings.append(vnic_to_network)
-
-                if mappings:
-                    connection_details = self.connection_retriever.connection_details()
-                    try:
-                        connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                                                  self.virtual_switch_connect_command.connect_to_networks,
-                                                                                                  vm_uuid,
-                                                                                                  mappings,
-                                                                                                  default_network)
-                        for connection_result in connection_results:
-                            result = ActionResult()
-                            result.actionId = str(action.actionId)
-                            result.type = str(action.type)
-                            result.infoMessage = 'VLAN successfully set'
-                            result.errorMessage = ''
-                            result.success = True
-                            result.updatedInterface = connection_result.mac_address
-                            results.append(result)
-
-                    except Exception as ex:
-                        error_result = ActionResult()
-                        error_result.actionId = str(action.actionId)
-                        error_result.type = str(action.type)
-                        error_result.infoMessage = str('')
-                        error_result.errorMessage = str(ex)
-                        error_result.success = False
-                        error_result.updatedInterface = None
-                        results.append(error_result)
+                results += self._set_vlan_bulk(action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
         set_command_result(result=driver_response_root, unpicklable=False)
+
+    def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid):
+        mappings = []
+        results = []
+        for vlan in action.connectionParams.vlanIds:
+            vnic_to_network = VmNetworkMapping()
+            vnic_to_network.dv_switch_path = dv_switch_path
+            vnic_to_network.dv_switch_name = dv_switch_name
+            vnic_to_network.port_group_path = port_group_path
+            vnic_to_network.vlan_id = vlan
+            vnic_to_network.vlan_spec = action.connectionParams.mode
+
+            mappings.append(vnic_to_network)
+        if mappings:
+            connection_details = self.connection_retriever.connection_details()
+            try:
+                connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                                          self.virtual_switch_connect_command.connect_to_networks,
+                                                                                          vm_uuid,
+                                                                                          mappings,
+                                                                                          default_network)
+                for connection_result in connection_results:
+                    result = ActionResult()
+                    result.actionId = str(action.actionId)
+                    result.type = str(action.type)
+                    result.infoMessage = 'VLAN successfully set'
+                    result.errorMessage = ''
+                    result.success = True
+                    result.updatedInterface = connection_result.mac_address
+                    results.append(result)
+
+            except Exception as ex:
+                error_result = ActionResult()
+                error_result.actionId = str(action.actionId)
+                error_result.type = str(action.type)
+                error_result.infoMessage = str('')
+                error_result.errorMessage = str(ex)
+                error_result.success = False
+                error_result.updatedInterface = None
+                results.append(error_result)
+
+        return results
 
     def _get_vm_uuid(self, action, session):
         vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
