@@ -9,3 +9,4 @@ class vCenterVMFromTemplateResourceModel(object):
         self.vm_cluster = ''
         self.vm_power_state = ''
         self.vm_storage = ''
+        self.ip_regex = ''
