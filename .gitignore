@@ -67,6 +67,7 @@ tests/config.ini
 *.tar.gz
 *.orig
 vCenterShell.zip
+vCenterShellPackage/Resource Drivers - Python/*
 vCenterShellPackage/Resource Scripts/*
 vCenterShellPackage/Topology Scripts/*.*
 debug.txt

@@ -1,4 +1,5 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import time
 from qualipy.api.cloudshell_api import InputNameValue
 from common.utilites.command_result import get_result_from_command_output, set_command_result, transfer_command_result
 from common.logger import getLogger
@@ -44,47 +45,42 @@ class DeployedAppService(object):
         """ Executes 'Power Off' on the vCenter for the deployed app its executed on """
         DeployedAppService.execute_command_on_vcenter_resource(
                 self.generic_deployed_app_resource_model,
-                "Power Off",
-                [InputNameValue('COMMAND', 'power_off'),
-                 InputNameValue('RESOURCE_FULLNAME', self.resource_context.fullname),
-                 InputNameValue('VM_UUID', self.generic_deployed_app_resource_model.vm_uuid)])
+                "power_off",
+                [InputNameValue('resource_fullname', self.resource_context.fullname),
+                 InputNameValue('vm_uuid', self.generic_deployed_app_resource_model.vm_uuid)])
 
     def power_on(self):
         """ Executes 'Power On' on the vCenter for the deployed app its executed on """
         DeployedAppService.execute_command_on_vcenter_resource(
                 self.generic_deployed_app_resource_model,
-                "Power On",
-                [InputNameValue('COMMAND', 'power_on'),
-                 InputNameValue('RESOURCE_FULLNAME', self.resource_context.fullname),
-                 InputNameValue('VM_UUID', self.generic_deployed_app_resource_model.vm_uuid)])
+                "power_on",
+                [InputNameValue('resource_fullname', self.resource_context.fullname),
+                 InputNameValue('vm_uuid', self.generic_deployed_app_resource_model.vm_uuid)])
 
     def destroy_vm(self):
         """ Executes 'Destroy VM' on the vCenter for the deployed app its executed on """
         DeployedAppService.execute_command_on_vcenter_resource(
                 self.generic_deployed_app_resource_model,
-                "Destroy VM",
-                [InputNameValue('COMMAND', 'destroy_vm'),
-                 InputNameValue('RESOURCE_FULLNAME', self.resource_context.fullname),
-                 InputNameValue('VM_UUID', self.generic_deployed_app_resource_model.vm_uuid)])
+                "destroy_vm",
+                [InputNameValue('resource_fullname', self.resource_context.fullname),
+                 InputNameValue('vm_uuid', self.generic_deployed_app_resource_model.vm_uuid)])
 
     def refresh_ip(self):
         """ Executes 'Refresh IP' on the vCenter for the deployed app its executed on """
         DeployedAppService.execute_command_on_vcenter_resource(
                 self.generic_deployed_app_resource_model,
-                "Refresh IP",
-                [InputNameValue('COMMAND', 'refresh_ip'),
-                 InputNameValue('RESOURCE_FULLNAME', self.resource_context.fullname),
-                 InputNameValue('VM_UUID', self.generic_deployed_app_resource_model.vm_uuid)])
+                "refresh_ip",
+                [InputNameValue('resource_fullname', self.resource_context.fullname),
+                 InputNameValue('vm_uuid', self.generic_deployed_app_resource_model.vm_uuid)])
 
     @staticmethod
     def execute_connect_command(access_mode, generic_deployed_app_resource_model, virtual_network):
         DeployedAppService.execute_command_on_vcenter_resource_and_passthrough_result(
                 generic_deployed_app_resource_model,
-                'Connect VM',
-                [InputNameValue('COMMAND', "connect"),
-                 InputNameValue('VLAN_ID', virtual_network),
-                 InputNameValue('VLAN_SPEC_TYPE', access_mode),
-                 InputNameValue('VM_UUID', generic_deployed_app_resource_model.vm_uuid)])
+                'connect',
+                [InputNameValue('vlan_id', virtual_network),
+                 InputNameValue('vlan_spec_type', access_mode),
+                 InputNameValue('vm_uuid', generic_deployed_app_resource_model.vm_uuid)])
 
     @staticmethod
     def execute_command_on_vcenter_resource(generic_deployed_app_resource_model, command, inputs):

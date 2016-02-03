@@ -29,6 +29,9 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)
         vnic_device_mapper.vnic = create_autospec(spec=vim.vm.device.VirtualEthernetCard)
         vnic_device_mapper.vnic.macAddress = 'AA-BB'
+        vnic_device_mapper.network = Mock()
+        vnic_device_mapper.network.name = 'the network'
+        vnic_device_mapper.network.key = 'keyyyyyey'
 
         self.dv_connector = Mock()
         self.dv_connector.connect_by_mapping = Mock(return_value=[vnic_device_mapper])
@@ -48,6 +51,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.vlan_id = 'vlan_id'
         mapping.vlan_spec = 'trunc'
         mapping.dv_port_name = 'port_name'
+        mapping.network = Mock()
 
         # act
         connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
@@ -58,7 +62,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
-        self.assertTrue(self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id))
+        self.assertTrue(self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id, self.vlan_spec_factory))
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
         self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping]))
         self.assertEqual(connect_results[0].mac_address, 'AA-BB')

@@ -7,8 +7,8 @@ from models.DeployDataHolder import DeployDataHolder
 
 class DeploymentServiceDriver(object):
     INPUT_KEY_COMMAND = "COMMAND"
-    INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
-    COMMAND_DEPLOY_FROM_TEMPLATE = "Deploy From Template"
+    INPUT_KEY_DEPLOY_DATA = "deploy_data"
+    COMMAND_DEPLOY_FROM_TEMPLATE = "deploy_from_template"
 
     def __init__(self, cs_retriever_service):
         self.cs_retriever_service = cs_retriever_service
@@ -49,5 +49,4 @@ class DeploymentServiceDriver(object):
                                                    power_on=power_on)
 
     def _get_command_inputs_list(self, json_data_holder):
-        return [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),
-                InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
+        return [InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
