@@ -28,26 +28,28 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.port_group_configurer = port_group_configurer
         self.default_network = default_network
 
-    def disconnect_from_networks(self, si, vm_uuid, vm_network_mappings, default_network_name):
+    def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings, default_network_name):
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         if not vm:
             raise ValueError('VM having UUID {0} not found'.format(vm_uuid))
 
-        for vm_net
-        if network_name:
-            network = self.pyvmomi_service.vm_get_network_by_name(vm, network_name)
-            if network is None:
-                raise KeyError('Network not found ({0})'.format(network_name))
-        else:
-            network = None
+        default_network = self.pyvmomi_service.get_network_by_full_name(si, default_network_name)
 
-        default_network = self.pyvmomi_service.get_network_by_full_name(si, self.default_network)
-        if network:
-            return self.port_group_configurer.disconnect_network(vm, network, default_network)
-        else:
-            return self.port_group_configurer.disconnect_all_networks(vm, default_network)
+        mappings = []
+        for vm_network_remove_mapping in vm_network_remove_mappings:
+            if vm_network_remove_mapping.network_name:
+                network = self.pyvmomi_service.vm_get_network_by_name(vm, vm_network_remove_mapping.network_name)
+                if network is None:
+                    raise KeyError('Network not found ({0})'.format(vm_network_remove_mapping.network_name))
+            else:
+                network = None
 
-        self._disconnect_by_mapping(si, vm, mappings)
+            if network:
+                mappings += self.port_group_configurer.create_mapping_for_network(vm, network, default_network)
+            else:
+                mappings += self.port_group_configurer.create_mappings_for_all_networks(vm, default_network)
+
+        return self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
 
     def remove_vnic(self, si, vm_uuid, network_name=None):
         """

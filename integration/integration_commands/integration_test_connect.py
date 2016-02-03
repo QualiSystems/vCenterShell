@@ -81,3 +81,5 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
     def test_integration(self):
         self.integration_test_connect_A()
         self.integration_test_connect_B()
+
+    def test_dicconnect_bulk(self):
