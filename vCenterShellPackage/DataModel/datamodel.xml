@@ -269,6 +269,9 @@
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>            
             <ns0:AttributeValue Name="vCenter Template" Value="" />
