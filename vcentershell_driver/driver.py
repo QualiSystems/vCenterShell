@@ -238,10 +238,11 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(
+        res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.virtual_switch_disconnect_command.disconnect_all,
             vm_uuid)
+        return set_command_result(result=res, unpicklable=False)
 
     def disconnect(self, context, vm_uuid, network_name):
         """
@@ -258,11 +259,12 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(
+        res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.virtual_switch_disconnect_command.disconnect,
             vm_uuid,
             network_name)
+        return set_command_result(result=res, unpicklable=False)
 
     def destroy_vm(self, context, vm_uuid, resource_fullname):
         """
@@ -277,12 +279,13 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(
+        res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.destroy_virtual_machine_command.destroy,
             session,
             vm_uuid,
             resource_fullname)
+        return set_command_result(result=res, unpicklable=False)
 
     def deploy_from_template(self, context, deploy_data):
         """
@@ -333,11 +336,12 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(connection_details,
-                                                             self.vm_power_management_command.power_off,
-                                                             session,
-                                                             vm_uuid,
-                                                             resource_fullname)
+        res = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                   self.vm_power_management_command.power_off,
+                                                                   session,
+                                                                   vm_uuid,
+                                                                   resource_fullname)
+        return set_command_result(result=res, unpicklable=False)
 
     def power_on(self, context, vm_uuid, resource_fullname):
         """
@@ -352,11 +356,12 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(connection_details,
-                                                             self.vm_power_management_command.power_on,
-                                                             session,
-                                                             vm_uuid,
-                                                             resource_fullname)
+        res = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                   self.vm_power_management_command.power_on,
+                                                                   session,
+                                                                   vm_uuid,
+                                                                   resource_fullname)
+        return set_command_result(result=res, unpicklable=False)
 
     def refresh_ip(self, context, vm_uuid, resource_fullname):
         """
@@ -371,9 +376,10 @@ class VCenterShellDriver:
         connection_details = self.cs_helper.get_connection_details(session, context)
 
         # execute command
-        self.command_wrapper.execute_command_with_connection(connection_details,
-                                                             self.refresh_ip_command.refresh_ip,
-                                                             session,
-                                                             vm_uuid,
-                                                             resource_fullname,
-                                                             self.vc_data_model.default_network)
+        res = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                   self.refresh_ip_command.refresh_ip,
+                                                                   session,
+                                                                   vm_uuid,
+                                                                   resource_fullname,
+                                                                   self.vc_data_model.default_network)
+        return set_command_result(result=res, unpicklable=False)

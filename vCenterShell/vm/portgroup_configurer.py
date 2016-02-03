@@ -80,14 +80,18 @@ class VirtualMachinePortGroupConfigurer(object):
             self.vnic_service.vnic_attached_to_network(spec, item.network)
             spec = self.vnic_service.get_device_spec(item.vnic, item.connect)
             vnics_change.append(spec)
-
+        logger.debug('reconfiguring vm: {0} with: {1}'.format(vm, vnics_change))
         return self.reconfig_vm(vnics_change, vm)
 
     def reconfig_vm(self, device_change, vm):
         logger.info("Changing network...")
         task = self.pyvmomi_service.vm_reconfig_task(vm, device_change)
-        return self.synchronous_task_waiter.wait_for_task(task=task,
-                                                          action_name='Reconfigure VM')
+        logger.debug('reconfigure task: {0}'.format(task.info))
+        res = self.synchronous_task_waiter.wait_for_task(task=task,
+                                                         action_name='Reconfigure VM')
+        if res:
+            logger.debug('reconfigure task result {0}'.format(res))
+        return res
 
     @staticmethod
     def destroy_port_group_task(network):

@@ -51,7 +51,8 @@ class VirtualSwitchConnectCommand:
 
             connection_result = ConnectionResult(mac_address=updated_mapping.vnic.macAddress,
                                                  vm_uuid=vm_uuid,
-                                                 network_name=updated_mapping.network)
+                                                 network_name=updated_mapping.network.name,
+                                                 network_key=updated_mapping.network.key)
             connection_results.append(connection_result)
 
         return connection_results
