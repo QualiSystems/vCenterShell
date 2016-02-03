@@ -8,7 +8,7 @@ class TestDvPortGroupCreator(TestCase):
         gen = DvPortGroupNameGenerator()
 
         # act
-        name = gen.generate_port_group_name('id')
+        name = gen.generate_port_group_name('id', 'Trunk')
 
         # assert
-        self.assertEqual('QS_VLAN_id', name)
+        self.assertEqual('QS_VLAN_id_Trunk', name)
