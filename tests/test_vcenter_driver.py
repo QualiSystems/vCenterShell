@@ -1,9 +1,8 @@
 from unittest import TestCase
 
-from mock import patch, Mock
+from mock import Mock, patch, MagicMock
 
 from vcentershell_driver.driver import VCenterShellDriver
-
 
 class MockResourceParser(object):
     @staticmethod
@@ -11,71 +10,105 @@ class MockResourceParser(object):
         return resource
 
 
-class TestVCenterDriver(TestCase):
-    @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
-           MockResourceParser.convert_to_resource_model)
+class Test_command_orchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
         self.resource = Mock()
         self.context = Mock()
-        session = Mock()
-        self.connection_details = Mock()
         self.context.resource = self.resource
+        self.driver.command_orchestrator = MagicMock()
+
+    @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
+           MockResourceParser.convert_to_resource_model)
+    def test_init(self):
         self.driver.initialize(self.context)
-        self.driver.command_wrapper.execute_command_with_connection = Mock(return_value=True)
-        self.driver.cs_helper = Mock()
-        self.driver.cs_helper.get_session = Mock(return_value=session)
-        self.driver.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
-        self.driver.vc_data_model.default_dvswitch_path = 'path'
-        self.driver.vc_data_model.default_dvswitch_name = 'dv_name'
-        self.driver.vc_data_model.default_port_group_path = 'port path'
-        self.driver.vc_data_model.default_network = 'default network'
+
+    def test_connect_bulk(self):
+        self.setUp()
+        requset = Mock()
+
+        res = self.driver.connect_bulk(self.context, requset)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
 
     def test_connect(self):
-        # act
-        res = self.driver.connect(self.context, 'uuid', 'vlan id', 'vlan type')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
-        self.assertTrue(res)
+        self.setUp()
+        vm_uuid = Mock()
+        vlan_id = Mock()
+        vlan_spec_type = Mock()
+
+        res = self.driver.connect(self.context, vm_uuid, vlan_id, vlan_spec_type)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.connect.called_with(self.context, vm_uuid,
+                                                                                  vlan_id, vlan_spec_type))
 
     def test_disconnect_all(self):
-        # act
-        self.driver.disconnect_all(self.context, 'uuid')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+
+        res = self.driver.disconnect_all(self.context, vm_uuid)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.disconnect_all.called_with(self.context, vm_uuid))
 
     def test_disconnect(self):
-        # act
-        self.driver.disconnect(self.context, 'uuid', 'network')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+        network_name = Mock()
+
+        res = self.driver.disconnect(self.context, vm_uuid, network_name)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.disconnect.called_with(self.context, vm_uuid, network_name))
 
     def test_destroy_vm(self):
-        # act
-        self.driver.destroy_vm(self.context, 'uuid', 'full_name')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+        resource_fullname = Mock()
+
+        res = self.driver.destroy_vm(self.context, vm_uuid, resource_fullname)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.destroy_vm.called_with(self.context, vm_uuid, resource_fullname))
 
     def test_deploy_from_template(self):
-        # act
-        self.driver.deploy_from_template(self.context, '{"name": "name"}')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        deploy_data = Mock()
+
+        res = self.driver.deploy_from_template(self.context, deploy_data)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.deploy_from_template.called_with(self.context,
+                                                                                          deploy_data))
 
     def test_power_off(self):
-        # act
-        self.driver.power_off(self.context, 'uuid', 'full_name')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+        resource_fullname = Mock()
+
+        res = self.driver.power_off(self.context, vm_uuid, resource_fullname)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.power_off.called_with(self.context, vm_uuid, resource_fullname))
 
     def test_power_on(self):
-        # act
-        self.driver.power_on(self.context, 'uuid', 'full_name')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+        resource_fullname = Mock()
+
+        res = self.driver.power_on(self.context, vm_uuid, resource_fullname)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.power_on.called_with(self.context, vm_uuid, resource_fullname))
 
     def test_refresh_ip(self):
-        # act
-        self.driver.refresh_ip(self.context, 'uuid', 'full_name')
-        # assert
-        self.assertTrue(self.driver.command_wrapper.execute_command_with_connection.called)
+        self.setUp()
+        vm_uuid = Mock()
+        resource_fullname = Mock()
+
+        res = self.driver.refresh_ip(self.context, vm_uuid, resource_fullname)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, vm_uuid, resource_fullname))
