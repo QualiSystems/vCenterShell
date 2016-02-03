@@ -152,7 +152,7 @@ class CommandOrchestrator(object):
         driver_response.actionResults = results
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
-        set_command_result(result=driver_response_root, unpicklable=False)
+        return set_command_result(result=driver_response_root, unpicklable=False)
 
     def _get_vm_uuid(self, action, session):
         vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes

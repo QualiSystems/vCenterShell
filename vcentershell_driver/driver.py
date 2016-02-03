@@ -11,10 +11,12 @@ class VCenterShellDriver:
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
 
-    def connect_bulk(self, context, request):
+    # connect_bulk
+    def Connect(self, context, request):
         return self.command_orchestrator.connect_bulk(context, request)
 
-    def connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
+    # obsolete
+    def _connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
         return self.command_orchestrator.connect(context, vm_uuid, vlan_id, vlan_spec_type)
 
     def disconnect_all(self, context, vm_uuid):
