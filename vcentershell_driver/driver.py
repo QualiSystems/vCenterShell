@@ -102,7 +102,7 @@ class VCenterShellDriver:
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
 
-    def connect_bulk(self, context, request):
+    def Connect(self, context, request):
 
         dv_switch_path = self.vc_data_model.default_dvswitch_path
         dv_switch_name = self.vc_data_model.default_dvswitch_name
@@ -168,7 +168,7 @@ class VCenterShellDriver:
         driver_response.actionResults = results
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
-        set_command_result(result=driver_response_root, unpicklable=False)
+        return set_command_result(result=driver_response_root, unpicklable=False)
 
     def _get_vm_uuid(self, action, session):
         vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
@@ -180,7 +180,8 @@ class VCenterShellDriver:
             deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
             return deployed_app_resource_model.vm_uuid
 
-    def connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
+    # obsolete
+    def _connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
         """
         Connect Command: connect a vm to a vlan, chooses the first available vnic
 
