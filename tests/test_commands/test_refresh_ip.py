@@ -1,6 +1,7 @@
 from unittest import TestCase
 from mock import Mock, MagicMock, create_autospec
 from qualipy.api.cloudshell_api import ResourceInfo
+
 from common.logger.service import LoggingService
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
 
@@ -89,7 +90,7 @@ class TestRefreshIpCommand(TestCase):
         vm_custom_param.Value = '255\.255\..*'
 
         vm_details = Mock()
-        vm_details.VmCustomParams = [vm_custom_param]
+        vm_details.VmCustomParam = [vm_custom_param]
 
         resource = create_autospec(ResourceInfo)
         resource.VmDetails = [vm_details]
@@ -125,3 +126,5 @@ class TestRefreshIpCommand(TestCase):
 
         # Assert
         session.UpdateResourceAddress.assert_called_with('machine1', '255.255.1.1')
+
+

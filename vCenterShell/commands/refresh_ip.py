@@ -44,9 +44,9 @@ class RefreshIpCommand(object):
     def _get_ip_match_function(api, resource_name):
         resource = api.GetResourceDetails(resource_name)
         ip_regexes = []
-        if resource.VmDetails and resource.VmDetails[0].VmCustomParams:
+        if resource.VmDetails and resource.VmDetails[0].VmCustomParam:
             ip_regexes = [custom_param.Value for custom_param
-                          in resource.VmDetails[0].VmCustomParams
+                          in resource.VmDetails[0].VmCustomParam
                           if custom_param.Name == 'IP Regex']
         if ip_regexes:
             filter_regex = ip_regexes[0]
