@@ -275,6 +275,7 @@
 			<ns0:AttributeValue Name="VM Cluster" Value="" />
 			<ns0:AttributeValue Name="VM Power State" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
+			<ns0:AttributeValue Name="IP Regex" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
