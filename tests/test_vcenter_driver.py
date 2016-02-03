@@ -27,22 +27,22 @@ class Test_command_orchestrator(TestCase):
         self.setUp()
         requset = Mock()
 
-        res = self.driver.connect_bulk(self.context, requset)
+        res = self.driver.Connect(self.context, requset)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
 
-    def test_connect(self):
-        self.setUp()
-        vm_uuid = Mock()
-        vlan_id = Mock()
-        vlan_spec_type = Mock()
-
-        res = self.driver.connect(self.context, vm_uuid, vlan_id, vlan_spec_type)
-
-        self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.connect.called_with(self.context, vm_uuid,
-                                                                                  vlan_id, vlan_spec_type))
+    # def test_connect(self):
+    #     self.setUp()
+    #     vm_uuid = Mock()
+    #     vlan_id = Mock()
+    #     vlan_spec_type = Mock()
+    #
+    #     res = self.driver.connect(self.context, vm_uuid, vlan_id, vlan_spec_type)
+    #
+    #     self.assertIsNotNone(res)
+    #     self.assertTrue(self.driver.command_orchestrator.connect.called_with(self.context, vm_uuid,
+    #                                                                               vlan_id, vlan_spec_type))
 
     def test_disconnect_all(self):
         self.setUp()
