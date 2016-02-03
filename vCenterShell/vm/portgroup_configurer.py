@@ -16,10 +16,10 @@ class VNicDeviceMapper(object):
 
 
 class VirtualMachinePortGroupConfigurer(object):
-    def __init__(self, 
-                 pyvmomi_service, 
-                 synchronous_task_waiter, 
-                 vnic_to_network_mapper, 
+    def __init__(self,
+                 pyvmomi_service,
+                 synchronous_task_waiter,
+                 vnic_to_network_mapper,
                  vnic_service):
         """
         :param pyvmomi_service: vCenter API wrapper
@@ -65,13 +65,26 @@ class VirtualMachinePortGroupConfigurer(object):
         update_mapping = [VNicDeviceMapper(vnic, None, False, default_network) for vnic in vnics.values()]
         return self.update_vnic_by_mapping(vm, update_mapping)
 
+    def create_mappings_for_all_networks(self, vm, default_network):
+        vnics = self.vnic_service.map_vnics(vm)
+        return [VNicDeviceMapper(vnic, None, False, default_network) for vnic in vnics.values()]
+
+    def create_mapping_for_network(self, vm, network, default_network):
+        condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
+        vnics = self.vnic_service.map_vnics(vm)
+
+        mapping = [VNicDeviceMapper(vnic, network, False, default_network)
+                   for vnic_name, vnic in vnics.items()
+                   if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
+        return mapping
+
     def disconnect_network(self, vm, network, default_network):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
 
         mapping = [VNicDeviceMapper(vnic, network, False, default_network)
-                        for vnic_name, vnic in vnics.items()
-                        if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
+                   for vnic_name, vnic in vnics.items()
+                   if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
         return self.update_vnic_by_mapping(vm, mapping)
 

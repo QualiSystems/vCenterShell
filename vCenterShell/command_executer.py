@@ -4,7 +4,7 @@ from common.utilites.command_result import set_command_result
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
 from models.ActionResult import ActionResult
-from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
+from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
 
 
 class CommandExecuterService(object):
@@ -58,7 +58,14 @@ class CommandExecuterService(object):
                 if vm_uuid == '':
                     continue
 
-                results += self._set_vlan_bulk(action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid)
+                results += self._set_vlan_bulk(action, default_network, dv_switch_name, dv_switch_path, port_group_path,
+                                               vm_uuid)
+            elif action.type == 'removeVlan':
+                vm_uuid = self._get_vm_uuid(action, session)
+                if vm_uuid == '':
+                    continue
+
+                results += self._remove_vlan_bulk(action, default_network, vm_uuid)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -83,6 +90,46 @@ class CommandExecuterService(object):
             try:
                 connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                                           self.virtual_switch_connect_command.connect_to_networks,
+                                                                                          vm_uuid,
+                                                                                          mappings,
+                                                                                          default_network)
+                for connection_result in connection_results:
+                    result = ActionResult()
+                    result.actionId = str(action.actionId)
+                    result.type = str(action.type)
+                    result.infoMessage = 'VLAN successfully set'
+                    result.errorMessage = ''
+                    result.success = True
+                    result.updatedInterface = connection_result.mac_address
+                    results.append(result)
+
+            except Exception as ex:
+                error_result = ActionResult()
+                error_result.actionId = str(action.actionId)
+                error_result.type = str(action.type)
+                error_result.infoMessage = str('')
+                error_result.errorMessage = str(ex)
+                error_result.success = False
+                error_result.updatedInterface = None
+                results.append(error_result)
+
+        return results
+
+    def _remove_vlan_bulk(self, action, default_network, vm_uuid):
+        mappings = []
+        results = []
+
+        vm_network_remove_mapping = VmNetworkRemoveMapping()
+        vm_network_remove_mapping.network_name = action.actionTarget.fullName
+        vm_network_remove_mapping.vm_uuid = vm_uuid
+
+        mappings.append(vm_network_remove_mapping)
+
+        if mappings:
+            connection_details = self.connection_retriever.connection_details()
+            try:
+                connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                            self.virtual_switch_disconnect_command.disconnect_from_networks,
                                                                                           vm_uuid,
                                                                                           mappings,
                                                                                           default_network)
@@ -165,9 +212,9 @@ class CommandExecuterService(object):
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.virtual_switch_disconnect_command.disconnect_all,
-                vm_uuid)
+            connection_details,
+            self.virtual_switch_disconnect_command.disconnect_all,
+            vm_uuid)
 
     def disconnect(self):
         vm_uuid = self.qualipy_helpers.get_user_param('VM_UUID')
@@ -178,10 +225,10 @@ class CommandExecuterService(object):
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.virtual_switch_disconnect_command.disconnect,
-                vm_uuid,
-                network_name)
+            connection_details,
+            self.virtual_switch_disconnect_command.disconnect,
+            vm_uuid,
+            network_name)
 
     def destroy_vm(self):
         # get command parameters from the environment
@@ -193,10 +240,10 @@ class CommandExecuterService(object):
 
         # execute command
         self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.destroyVirtualMachineCommand.destroy,
-                uuid,
-                resource_fullname)
+            connection_details,
+            self.destroyVirtualMachineCommand.destroy,
+            uuid,
+            resource_fullname)
 
     def deploy_from_template(self):
         # get command parameters from the environment
@@ -209,9 +256,9 @@ class CommandExecuterService(object):
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.deployFromTemplateCommand.execute_deploy_from_template,
-                data_holder)
+            connection_details,
+            self.deployFromTemplateCommand.execute_deploy_from_template,
+            data_holder)
 
         set_command_result(result=result, unpicklable=False)
 
