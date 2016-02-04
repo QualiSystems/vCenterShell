@@ -37,17 +37,11 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         mappings = []
         for vm_network_remove_mapping in vm_network_remove_mappings:
-            if vm_network_remove_mapping.network_name:
-                network = self.pyvmomi_service.vm_get_network_by_name(vm, vm_network_remove_mapping.network_name)
-                if network is None:
-                    raise KeyError('Network not found ({0})'.format(vm_network_remove_mapping.network_name))
-            else:
-                network = None
+            network = self.pyvmomi_service.get_network_by_mac_address(vm, vm_network_remove_mapping.mac_address)
+            if network is None:
+                raise KeyError('Network having MAC address {0} not found'.format(vm_network_remove_mapping.mac_address))
 
-            if network:
-                mappings += self.port_group_configurer.create_mapping_for_network(vm, network, default_network)
-            else:
-                mappings += self.port_group_configurer.create_mappings_for_all_networks(vm, default_network)
+            mappings += self.port_group_configurer.create_mapping_for_network(vm, network, default_network)
 
         return self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
 

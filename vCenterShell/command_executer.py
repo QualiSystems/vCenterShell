@@ -119,8 +119,22 @@ class CommandExecuterService(object):
         mappings = []
         results = []
 
+        interface_attributes = [attr.attributeValue for attr in action.connectorAttributes
+                                if attr.attributeName == 'Interface']
+
+        if not interface_attributes:
+            error_result = ActionResult()
+            error_result.actionId = str(action.actionId)
+            error_result.type = str(action.type)
+            error_result.infoMessage = str('')
+            error_result.errorMessage = 'Interface attribute is missing on connectorAttributes for removeVlan action'
+            error_result.success = False
+            error_result.updatedInterface = None
+            results.append(error_result)
+            return results
+
         vm_network_remove_mapping = VmNetworkRemoveMapping()
-        vm_network_remove_mapping.network_name = action.actionTarget.fullName
+        vm_network_remove_mapping.mac_address = interface_attributes[0]
         vm_network_remove_mapping.vm_uuid = vm_uuid
 
         mappings.append(vm_network_remove_mapping)
