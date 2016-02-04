@@ -20,7 +20,9 @@ class TestDriverHelper(TestCase):
         self.context.reservation.domain = 'domain'
 
     def test_get_session(self):
-        self.helper.get_session(self.context)
+        self.helper.get_session(self.context.connectivity.serverAddress,
+                                self.context.connectivity.adminAuthToken,
+                                self.context.reservation.domain)
         self.assertTrue(self.helper.session_class.called_with(self.context.connectivity.serverAddress,
                                                               self.context.connectivity.adminAuthToken,
                                                               'admin',

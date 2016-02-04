@@ -9,27 +9,30 @@ class CloudshellDriverHelper(object):
         self.cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         self.session_class = CloudShellAPISession
 
-    def get_session(self, context):
+    def get_session(self, server_address, token, reservation_domain):
         """
         gets the current session
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str reservation_domain: reservation domain
+        :param token: the admin authentication token
+        :param server_address: cloudshell server address
         :return CloudShellAPISession
         """
-        return self.session_class(host=context.connectivity.server_address,
-                                  token=context.connectivity.admin_auth_token,
+        return self.session_class(host=server_address,
+                                  token=token,
                                   user=None,
                                   password=None,
-                                  domain=context.reservation.domain)
+                                  domain=reservation_domain)
 
-    def get_connection_details(self, session, context):
+    def get_connection_details(self, session, resource):
         """
         Receives the context of the command and returns a cloudshell session
         :param CloudShellAPISession session:
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param ResourceContextDetails resource: the context of the command
+        :type context: models.QualiDriverModels.ResourceRemoteCommandContext or models.QualiDriverModels.ResourceCommandContext
         """
         # get connection details
         connection_details = \
             self.cloudshell_data_retriever_service.getVCenterConnectionDetails(session=session,
-                                                                               vCenter_resource_details=context.resource)
+                                                                               vCenter_resource_details=resource)
         return connection_details

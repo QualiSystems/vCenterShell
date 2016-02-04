@@ -1,6 +1,6 @@
 from logging import getLogger
-
 import jsonpickle
+import time
 from pyVim.connect import SmartConnect, Disconnect
 from common.cloudshell.driver_helper import CloudshellDriverHelper
 from common.cloudshell.resource_remover import CloudshellResourceRemover
@@ -98,7 +98,8 @@ class CommandOrchestrator(object):
 
         results = []
 
-        session = self.cs_helper.get_session(context)
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
 
         for action in holder.driverRequest.actions:
 
@@ -119,7 +120,7 @@ class CommandOrchestrator(object):
                     mappings.append(vnic_to_network)
 
                 if mappings:
-                    connection_details = self.cs_helper.get_connection_details(session, context)
+                    connection_details = self.cs_helper.get_connection_details(session, context.resource)
                     try:
                         connection_results = self.command_wrapper.execute_command_with_connection(
                             connection_details,
@@ -154,15 +155,42 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def _get_vm_uuid(self, action, session):
-        vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
-                          if attr.attributeName == 'VM_UUID']
-        if vm_uuid_values:
-            return vm_uuid_values[0]
-        else:
-            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
-            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
-            return deployed_app_resource_model.vm_uuid
+    def deploy_from_template(self, context, deploy_data):
+        """
+        Deploy From Template Commnand, will deploy vm from template
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {
+                "template_model": {
+                    "vCenter_resource_name": "QualiSB",
+                    "vm_folder": "QualiSB/Raz",
+                    "template_name": "2"
+                },
+                "vm_cluster_model": {
+                    "cluster_name": "QualiSB Cluster",
+                    "resource_pool": "IT"
+                },
+                "datastore_name": "eric ds cluster",
+                "power_on": False
+            }
+        :return str deploy results
+        """
+        # get connection details
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            connection_details,
+            self.deploy_from_template_command.execute_deploy_from_template,
+            data_holder)
+
+        return set_command_result(result=result, unpicklable=False)
 
     def connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
         """
@@ -194,8 +222,9 @@ class CommandOrchestrator(object):
         vnic_to_network.vlan_spec = vlan_spec_type
 
         # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
 
         # execute command
         connection_results = \
@@ -206,164 +235,186 @@ class CommandOrchestrator(object):
                                                                  self.vc_data_model.default_network)
         return set_command_result(result=connection_results, unpicklable=False)
 
-    def disconnect_all(self, context, vm_uuid):
+    # remote command
+    def disconnect_all(self, context, ports):
         """
         Disconnect All Command, will the assign all the vnics on the vm to the default network,
         which is sign to be disconnected
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: vm uuid
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
-        if not vm_uuid:
-            raise ValueError('VM_UUID is missing')
-
         # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.remote_reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        resource_details = self._parse_remote_model(context)
 
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.virtual_switch_disconnect_command.disconnect_all,
-            vm_uuid)
+            resource_details.vm_uuid)
         return set_command_result(result=res, unpicklable=False)
 
-    def disconnect(self, context, vm_uuid, network_name):
+    # remote command
+    def disconnect(self, context, ports, network_name):
         """
         Disconnect Command, will disconnect the a specific network that is assign to the vm,
         the command will assign the default network for all the vnics that is assigned to the given network
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: the uuid of the vm
-        :param str network_name: the name of the network to disconnect
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param str network_name: the name of the network to disconnect from
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
 
         # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.remote_reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        resource_details = self._parse_remote_model(context)
 
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.virtual_switch_disconnect_command.disconnect,
-            vm_uuid,
+            resource_details.vm_uuid,
             network_name)
         return set_command_result(result=res, unpicklable=False)
 
-    def destroy_vm(self, context, vm_uuid, resource_fullname):
+    # remote command
+    def destroy_vm(self, context, ports):
         """
         Destroy Vm Command, will destroy the vm and remove the resource
 
-        :param str resource_fullname: name of the resource related to the command
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: the vm uuid to destroy
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.remote_reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        resource_details = self._parse_remote_model(context)
 
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             connection_details,
             self.destroy_virtual_machine_command.destroy,
             session,
-            vm_uuid,
-            resource_fullname)
+            resource_details.vm_uuid,
+            resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
 
-    def deploy_from_template(self, context, deploy_data):
-        """
-        Deploy From Template Commnand, will deploy vm from template
-
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str deploy_data: represent a json of the parameters, example: {
-                "template_model": {
-                    "vCenter_resource_name": "QualiSB",
-                    "vm_folder": "QualiSB/Raz",
-                    "template_name": "2"
-                },
-                "vm_cluster_model": {
-                    "cluster_name": "QualiSB Cluster",
-                    "resource_pool": "IT"
-                },
-                "datastore_name": "eric ds cluster",
-                "power_on": False
-            }
-        :return str deploy results
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
-
-        # get command parameters from the environment
-        data = jsonpickle.decode(deploy_data)
-        data_holder = DeployDataHolder(data)
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
-            connection_details,
-            self.deploy_from_template_command.execute_deploy_from_template,
-            data_holder)
-
-        return set_command_result(result=result, unpicklable=False)
-
-    def power_off(self, context, vm_uuid, resource_fullname):
-        """
-        Power off Command, will turn off the vm
-
-        :param str resource_fullname: name of the resource related to the command
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: the vm uuid to turn off
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
-
-        # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                   self.vm_power_management_command.power_off,
-                                                                   session,
-                                                                   vm_uuid,
-                                                                   resource_fullname)
-        return set_command_result(result=res, unpicklable=False)
-
-    def power_on(self, context, vm_uuid, resource_fullname):
-        """
-        Power on Command, will turn on the vm
-
-        :param str resource_fullname: name of the resource related to the command
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: the vm uuid to turn on
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
-
-        # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                   self.vm_power_management_command.power_on,
-                                                                   session,
-                                                                   vm_uuid,
-                                                                   resource_fullname)
-        return set_command_result(result=res, unpicklable=False)
-
-    def refresh_ip(self, context, vm_uuid, resource_fullname):
+    # remote command
+    def refresh_ip(self, context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
 
-        :param str resource_fullname: name of the resource related to the command
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str vm_uuid: the vm uuid
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         # get connection details
-        session = self.cs_helper.get_session(context)
-        connection_details = self.cs_helper.get_connection_details(session, context)
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.remote_reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        resource_details = self._parse_remote_model(context)
 
         # execute command
         res = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                    self.refresh_ip_command.refresh_ip,
                                                                    session,
-                                                                   vm_uuid,
-                                                                   resource_fullname,
+                                                                   resource_details.vm_uuid,
+                                                                   resource_details.fullname,
                                                                    self.vc_data_model.default_network)
+        return set_command_result(result=res, unpicklable=False)
+
+    # remote command
+    def power_off(self, context, ports):
+        """
+        Powers off the remote vm
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
+        """
+        return self._power_command(context, ports, self.vm_power_management_command.power_off)
+
+    # remote command
+    def power_on(self, context, ports):
+        """
+        Powers on the remote vm
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
+        """
+        return self._power_command(context, ports, self.vm_power_management_command.power_on)
+
+    # remote command
+    def power_cycle(self, context, ports, delay):
+        """
+        preforms a restart to the vm
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
+        :param float delay: the time to wait between the power on and off
+        """
+        self.power_off(context, ports)
+        time.sleep(delay)
+        return self.power_on(context, ports)
+
+    def _power_command(self, context, ports, command):
+        # get connection details
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.remote_reservation.domain)
+
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        resource_details = self._parse_remote_model(context)
+
+        # execute command
+        res = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                   command,
+                                                                   session,
+                                                                   resource_details.vm_uuid,
+                                                                   resource_details.fullname)
+        return set_command_result(result=res, unpicklable=False)
+
+    def _get_vm_uuid(self, action, session):
+        vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
+                          if attr.attributeName == 'VM_UUID']
+        if vm_uuid_values:
+            return vm_uuid_values[0]
+        else:
+            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
+            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
+            return deployed_app_resource_model.vm_uuid
+
+    def _parse_remote_model(self, context):
+        """
+        parse the remote resource model and adds its full name
+        :type context: models.QualiDriverModels.ResourceRemoteCommandContext
+
+        """
+        if not context.remote_endpoints:
+            raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
+        resource = context.remote_endpoints[0]        
+        resource_details = self.resource_model_parser.convert_to_resource_model(resource)
+        resource_details.fullname = resource.fullname
+        return resource_details
+
+    def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
+        # get connection details
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        res = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                   self.vm_power_management_command.power_on,
+                                                                   session,
+                                                                   vm_uuid,
+                                                                   resource_fullname)
         return set_command_result(result=res, unpicklable=False)

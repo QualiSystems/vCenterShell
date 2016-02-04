@@ -1,3 +1,17 @@
 <Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.0.0">
-
+    <Layout>
+        <Category Name="Connectivity">
+            <Command Description="Disconnects all the networks attached to the app" DisplayName="Disconnect All" Name="remote_disconnect_all" Tags="remote_connectivity,allow_shared" />
+            <Command Description="Disconnects a specific network attached to the app" DisplayName="Disconnect" Name="remote_disconnect" Tags="remote_connectivity,allow_shared" />
+            <Command Description="" DisplayName="Refresh Ip" Name="remote_refresh_ip" Tags="remote_connectivity,allow_shared" />
+        </Category>
+        <Category Name="App Management">
+            <Command Description="" DisplayName="Destroy App" Name="remote_destroy_vm" Tags="remote_app_management,allow_shared" />
+        </Category>
+        <Category Name="Power">
+            <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />
+            <Command Description="" DisplayName="Power Off" Name="PowerOff" Tags="power" />
+            <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />
+        </Category>
+    </Layout>
 </Driver>

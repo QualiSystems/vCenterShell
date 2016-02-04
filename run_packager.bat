@@ -7,11 +7,6 @@ del /F /Q "vCenterShellPackage\Topology Scripts\."
 python driver_packager.py package_specs\\deployment_service_driver.ini
 python driver_packager.py package_specs\\vlan_auto_service.ini
 python driver_packager.py package_specs\\orchestration_service.ini
-python driver_packager.py package_specs\\deployed_app_proxy_connect.ini
-python driver_packager.py package_specs\\deployed_app_proxy_power_on.ini
-python driver_packager.py package_specs\\deployed_app_proxy_power_off.ini
-python driver_packager.py package_specs\\deployed_app_proxy_destroy_vm.ini
-python driver_packager.py package_specs\\deployed_app_proxy_refresh_ip.ini
 
 python driver_packager.py package_specs\\environment_connect_all.ini
 
