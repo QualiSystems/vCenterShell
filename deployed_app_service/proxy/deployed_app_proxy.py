@@ -77,7 +77,7 @@ class DeployedAppService(object):
     def execute_connect_command(access_mode, generic_deployed_app_resource_model, virtual_network):
         DeployedAppService.execute_command_on_vcenter_resource_and_passthrough_result(
                 generic_deployed_app_resource_model,
-                'connect',
+                'Connect',
                 [InputNameValue('vlan_id', virtual_network),
                  InputNameValue('vlan_spec_type', access_mode),
                  InputNameValue('vm_uuid', generic_deployed_app_resource_model.vm_uuid)])

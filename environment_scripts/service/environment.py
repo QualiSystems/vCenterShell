@@ -83,9 +83,9 @@ class EnvironmentService(object):
 
         _logger.debug('Executing Connect command on: ' + connected_resource)
 
-        command_result = session.ExecuteCommand(reservation_id, connected_resource, 'Resource', 'connect_bulk',
-                                                [InputNameValue('vlan_id', virtual_network),
-                                                 InputNameValue('vlan_spec_type', access_mode)], True)
+        command_result = session.ExecuteCommand(reservation_id, connected_resource, 'Resource', 'Connect',
+                                                [InputNameValue('VLAN_ID', virtual_network),
+                                                 InputNameValue('VLAN_SPEC_TYPE', access_mode)], True)
 
         connect_results = get_result_from_command_output(command_result.Output)
 

@@ -11,7 +11,6 @@ class VCenterShellDriver:
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
 
-    # connect_bulk
     def Connect(self, context, request):
         return self.command_orchestrator.connect_bulk(context, request)
 
