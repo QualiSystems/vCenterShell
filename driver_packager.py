@@ -3,12 +3,15 @@ import sys
 import zipfile
 import ConfigParser
 import xml.etree.ElementTree as ET
+import time
 
 DRIVER_FILE_BASE_DIR = 'vCenterShellPackage'
 STRIPING_CHARS = ' \t\n\r'
 DRIVER_FOLDER = 'driver_folder'
+INCLUDE_FILES = 'include_files'
 INCLUDE_DIRS = 'include_dirs'
 TARGET_NAME = 'target_name'
+IS_DRIVER = 'is_driver'
 VERSION_FILENAME = 'version.txt'
 TARGET_DIR = 'target_dir'
 
@@ -23,11 +26,17 @@ def zip_dir(path, zip_handler, include_dir=True):
     for root, dirs, files in os.walk(path):
         for file_to_zip in files:
             filename = os.path.join(root, file_to_zip)
-            if os.path.isfile(filename):  # regular files only
-                if include_dir:
-                    zip_handler.write(filename)
-                else:
-                    zip_handler.write(filename, filename.split('\\', 1)[1])
+            add_file(filename, zip_handler, include_dir)
+
+
+def add_file(filename, zip_handler, include_dir=True):
+    if os.path.isfile(filename):  # regular files only
+        if include_dir:
+            zip_handler.write(filename)
+        else:
+            splited_filename = filename.split('\\', 1)
+            s_filename = splited_filename[1] if len(splited_filename) > 1 else filename
+            zip_handler.write(filename, s_filename)
 
 
 def ensure_dir(f):
@@ -43,18 +52,31 @@ def add_version_file_to_zip(ziph, driver_path=None):
 
 
 def main(args):
+    # time.sleep(15)
     config_file_name = args[1]
 
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser.SafeConfigParser()
     config.readfp(open(config_file_name))
 
     driver = config.get('Packaging', DRIVER_FOLDER)
     include_dirs = config.get('Packaging', INCLUDE_DIRS).split(',')
     target_name = config.get('Packaging', TARGET_NAME)
     target_dir = config.get('Packaging', TARGET_DIR)
+    try:
+        include_files = config.get('Packaging', INCLUDE_FILES).split(',')
+    except Exception:
+        include_files = []
+    try:
+        is_driver = config.getboolean('Packaging', IS_DRIVER)
+    except Exception:
+        is_driver = False
+
     version = _get_version()
 
-    _update_version(target_name, version)
+    if is_driver:
+        _update_driver_version(driver, version)
+    else:
+        _update_script_version(target_name, version)
 
     zip_name = os.path.join(DRIVER_FILE_BASE_DIR, target_dir, target_name + '.zip')
 
@@ -82,14 +104,27 @@ def main(args):
 
     add_version_file_to_zip(zip_file)
 
+    for file_to_include in include_files:
+        add_file(file_to_include, zip_file, False)
+
     for dir_to_include in include_dirs:
         zip_dir(dir_to_include, zip_file)
 
     zip_file.close()
 
 
-def _update_version(script_name, version):
+def _update_driver_version(folder_path, version):
+    driver_model_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                     folder_path + '/drivermetadata.xml')
+    tree = ET.parse(driver_model_path)
+    if tree.getroot().get('Version'):
+        tree.getroot().attrib['Version'] = version
+        tree.write(driver_model_path)
+    else:
+        raise Exception('version attribute in: {0} not found'.format(driver_model_path))
 
+
+def _update_script_version(script_name, version):
     ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
     datamodel_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                   'vCenterShellPackage/DataModel/datamodel.xml')
@@ -97,7 +132,6 @@ def _update_version(script_name, version):
     tree = ET.parse(datamodel_path)
     scripts = tree.getroot().findall('.//default:ScriptDescriptors/default:ScriptDescriptor/[@Name="{0}"]'
                                      .format(script_name), ns)
-
     if not len(scripts):
         raise Exception('Script {0} not found in datamodel.xml'.format(script_name))
 
@@ -109,6 +143,7 @@ def _get_version():
     with open('version.txt', 'r') as version_file:
         version = version_file.read().replace('\n', '')
     return version
+
 
 if __name__ == "__main__":
     main(sys.argv)

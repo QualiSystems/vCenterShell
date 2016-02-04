@@ -13,6 +13,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         vm_uuid = 'uuid'
         si = Mock(spec=vim.ServiceInstance)
         vm = Mock(spec=vim.VirtualMachine)
+        session = Mock()
         pv_service = Mock()
         pv_service.find_by_uuid = Mock(return_value=vm)
 
@@ -26,7 +27,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
 
         # act
-        res = power_manager.power_on(si, vm_uuid, None)
+        res = power_manager.power_on(session, si, vm_uuid, None)
 
         # assert
         self.assertTrue(res)
@@ -37,6 +38,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         # arrange
         vcenter_name = 'vcenter name'
         vm_uuid = 'uuid'
+        session = Mock()
         si = Mock(spec=vim.ServiceInstance)
         vm = Mock(spec=vim.VirtualMachine)
         task = Mock()
@@ -53,7 +55,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager._get_vm = Mock(return_value=vm)
 
         # act
-        res = power_manager.power_off(si, vm_uuid, None)
+        res = power_manager.power_off(session, si, vm_uuid, None)
 
         # assert
         self.assertTrue(res)

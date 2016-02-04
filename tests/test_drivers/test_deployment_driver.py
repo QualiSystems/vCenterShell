@@ -76,10 +76,8 @@ class test_DeploymentService(unittest.TestCase):
         deployment_service = DeploymentServiceDriver(cs)
         command_inputs = deployment_service._get_command_inputs_list(json_data)
 
-        self.assertEquals(len(command_inputs), 2)
-        self.assertEquals(command_inputs[0].Value, "deploy_from_template")
-        self.assertEquals(command_inputs[0].Name, DeploymentServiceDriver.INPUT_KEY_COMMAND)
-        self.assertEquals(command_inputs[1].Value, json_data)
-        self.assertEquals(command_inputs[1].Name, DeploymentServiceDriver.INPUT_KEY_DEPLOY_DATA)
+        self.assertEquals(len(command_inputs), 1)
+        self.assertEquals(command_inputs[0].Value, json_data)
+        self.assertEquals(command_inputs[0].Name, DeploymentServiceDriver.INPUT_KEY_DEPLOY_DATA)
 
 

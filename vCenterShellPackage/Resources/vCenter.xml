@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ResourceInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="vCenter" FolderFullPath="" Address="" ModelName="vCenter" Driver="Generic Driver" xmlns="http://schemas.qualisystems.com/ResourceManagement/ResourceSchema.xsd">
+<ResourceInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="vCenter" FolderFullPath="" Address="" ModelName="vCenter" Driver="VCenter Shell Driver" xmlns="http://schemas.qualisystems.com/ResourceManagement/ResourceSchema.xsd">
   <Attributes/>
   <ChildResources />
   <Connections />

@@ -1,4 +1,3 @@
-from models.VCenterConnectionDetails import VCenterConnectionDetails
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
@@ -6,13 +5,8 @@ __author__ = 'shms'
 import os.path
 import sys
 import unittest
-
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from mock import Mock, create_autospec, MagicMock
+from mock import Mock, create_autospec
 from pyVmomi import vim
-from models.VCenterTemplateModel import VCenterTemplateModel
-
-from models.VMClusterModel import VMClusterModel
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
@@ -33,10 +27,11 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         resource_remover.remove_resource = Mock(return_value=True)
         pv_service.find_by_uuid = Mock(return_value=vm)
 
+        session = Mock()
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy(si, uuid, resource_name)
+        res = destroyer.destroy(si, session, uuid, resource_name)
 
         # assert
         self.assertTrue(res)

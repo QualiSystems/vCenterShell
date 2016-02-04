@@ -1,0 +1,3 @@
+<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.0.0">
+
+</Driver>

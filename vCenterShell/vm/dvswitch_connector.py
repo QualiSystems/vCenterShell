@@ -1,3 +1,5 @@
+from common.vcenter.vmomi_service import *
+
 class VmNetworkMapping(object):
     def __init__(self):
         self.vnic_name = ''
@@ -48,6 +50,9 @@ class VirtualSwitchToMachineConnector(object):
         """
         request_mapping = []
 
+        logger.debug(
+            'about to map to the vm: {0}, the following networks'.format(vm.name if vm.name else vm.config.uuid))
+
         for network_map in mapping:
             network = self.dv_port_group_creator.get_or_create_network(si,
                                                                        vm,
@@ -57,6 +62,8 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.port_group_path,
                                                                        network_map.vlan_id,
                                                                        network_map.vlan_spec)
+
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
+        logger.debug(str(request_mapping))
         return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)

@@ -32,7 +32,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = [vim.NumericRange(start=65, end=65)]
-        mapping.dv_port_name = DvPortGroupNameGenerator().generate_port_group_name(65)
+        mapping.dv_port_name = DvPortGroupNameGenerator().generate_port_group_name(65, 'Trunk')
         mapping.dv_switch_name = 'dvSwitch'
         mapping.dv_switch_path = 'QualiSB'
         mapping.port_group_path = 'QualiSB'

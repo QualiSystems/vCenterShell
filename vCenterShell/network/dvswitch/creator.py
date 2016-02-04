@@ -17,9 +17,8 @@ class DvPortGroupCreator(object):
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
-        port_group = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                action_name='Create dv port group')
-        return port_group
+        self.synchronous_task_waiter.wait_for_task(task=task,
+                                                   action_name='Create dv port group')
 
     @staticmethod
     def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, num_ports=32):
@@ -81,16 +80,18 @@ class DvPortGroupCreator(object):
         if network is None:
             # try to get it from the vcenter
             try:
-                network = self.pyvmomi_service.find_network_by_name(si, port_group_path, dv_port_name)
+                network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
             except KeyError:
                 network = None
 
         # if we still couldn't get the network ---> create it(can't find it, play god!)
         if network is None:
-            network = self.create_dv_port_group(dv_port_name,
-                                                dv_switch_name,
-                                                dv_switch_path,
-                                                si,
-                                                vlan_spec,
-                                                vlan_id)
+            self.create_dv_port_group(dv_port_name,
+                                      dv_switch_name,
+                                      dv_switch_path,
+                                      si,
+                                      vlan_spec,
+                                      vlan_id)
+            network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
+
         return network
