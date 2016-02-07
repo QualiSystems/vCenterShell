@@ -17,6 +17,7 @@ class Test_command_orchestrator(TestCase):
         self.context = Mock()
         self.context.resource = self.resource
         self.driver.command_orchestrator = MagicMock()
+        self.ports = Mock()
 
     @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
            MockResourceParser.convert_to_resource_model)
@@ -46,32 +47,28 @@ class Test_command_orchestrator(TestCase):
 
     def test_disconnect_all(self):
         self.setUp()
-        vm_uuid = Mock()
 
-        res = self.driver.disconnect_all(self.context, vm_uuid)
+        res = self.driver.disconnect_all(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.disconnect_all.called_with(self.context, vm_uuid))
+        self.assertTrue(self.driver.command_orchestrator.disconnect_all.called_with(self.context, self.ports))
 
     def test_disconnect(self):
         self.setUp()
-        vm_uuid = Mock()
         network_name = Mock()
 
-        res = self.driver.disconnect(self.context, vm_uuid, network_name)
+        res = self.driver.disconnect(self.context, self.ports, network_name)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.disconnect.called_with(self.context, vm_uuid, network_name))
+        self.assertTrue(self.driver.command_orchestrator.disconnect.called_with(self.context, self.ports, network_name))
 
     def test_destroy_vm(self):
         self.setUp()
-        vm_uuid = Mock()
-        resource_fullname = Mock()
 
-        res = self.driver.destroy_vm(self.context, vm_uuid, resource_fullname)
+        res = self.driver.remote_destroy_vm(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.destroy_vm.called_with(self.context, vm_uuid, resource_fullname))
+        self.assertTrue(self.driver.command_orchestrator.destroy_vm.called_with(self.context, self.ports))
 
     def test_deploy_from_template(self):
         self.setUp()
@@ -85,30 +82,31 @@ class Test_command_orchestrator(TestCase):
 
     def test_power_off(self):
         self.setUp()
-        vm_uuid = Mock()
-        resource_fullname = Mock()
 
-        res = self.driver.power_off(self.context, vm_uuid, resource_fullname)
+        res = self.driver.PowerOff(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.power_off.called_with(self.context, vm_uuid, resource_fullname))
+        self.assertTrue(self.driver.command_orchestrator.power_off.called_with(self.context, self.ports))
 
     def test_power_on(self):
         self.setUp()
-        vm_uuid = Mock()
-        resource_fullname = Mock()
 
-        res = self.driver.power_on(self.context, vm_uuid, resource_fullname)
+        res = self.driver.PowerOn(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.power_on.called_with(self.context, vm_uuid, resource_fullname))
+        self.assertTrue(self.driver.command_orchestrator.power_on.called_with(self.context, self.ports))
+
+    def test_power_cycle(self):
+        self.setUp()
+
+        res = self.driver.PowerCycle(self.context, self.ports, 10)
+
+        self.assertIsNotNone(res)
 
     def test_refresh_ip(self):
         self.setUp()
-        vm_uuid = Mock()
-        resource_fullname = Mock()
 
-        res = self.driver.refresh_ip(self.context, vm_uuid, resource_fullname)
+        res = self.driver.remote_refresh_ip(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, vm_uuid, resource_fullname))
+        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context,self.ports))
