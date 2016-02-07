@@ -356,7 +356,7 @@
   </ns0:ResourceFamilies>
   <ns0:DriverDescriptors>
     <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
-    <ns0:DriverDescriptor DriverType="ScriptDriver" Name="VCenter Shell Driver" />
+    <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
     <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
