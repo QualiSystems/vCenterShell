@@ -29,7 +29,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.default_network = default_network
 
     def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings, default_network_name):
-        vm = self.pv_service.find_by_uuid(si, vm_uuid)
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         if not vm:
             raise ValueError('VM having UUID {0} not found'.format(vm_uuid))
 
