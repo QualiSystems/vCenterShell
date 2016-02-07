@@ -22,10 +22,10 @@ class VCenterShellDriver:
     def _connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
         return self.command_orchestrator.connect(context, vm_uuid, vlan_id, vlan_spec_type)
 
-    def remote_disconnect_all(self, context, ports):
+    def disconnect_all(self, context, ports):
         return self.command_orchestrator.disconnect_all(context, ports)
 
-    def remote_disconnect(self, context, ports, network_name):
+    def disconnect(self, context, ports, network_name):
         return self.command_orchestrator.disconnect(context, ports, network_name)
 
     def remote_destroy_vm(self, context, ports):
