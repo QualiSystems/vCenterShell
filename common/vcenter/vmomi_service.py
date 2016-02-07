@@ -461,14 +461,17 @@ class pyVmomiService:
         return
 
     def get_network_by_mac_address(self, vm, mac_address):
-        networks = [device.backing.network for device in vm.config.hardware.device
+        backing = [device.backing for device in vm.config.hardware.device
                     if isinstance(device, vim.vm.device.VirtualEthernetCard)
-                    and hasattr(device.backing, 'network')
                     and hasattr(device, 'macAddress')
                     and device.macAddress == mac_address]
 
-        if networks:
-            return networks[0]
+        if backing:
+            back = backing[0]
+            if hasattr(back, 'network'):
+                return back.network
+            if hasattr(back, 'port'):
+                return back.port
         return None
 
     @staticmethod
