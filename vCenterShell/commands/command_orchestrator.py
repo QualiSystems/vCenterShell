@@ -175,6 +175,7 @@ class CommandOrchestrator(object):
             }
         :return str deploy results
         """
+
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)

@@ -214,6 +214,7 @@
 
           </ns0:Drivers>
           <ns0:Scripts>
+              <ns0:ScriptName>Connect</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
@@ -353,6 +354,12 @@
     <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
+      <ns0:ScriptDescriptor Name="Connect" Version="1.0.0">
+      <ns0:ScriptInputs>
+        <ns0:ScriptInput Name="VLAN_SPEC_TYPE" />
+        <ns0:ScriptInput Name="VLAN_ID" />
+      </ns0:ScriptInputs>
+    </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
