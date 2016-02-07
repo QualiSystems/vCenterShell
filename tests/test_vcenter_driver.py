@@ -48,7 +48,7 @@ class Test_command_orchestrator(TestCase):
     def test_disconnect_all(self):
         self.setUp()
 
-        res = self.driver.remote_disconnect_all(self.context, self.ports)
+        res = self.driver.disconnect_all(self.context, self.ports)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.disconnect_all.called_with(self.context, self.ports))
@@ -57,7 +57,7 @@ class Test_command_orchestrator(TestCase):
         self.setUp()
         network_name = Mock()
 
-        res = self.driver.remote_disconnect(self.context, self.ports, network_name)
+        res = self.driver.disconnect(self.context, self.ports, network_name)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.disconnect.called_with(self.context, self.ports, network_name))
