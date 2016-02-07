@@ -4,7 +4,7 @@ REM build driver scripts
 del /F /Q "vCenterShellPackage\Resource Scripts\."
 del /F /Q "vCenterShellPackage\Topology Scripts\."
 
-python driver_packager.py package_specs\\deployed_app_proxy_connect.ini
+REM python driver_packager.py package_specs\\deployed_app_proxy_connect.ini
 
 python driver_packager.py package_specs\\deployment_service_driver.ini
 python driver_packager.py package_specs\\vlan_auto_service.ini
