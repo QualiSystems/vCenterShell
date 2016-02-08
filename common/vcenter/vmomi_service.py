@@ -474,6 +474,14 @@ class pyVmomiService:
                 return back.port
         return None
 
+    def get_vnic_by_mac_address(self, vm, mac_address):
+        for device in vm.config.hardware.device:
+            if isinstance(device, vim.vm.device.VirtualEthernetCard)\
+               and hasattr(device, 'macAddress') and device.macAddress == mac_address:
+                # mac address is unique
+                return device
+        return None
+
     @staticmethod
     def vm_reconfig_task(vm, device_change):
         """

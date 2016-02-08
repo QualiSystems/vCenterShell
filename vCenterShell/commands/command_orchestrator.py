@@ -1,3 +1,4 @@
+import traceback
 from logging import getLogger
 import jsonpickle
 import time
@@ -88,7 +89,6 @@ class CommandOrchestrator(object):
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
 
     def connect_bulk(self, context, request):
-
         dv_switch_path = self.vc_data_model.default_dvswitch_path
         dv_switch_name = self.vc_data_model.default_dvswitch_name
         port_group_path = self.vc_data_model.default_port_group_path
@@ -486,8 +486,7 @@ class CommandOrchestrator(object):
                     connection_details,
                     self.virtual_switch_disconnect_command.disconnect_from_networks,
                     vm_uuid,
-                    mappings,
-                    default_network)
+                    mappings)
 
                 for connection_result in connection_results:
                     result = ActionResult()
@@ -496,15 +495,15 @@ class CommandOrchestrator(object):
                     result.infoMessage = 'VLAN successfully set'
                     result.errorMessage = ''
                     result.success = True
-                    result.updatedInterface = connection_result.mac_address
+                    result.updatedInterface = connection_result.vnic.macAddress
                     results.append(result)
 
-            except Exception as ex:
+            except Exception:
                 error_result = ActionResult()
                 error_result.actionId = str(action.actionId)
                 error_result.type = str(action.type)
                 error_result.infoMessage = str('')
-                error_result.errorMessage = str(ex)
+                error_result.errorMessage = traceback.format_exc()
                 error_result.success = False
                 error_result.updatedInterface = None
                 results.append(error_result)

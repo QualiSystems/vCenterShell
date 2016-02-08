@@ -94,7 +94,8 @@ class VirtualMachinePortGroupConfigurer(object):
             spec = self.vnic_service.get_device_spec(item.vnic, item.connect)
             vnics_change.append(spec)
         logger.debug('reconfiguring vm: {0} with: {1}'.format(vm, vnics_change))
-        return self.reconfig_vm(vnics_change, vm)
+        self.reconfig_vm(vnics_change, vm)
+        return mapping
 
     def reconfig_vm(self, device_change, vm):
         logger.info("Changing network...")

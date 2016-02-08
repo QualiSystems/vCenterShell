@@ -8,6 +8,7 @@
 from pyVmomi import vim
 from vCenterShell.network.vnic.vnic_service import VNicService
 from common.logger import getLogger
+from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
 
 _logger = getLogger("vCenterShell")
 
@@ -28,20 +29,20 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.port_group_configurer = port_group_configurer
         self.default_network = default_network
 
-    def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings, default_network_name):
+    def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings):
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         if not vm:
             raise ValueError('VM having UUID {0} not found'.format(vm_uuid))
 
-        default_network = self.pyvmomi_service.get_network_by_full_name(si, default_network_name)
+        default_network = self.pyvmomi_service.get_network_by_full_name(si, self.default_network)
 
         mappings = []
         for vm_network_remove_mapping in vm_network_remove_mappings:
-            network = self.pyvmomi_service.get_network_by_mac_address(vm, vm_network_remove_mapping.mac_address)
-            if network is None:
-                raise KeyError('Network having MAC address {0} not found'.format(vm_network_remove_mapping.mac_address))
+            vnic = self.pyvmomi_service.get_vnic_by_mac_address(vm, vm_network_remove_mapping.mac_address)
+            if vnic is None:
+                raise KeyError('VNIC not found by MAC address {0}'.format(vm_network_remove_mapping.mac_address))
 
-            mappings += self.port_group_configurer.create_mapping_for_network(vm, network, default_network)
+            mappings.append(VNicDeviceMapper(connect=False, network=default_network, vnic=vnic))
 
         return self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
 
