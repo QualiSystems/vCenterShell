@@ -261,7 +261,7 @@ class pyVmomiService:
 
         obj = None
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vimtype, True)
+            content.rootFolder, vimtype, True)
         for c in container.view:
             if name:
                 if c.name == name:
@@ -459,6 +459,28 @@ class pyVmomiService:
             if network_key == network.key:
                 return network
         return
+
+    def get_network_by_mac_address(self, vm, mac_address):
+        backing = [device.backing for device in vm.config.hardware.device
+                    if isinstance(device, vim.vm.device.VirtualEthernetCard)
+                    and hasattr(device, 'macAddress')
+                    and device.macAddress == mac_address]
+
+        if backing:
+            back = backing[0]
+            if hasattr(back, 'network'):
+                return back.network
+            if hasattr(back, 'port'):
+                return back.port
+        return None
+
+    def get_vnic_by_mac_address(self, vm, mac_address):
+        for device in vm.config.hardware.device:
+            if isinstance(device, vim.vm.device.VirtualEthernetCard)\
+               and hasattr(device, 'macAddress') and device.macAddress == mac_address:
+                # mac address is unique
+                return device
+        return None
 
     @staticmethod
     def vm_reconfig_task(vm, device_change):

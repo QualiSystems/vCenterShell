@@ -1204,3 +1204,63 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         #assert
         self.assertTrue(vm.PowerOffVM_Task.called)
         self.assertTrue(vm.Destroy_Task.called)
+
+    def test_vm_get_network_by_name(self):
+        # Arrange
+        pv_service = pyVmomiService(None, None)
+        pv_service.wait_for_task = Mock()
+
+        network = Mock()
+        network.name = 'main_network'
+
+        backing = Mock()
+        backing.network = network
+
+        virtual_card = create_autospec(vim.vm.device.VirtualEthernetCard)
+        virtual_card.macAddress = 'AA-BB'
+        virtual_card.backing = backing
+
+        hardware = Mock()
+        hardware.device = [virtual_card]
+
+        config = Mock()
+        config.hardware = hardware
+
+        vm = Mock()
+        vm.config = config
+
+        # Act
+        actual_network = pv_service.get_network_by_mac_address(vm, 'AA-BB')
+
+        # Assert
+        self.assertEqual(actual_network.name, 'main_network')
+
+    def test_vm_get_network_by_name(self):
+        # Arrange
+        pv_service = pyVmomiService(None, None)
+        pv_service.wait_for_task = Mock()
+
+        network = Mock()
+        network.name = 'main_network'
+
+        backing = Mock()
+        backing.network = network
+
+        virtual_card = create_autospec(vim.vm.device.VirtualEthernetCard)
+        virtual_card.macAddress = 'AA-BB'
+        virtual_card.backing = backing
+
+        hardware = Mock()
+        hardware.device = [virtual_card]
+
+        config = Mock()
+        config.hardware = hardware
+
+        vm = Mock()
+        vm.config = config
+
+        # Act
+        actual_network = pv_service.get_network_by_mac_address(vm, 'BB-CC')
+
+        # Assert
+        self.assertIsNone(actual_network)

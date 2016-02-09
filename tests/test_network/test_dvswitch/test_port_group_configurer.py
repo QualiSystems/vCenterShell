@@ -56,12 +56,12 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertIsNone(res)
 
     def test_disconnect_all_networks(self):
-        res = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network))
-        self.assertEquals(res, "TASK OK")
+        mapping = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network))
+        self.assertFalse(mapping[0].connect)
 
     def test_disconnect_network(self):
-        res = self.configurer.disconnect_network(self.vm, self.network,  Mock(spec=vim.Network))
-        self.assertEquals(res, "TASK OK")
+        mapping = self.configurer.disconnect_network(self.vm, self.network,  Mock(spec=vim.Network))
+        self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):
         ConnectRequest('vnic 1', Mock(spec=vim.Network))

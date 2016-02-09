@@ -11,10 +11,6 @@ class VCenterShellDriver:
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
 
-    def deploy_from_template(self, context, deploy_data):
-        return self.command_orchestrator.deploy_from_template(context, deploy_data)
-
-    # connect_bulk
     def Connect(self, context, request):
         return self.command_orchestrator.connect_bulk(context, request)
 
@@ -53,3 +49,5 @@ class VCenterShellDriver:
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
+    def deploy_from_template(self, context, deploy_data):
+        return self.command_orchestrator.deploy_from_template(context, deploy_data)

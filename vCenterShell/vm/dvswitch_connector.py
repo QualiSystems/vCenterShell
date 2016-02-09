@@ -11,6 +11,12 @@ class VmNetworkMapping(object):
         self.vlan_spec = ''
 
 
+class VmNetworkRemoveMapping(object):
+    def __init__(self):
+        self.vnic_name = ''
+        self.network_name = ''
+
+
 class ConnectRequest(object):
     def __init__(self, vnic_name, network):
         """

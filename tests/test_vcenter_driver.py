@@ -74,7 +74,7 @@ class Test_command_orchestrator(TestCase):
         self.setUp()
         deploy_data = Mock()
 
-        res = self.driver.deploy_from_template(self.context, deploy_data)
+        res = self.driver.remote_destroy_vm(self.context, deploy_data)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.deploy_from_template.called_with(self.context,

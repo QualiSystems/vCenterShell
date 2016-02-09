@@ -7,6 +7,7 @@ logger = getLogger("App Orchestration Driver")
 
 
 def execute_app_orchestration():
+    time.sleep(20)
     # Retrieve data from environment variables
     reservation_id = helpers.get_reservation_context_details().id
     resource_details = helpers.get_resource_context_details_dict()
@@ -119,10 +120,11 @@ def deploy_app(api, app_name, deployment_service, reservation_id):
         return api.ExecuteDeployAppCommand(reservation_id, app_name)
     except CloudShellAPIError as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
-        exit(1)
+        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
-        exit(1)
+        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
+
 
 
 
