@@ -330,10 +330,10 @@ class CommandOrchestrator(object):
         preforms a restart to the vm
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
-        :param float delay: the time to wait between the power on and off
+        :param number delay: the time to wait between the power on and off
         """
         self.power_off(context, ports)
-        time.sleep(delay)
+        time.sleep(float(delay))
         return self.power_on(context, ports)
 
     def _power_command(self, context, ports, command):
