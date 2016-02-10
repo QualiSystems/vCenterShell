@@ -127,10 +127,10 @@ def deploy_app(api, app_name, deployment_service, reservation_id):
         return api.ExecuteDeployAppCommand(reservation_id, app_name)
     except CloudShellAPIError as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
-        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, exc.message))
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
-        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
 
 
 
