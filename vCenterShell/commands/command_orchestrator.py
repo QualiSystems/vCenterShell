@@ -372,6 +372,13 @@ class CommandOrchestrator(object):
             deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
             return deployed_app_resource_model.vm_uuid
 
+    def _get_vnic_name(self, action):
+        vnic_name_values = [attr.attributeValue for attr in action.customActionAttributes
+                          if attr.attributeName == 'Vnic Name']
+        if vnic_name_values:
+            return vnic_name_values[0]
+        return None
+
     def _parse_remote_model(self, context):
         """
         parse the remote resource model and adds its full name
@@ -433,6 +440,10 @@ class CommandOrchestrator(object):
             vnic_to_network.port_group_path = port_group_path
             vnic_to_network.vlan_id = vlan
             vnic_to_network.vlan_spec = action.connectionParams.mode
+
+            vnic_name = self._get_vnic_name(action)
+            if vnic_name:
+                vnic_to_network.vnic_name = vnic_name
 
             mappings.append(vnic_to_network)
         if mappings:
