@@ -15,7 +15,7 @@ class VnicToNetworkMapper(object):
         vnics_to_network_mapping = self._map_vnic_to_network(vnics, existing_network, default_network)
         for request in requests:
             if request.vnic_name:
-                if not vnics_to_network_mapping[request.vnic_name]:
+                if request.vnic_name not in vnics_to_network_mapping:
                     raise Exception('the vnic: {0} does not exist'.format(request.vnic))
                 mapping[request.vnic_name] = request.network
                 vnics_to_network_mapping.pop(request.vnic_name)
