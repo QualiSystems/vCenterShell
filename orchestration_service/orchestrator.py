@@ -7,7 +7,7 @@ logger = getLogger("App Orchestration Driver")
 
 
 def execute_app_orchestration():
-    time.sleep(20)
+    #time.sleep(20)
     # Retrieve data from environment variables
     reservation_id = helpers.get_reservation_context_details().id
     resource_details = helpers.get_resource_context_details_dict()

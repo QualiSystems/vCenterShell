@@ -2,6 +2,7 @@ import traceback
 from logging import getLogger
 import jsonpickle
 import time
+from multiprocessing.pool import ThreadPool
 from pyVim.connect import SmartConnect, Disconnect
 from common.cloudshell.driver_helper import CloudshellDriverHelper
 from common.cloudshell.resource_remover import CloudshellResourceRemover
@@ -101,21 +102,28 @@ class CommandOrchestrator(object):
                                              context.reservation.domain)
         connection_details = self.cs_helper.get_connection_details(session, context.resource)
 
+        pool = ThreadPool()
+        async_results = []
         for action in holder.driverRequest.actions:
-
+            vm_uuid = self._get_vm_uuid(action, session)
+            if vm_uuid == '':
+                continue
             if action.type == 'setVlan':
-                vm_uuid = self._get_vm_uuid(action, session)
-                if vm_uuid == '':
-                    continue
+                res = pool.apply_async(self._set_vlan_bulk,
+                                       (action, default_network, dv_switch_name, dv_switch_path,
+                                        port_group_path,
+                                        vm_uuid, connection_details))
 
-                results += self._set_vlan_bulk(action, default_network, dv_switch_name, dv_switch_path, port_group_path,
-                                               vm_uuid, connection_details)
             elif action.type == 'removeVlan':
-                vm_uuid = self._get_vm_uuid(action, session)
-                if vm_uuid == '':
-                    continue
 
-                results += self._remove_vlan_bulk(action, default_network, vm_uuid, connection_details)
+                res = pool.apply_async(self._remove_vlan_bulk,
+                                       (action, default_network, vm_uuid, connection_details))
+
+            if res:
+                async_results.append(res)
+
+        for async_result in async_results:
+            results += async_result.get()
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -199,10 +207,10 @@ class CommandOrchestrator(object):
         connection_results = \
             self.command_wrapper.execute_command_with_connection(
                 connection_details,
-                                                                 self.virtual_switch_connect_command.connect_to_networks,
-                                                                 vm_uuid,
-                                                                 [vnic_to_network],
-                                                                 self.vc_data_model.default_network)
+                self.virtual_switch_connect_command.connect_to_networks,
+                vm_uuid,
+                [vnic_to_network],
+                self.vc_data_model.default_network)
 
         return set_command_result(result=connection_results, unpicklable=False)
 
@@ -372,7 +380,7 @@ class CommandOrchestrator(object):
         """
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
-        resource = context.remote_endpoints[0]        
+        resource = context.remote_endpoints[0]
         resource_details = self.resource_model_parser.convert_to_resource_model(resource)
         resource_details.fullname = resource.fullname
         return resource_details
