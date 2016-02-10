@@ -7,7 +7,6 @@ logger = getLogger("App Orchestration Driver")
 
 
 def execute_app_orchestration():
-    time.sleep(20)
     # Retrieve data from environment variables
     reservation_id = helpers.get_reservation_context_details().id
     resource_details = helpers.get_resource_context_details_dict()
@@ -32,8 +31,7 @@ def execute_app_orchestration():
                     [AttributeNameValue("VM_UUID", deployment_result.VmUuid),
                      AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
 
-    # connect all
-    connect_all(api, reservation_id)
+    connect_routes_on_deployed_app(api, reservation_id, deployment_result.LogicalResourceName)
 
     # "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
@@ -50,9 +48,18 @@ def execute_app_orchestration():
     logger.info("Deployed {0} Successfully".format(app_name))
 
 
-def connect_all(api, reservation_id):
+def connect_routes_on_deployed_app(api, reservation_id, resource_name):
     try:
-        api.ExecuteEnvironmentCommand(reservation_id, "Connect All")
+        reservation = api.GetReservationDetails(reservation_id)
+        connectors = [connector for connector in reservation.ReservationDescription.Connectors
+                        if connector.Source == resource_name or connector.Target == resource_name]
+        endpoints = []
+        for endpoint in connectors:
+            endpoints.append(endpoint.Target)
+            endpoints.append(endpoint.Source)
+
+        api.ConnectRoutesInReservation(reservation_id, endpoints, 'bi')
+
     except CloudShellAPIError as exc:
         logger.error("Error executing connect all. Error: {0}".format(exc.rawxml))
         exit(1)
@@ -120,10 +127,10 @@ def deploy_app(api, app_name, deployment_service, reservation_id):
         return api.ExecuteDeployAppCommand(reservation_id, app_name)
     except CloudShellAPIError as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
-        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, exc.message))
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
-        return "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
 
 
 
