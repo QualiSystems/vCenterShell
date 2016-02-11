@@ -130,11 +130,11 @@
     </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Cloud Provider">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Cloud Provider" IsAdminOnly="true">
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
-        <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
