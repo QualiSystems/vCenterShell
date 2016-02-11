@@ -21,7 +21,7 @@ class test_DeploymentService(unittest.TestCase):
 
         helpers.get_resource_context_details = Mock()
 
-        os.environ["Name"] = "app name"
+        os.environ["NAME"] = "app name"
 
         data_holder = deploymentService._get_data_holder()
 
