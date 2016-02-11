@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import create_autospec
-from qualipy.api.cloudshell_api import ResourceInfo, ResponseInfo, ResourceAttribute
+from cloudshell.api.cloudshell_api import ResourceInfo, ResourceAttribute
 from qualipy.scripts.cloudshell_scripts_helpers import ResourceContextDetails
 
 from common.model_factory import ResourceModelParser
