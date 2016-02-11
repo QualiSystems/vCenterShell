@@ -21,6 +21,8 @@ class test_DeploymentService(unittest.TestCase):
 
         helpers.get_resource_context_details = Mock()
 
+        os.environ["NAME"] = "app name"
+
         data_holder = deploymentService._get_data_holder()
 
         self.assertEquals(data_holder.template_model.vCenter_resource_name, "vCenter")
@@ -32,7 +34,7 @@ class test_DeploymentService(unittest.TestCase):
         self.assertEquals(data_holder.vm_cluster_model.cluster_name, "some_cluster")
         self.assertEquals(data_holder.vm_cluster_model.resource_pool, "some_resource_pool")
 
-        self.assertTrue(data_holder.power_on)
+        self.assertFalse(data_holder.power_on)
 
     def test_execute_deployment_service(self):
         session = Mock()
