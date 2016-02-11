@@ -58,6 +58,11 @@ def connect_routes_on_deployed_app(api, reservation_id, resource_name):
             endpoints.append(endpoint.Target)
             endpoints.append(endpoint.Source)
 
+        if len(endpoints) == 0:
+            logger.info("No routes to connect for app {0}".format(resource_name))
+            return
+
+        logger.info("Executing connect for app {0}".format(resource_name))
         api.ConnectRoutesInReservation(reservation_id, endpoints, 'bi')
 
     except CloudShellAPIError as exc:
@@ -124,7 +129,7 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
 def deploy_app(api, app_name, deployment_service, reservation_id):
     try:
         logger.info("Executing '{0}' on app '{1}'...".format(deployment_service, app_name))
-        return api.ExecuteDeployAppCommand(reservation_id, app_name)
+        return api.ExecuteDeployAppCommand(reservation_id, app_name,[InputNameValue("Name", app_name)])
     except CloudShellAPIError as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
         raise Exception("Error deploying app {0}. Error: {1}".format(app_name, exc.message))

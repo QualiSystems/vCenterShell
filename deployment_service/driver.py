@@ -36,8 +36,10 @@ class DeploymentServiceDriver(object):
 
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
+        template_model.app_name = helpers.get_user_param("Name")
+
         # get power state of the cloned VM
-        power_on = self.cs_retriever_service.getPowerStateAttributeData(resource_context)
+        power_on = False  # self.cs_retriever_service.getPowerStateAttributeData(resource_context)
         # get cluster and resource pool
         vm_cluster_model = self.cs_retriever_service.getVMClusterAttributeData(resource_context)
         # get datastore
