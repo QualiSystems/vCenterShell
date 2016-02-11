@@ -8,7 +8,7 @@ class VirtualMachineDeployer(object):
 
     def deploy_from_template(self, si, data_holder):
         # generate unique name
-        vm_name = self.name_generator(data_holder.template_model.template_name)
+        vm_name = self.name_generator(data_holder.template_model.app_name)
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=data_holder.template_model.template_name,

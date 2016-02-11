@@ -468,12 +468,22 @@ class CommandOrchestrator(object):
                 error_result.actionId = str(action.actionId)
                 error_result.type = str(action.type)
                 error_result.infoMessage = str('')
-                error_result.errorMessage = str(ex)
+                error_result.errorMessage = self._get_error_message_from_exception(ex)
                 error_result.success = False
                 error_result.updatedInterface = None
                 results.append(error_result)
 
         return results
+
+    @staticmethod
+    def _get_error_message_from_exception(ex):
+        error_message = ''
+        if hasattr(ex, 'msg'):
+            error_message = ex.msg
+        if hasattr(ex, 'faultMessage'):
+            if hasattr(ex.faultMessage, 'message'):
+                error_message += '. ' + ex.faultMessage.message
+        return error_message
 
     def _remove_vlan_bulk(self, action, default_network, vm_uuid, connection_details):
         mappings = []
@@ -517,12 +527,12 @@ class CommandOrchestrator(object):
                     result.updatedInterface = connection_result.vnic.macAddress
                     results.append(result)
 
-            except Exception:
+            except Exception as ex:
                 error_result = ActionResult()
                 error_result.actionId = str(action.actionId)
                 error_result.type = str(action.type)
                 error_result.infoMessage = str('')
-                error_result.errorMessage = traceback.format_exc()
+                error_result.errorMessage = self._get_error_message_from_exception(ex)
                 error_result.success = False
                 error_result.updatedInterface = None
                 results.append(error_result)
