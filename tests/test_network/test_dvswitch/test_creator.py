@@ -18,7 +18,7 @@ class TestDvPortGroupCreator(TestCase):
 
         # Assert
         self.assertRaises(Exception,
-                          dv_port_group_creator.create_dv_port_group, 'port_name', 'switch_name', 'switch_path', Mock(),
+                          dv_port_group_creator._create_dv_port_group, 'port_name', 'switch_name', 'switch_path', Mock(),
                           None, None)
 
 
@@ -35,7 +35,7 @@ class TestDvPortGroupCreator(TestCase):
         DvPortGroupCreator.dv_port_group_create_task = Mock()
 
         # Act
-        dv_port_group_creator.create_dv_port_group('port_name', 'switch_name', 'switch_path',
+        dv_port_group_creator._create_dv_port_group('port_name', 'switch_name', 'switch_path',
                                                    create_autospec(spec=vim.ServiceInstance), None, 1001)
 
         # Assert
