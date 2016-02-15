@@ -4,7 +4,7 @@ import unittest
 
 from mock import Mock
 
-from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from common.cloudshell.resource_remover import CloudshellResourceRemover
+from common.cloud_shell.resource_remover import CloudshellResourceRemover
 
 
 class TestResourceRemover(TestCase):

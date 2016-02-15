@@ -4,8 +4,8 @@ import jsonpickle
 import time
 from multiprocessing.pool import ThreadPool
 from pyVim.connect import SmartConnect, Disconnect
-from common.cloudshell.driver_helper import CloudshellDriverHelper
-from common.cloudshell.resource_remover import CloudshellResourceRemover
+from common.cloud_shell.driver_helper import CloudshellDriverHelper
+from common.cloud_shell.resource_remover import CloudshellResourceRemover
 from common.model_factory import ResourceModelParser
 from common.utilites.command_result import set_command_result
 from common.utilites.common_name import generate_unique_name

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
 
 
 class TestConnectionDetailRetriever(TestCase):
