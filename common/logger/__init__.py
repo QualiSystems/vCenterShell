@@ -10,6 +10,8 @@ import os
 import logging
 from logging.config import fileConfig
 
+import time
+
 
 def get_logging_config(level_console="DEBUG", level_file=None, logfile=None):
     """
@@ -58,18 +60,20 @@ def get_logging_config(level_console="DEBUG", level_file=None, logfile=None):
             },
         }
     }
-    if logfile:
-        logger["handlers"]["file"] = {
-                'level': level_file,
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': logfile,
-                'maxBytes': 1024 * 10,
-                'backupCount': 10,
-                'formatter': 'simple'
-                }
+    if not logfile:
+        logfile = 'vCenterShell_{0}.log'.format(time.strftime("%Y%m%d-%H%M%S"))
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), logfile)
+
+    logger["handlers"]["file"] = {
+            'level': level_file,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': logfile,
+            'maxBytes': 1024 * 10,
+            'backupCount': 10,
+            'formatter': 'simple'
+            }
     return logger
 
-# print os.environ.get("LOG_LEVEL") or "DEBUG"
 initial_log_level = os.environ.get("LOG_LEVEL") or "DEBUG"
 logging.config.dictConfig(get_logging_config(initial_log_level))
 
