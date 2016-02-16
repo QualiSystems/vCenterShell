@@ -1,4 +1,5 @@
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
+import time
 
 
 class VCenterShellDriver:
@@ -12,6 +13,7 @@ class VCenterShellDriver:
         self.command_orchestrator = CommandOrchestrator(context)
 
     def Connect(self, context, request):
+        time.sleep(10)
         return self.command_orchestrator.connect_bulk(context, request)
 
     # obsolete
