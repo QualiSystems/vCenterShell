@@ -1,8 +1,9 @@
-import traceback
-from logging import getLogger
-import jsonpickle
+import copy
 import time
+import uuid
+from logging import getLogger
 from multiprocessing.pool import ThreadPool
+import jsonpickle
 from pyVim.connect import SmartConnect, Disconnect
 from common.cloudshell.driver_helper import CloudshellDriverHelper
 from common.cloudshell.resource_remover import CloudshellResourceRemover
@@ -15,6 +16,7 @@ from common.wrappers.command_wrapper import CommandWrapper
 from models.ActionResult import ActionResult
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
+from vCenterShell.commands.combine_action import CombineAction
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
@@ -89,6 +91,34 @@ class CommandOrchestrator(object):
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
 
+    def _group_actions_by_uuid_and_mode(self, actions):
+        key_to_actions = dict()
+
+        # group by machine and vlan mode and action type
+        for action in actions:
+            vm_uuid = self._get_vm_uuid(action)
+            vlan_mode = action.connectionParams.mode
+            action_type = action.type
+            key = (vm_uuid, vlan_mode, action_type)
+            if key not in key_to_actions:
+                key_to_actions[key] = []
+            key_to_actions[key].append(action)
+
+        # generate new keys
+        return {uuid.uuid4(): action
+                for key, action in key_to_actions}
+
+    def _create_new_action_by_mapping(self, mapping):
+        actions = []
+
+        for key, actions_arr in mapping.items():
+            action = copy.deepcopy(actions_arr[0])
+            action.actionId = key
+            for act in actions_arr[1:]:
+                CombineAction.combine(action, act)
+            actions.append(action)
+        return actions
+
     def connect_bulk(self, context, request):
         dv_switch_path = self.vc_data_model.default_dvswitch_path
         dv_switch_name = self.vc_data_model.default_dvswitch_name
@@ -104,10 +134,12 @@ class CommandOrchestrator(object):
 
         pool = ThreadPool()
         async_results = []
-        for action in holder.driverRequest.actions:
-            vm_uuid = self._get_vm_uuid(action, session)
-            if vm_uuid == '':
-                continue
+
+        mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions, session)
+        unified_actions = self._create_new_action_by_mapping(mappings)
+
+        for key, action in unified_actions.items():
+            vm_uuid = self._get_vm_uuid(action)
             if action.type == 'setVlan':
                 res = pool.apply_async(self._set_vlan_bulk,
                                        (action, default_network, dv_switch_name, dv_switch_path,
@@ -123,7 +155,12 @@ class CommandOrchestrator(object):
                 async_results.append(res)
 
         for async_result in async_results:
-            results += async_result.get()
+            action_results = async_result.get()
+            for action_result in action_results:
+                for unified_action in unified_actions[action_results.actionId]:
+                    copied_action = copy.deepcopy(action_result)
+                    copied_action.actionId = unified_action.actionId
+                    results.append(copied_action)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -362,19 +399,18 @@ class CommandOrchestrator(object):
                                                                    resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
 
-    def _get_vm_uuid(self, action, session):
+    def _get_vm_uuid(self, action):
         vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
                           if attr.attributeName == 'VM_UUID']
-        if vm_uuid_values:
+
+        if vm_uuid_values and vm_uuid_values[0]:
             return vm_uuid_values[0]
-        else:
-            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
-            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
-            return deployed_app_resource_model.vm_uuid
+
+        raise ValueError('VM_UUID is missing on action attributes')
 
     def _get_vnic_name(self, action):
         vnic_name_values = [attr.attributeValue for attr in action.customActionAttributes
-                          if attr.attributeName == 'Vnic Name']
+                            if attr.attributeName == 'Vnic Name']
         if vnic_name_values:
             return vnic_name_values[0]
         return None
@@ -464,13 +500,7 @@ class CommandOrchestrator(object):
                     results.append(result)
 
             except Exception as ex:
-                error_result = ActionResult()
-                error_result.actionId = str(action.actionId)
-                error_result.type = str(action.type)
-                error_result.infoMessage = str('')
-                error_result.errorMessage = self._get_error_message_from_exception(ex)
-                error_result.success = False
-                error_result.updatedInterface = None
+                error_result = self._create_failure_result(action, ex)
                 results.append(error_result)
 
         return results
@@ -488,11 +518,16 @@ class CommandOrchestrator(object):
     def _remove_vlan_bulk(self, action, default_network, vm_uuid, connection_details):
         mappings = []
         results = []
-
         interface_attributes = [attr.attributeValue for attr in action.connectorAttributes
                                 if attr.attributeName == 'Interface']
 
-        if not interface_attributes:
+        for interface_attribute in interface_attributes:
+            vm_network_remove_mapping = VmNetworkRemoveMapping()
+            vm_network_remove_mapping.mac_address = interface_attribute
+            vm_network_remove_mapping.vm_uuid = vm_uuid
+            mappings.append(vm_network_remove_mapping)
+
+        if not mappings:
             error_result = ActionResult()
             error_result.actionId = str(action.actionId)
             error_result.type = str(action.type)
@@ -500,16 +535,8 @@ class CommandOrchestrator(object):
             error_result.errorMessage = 'Interface attribute is missing on connectorAttributes for removeVlan action'
             error_result.success = False
             error_result.updatedInterface = None
-            results.append(error_result)
-            return results
-
-        vm_network_remove_mapping = VmNetworkRemoveMapping()
-        vm_network_remove_mapping.mac_address = interface_attributes[0]
-        vm_network_remove_mapping.vm_uuid = vm_uuid
-
-        mappings.append(vm_network_remove_mapping)
-
-        if mappings:
+            results = [error_result]
+        else:
             try:
                 connection_results = self.command_wrapper.execute_command_with_connection(
                     connection_details,
@@ -518,23 +545,33 @@ class CommandOrchestrator(object):
                     mappings)
 
                 for connection_result in connection_results:
-                    result = ActionResult()
-                    result.actionId = str(action.actionId)
-                    result.type = str(action.type)
-                    result.infoMessage = 'VLAN successfully set'
-                    result.errorMessage = ''
-                    result.success = True
-                    result.updatedInterface = connection_result.vnic.macAddress
+                    result = self._create_successful_result(action, connection_result)
                     results.append(result)
 
             except Exception as ex:
-                error_result = ActionResult()
-                error_result.actionId = str(action.actionId)
-                error_result.type = str(action.type)
-                error_result.infoMessage = str('')
-                error_result.errorMessage = self._get_error_message_from_exception(ex)
-                error_result.success = False
-                error_result.updatedInterface = None
+                error_result = self._create_failure_result(action, ex)
                 results.append(error_result)
 
         return results
+
+    @staticmethod
+    def _create_successful_result(action, connection_result):
+        result = ActionResult()
+        result.actionId = str(action.actionId)
+        result.type = str(action.type)
+        result.infoMessage = 'VLAN successfully set'
+        result.errorMessage = ''
+        result.success = True
+        result.updatedInterface = connection_result.vnic.macAddress
+        return result
+
+    @staticmethod
+    def _create_failure_result(action, ex):
+        error_result = ActionResult()
+        error_result.actionId = str(action.actionId)
+        error_result.type = str(action.type)
+        error_result.infoMessage = str('')
+        error_result.errorMessage = CommandOrchestrator._get_error_message_from_exception(ex)
+        error_result.success = False
+        error_result.updatedInterface = None
+        return error_result
