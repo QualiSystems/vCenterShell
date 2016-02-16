@@ -3,8 +3,8 @@ from mock import Mock
 from pyVmomi import vim
 
 from common.model_factory import ResourceModelParser
-from common.cloudshell.conn_details_retriever import ResourceConnectionDetailsRetriever
-from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
