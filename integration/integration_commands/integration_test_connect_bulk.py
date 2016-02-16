@@ -1,49 +1,45 @@
 from unittest import TestCase
 
 import jsonpickle
-from mock import Mock
-from pyVim.connect import SmartConnect, Disconnect
+from mock import Mock, patch
 
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
-from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from pyVmomi import vim
+from vCenterShell.commands.command_orchestrator import CommandOrchestrator
+
+
+class MockResourceParser(object):
+    @staticmethod
+    def convert_to_resource_model(dummy, resource):
+        return resource
 
 
 class TestConnectBulk(TestCase):
+    @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
+           MockResourceParser.convert_to_resource_model)
     def setUp(self):
-        py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
-        cred = TestCredentials()
-        self.si = py_vmomi_service.connect(cred.host, cred.username, cred.password, cred.port)
-        synchronous_task_waiter = SynchronousTaskWaiter()
-        mapper = VnicToNetworkMapper(DvPortGroupNameGenerator())
-        dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
-        virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
-                                                                                  synchronous_task_waiter,
-                                                                                  mapper,
-                                                                                  VNicService())
-
-        connector = VirtualSwitchToMachineConnector(
-            dv_port_group_creator,
-            virtual_machine_port_group_configurer)
-
-        self.vc_data_model = Mock()
-        self.vc_data_model.default_dvswitch_path = 'QualiSB'
-        self.vc_data_model.default_dvswitch_name = 'dvSwitch'
-        self.vc_data_model.default_port_group_path = 'QualiSB'
-        self.vc_data_model.default_network = 'QualiSB/anetwork'
-        self.orc_connection = ConnectionCommandOrchestrator(self.vc_data_model, connector)
+        self.resource = Mock()
+        self.context = Mock()
+        session = Mock()
+        remote_resource = Mock()
+        remote_resource.fullname = 'this is full name of the remote resource'
+        remote_resource.uuid = 'this is full uuis of the remote resource'
+        self.connection_details = TestCredentials()
+        self.context.resource = self.resource
+        self.context.remote_endpoints = [self.resource]
+        self.command_orchestrator = CommandOrchestrator(self.context)
+        self.command_orchestrator.cs_helper = Mock()
+        self.command_orchestrator.cs_helper.get_session = Mock(return_value=session)
+        self.command_orchestrator.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
+        self.command_orchestrator.vc_data_model.default_dvswitch_path = 'QualiSB'
+        self.command_orchestrator.vc_data_model.default_dvswitch_name = 'dvSwitch'
+        self.command_orchestrator.vc_data_model.default_port_group_path = 'QualiSB'
+        self.command_orchestrator.vc_data_model.default_network = 'QualiSB/anetwork'
+        self.ports = Mock()
+        self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
     def test_connect_bulk(self):
         json = self._get_json()
-        results = self.orc_connection.connect_bulk(self.si, json)
+        results = self.command_orchestrator.connect_bulk(self.context, json)
         print results
 
     def _get_json(self):
@@ -71,7 +67,7 @@ class TestConnectBulk(TestCase):
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "422239d1-718a-f918-8eca-a70f0667dbbf",
+                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
                                 "type": "customAttribute"
                             }
                         ],
@@ -98,7 +94,7 @@ class TestConnectBulk(TestCase):
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "422239d1-718a-f918-8eca-a70f0667dbbf",
+                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
                                 "type": "customAttribute"
                             }
                         ],
@@ -125,7 +121,7 @@ class TestConnectBulk(TestCase):
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "422239d1-718a-f918-8eca-a70f0667dbbf",
+                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
                                 "type": "customAttribute"
                             }
                         ],

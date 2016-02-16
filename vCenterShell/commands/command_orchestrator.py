@@ -1,10 +1,9 @@
-import copy
 import time
-import uuid
 from logging import getLogger
-from multiprocessing.pool import ThreadPool
+
 import jsonpickle
 from pyVim.connect import SmartConnect, Disconnect
+
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.cloud_shell.resource_remover import CloudshellResourceRemover
 from common.model_factory import ResourceModelParser
@@ -13,10 +12,8 @@ from common.utilites.common_name import generate_unique_name
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
-from models.ActionResult import ActionResult
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
-from vCenterShell.commands.combine_action import CombineAction
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
@@ -30,7 +27,7 @@ from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.deploy import VirtualMachineDeployer
-from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector, VmNetworkMapping, VmNetworkRemoveMapping
+from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
@@ -66,6 +63,13 @@ class CommandOrchestrator(object):
         # Deploy Command
         self.deploy_from_template_command = DeployFromTemplateCommand(deployer=template_deployer)
 
+        # Virtual Switch Revoke
+        self.virtual_switch_disconnect_command = \
+            VirtualSwitchToMachineDisconnectCommand(
+                pyvmomi_service=pv_service,
+                port_group_configurer=virtual_machine_port_group_configurer,
+                default_network=self.vc_data_model.default_network)
+
         # Virtual Switch Connect
         virtual_switch_connect_command = \
             VirtualSwitchConnectCommand(
@@ -75,14 +79,10 @@ class CommandOrchestrator(object):
                 vlan_spec_factory=VlanSpecFactory(),
                 vlan_id_range_parser=VLanIdRangeParser(),
                 logger=getLogger('VirtualSwitchConnectCommand'))
-        self.connection_orchestrator = ConnectionCommandOrchestrator(self.vc_data_model, virtual_switch_connect_command)
+        self.connection_orchestrator = ConnectionCommandOrchestrator(self.vc_data_model,
+                                                                     virtual_switch_connect_command,
+                                                                     self.virtual_switch_disconnect_command)
 
-        # Virtual Switch Revoke
-        self.virtual_switch_disconnect_command = \
-            VirtualSwitchToMachineDisconnectCommand(
-                pyvmomi_service=pv_service,
-                port_group_configurer=virtual_machine_port_group_configurer,
-                default_network=self.vc_data_model.default_network)
         # Destroy VM Command
         self.destroy_virtual_machine_command = \
             DestroyVirtualMachineCommand(pv_service=pv_service,
@@ -102,7 +102,6 @@ class CommandOrchestrator(object):
 
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
-                                                                       session,
                                                                        request)
 
         driver_response = DriverResponse()

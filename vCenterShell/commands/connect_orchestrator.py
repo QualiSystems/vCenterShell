@@ -4,17 +4,16 @@ from multiprocessing.pool import ThreadPool
 
 import jsonpickle
 
-from common.utilites.command_result import set_command_result
 from models.ActionResult import ActionResult
 from models.DeployDataHolder import DeployDataHolder
-from models.DriverResponse import DriverResponse, DriverResponseRoot
 from vCenterShell.commands.combine_action import CombineAction
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
 
 
 class ConnectionCommandOrchestrator(object):
-    def __init__(self, vc_data_model, connections_commands):
-        self.connections_commands = connections_commands
+    def __init__(self, vc_data_model, connector, disconnector):
+        self.connector = connector
+        self.disconnector = disconnector
         self.vc_data_model = vc_data_model
 
     def connect_bulk(self, si, request):
@@ -30,7 +29,7 @@ class ConnectionCommandOrchestrator(object):
         async_results = self.run_async_connection_actions(default_network, dv_switch_name, dv_switch_path,
                                                           port_group_path, si, unified_actions)
 
-        return self._get_async_results(async_results, unified_actions)
+        return self._get_async_results(async_results, mappings)
 
     def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
                                      unified_actions):
@@ -60,8 +59,8 @@ class ConnectionCommandOrchestrator(object):
         results = []
         if mappings:
             try:
-                connection_results = self.connections_commands.connect_to_networks(si, vm_uuid, mappings,
-                                                                                   default_network)
+                connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
+                                                                        default_network)
                 for connection_result in connection_results:
                     result = ActionResult()
                     result.actionId = str(action.actionId)
@@ -70,6 +69,7 @@ class ConnectionCommandOrchestrator(object):
                     result.errorMessage = ''
                     result.success = True
                     result.updatedInterface = connection_result.mac_address
+                    result.network_name = connection_result.network_name
                     results.append(result)
 
             except Exception as ex:
@@ -93,7 +93,7 @@ class ConnectionCommandOrchestrator(object):
             results = [error_result]
         else:
             try:
-                connection_results = self.connections_commands.disconnect_from_networks(si, vm_uuid, mappings)
+                connection_results = self.disconnector.disconnect_from_networks(si, vm_uuid, mappings)
 
                 for connection_result in connection_results:
                     result = self._create_successful_result(action, connection_result)
@@ -132,7 +132,7 @@ class ConnectionCommandOrchestrator(object):
             key_to_actions[key].append(action)
 
         # generate new keys
-        return {uuid.uuid4(): action
+        return {str(uuid.uuid4()): action
                 for key, action in key_to_actions.items()}
 
     @staticmethod
@@ -204,9 +204,19 @@ class ConnectionCommandOrchestrator(object):
             action_results = async_result.get()
             for action_result in action_results:
                 for unified_action in unified_actions[action_result.actionId]:
-                    copied_action = copy.deepcopy(action_result)
-                    copied_action.actionId = unified_action.actionId
-                    results.append(copied_action)
+                    found = False
+                    for vlan_id in unified_action.connectionParams.vlanIds:
+                        name = str(action_result.network_name)
+                        sub = '_{0}_'.format(str(vlan_id))
+                        if name.find(sub) > -1:
+                            found = True
+                            copied_action = copy.deepcopy(action_result)
+                            copied_action.actionId = unified_action.actionId
+                            results.append(copied_action)
+                            break
+                    if found:
+                        break
+
         return results
 
     @staticmethod

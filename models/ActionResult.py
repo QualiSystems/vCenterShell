@@ -8,3 +8,4 @@ class ActionResult(object):
         self.errorMessage = '',
         self.success = True,
         self.updatedInterface = ''
+        self.network_name = ''

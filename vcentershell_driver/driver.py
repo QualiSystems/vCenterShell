@@ -16,10 +16,6 @@ class VCenterShellDriver:
         time.sleep(10)
         return self.command_orchestrator.connect_bulk(context, request)
 
-    # obsolete
-    def _connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
-        return self.command_orchestrator.connect(context, vm_uuid, vlan_id, vlan_spec_type)
-
     def disconnect_all(self, context, ports):
         return self.command_orchestrator.disconnect_all(context, ports)
 
