@@ -38,11 +38,50 @@ class TestConnectBulk(TestCase):
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
     def test_connect_bulk(self):
-        json = self._get_json()
+        json = self._get_connect_json()
         results = self.command_orchestrator.connect_bulk(self.context, json)
         print results
 
-    def _get_json(self):
+    def test_disconnect_bulk(self):
+        json = self._get_disconnect_json()
+        results = self.command_orchestrator.connect_bulk(self.context, json)
+        print results
+
+    def _get_disconnect_json(self):
+        return jsonpickle.encode({
+            "driverRequest": {
+                "actions": [
+                    {
+                        "connectionId": "1cffa2d4-5507-4db3-9119-8212ebb45b94",
+                        "connectionParams": {
+                            "vlanIds": [
+                                "8"
+                            ],
+                            "mode": "Access",
+                            "type": "setVlanParameter"
+                        },
+                        "connectorAttributes": [],
+                        "actionId": "dbb453a6-d897-482f-b7c4-b3d89447a740",
+                        "actionTarget": {
+                            "fullName": "VM Deployment_ab14e2b3",
+                            "fullAddress": "N/A",
+                            "type": "actionTarget"
+                        },
+                        "customActionAttributes": [
+                            {
+                                "attributeName": "VM_UUID",
+                                "attributeValue": "42221c16-d835-b0ab-729d-2b5c702874b4",
+                                "type": "customAttribute"
+                            }
+                        ],
+                        "type": "removeVlan"
+                    }
+                ]
+            }
+        }
+        )
+
+    def _get_connect_json(self):
         return jsonpickle.encode({
             "driverRequest": {
                 "actions": [
