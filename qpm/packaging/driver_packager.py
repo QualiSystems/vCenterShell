@@ -52,12 +52,14 @@ def add_version_file_to_zip(ziph, driver_path=None):
 
 
 def main(args):
-    # time.sleep(15)
     config_file_name = args[1]
 
+    pack_driver(config_file_name)
+
+
+def pack_driver(config_file_name):
     config = ConfigParser.SafeConfigParser()
     config.readfp(open(config_file_name))
-
     driver = config.get('Packaging', DRIVER_FOLDER)
     include_dirs = config.get('Packaging', INCLUDE_DIRS).split(',')
     target_name = config.get('Packaging', TARGET_NAME)
@@ -70,30 +72,21 @@ def main(args):
         is_driver = config.getboolean('Packaging', IS_DRIVER)
     except Exception:
         is_driver = False
-
     version = _get_version()
-
     if is_driver:
         _update_driver_version(driver, version)
     else:
         _update_script_version(target_name, version)
-
     zip_name = os.path.join(DRIVER_FILE_BASE_DIR, target_dir, target_name + '.zip')
-
     print 'Creating script {0} version {1}'.format(zip_name, version)
-
     ensure_dir(zip_name)
-
     # deletes old package
     if os.path.isfile(zip_name):
         os.remove(zip_name)
-
     zip_file = zipfile.ZipFile(zip_name, 'w')
-
     os.chdir(os.path.join(os.getcwd(), driver))
     zip_dir('.', zip_file)
     os.chdir(os.path.join(os.getcwd(), '../'))
-
     if driver.find("\\") != -1:
         path_parts = len(driver.split("\\")) - 1
         if path_parts > 0:
@@ -101,15 +94,11 @@ def main(args):
             for i in range(path_parts):
                 path_fixer += '../'
             os.chdir(os.path.join(os.getcwd(), path_fixer))
-
     add_version_file_to_zip(zip_file)
-
     for file_to_include in include_files:
         add_file(file_to_include, zip_file, False)
-
     for dir_to_include in include_dirs:
         zip_dir(dir_to_include, zip_file)
-
     zip_file.close()
 
 
