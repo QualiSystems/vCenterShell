@@ -103,7 +103,12 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
   </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Vnic Name" Type="String">
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Link Configurations" />
+      </ns0:Rules>
+  </ns0:AttributeInfo>
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
