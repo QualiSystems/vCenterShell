@@ -1,7 +1,7 @@
 import time
-from qualipy.api.cloudshell_api import CloudShellAPISession
+from cloudshell.api.cloudshell_api import CloudShellAPISession
 
-from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 
 
 class CloudshellDriverHelper(object):
@@ -19,8 +19,8 @@ class CloudshellDriverHelper(object):
         :return CloudShellAPISession
         """
         return self.session_class(host=server_address,
-                                  token=token,
-                                  user=None,
+                                  token_id=token,
+                                  username=None,
                                   password=None,
                                   domain=reservation_domain)
 

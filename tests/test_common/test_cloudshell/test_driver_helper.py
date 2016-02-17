@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 from mock import Mock, patch, MagicMock
-from qualipy.api.cloudshell_api import CloudShellAPISession
+from cloudshell.api.cloudshell_api import CloudShellAPISession
 
-from common.cloudshell.driver_helper import CloudshellDriverHelper
+from common.cloud_shell.driver_helper import CloudshellDriverHelper
 
 
 class TestDriverHelper(TestCase):
