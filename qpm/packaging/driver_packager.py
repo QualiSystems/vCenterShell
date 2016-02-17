@@ -103,8 +103,7 @@ def pack_driver(config_file_name):
 
 
 def _update_driver_version(folder_path, version):
-    driver_model_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                     folder_path + '/drivermetadata.xml')
+    driver_model_path = os.path.join(_get_current_dir(), folder_path, 'drivermetadata.xml')
     tree = ET.parse(driver_model_path)
     if tree.getroot().get('Version'):
         tree.getroot().attrib['Version'] = version
@@ -113,10 +112,13 @@ def _update_driver_version(folder_path, version):
         raise Exception('version attribute in: {0} not found'.format(driver_model_path))
 
 
+def _get_current_dir():
+    return os.getcwd()
+
+
 def _update_script_version(script_name, version):
     ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
-    datamodel_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                  'vCenterShellPackage/DataModel/datamodel.xml')
+    datamodel_path = os.path.join(_get_current_dir(),'vCenterShellPackage', 'DataModel', 'datamodel.xml')
 
     tree = ET.parse(datamodel_path)
     scripts = tree.getroot().findall('.//default:ScriptDescriptors/default:ScriptDescriptor/[@Name="{0}"]'

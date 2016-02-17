@@ -1,7 +1,5 @@
 from argparse import ArgumentParser
 from packaging.package_manager import PackageManager
-import pydevd
-pydevd.settrace('127.0.0.1', port=51234, stdoutToServer=True, stderrToServer=True)
 
 
 def main():
