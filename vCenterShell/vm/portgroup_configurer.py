@@ -7,10 +7,11 @@ from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 
 
 class VNicDeviceMapper(object):
-    def __init__(self, vnic, network, connect):
+    def __init__(self, vnic, network, connect, mac):
         self.vnic = vnic
         self.network = network
         self.connect = connect
+        self.vnic_mac = mac
 
 
 class VirtualMachinePortGroupConfigurer(object):
@@ -40,7 +41,7 @@ class VirtualMachinePortGroupConfigurer(object):
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append(VNicDeviceMapper(vnic, network, True))
+            update_mapping.append(VNicDeviceMapper(vnic, network, True, vnic.macAddress))
 
         self.update_vnic_by_mapping(vm, update_mapping)
         return update_mapping

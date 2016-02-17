@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 
 import jsonpickle
 
-from models.ActionResult import ActionResult
+from models.ActionResult import ActionResult, CustomActionResult
 from models.DeployDataHolder import DeployDataHolder
 from vCenterShell.commands.combine_action import CombineAction
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
@@ -46,7 +46,7 @@ class ConnectionCommandOrchestrator(object):
             elif action.type == 'removeVlan':
 
                 res = pool.apply_async(self._remove_vlan_bulk,
-                                       (action, default_network, vm_uuid, si))
+                                       (action, vm_uuid, si))
 
             if res:
                 async_results.append(res)
@@ -62,7 +62,7 @@ class ConnectionCommandOrchestrator(object):
                 connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
                                                                         default_network)
                 for connection_result in connection_results:
-                    result = ActionResult()
+                    result = CustomActionResult()
                     result.actionId = str(action.actionId)
                     result.type = str(action.type)
                     result.infoMessage = 'VLAN successfully set'
@@ -83,7 +83,7 @@ class ConnectionCommandOrchestrator(object):
 
         results = []
         if not mappings:
-            error_result = ActionResult()
+            error_result = CustomActionResult()
             error_result.actionId = str(action.actionId)
             error_result.type = str(action.type)
             error_result.infoMessage = str('')
@@ -149,18 +149,19 @@ class ConnectionCommandOrchestrator(object):
 
     @staticmethod
     def _create_successful_result(action, connection_result):
-        result = ActionResult()
+        result = CustomActionResult()
         result.actionId = str(action.actionId)
         result.type = str(action.type)
+        result.vnic_mac = connection_result.mac
         result.infoMessage = 'VLAN successfully set'
         result.errorMessage = ''
         result.success = True
-        result.updatedInterface = connection_result.vnic.macAddress
+        result.updatedInterface = connection_result.vnic_mac
         return result
 
     @staticmethod
     def _create_failure_result(action, ex):
-        error_result = ActionResult()
+        error_result = CustomActionResult()
         error_result.actionId = str(action.actionId)
         error_result.type = str(action.type)
         error_result.infoMessage = str('')
@@ -204,20 +205,40 @@ class ConnectionCommandOrchestrator(object):
             action_results = async_result.get()
             for action_result in action_results:
                 for unified_action in unified_actions[action_result.actionId]:
-                    found = False
-                    for vlan_id in unified_action.connectionParams.vlanIds:
-                        name = str(action_result.network_name)
-                        sub = '_{0}_'.format(str(vlan_id))
-                        if name.find(sub) > -1:
-                            found = True
-                            copied_action = copy.deepcopy(action_result)
-                            copied_action.actionId = unified_action.actionId
-                            results.append(copied_action)
-                            break
-                    if found:
+                    result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
+                    if result:
+                        results.append(result)
                         break
 
         return results
+
+    @staticmethod
+    def _decombine_setVlan(unified_action, action_result):
+        name = str(action_result.network_name)
+        for vlan_id in unified_action.connectionParams.vlanIds:
+            sub = '_{0}_'.format(str(vlan_id))
+            if name.find(sub) > -1:
+                copied_action = copy.deepcopy(action_result.get_base_class())
+                copied_action.actionId = unified_action.actionId
+                del copied_action.network_name
+                return copied_action
+        return None
+
+    @staticmethod
+    def _decombine_removeVlan(unified_action, action_result):
+        """
+            :type action_result: CustomActionResult
+        """
+        mac = str(action_result.updatedInterface)
+        interfaces = [inter
+                      for inter in unified_action.connectorAttributes
+                      if inter.attributeName == "Interface"]
+        for interface in interfaces:
+            if not unified_action.success or mac == str(interface.attributeValue):
+                copied_action = copy.deepcopy(action_result.get_base_class())
+                copied_action.actionId = unified_action.actionId
+                return copied_action
+        return None
 
     @staticmethod
     def _create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path):
@@ -236,3 +257,13 @@ class ConnectionCommandOrchestrator(object):
 
             mappings.append(vnic_to_network)
         return mappings
+
+    @classmethod
+    def _decombine(self, unified_action, action_result):
+        method_name = '_decombine_' + unified_action.type
+
+        if not hasattr(self, method_name):
+            raise ValueError('Action type {0} is not supported'.format(unified_action.type))
+
+        method = getattr(self, method_name)
+        return method(unified_action, action_result)

@@ -52,25 +52,31 @@ class TestConnectBulk(TestCase):
             "driverRequest": {
                 "actions": [
                     {
-                        "connectionId": "1cffa2d4-5507-4db3-9119-8212ebb45b94",
+                        "connectionId": "9376d21d-f3a5-4308-83a7-1bf63c281436",
                         "connectionParams": {
                             "vlanIds": [
-                                "8"
+                                "6"
                             ],
                             "mode": "Access",
                             "type": "setVlanParameter"
                         },
-                        "connectorAttributes": [],
-                        "actionId": "dbb453a6-d897-482f-b7c4-b3d89447a740",
+                        "connectorAttributes": [
+                            {
+                                "attributeName": "Interface",
+                                "attributeValue": "00:50:56:a2:7e:15",
+                                "type": "connectorAttribute"
+                            }
+                        ],
+                        "actionId": "6d7550d4-19a1-4fac-89ee-fbf4409bbcd9",
                         "actionTarget": {
-                            "fullName": "VM Deployment_ab14e2b3",
+                            "fullName": "VM Deployment_94b23f88",
                             "fullAddress": "N/A",
                             "type": "actionTarget"
                         },
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "42221c16-d835-b0ab-729d-2b5c702874b4",
+                                "attributeValue": "4222fa1a-c0f8-b61d-2dfb-a894274eac7c",
                                 "type": "customAttribute"
                             }
                         ],
@@ -78,89 +84,32 @@ class TestConnectBulk(TestCase):
                     }
                 ]
             }
-        }
-        )
+        })
 
     def _get_connect_json(self):
         return jsonpickle.encode({
             "driverRequest": {
                 "actions": [
                     {
-                        "connectionId": "c2c7384c-0afc-438e-9a53-95840d98a64f",
+                        "connectionId": "4690f6a3-d18b-4f0d-9937-ae84b50c35c0",
                         "connectionParams": {
                             "vlanIds": [
-                                "10"
+                                "2"
                             ],
                             "mode": "Access",
                             "type": "setVlanParameter"
                         },
-                        "connectorAttributes": [
-
-                        ],
-                        "actionId": "2bb7f875-25d2-42de-ae8c-6c8acead053b",
+                        "connectorAttributes": [],
+                        "actionId": "42d630fa-d52e-4cfd-a329-e43bd6b6b0ae",
                         "actionTarget": {
-                            "fullName": "VM Deployment_a2917e64",
+                            "fullName": "VM Deployment_2fadfcad",
                             "fullAddress": "N/A",
                             "type": "actionTarget"
                         },
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
-                                "type": "customAttribute"
-                            }
-                        ],
-                        "type": "setVlan"
-                    },
-                    {
-                        "connectionId": "0bf012ab-06ec-41a9-8e48-bbc4609f4d31",
-                        "connectionParams": {
-                            "vlanIds": [
-                                "9"
-                            ],
-                            "mode": "Access",
-                            "type": "setVlanParameter"
-                        },
-                        "connectorAttributes": [
-
-                        ],
-                        "actionId": "bb40973d-8ef5-4235-ac26-7332153f5e50",
-                        "actionTarget": {
-                            "fullName": "VM Deployment_a2917e64",
-                            "fullAddress": "N/A",
-                            "type": "actionTarget"
-                        },
-                        "customActionAttributes": [
-                            {
-                                "attributeName": "VM_UUID",
-                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
-                                "type": "customAttribute"
-                            }
-                        ],
-                        "type": "setVlan"
-                    },
-                    {
-                        "connectionId": "fb8a2512-4d04-48c7-a6a8-bc52cc6ba717",
-                        "connectionParams": {
-                            "vlanIds": [
-                                "8"
-                            ],
-                            "mode": "Access",
-                            "type": "setVlanParameter"
-                        },
-                        "connectorAttributes": [
-
-                        ],
-                        "actionId": "df3d5406-11f5-4e64-89c5-f681ee099ed9",
-                        "actionTarget": {
-                            "fullName": "VM Deployment_a2917e64",
-                            "fullAddress": "N/A",
-                            "type": "actionTarget"
-                        },
-                        "customActionAttributes": [
-                            {
-                                "attributeName": "VM_UUID",
-                                "attributeValue": "42220987-0ec2-b9f0-0c47-1034fd25bac7",
+                                "attributeValue": "42229eed-1071-b447-faf5-280412d97501",
                                 "type": "customAttribute"
                             }
                         ],

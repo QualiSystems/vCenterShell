@@ -42,8 +42,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
             if vnic is None:
                 raise KeyError('VNIC not found by MAC address {0}'.format(vm_network_remove_mapping.mac_address))
 
-            mappings.append(VNicDeviceMapper(connect=False, network=default_network, vnic=vnic))
-
+            mappings.append(VNicDeviceMapper(connect=False, network=default_network,
+                                             vnic=vnic, mac=vm_network_remove_mapping.mac_address))
         return self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
 
     def remove_vnic(self, si, vm_uuid, network_name=None):
