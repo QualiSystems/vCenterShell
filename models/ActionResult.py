@@ -16,5 +16,14 @@ class CustomActionResult(ActionResult):
         self.network_name = ''
 
     def get_base_class(self):
-        return super(CustomActionResult, self)
+        action = ActionResult()
+        for att in self._get_attributes_names(action):
+            if hasattr(self, att):
+                value = str(getattr(self, att))
+                setattr(action, att, value)
 
+        return action
+
+    @staticmethod
+    def _get_attributes_names(cls):
+        return (attr for attr in dir(cls) if not attr.startswith("__"))

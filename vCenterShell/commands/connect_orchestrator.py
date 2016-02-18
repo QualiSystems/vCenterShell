@@ -207,23 +207,37 @@ class ConnectionCommandOrchestrator(object):
         for async_result in async_results:
             action_results = async_result.get()
             for action_result in action_results:
-                for unified_action in unified_actions[action_result.actionId]:
-                    result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
-                    if result:
-                        results.append(result)
-                        break
-
+                if action_result.success:
+                    ConnectionCommandOrchestrator._decombine_success_action_result(action_result,
+                                                                                   unified_actions, results)
+                else:
+                    ConnectionCommandOrchestrator._decombine_failed_action_result(action_result,
+                                                                                   unified_actions, results)
         return results
+
+    @staticmethod
+    def _decombine_failed_action_result(action_result, unified_actions, results):
+        for unified_action in unified_actions[action_result.actionId]:
+            result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
+            if result:
+                results.append(result)
+
+    @staticmethod
+    def _decombine_success_action_result(action_result, unified_actions, results):
+        for unified_action in unified_actions[action_result.actionId]:
+            result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
+            if result:
+                results.append(result)
+                break
 
     @staticmethod
     def _decombine_setVlan(unified_action, action_result):
         name = str(action_result.network_name)
         for vlan_id in unified_action.connectionParams.vlanIds:
             sub = '_{0}_'.format(str(vlan_id))
-            if name.find(sub) > -1:
-                copied_action = copy.deepcopy(action_result.get_base_class())
+            if name.find(sub) > -1 or not action_result.success:
+                copied_action = action_result.get_base_class()
                 copied_action.actionId = unified_action.actionId
-                del copied_action.network_name
                 return copied_action
         return None
 
@@ -237,8 +251,8 @@ class ConnectionCommandOrchestrator(object):
                       for inter in unified_action.connectorAttributes
                       if inter.attributeName == "Interface"]
         for interface in interfaces:
-            if not unified_action.success or mac == str(interface.attributeValue):
-                copied_action = copy.deepcopy(action_result.get_base_class())
+            if not action_result.success or mac == str(interface.attributeValue):
+                copied_action = action_result.get_base_class()
                 copied_action.actionId = unified_action.actionId
                 return copied_action
         return None
@@ -270,3 +284,4 @@ class ConnectionCommandOrchestrator(object):
 
         method = getattr(self, method_name)
         return method(unified_action, action_result)
+
