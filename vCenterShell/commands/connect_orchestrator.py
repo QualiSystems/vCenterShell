@@ -26,15 +26,17 @@ class ConnectionCommandOrchestrator(object):
         mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)
         unified_actions = self._create_new_action_by_mapping(mappings)
 
+        pool = ThreadPool()
         async_results = self.run_async_connection_actions(default_network, dv_switch_name, dv_switch_path,
-                                                          port_group_path, si, unified_actions)
+                                                          port_group_path, si, unified_actions, pool)
 
-        return self._get_async_results(async_results, mappings)
+        results = self._get_async_results(async_results, mappings, pool)
+
+        return results
 
     def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
-                                     unified_actions):
+                                     unified_actions, pool):
         async_results = []
-        pool = ThreadPool()
         for action in unified_actions:
             vm_uuid = self._get_vm_uuid(action)
             if action.type == 'setVlan':
@@ -152,7 +154,6 @@ class ConnectionCommandOrchestrator(object):
         result = CustomActionResult()
         result.actionId = str(action.actionId)
         result.type = str(action.type)
-        result.vnic_mac = connection_result.mac
         result.infoMessage = 'VLAN successfully set'
         result.errorMessage = ''
         result.success = True
@@ -199,7 +200,9 @@ class ConnectionCommandOrchestrator(object):
         return None
 
     @staticmethod
-    def _get_async_results(async_results, unified_actions):
+    def _get_async_results(async_results, unified_actions, pool):
+        pool.close()
+        pool.join()
         results = []
         for async_result in async_results:
             action_results = async_result.get()

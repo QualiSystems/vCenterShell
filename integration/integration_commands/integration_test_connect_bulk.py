@@ -48,43 +48,7 @@ class TestConnectBulk(TestCase):
         print results
 
     def _get_disconnect_json(self):
-        return jsonpickle.encode({
-            "driverRequest": {
-                "actions": [
-                    {
-                        "connectionId": "9376d21d-f3a5-4308-83a7-1bf63c281436",
-                        "connectionParams": {
-                            "vlanIds": [
-                                "6"
-                            ],
-                            "mode": "Access",
-                            "type": "setVlanParameter"
-                        },
-                        "connectorAttributes": [
-                            {
-                                "attributeName": "Interface",
-                                "attributeValue": "00:50:56:a2:7e:15",
-                                "type": "connectorAttribute"
-                            }
-                        ],
-                        "actionId": "6d7550d4-19a1-4fac-89ee-fbf4409bbcd9",
-                        "actionTarget": {
-                            "fullName": "VM Deployment_94b23f88",
-                            "fullAddress": "N/A",
-                            "type": "actionTarget"
-                        },
-                        "customActionAttributes": [
-                            {
-                                "attributeName": "VM_UUID",
-                                "attributeValue": "4222fa1a-c0f8-b61d-2dfb-a894274eac7c",
-                                "type": "customAttribute"
-                            }
-                        ],
-                        "type": "removeVlan"
-                    }
-                ]
-            }
-        })
+        return jsonpickle.encode({"driverRequest":{"actions":[{"connectionId":"89a08d5f-bf26-4b9b-b704-843e19bdcd35","connectionParams":{"vlanIds":["2"],"mode":"Access","type":"setVlanParameter"},"connectorAttributes":[{"attributeName":"Interface","attributeValue":"00:50:56:a2:3f:96","type":"connectorAttribute"}],"actionId":"eff31a93-4056-43b7-8d52-dba34aec9d93","actionTarget":{"fullName":"VM Deployment_bd4295cd","fullAddress":"N/A","type":"actionTarget"},"customActionAttributes":[{"attributeName":"VM_UUID","attributeValue":"4222f73c-432f-cb28-caa5-61ba4776950b","type":"customAttribute"}],"type":"removeVlan"}]}})
 
     def _get_connect_json(self):
         return jsonpickle.encode({
@@ -109,7 +73,7 @@ class TestConnectBulk(TestCase):
                         "customActionAttributes": [
                             {
                                 "attributeName": "VM_UUID",
-                                "attributeValue": "42229eed-1071-b447-faf5-280412d97501",
+                                "attributeValue": "4222f73c-432f-cb28-caa5-61ba4776950b",
                                 "type": "customAttribute"
                             }
                         ],
