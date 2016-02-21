@@ -1,6 +1,6 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import time
 from qualipy.api.cloudshell_api import *
+
 from common.logger import getLogger
 
 logger = getLogger("App Orchestration Driver")
@@ -96,14 +96,23 @@ def refresh_ip(api, deployment_result, reservation_id):
 def execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id):
     if not installation_service_data:
         return
+
     installation_service_name = installation_service_data["name"]
-    logger.info("Executing installation '{0}' on deployed app resource '{1}'..."
-                .format(installation_service_name, deployment_result.LogicalResourceName))
+    installation_script_name = installation_service_data["scriptCommandName"]
+    installation_script_inputs = installation_service_data["scriptInputs"]
+
+    logger.info("Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
+                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
     try:
-        # TODO update the script inputs with data from the installation service
+
+        script_inputs = []
+        for installation_script_input in installation_script_inputs:
+            script_inputs.append(
+                    InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+
         installation_result = api.ExecuteInstallAppCommand(reservation_id, deployment_result.LogicalResourceName,
-                                                           "Install", [InputNameValue('STAM', "- its just a demo")])
-        logger.debug("installation_result: " + installation_result.Output)
+                                                           installation_script_name, script_inputs)
+        logger.debug("Installation_result: " + installation_result.Output)
     except CloudShellAPIError as exc:
         logger.error("Error installing deployed app {0}. Error: {1}"
                      .format(deployment_result.LogicalResourceName, exc.rawxml))
