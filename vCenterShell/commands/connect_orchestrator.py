@@ -174,7 +174,9 @@ class ConnectionCommandOrchestrator(object):
     @staticmethod
     def _get_error_message_from_exception(ex):
         error_message = ''
-        if hasattr(ex, 'msg'):
+        if hasattr(ex, 'message'):
+            error_message = ex.message
+        elif hasattr(ex, 'msg'):
             error_message = ex.msg
         if hasattr(ex, 'faultMessage'):
             if hasattr(ex.faultMessage, 'message'):

@@ -40,7 +40,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         for vm_network_remove_mapping in vm_network_remove_mappings:
             vnic = self.pyvmomi_service.get_vnic_by_mac_address(vm, vm_network_remove_mapping.mac_address)
             if vnic is None:
-                raise KeyError('VNIC not found by MAC address {0}'.format(vm_network_remove_mapping.mac_address))
+                raise KeyError('VNIC having MAC address {0} not found on VM having UUID {1}'
+                               .format(vm_network_remove_mapping.mac_address, vm_uuid))
 
             mappings.append(VNicDeviceMapper(connect=False, network=default_network,
                                              vnic=vnic, mac=vm_network_remove_mapping.mac_address))
