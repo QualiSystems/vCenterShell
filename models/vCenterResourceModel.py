@@ -11,5 +11,5 @@ class vCenterResourceModel(object):
         self.vm_location = ''
         self.shutdown_method = ''
         self.ovf_tools_path = ''
-        self.execution_server_selector = ''
+        self.executions_server_selector = ''
         self.promiscuous_mode = ''

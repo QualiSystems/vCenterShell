@@ -1,4 +1,4 @@
-from cloudshell.api.cloudshell_api import ResourceAttribute
+from qualipy.api.cloudshell_api import ResourceAttribute
 
 
 class ResourceModelParser:

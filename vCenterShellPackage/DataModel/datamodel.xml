@@ -126,6 +126,42 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Promiscuous Mode" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Resource Pool" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Location" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Shutdown Method" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="OVF Tools Path" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Shutdown Method" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
