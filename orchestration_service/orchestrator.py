@@ -1,5 +1,6 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import *
+
 from common.logger import getLogger
 
 logger = getLogger("App Orchestration Driver")
@@ -7,6 +8,7 @@ logger = getLogger("App Orchestration Driver")
 
 def execute_app_orchestration():
     # Retrieve data from environment variables
+    # time.sleep(15)
     reservation_id = helpers.get_reservation_context_details().id
     resource_details = helpers.get_resource_context_details_dict()
     helpers.get_resource_context_details()
@@ -30,8 +32,7 @@ def execute_app_orchestration():
                     [AttributeNameValue("VM_UUID", deployment_result.VmUuid),
                      AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
 
-    # connect all
-    connect_all(api, reservation_id)
+    connect_routes_on_deployed_app(api, reservation_id, deployment_result.LogicalResourceName)
 
     # "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
@@ -48,9 +49,23 @@ def execute_app_orchestration():
     logger.info("Deployed {0} Successfully".format(app_name))
 
 
-def connect_all(api, reservation_id):
+def connect_routes_on_deployed_app(api, reservation_id, resource_name):
     try:
-        api.ExecuteEnvironmentCommand(reservation_id, "Connect All")
+        reservation = api.GetReservationDetails(reservation_id)
+        connectors = [connector for connector in reservation.ReservationDescription.Connectors
+                        if connector.Source == resource_name or connector.Target == resource_name]
+        endpoints = []
+        for endpoint in connectors:
+            endpoints.append(endpoint.Target)
+            endpoints.append(endpoint.Source)
+
+        if len(endpoints) == 0:
+            logger.info("No routes to connect for app {0}".format(resource_name))
+            return
+
+        logger.info("Executing connect for app {0}".format(resource_name))
+        api.ConnectRoutesInReservation(reservation_id, endpoints, 'bi')
+
     except CloudShellAPIError as exc:
         logger.error("Error executing connect all. Error: {0}".format(exc.rawxml))
         exit(1)
@@ -64,9 +79,9 @@ def refresh_ip(api, deployment_result, reservation_id):
     try:
         # TODO update the script inputs with data from the installation service
         api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName,
-                           "Resource" "Refresh IP", [InputNameValue('VM_UUID',
+                           "Resource" "refresh_ip", [InputNameValue('vm_uuid',
                                                                     deployment_result.VmUuid),
-                                                     InputNameValue('RESOURCE_NAME',
+                                                     InputNameValue('resource_name',
                                                                     deployment_result.LogicalResourceName)])
     except CloudShellAPIError as exc:
         logger.error("Error refreshing ip for deployed app {0}. Error: {1}"
@@ -81,14 +96,23 @@ def refresh_ip(api, deployment_result, reservation_id):
 def execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id):
     if not installation_service_data:
         return
+
     installation_service_name = installation_service_data["name"]
-    logger.info("Executing installation '{0}' on deployed app resource '{1}'..."
-                .format(installation_service_name, deployment_result.LogicalResourceName))
+    installation_script_name = installation_service_data["scriptCommandName"]
+    installation_script_inputs = installation_service_data["scriptInputs"]
+
+    logger.info("Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
+                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
     try:
-        # TODO update the script inputs with data from the installation service
+
+        script_inputs = []
+        for installation_script_input in installation_script_inputs:
+            script_inputs.append(
+                    InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+
         installation_result = api.ExecuteInstallAppCommand(reservation_id, deployment_result.LogicalResourceName,
-                                                           "Install", [InputNameValue('STAM', "- its just a demo")])
-        logger.debug("installation_result: " + installation_result.Output)
+                                                           installation_script_name, script_inputs)
+        logger.debug("Installation_result: " + installation_result.Output)
     except CloudShellAPIError as exc:
         logger.error("Error installing deployed app {0}. Error: {1}"
                      .format(deployment_result.LogicalResourceName, exc.rawxml))
@@ -104,10 +128,9 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
         logger.info("Powering on deployed app {0}".format(deployment_result.LogicalResourceName))
         logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
                                                                          deployment_result.VmUuid))
-        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "Power On",
-                           [InputNameValue("COMMAND", "power_on"),
-                            InputNameValue("VM_UUID", deployment_result.VmUuid),
-                            InputNameValue("RESOURCE_FULLNAME", "")])
+        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "power_on",
+                           [InputNameValue("vm_uuid", deployment_result.VmUuid),
+                            InputNameValue("resource_fullname", "")])
     except Exception as exc:
         logger.error("Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc)))
         exit(1)
@@ -116,13 +139,14 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
 def deploy_app(api, app_name, deployment_service, reservation_id):
     try:
         logger.info("Executing '{0}' on app '{1}'...".format(deployment_service, app_name))
-        return api.ExecuteDeployAppCommand(reservation_id, app_name)
+        return api.ExecuteDeployAppCommand(reservation_id, app_name,[InputNameValue("Name", app_name)])
     except CloudShellAPIError as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
-        exit(1)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, exc.message))
     except Exception as exc:
         logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
-        exit(1)
+        raise Exception("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
+
 
 
 

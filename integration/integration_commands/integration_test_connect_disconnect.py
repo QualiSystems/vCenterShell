@@ -36,7 +36,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.vm = None
 
         self.virtual_machine_path = 'SergiiT'
-        self.virtual_machine_name = 'TestVM'
+        self.virtual_machine_name = 'test_4f383119'
         self.vm_uuid = None
 
         self.vcenter_name = "QualiSB"
@@ -96,10 +96,9 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         print result
 
-    def integrationtest_disconnect(self):
+    def test_integrationtest_disconnect(self):
         default_network = None
         connector = VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
-                                                            self.resource_connection_details_retriever,
                                                             self.configurer,
                                                             default_network)
 

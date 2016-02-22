@@ -1,5 +1,7 @@
-import time
 import re
+
+import time
+
 from common.logger import getLogger
 
 logger = getLogger(__name__)
@@ -9,27 +11,22 @@ class RefreshIpCommand(object):
     TIMEOUT = 600
     IP_V4_PATTERN = re.compile('^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$')
 
-    def __init__(self, pyvmomi_service, cs_retriever_rervice, qualipy_helpers, resource_model_parser):
-        self.qualipy_helpers = qualipy_helpers
+    def __init__(self, pyvmomi_service, resource_model_parser):
         self.pyvmomi_service = pyvmomi_service
-        self.cs_retriever_rervice = cs_retriever_rervice
         self.resource_model_parser = resource_model_parser
 
-    def refresh_ip(self, si, vm_uuid, resource_name):
+    def refresh_ip(self, si, session, vm_uuid, resource_name, default_network):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
-        :param vm_uuid: UUID of Virtual Machine
-        :param resource_name: Logical resource name to update address property on
+
+        :param vim.ServiceInstance si: py_vmomi service instance
+        :param vCenterShell.driver.SecureCloudShellApiSession session: cloudshell session
+        :param str vm_uuid: UUID of Virtual Machine
+        :param str resource_name: Logical resource name to update address property on
+        :param vim.Network default_network: the default network
         """
-
         time.sleep(20)
-
-        api = self.qualipy_helpers.get_api_session()
-        vcenter_resource_context = self.qualipy_helpers.get_resource_context_details()
-        match_function = self._get_ip_match_function(api, resource_name)
-
-        # vCenterResourceModel
-        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_resource_context)
+        match_function = self._get_ip_match_function(session, resource_name)
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
@@ -37,25 +34,28 @@ class RefreshIpCommand(object):
             raise ValueError('VMWare Tools status on VM {0} is {1}, while should be toolsOk'
                              .format(resource_name, vm.guest.toolsStatus))
 
-        ip = self._obtain_ip(vm, vcenter_resource_model.default_network, match_function)
+        ip = self._obtain_ip(vm, default_network, match_function)
 
         if ip is None:
             raise ValueError('IP address of VM {0} could not be obtained during {1} seconds'
                              .format(resource_name, self.TIMEOUT))
 
-        api.UpdateResourceAddress(resource_name, ip)
+        session.UpdateResourceAddress(resource_name, ip)
 
     @staticmethod
-    def _get_ip_match_function(api, resource_name):
+    def _get_ip_match_function(session, resource_name):
 
         logger.debug('Trying to obtain IP address for {0}'.format(resource_name))
 
-        resource = api.GetResourceDetails(resource_name)
+        resource = session.GetResourceDetails(resource_name)
         ip_regexes = []
         ip_regex = '.*'
+
         if resource.VmDetails and resource.VmDetails[0].VmCustomParam:
+            params = resource.VmDetails[0].VmCustomParam if isinstance(resource.VmDetails[0].VmCustomParam, list) \
+                else [ resource.VmDetails[0].VmCustomParam]
             ip_regexes = [custom_param.Value for custom_param
-                          in resource.VmDetails[0].VmCustomParam
+                          in params
                           if custom_param.Name == 'ip_regex']
         if ip_regexes:
             ip_regex = ip_regexes[0]
@@ -79,8 +79,8 @@ class RefreshIpCommand(object):
                 ips = RefreshIpCommand._select_ip_by_match(ips, match_function)
             if ips:
                 ip = ips[0]
-            time_elapsed += interval
-            time.sleep(interval)
+                time_elapsed += interval
+                time.sleep(interval)
         return ip
 
     @staticmethod

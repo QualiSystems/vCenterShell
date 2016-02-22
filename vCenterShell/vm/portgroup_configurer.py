@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from pyVmomi import vim
-
 from common.vcenter.vmomi_service import *
 from vCenterShell.network import network_is_portgroup
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 
 
 class VNicDeviceMapper(object):
-    def __init__(self, vnic, network, connect, default_network=None):
+    def __init__(self, vnic, network, connect, mac):
         self.vnic = vnic
         self.network = network
         self.connect = connect
-        self.default_network = default_network
+        self.vnic_mac = mac
 
 
 class VirtualMachinePortGroupConfigurer(object):
@@ -42,7 +41,7 @@ class VirtualMachinePortGroupConfigurer(object):
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append(VNicDeviceMapper(vnic, network, True))
+            update_mapping.append(VNicDeviceMapper(vnic, network, True, vnic.macAddress))
 
         self.update_vnic_by_mapping(vm, update_mapping)
         return update_mapping
@@ -62,14 +61,27 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def disconnect_all_networks(self, vm, default_network):
         vnics = self.vnic_service.map_vnics(vm)
-        update_mapping = [VNicDeviceMapper(vnic, None, False, default_network) for vnic in vnics.values()]
+        update_mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
         return self.update_vnic_by_mapping(vm, update_mapping)
+
+    def create_mappings_for_all_networks(self, vm, default_network):
+        vnics = self.vnic_service.map_vnics(vm)
+        return [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
+
+    def create_mapping_for_network(self, vm, network, default_network):
+        condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
+        vnics = self.vnic_service.map_vnics(vm)
+
+        mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
+                   for vnic_name, vnic in vnics.items()
+                   if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
+        return mapping
 
     def disconnect_network(self, vm, network, default_network):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
 
-        mapping = [VNicDeviceMapper(vnic, network, False, default_network)
+        mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
                         for vnic_name, vnic in vnics.items()
                         if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
@@ -79,18 +91,22 @@ class VirtualMachinePortGroupConfigurer(object):
         vnics_change = []
         for item in mapping:
             spec = self.vnic_service.vnic_compose_empty(item.vnic)
-            if item.network:
-                self.vnic_service.vnic_attached_to_network(spec, item.network)
+            self.vnic_service.vnic_attached_to_network(spec, item.network)
             spec = self.vnic_service.get_device_spec(item.vnic, item.connect)
             vnics_change.append(spec)
-
-        return self.reconfig_vm(vnics_change, vm)
+        logger.debug('reconfiguring vm: {0} with: {1}'.format(vm, vnics_change))
+        self.reconfig_vm(vnics_change, vm)
+        return mapping
 
     def reconfig_vm(self, device_change, vm):
         logger.info("Changing network...")
         task = self.pyvmomi_service.vm_reconfig_task(vm, device_change)
-        return self.synchronous_task_waiter.wait_for_task(task=task,
+        logger.debug('reconfigure task: {0}'.format(task.info))
+        res = self.synchronous_task_waiter.wait_for_task(task=task,
                                                           action_name='Reconfigure VM')
+        if res:
+            logger.debug('reconfigure task result {0}'.format(res))
+        return res
 
     @staticmethod
     def destroy_port_group_task(network):

@@ -32,7 +32,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = [vim.NumericRange(start=65, end=65)]
-        mapping.dv_port_name = DvPortGroupNameGenerator().generate_port_group_name(65)
+        mapping.dv_port_name = DvPortGroupNameGenerator().generate_port_group_name(65, 'Trunk')
         mapping.dv_switch_name = 'dvSwitch'
         mapping.dv_switch_path = 'QualiSB'
         mapping.port_group_path = 'QualiSB'
@@ -81,3 +81,17 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
     def test_integration(self):
         self.integration_test_connect_A()
         self.integration_test_connect_B()
+
+    def test_dicconnect_bulk(self):
+        py_vmomi_service = pyVmomiService(SmartConnect, Disconnect)
+        cred = TestCredentials()
+        si = py_vmomi_service.connect(cred.host, cred.username, cred.password, cred.port)
+        vm = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Alex', 'test_25bf07ee')
+        mac_address = '00:50:56:a2:5f:43'
+        vnics = [device.backing.network for device in vm.config.hardware.device
+                 if isinstance(device, vim.vm.device.VirtualEthernetCard)
+                 and hasattr(device.backing, 'network')
+                 and hasattr(device, 'macAddress')
+                 and device.macAddress == mac_address]
+
+        pass

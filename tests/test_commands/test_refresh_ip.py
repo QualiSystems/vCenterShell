@@ -10,15 +10,6 @@ class TestRefreshIpCommand(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
     def test_refresh_ip(self):
-
-        resource_model_parser = Mock()
-
-        qualipy_helpers = MagicMock()
-
-        session = MagicMock()
-
-        qualipy_helpers.get_api_session = Mock(return_value=session)
-
         nic = Mock()
         nic.network = 'A Network'
         nic.ipAddress = ['192.168.1.1']
@@ -32,15 +23,16 @@ class TestRefreshIpCommand(TestCase):
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, Mock(), qualipy_helpers, resource_model_parser)
-
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service)
+        session = Mock()
+        session.UpdateResourceAddress = Mock(return_value=True)
         si = Mock()
 
         # Act
-        refresh_ip_command.refresh_ip(si, '1234-5678', 'machine1')
+        refresh_ip_command.refresh_ip(session, si, '1234-5678', 'machine1', 'default_network')
 
         # Assert
-        session.UpdateResourceAddress.assert_called_with('machine1', '192.168.1.1')
+        self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
 
     def test_refresh_ip_choose_ipv4(self):
 

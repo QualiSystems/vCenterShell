@@ -1,6 +1,6 @@
 ﻿from common.model_factory import ResourceModelParser
 from driver import DeploymentServiceDriver
-from common.cloudshell.data_retriever import CloudshellDataRetrieverService
+from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 
 
 def main():

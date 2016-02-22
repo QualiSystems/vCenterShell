@@ -61,6 +61,9 @@ class CommandWrapper:
 
             results = command(*tuple(command_args))
 
+            if not results:
+                results = 'finished successfully'
+
             logger.info(FINISHED_EXECUTING_COMMAND.format(command_name))
             logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
 

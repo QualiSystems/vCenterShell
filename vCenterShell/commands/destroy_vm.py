@@ -1,5 +1,4 @@
-﻿import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from common.logger import getLogger
+﻿from common.logger import getLogger
 
 logger = getLogger(__name__)
 
@@ -16,7 +15,7 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
-    def destroy(self, si, vm_uuid, resource_full_name):
+    def destroy(self, si, session, vm_uuid, vm_name):
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
@@ -29,5 +28,5 @@ class DestroyVirtualMachineCommand(object):
         result = self.pv_service.destroy_vm(vm)
 
         # delete resources
-        self.resource_remover.remove_resource(resource_full_name)
+        self.resource_remover.remove_resource(session=session, resource_full_name=vm_name)
         return result

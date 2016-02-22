@@ -70,12 +70,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Power State" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
 	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Storage" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -94,19 +88,39 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Target Interface" Type="String">
+	<ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Link Configurations" />
+      </ns0:Rules>
+  </ns0:AttributeInfo>
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Link Configurations" />
+      </ns0:Rules>
+  </ns0:AttributeInfo>
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Link Configurations" />
+      </ns0:Rules>
+  </ns0:AttributeInfo>
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Link Configurations" />
+      </ns0:Rules>
+  </ns0:AttributeInfo>
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
         <ns0:Rule Name="Admin Only" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Virtual Network" Type="String">
+  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -126,11 +140,11 @@
     </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Cloud Provider">
+    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
-        <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
@@ -160,16 +174,9 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
+            <ns0:DriverName>VCenter Shell Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts>
-            <ns0:ScriptName>Deploy From Template</ns0:ScriptName>
-            <ns0:ScriptName>Power On</ns0:ScriptName>
-            <ns0:ScriptName>Power Off</ns0:ScriptName>
-            <ns0:ScriptName>Connect VM</ns0:ScriptName>
-            <ns0:ScriptName>Destroy VM</ns0:ScriptName>
-            <ns0:ScriptName>Refresh IP</ns0:ScriptName>
-            <ns0:ScriptName>Connect Bulk</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
@@ -214,14 +221,8 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts>
-            <ns0:ScriptName>Connect</ns0:ScriptName>
-            <ns0:ScriptName>Power On Proxy</ns0:ScriptName>
-            <ns0:ScriptName>Power Off Proxy</ns0:ScriptName>
-            <ns0:ScriptName>Destroy VM Proxy</ns0:ScriptName>
-            <ns0:ScriptName>Refresh IP Proxy</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
@@ -256,14 +257,11 @@
       <ns0:AttributeValues />
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter VM From Template" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>            
+          <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Power State" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="true">
@@ -273,10 +271,9 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
-          <ns0:AttributeValues>            
+          <ns0:AttributeValues>
             <ns0:AttributeValue Name="vCenter Template" Value="" />
 			<ns0:AttributeValue Name="VM Cluster" Value="" />
-			<ns0:AttributeValue Name="VM Power State" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
 			<ns0:AttributeValue Name="IP Regex" Value="" />
           </ns0:AttributeValues>
@@ -317,7 +314,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
@@ -362,85 +359,22 @@
   </ns0:ResourceFamilies>
   <ns0:DriverDescriptors>
     <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
+    <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
-    <ns0:ScriptDescriptor Name="Destroy VM" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="destroy_vm" Name="COMMAND" />
-        <ns0:ScriptInput Name="VM_UUID" />
-        <ns0:ScriptInput Name="RESOURCE_FULLNAME" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Power On" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="power_on" Name="COMMAND" />
-        <ns0:ScriptInput Name="VM_UUID" />
-        <ns0:ScriptInput Name="RESOURCE_FULLNAME" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Power Off" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="power_off" Name="COMMAND" />
-        <ns0:ScriptInput Name="VM_UUID" />
-        <ns0:ScriptInput Name="RESOURCE_FULLNAME" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Refresh IP" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="refresh_ip" Name="COMMAND" />
-        <ns0:ScriptInput Name="VM_UUID" />
-        <ns0:ScriptInput Name="RESOURCE_FULLNAME" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect VM" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="connect" Name="COMMAND" />
-        <ns0:ScriptInput Name="VLAN_ID" />
-        <ns0:ScriptInput Name="VLAN_SPEC_TYPE" />
-        <ns0:ScriptInput Name="VM_UUID" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
-      <ns0:ScriptInputs />
+      <ns0:ScriptInputs>
+        <ns0:ScriptInput Name="Name" />
+      </ns0:ScriptInputs>
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Deploy From Template" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="deploy_from_template" Name="COMMAND" />
-        <ns0:ScriptInput Name="DEPLOY_DATA" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Name="Auto Resolve Vlan" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput Name="VLAN_SPEC_TYPE" />
-        <ns0:ScriptInput Name="VLAN_ID" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Power On Proxy" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Power Off Proxy" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Destroy VM Proxy" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Refresh IP Proxy" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
       <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect Bulk" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput DefaultValue="connect_bulk" Name="COMMAND" />
-        <ns0:ScriptInput Name="REQUEST" />
-      </ns0:ScriptInputs>
     </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>
 </ns0:DataModelInfo>

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyVmomi import vim
 from common.logger import getLogger
+from threading import Lock
 
 logger = getLogger("vCenterCommon")
 
@@ -9,17 +10,54 @@ class DvPortGroupCreator(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
-        pass
+        self._lock = Lock()
 
-    def create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id):
+    def get_or_create_network(self,
+                              si,
+                              vm,
+                              dv_port_name,
+                              dv_switch_name,
+                              dv_switch_path,
+                              port_group_path,
+                              vlan_id,
+                              vlan_spec):
+        network = None
+        self._lock.acquire()
+        try:
+            # check if the network is attached to the vm and gets it, the function doesn't goes to the vcenter
+            network = self.pyvmomi_service.get_network_by_name_from_vm(vm, dv_port_name)
+
+            # if we didn't found the network on the vm
+            if network is None:
+                # try to get it from the vcenter
+                try:
+                    network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
+                except KeyError:
+                    network = None
+
+            # if we still couldn't get the network ---> create it(can't find it, play god!)
+            if network is None:
+                self._create_dv_port_group(dv_port_name,
+                                          dv_switch_name,
+                                          dv_switch_path,
+                                          si,
+                                          vlan_spec,
+                                          vlan_id)
+                network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
+
+        finally:
+            self._lock.release()
+            return network
+
+
+    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id):
         dv_switch = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_switch_name)
         if dv_switch is None:
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
-        port_group = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                action_name='Create dv port group')
-        return port_group
+        self.synchronous_task_waiter.wait_for_task(task=task,
+                                                   action_name='Create dv port group')
 
     @staticmethod
     def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, num_ports=32):
@@ -65,32 +103,3 @@ class DvPortGroupCreator(object):
         """
         return port_group.Destroy()
 
-    def get_or_create_network(self,
-                              si,
-                              vm,
-                              dv_port_name,
-                              dv_switch_name,
-                              dv_switch_path,
-                              port_group_path,
-                              vlan_id,
-                              vlan_spec):
-        # check if the network is attached to the vm and gets it, the function doesn't goes to the vcenter
-        network = self.pyvmomi_service.get_network_by_name_from_vm(vm, dv_port_name)
-
-        # if we didn't found the network on the vm
-        if network is None:
-            # try to get it from the vcenter
-            try:
-                network = self.pyvmomi_service.find_network_by_name(si, port_group_path, dv_port_name)
-            except KeyError:
-                network = None
-
-        # if we still couldn't get the network ---> create it(can't find it, play god!)
-        if network is None:
-            network = self.create_dv_port_group(dv_port_name,
-                                                dv_switch_name,
-                                                dv_switch_path,
-                                                si,
-                                                vlan_spec,
-                                                vlan_id)
-        return network

@@ -9,8 +9,8 @@ from models.DeployDataHolder import DeployDataHolder
 
 class DeploymentServiceDriver(object):
     INPUT_KEY_COMMAND = "COMMAND"
-    INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
-    COMMAND_DEPLOY_FROM_TEMPLATE = "Deploy From Template"
+    INPUT_KEY_DEPLOY_DATA = "deploy_data"
+    COMMAND_DEPLOY_FROM_TEMPLATE = "deploy_from_template"
 
     def __init__(self, cs_retriever_service, resource_model_parser):
         self.cs_retriever_service = cs_retriever_service
@@ -38,8 +38,10 @@ class DeploymentServiceDriver(object):
         resource_context = helpers.get_resource_context_details()
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
+        template_model.app_name = os.environ["NAME"]
+
         # get power state of the cloned VM
-        power_on = self.cs_retriever_service.getPowerStateAttributeData(resource_context)
+        power_on = False  # self.cs_retriever_service.getPowerStateAttributeData(resource_context)
         # get cluster and resource pool
         vm_cluster_model = self.cs_retriever_service.getVMClusterAttributeData(resource_context)
         # get datastore
@@ -57,5 +59,4 @@ class DeploymentServiceDriver(object):
         return deploy_data_holder
 
     def _get_command_inputs_list(self, json_data_holder):
-        return [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),
-                InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
+        return [InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
