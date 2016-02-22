@@ -1,4 +1,5 @@
 from drivers_packager import DriversPackager
+from shell_installer import ShellInstaller
 from shell_publisher import ShellPublisher
 from shell_packager import ShellPackager
 
@@ -16,6 +17,11 @@ class PackageManager(object):
     def publish(self, package_name):
         packager = ShellPublisher()
         packager.publish(package_name)
+
+    def install(self, package_name):
+        installer = ShellInstaller()
+        installer.intstall(package_name)
+
 
 
 
