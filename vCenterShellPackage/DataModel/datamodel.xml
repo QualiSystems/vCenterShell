@@ -24,19 +24,13 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch Path" Type="String">
+	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Holding Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -149,13 +143,10 @@
 			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default port group path">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Path">
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Name">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Network">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Holding Network">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
@@ -163,8 +154,7 @@
 			<ns0:AttributeValue Name="User" Value="" />
 			<ns0:AttributeValue Name="Password" Value="" />
 			<ns0:AttributeValue Name="Default port group path" Value="" />
-			<ns0:AttributeValue Name="Default dvSwitch Path" Value="" />
-			<ns0:AttributeValue Name="Default dvSwitch Name" Value="" />
+			<ns0:AttributeValue Name="Default dvSwitch" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>

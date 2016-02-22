@@ -17,10 +17,13 @@ class ConnectionCommandOrchestrator(object):
         self.vc_data_model = vc_data_model
 
     def connect_bulk(self, si, request):
-        dv_switch_path = self.vc_data_model.default_dvswitch_path
-        dv_switch_name = self.vc_data_model.default_dvswitch_name
+        dv_switch_path_parts = str.split(self.vc_data_model.default_dvswitch, '\\')
+        if len(dv_switch_path_parts) < 2:
+            raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
+        dv_switch_path = dv_switch_path_parts[0]
+        dv_switch_name = dv_switch_path_parts[1]
         port_group_path = self.vc_data_model.default_port_group_path
-        default_network = self.vc_data_model.default_network
+        default_network = self.vc_data_model.holding_network
         holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)

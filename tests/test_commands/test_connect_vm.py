@@ -22,8 +22,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.vlan_id = 100
         self.spec_type = Mock()
         self.vcenter_context = Mock()
-        self.vcenter_context.default_dvswitch_path = 'default_dvswitch_path'
-        self.vcenter_context.default_dvswitch_name = 'default_dvswitch_name'
+        self.vcenter_context.default_dvswitch = 'default_dvswitch_path\\default_dvswitch_name'
         self.vcenter_context.default_port_group_path = 'default_port_group_path'
 
         vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)

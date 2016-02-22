@@ -68,7 +68,7 @@ class CommandOrchestrator(object):
             VirtualSwitchToMachineDisconnectCommand(
                 pyvmomi_service=pv_service,
                 port_group_configurer=virtual_machine_port_group_configurer,
-                default_network=self.vc_data_model.default_network)
+                default_network=self.vc_data_model.holding_network)
 
         # Virtual Switch Connect
         virtual_switch_connect_command = \
@@ -245,7 +245,7 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.default_network)
+                                                                   self.vc_data_model.holding_network)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -343,5 +343,5 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.default_network)
+                                                                   self.vc_data_model.holding_network)
         return set_command_result(result=res, unpicklable=False)
