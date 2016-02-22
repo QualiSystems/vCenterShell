@@ -1,6 +1,5 @@
 import time
 import re
-
 from common.logger import getLogger
 
 logger = getLogger(__name__)
@@ -22,6 +21,9 @@ class RefreshIpCommand(object):
         :param vm_uuid: UUID of Virtual Machine
         :param resource_name: Logical resource name to update address property on
         """
+
+        time.sleep(20)
+
         api = self.qualipy_helpers.get_api_session()
         vcenter_resource_context = self.qualipy_helpers.get_resource_context_details()
         match_function = self._get_ip_match_function(api, resource_name)
@@ -31,8 +33,9 @@ class RefreshIpCommand(object):
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        if not vm.guest:
-            raise ValueError('VM {0} does not have VMWare Tools installed'.format(resource_name))
+        if vm.guest.toolsStatus != 'toolsOk':
+            raise ValueError('VMWare Tools status on VM {0} is {1}, while should be toolsOk'
+                             .format(resource_name, vm.guest.toolsStatus))
 
         ip = self._obtain_ip(vm, vcenter_resource_model.default_network, match_function)
 
@@ -53,7 +56,7 @@ class RefreshIpCommand(object):
         if resource.VmDetails and resource.VmDetails[0].VmCustomParam:
             ip_regexes = [custom_param.Value for custom_param
                           in resource.VmDetails[0].VmCustomParam
-                          if custom_param.Name == 'IP Regex']
+                          if custom_param.Name == 'ip_regex']
         if ip_regexes:
             ip_regex = ip_regexes[0]
             logger.debug('Custom IP Regex to filter IP addresses {0}'.format(ip_regex))
@@ -63,7 +66,7 @@ class RefreshIpCommand(object):
     def _obtain_ip(self, vm, default_network, match_function):
         time_elapsed = 0
         ip = None
-        interval = self.TIMEOUT / 10
+        interval = self.TIMEOUT / 100
         while time_elapsed < self.TIMEOUT and ip is None:
             ips = RefreshIpCommand._get_ip_addresses(vm, default_network)
             if ips:
