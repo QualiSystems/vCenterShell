@@ -22,7 +22,7 @@ class ConnectionCommandOrchestrator(object):
             raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
         dv_switch_path = dv_switch_path_parts[0]
         dv_switch_name = dv_switch_path_parts[1]
-        port_group_path = self.vc_data_model.default_port_group_path
+        port_group_path = self.vc_data_model.default_port_group_location
         default_network = self.vc_data_model.holding_network
         holder = DeployDataHolder(jsonpickle.decode(request))
 

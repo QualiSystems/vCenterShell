@@ -29,7 +29,7 @@ class Test_command_orchestrator(TestCase):
         self.command_orchestrator.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
         self.command_orchestrator.vc_data_model.default_dvswitch_path = 'path'
         self.command_orchestrator.vc_data_model.default_dvswitch_name = 'dv_name'
-        self.command_orchestrator.vc_data_model.default_port_group_path = 'port path'
+        self.command_orchestrator.vc_data_model.default_port_group_location = 'port path'
         self.command_orchestrator.vc_data_model.default_network = 'default network'
         self.ports = Mock()
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)

@@ -31,7 +31,7 @@ class TestConnectBulk(TestCase):
         self.command_orchestrator.cs_helper.get_session = Mock(return_value=session)
         self.command_orchestrator.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
         self.command_orchestrator.vc_data_model.default_dvswitch = 'QualiSB\\dvSwitch'
-        self.command_orchestrator.vc_data_model.default_port_group_path = 'QualiSB'
+        self.command_orchestrator.vc_data_model.default_port_group_location = 'QualiSB'
         self.command_orchestrator.vc_data_model.holding_network = 'QualiSB/anetwork'
         self.ports = Mock()
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)

@@ -23,7 +23,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.spec_type = Mock()
         self.vcenter_context = Mock()
         self.vcenter_context.default_dvswitch = 'default_dvswitch_path\\default_dvswitch_name'
-        self.vcenter_context.default_port_group_path = 'default_port_group_path'
+        self.vcenter_context.default_port_group_location = 'default_port_group_path'
 
         vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)
         vnic_device_mapper.vnic = create_autospec(spec=vim.vm.device.VirtualEthernetCard)
@@ -57,7 +57,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         mapping.dv_switch_path = self.vcenter_context.default_dvswitch_path
         mapping.dv_switch_name = self.vcenter_context.default_dvswitch_name
-        mapping.port_group_path = self.vcenter_context.default_port_group_path
+        mapping.port_group_path = self.vcenter_context.default_port_group_location
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
