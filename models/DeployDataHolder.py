@@ -26,17 +26,19 @@ class DeployDataHolder(object):
         return isinstance(thing, primitive)
 
     @classmethod
-    def create_from_params(cls, template_model, datastore_name, vm_cluster_model, power_on):
+    def create_from_params(cls, template_model, datastore_name, vm_cluster_model, power_on, ip_regex):
         """
         :param VCenterTemplateModel template_model:
         :param str datastore_name:
         :param VMClusterModel vm_cluster_model:
         :param bool power_on:
+        :param attributes:
         """
         dic = {
             'template_model': template_model,
             'datastore_name': datastore_name,
             'vm_cluster_model': vm_cluster_model,
-            'power_on': power_on
+            'power_on': power_on,
+            'ip_regex': ip_regex
         }
         return cls(dic)

@@ -1,3 +1,5 @@
+import time
+
 from models.DeployResultModel import DeployResult
 
 
@@ -7,6 +9,7 @@ class VirtualMachineDeployer(object):
         self.name_generator = name_generator
 
     def deploy_from_template(self, si, data_holder):
+
         # generate unique name
         vm_name = self.name_generator(data_holder.template_model.template_name)
 
@@ -23,6 +26,8 @@ class VirtualMachineDeployer(object):
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
 
-        return DeployResult(vm_name,
-                            clone_vm_result.vm.summary.config.uuid,
-                            data_holder.template_model.vCenter_resource_name)
+        deploy_result = DeployResult(vm_name, clone_vm_result.vm.summary.config.uuid,
+                                     data_holder.template_model.vCenter_resource_name,
+                                     data_holder.ip_regex)
+
+        return deploy_result

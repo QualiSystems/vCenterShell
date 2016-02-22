@@ -1,6 +1,8 @@
 import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import time
 from qualipy.api.cloudshell_api import *
+from common.model_factory import ResourceModelParser
 
 from models.DeployDataHolder import DeployDataHolder
 
@@ -10,8 +12,9 @@ class DeploymentServiceDriver(object):
     INPUT_KEY_DEPLOY_DATA = "DEPLOY_DATA"
     COMMAND_DEPLOY_FROM_TEMPLATE = "Deploy From Template"
 
-    def __init__(self, cs_retriever_service):
+    def __init__(self, cs_retriever_service, resource_model_parser):
         self.cs_retriever_service = cs_retriever_service
+        self.resource_model_parser = resource_model_parser
 
     def execute(self):
         data_holder = self._get_data_holder()
@@ -33,7 +36,6 @@ class DeploymentServiceDriver(object):
 
     def _get_data_holder(self):
         resource_context = helpers.get_resource_context_details()
-
         # get vCenter resource name, template name, template folder
         template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
         # get power state of the cloned VM
@@ -43,10 +45,16 @@ class DeploymentServiceDriver(object):
         # get datastore
         datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
 
-        return DeployDataHolder.create_from_params(template_model=template_model,
-                                                   datastore_name=datastore_name,
-                                                   vm_cluster_model=vm_cluster_model,
-                                                   power_on=power_on)
+        # Convert to an instance of vCenterVMFromTemplateResourceModel in order to get ip_regex
+        resource_model = self.resource_model_parser.convert_to_resource_model(resource_context)
+        ip_regex = resource_model.ip_regex
+
+        deploy_data_holder = DeployDataHolder.create_from_params(template_model=template_model,
+                                                                 datastore_name=datastore_name,
+                                                                 vm_cluster_model=vm_cluster_model,
+                                                                 power_on=power_on,
+                                                                 ip_regex=ip_regex)
+        return deploy_data_holder
 
     def _get_command_inputs_list(self, json_data_holder):
         return [InputNameValue(self.INPUT_KEY_COMMAND, "deploy_from_template"),

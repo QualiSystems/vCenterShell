@@ -22,18 +22,17 @@ class RefreshIpCommand(object):
         :param vm_uuid: UUID of Virtual Machine
         :param resource_name: Logical resource name to update address property on
         """
-
         api = self.qualipy_helpers.get_api_session()
         vcenter_resource_context = self.qualipy_helpers.get_resource_context_details()
         match_function = self._get_ip_match_function(api, resource_name)
-        print 'start refresh ip'
+
         # vCenterResourceModel
         vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_resource_context)
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        # where vm. is the MOR of the VM
-        # guest_primary_ipaddress = vm.guest.ipAddress
+        if not vm.guest:
+            raise ValueError('VM {0} does not have VMWare Tools installed'.format(resource_name))
 
         ip = self._obtain_ip(vm, vcenter_resource_model.default_network, match_function)
 
@@ -84,6 +83,8 @@ class RefreshIpCommand(object):
     @staticmethod
     def _get_ip_addresses(vm, default_network):
         ips = []
+        if not vm.guest.ipAddress:
+            ips.append(vm.guest.ipAddress)
         for nic in vm.guest.net:
             if nic.network != default_network:
                 for addr in nic.ipAddress:
