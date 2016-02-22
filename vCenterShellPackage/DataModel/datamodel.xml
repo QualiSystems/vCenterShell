@@ -42,7 +42,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Domain Selector" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Executions Server Selector" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -149,12 +149,51 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Holding Network">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Location">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Shutdown Method">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>hard</ns0:AllowedValue>
+                <ns0:AllowedValue>soft</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="OVF Tools Path">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Executions Server Selector">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Promiscuous Mode">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Accept</ns0:AllowedValue>
+                <ns0:AllowedValue>Reject</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
 			<ns0:AttributeValue Name="User" Value="" />
 			<ns0:AttributeValue Name="Password" Value="" />
 			<ns0:AttributeValue Name="Default Port Group Location" Value="" />
 			<ns0:AttributeValue Name="Default dvSwitch" Value="" />
+			<ns0:AttributeValue Name="Holding Network" Value="" />
+			<ns0:AttributeValue Name="VM Cluster" Value="" />
+			<ns0:AttributeValue Name="VM Resource Pool" Value="" />
+			<ns0:AttributeValue Name="VM Storage" Value="" />
+			<ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
+			<ns0:AttributeValue Name="VM Shutdown Method" Value="hard" />
+			<ns0:AttributeValue Name="OVF Tools Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
+			<ns0:AttributeValue Name="Executions Server Selector" Value="" />
+			<ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
