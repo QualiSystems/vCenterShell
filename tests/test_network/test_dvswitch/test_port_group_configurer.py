@@ -29,6 +29,7 @@ class TestDvPortGroupConfigurer(TestCase):
         self.vm = Mock()
         self.vm.config.hardware = Mock()
         self.vnic = Mock(spec=vim.vm.device.VirtualEthernetCard)
+        self.vnic.macAddress = True
         self.vnic.deviceInfo = Mock()
         self.vm.config.hardware.device = [self.vnic]
         self.py_vmomi_service.find_by_uuid = lambda a, b, c: self.vm
@@ -64,7 +65,7 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):
-        ConnectRequest('vnic 1', Mock(spec=vim.Network))
+        req  = ConnectRequest('vnic 1', Mock(spec=vim.Network))
         mapping = [ConnectRequest('vnic 1', Mock(spec=vim.Network))]
         res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network))
         self.assertIsNotNone(res[0].vnic)

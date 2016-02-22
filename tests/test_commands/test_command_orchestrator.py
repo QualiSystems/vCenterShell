@@ -34,13 +34,6 @@ class Test_command_orchestrator(TestCase):
         self.ports = Mock()
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
-    def test_connect(self):
-        # act
-        res = self.command_orchestrator.connect(self.context, 'uuid', 'vlan id', 'vlan type')
-        # assert
-        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
-        self.assertTrue(res)
-
     def test_disconnect_all(self):
         # act
         self.command_orchestrator.disconnect_all(self.context, self.ports)

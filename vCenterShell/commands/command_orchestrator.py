@@ -1,9 +1,9 @@
-import traceback
-from logging import getLogger
-import jsonpickle
 import time
-from multiprocessing.pool import ThreadPool
+from logging import getLogger
+
+import jsonpickle
 from pyVim.connect import SmartConnect, Disconnect
+
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.cloud_shell.resource_remover import CloudshellResourceRemover
 from common.model_factory import ResourceModelParser
@@ -12,10 +12,10 @@ from common.utilites.common_name import generate_unique_name
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
-from models.ActionResult import ActionResult
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
+from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
@@ -27,7 +27,7 @@ from vCenterShell.network.vlan.factory import VlanSpecFactory
 from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.deploy import VirtualMachineDeployer
-from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector, VmNetworkMapping, VmNetworkRemoveMapping
+from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
@@ -62,8 +62,16 @@ class CommandOrchestrator(object):
         self.command_wrapper = CommandWrapper(logger=getLogger, pv_service=pv_service)
         # Deploy Command
         self.deploy_from_template_command = DeployFromTemplateCommand(deployer=template_deployer)
+
+        # Virtual Switch Revoke
+        self.virtual_switch_disconnect_command = \
+            VirtualSwitchToMachineDisconnectCommand(
+                pyvmomi_service=pv_service,
+                port_group_configurer=virtual_machine_port_group_configurer,
+                default_network=self.vc_data_model.default_network)
+
         # Virtual Switch Connect
-        self.virtual_switch_connect_command = \
+        virtual_switch_connect_command = \
             VirtualSwitchConnectCommand(
                 pv_service=pv_service,
                 virtual_switch_to_machine_connector=virtual_switch_to_machine_connector,
@@ -71,12 +79,10 @@ class CommandOrchestrator(object):
                 vlan_spec_factory=VlanSpecFactory(),
                 vlan_id_range_parser=VLanIdRangeParser(),
                 logger=getLogger('VirtualSwitchConnectCommand'))
-        # Virtual Switch Revoke
-        self.virtual_switch_disconnect_command = \
-            VirtualSwitchToMachineDisconnectCommand(
-                pyvmomi_service=pv_service,
-                port_group_configurer=virtual_machine_port_group_configurer,
-                default_network=self.vc_data_model.default_network)
+        self.connection_orchestrator = ConnectionCommandOrchestrator(self.vc_data_model,
+                                                                     virtual_switch_connect_command,
+                                                                     self.virtual_switch_disconnect_command)
+
         # Destroy VM Command
         self.destroy_virtual_machine_command = \
             DestroyVirtualMachineCommand(pv_service=pv_service,
@@ -90,40 +96,13 @@ class CommandOrchestrator(object):
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
 
     def connect_bulk(self, context, request):
-        dv_switch_path = self.vc_data_model.default_dvswitch_path
-        dv_switch_name = self.vc_data_model.default_dvswitch_name
-        port_group_path = self.vc_data_model.default_port_group_path
-        default_network = self.vc_data_model.default_network
-
-        holder = DeployDataHolder(jsonpickle.decode(request))
-
-        results = []
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
         connection_details = self.cs_helper.get_connection_details(session, context.resource)
 
-        pool = ThreadPool()
-        async_results = []
-        for action in holder.driverRequest.actions:
-            vm_uuid = self._get_vm_uuid(action, session)
-            if vm_uuid == '':
-                continue
-            if action.type == 'setVlan':
-                res = pool.apply_async(self._set_vlan_bulk,
-                                       (action, default_network, dv_switch_name, dv_switch_path,
-                                        port_group_path,
-                                        vm_uuid, connection_details))
-
-            elif action.type == 'removeVlan':
-
-                res = pool.apply_async(self._remove_vlan_bulk,
-                                       (action, default_network, vm_uuid, connection_details))
-
-            if res:
-                async_results.append(res)
-
-        for async_result in async_results:
-            results += async_result.get()
+        results = self.command_wrapper.execute_command_with_connection(connection_details,
+                                                                       self.connection_orchestrator.connect_bulk,
+                                                                       request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -168,51 +147,6 @@ class CommandOrchestrator(object):
             data_holder)
 
         return set_command_result(result=result, unpicklable=False)
-
-    def connect(self, context, vm_uuid, vlan_id, vlan_spec_type):
-        """
-        Connect Command: connect a vm to a vlan, chooses the first available vnic
-
-        :param context: models.QualiDriverModels.ResourceCommandContext
-        :param str vm_uuid: the uuid id of the  vm
-        :param str vlan_id: the id of the vlan, can be numeric or numeric range
-        :param str vlan_spec_type: the type of the vlan, can only be ('Trunk', 'Access')
-
-        :return str the connection details
-        """
-        # get command parameters from the environment
-        if not vm_uuid:
-            raise ValueError('VM_UUID is missing')
-
-        if not vlan_id:
-            raise ValueError('VLAN_ID is missing')
-
-        if not vlan_spec_type:
-            raise ValueError('VLAN_SPEC_TYPE is missing')
-
-        # load default params
-        vnic_to_network = VmNetworkMapping()
-        vnic_to_network.dv_switch_path = self.vc_data_model.default_dvswitch_path
-        vnic_to_network.dv_switch_name = self.vc_data_model.default_dvswitch_name
-        vnic_to_network.port_group_path = self.vc_data_model.default_port_group_path
-        vnic_to_network.vlan_id = vlan_id
-        vnic_to_network.vlan_spec = vlan_spec_type
-
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-                                             context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
-
-        # execute command
-        connection_results = \
-            self.command_wrapper.execute_command_with_connection(
-                connection_details,
-                self.virtual_switch_connect_command.connect_to_networks,
-                vm_uuid,
-                [vnic_to_network],
-                self.vc_data_model.default_network)
-
-        return set_command_result(result=connection_results, unpicklable=False)
 
     # remote command
     def disconnect_all(self, context, ports):
@@ -362,23 +296,6 @@ class CommandOrchestrator(object):
                                                                    resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
 
-    def _get_vm_uuid(self, action, session):
-        vm_uuid_values = [attr.attributeValue for attr in action.customActionAttributes
-                          if attr.attributeName == 'VM_UUID']
-        if vm_uuid_values:
-            return vm_uuid_values[0]
-        else:
-            resource_details = session.GetResourceDetails(action.actionTarget.fullName, False)
-            deployed_app_resource_model = self.resource_model_parser.convert_to_resource_model(resource_details)
-            return deployed_app_resource_model.vm_uuid
-
-    def _get_vnic_name(self, action):
-        vnic_name_values = [attr.attributeValue for attr in action.customActionAttributes
-                          if attr.attributeName == 'Vnic Name']
-        if vnic_name_values:
-            return vnic_name_values[0]
-        return None
-
     def _parse_remote_model(self, context):
         """
         parse the remote resource model and adds its full name
@@ -428,113 +345,3 @@ class CommandOrchestrator(object):
                                                                    resource_details.fullname,
                                                                    self.vc_data_model.default_network)
         return set_command_result(result=res, unpicklable=False)
-
-    def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
-                       connection_details):
-        mappings = []
-        results = []
-        for vlan in action.connectionParams.vlanIds:
-            vnic_to_network = VmNetworkMapping()
-            vnic_to_network.dv_switch_path = dv_switch_path
-            vnic_to_network.dv_switch_name = dv_switch_name
-            vnic_to_network.port_group_path = port_group_path
-            vnic_to_network.vlan_id = vlan
-            vnic_to_network.vlan_spec = action.connectionParams.mode
-
-            vnic_name = self._get_vnic_name(action)
-            if vnic_name:
-                vnic_to_network.vnic_name = vnic_name
-
-            mappings.append(vnic_to_network)
-        if mappings:
-            try:
-                connection_results = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                                          self.virtual_switch_connect_command.connect_to_networks,
-                                                                                          vm_uuid,
-                                                                                          mappings,
-                                                                                          default_network)
-                for connection_result in connection_results:
-                    result = ActionResult()
-                    result.actionId = str(action.actionId)
-                    result.type = str(action.type)
-                    result.infoMessage = 'VLAN successfully set'
-                    result.errorMessage = ''
-                    result.success = True
-                    result.updatedInterface = connection_result.mac_address
-                    results.append(result)
-
-            except Exception as ex:
-                error_result = ActionResult()
-                error_result.actionId = str(action.actionId)
-                error_result.type = str(action.type)
-                error_result.infoMessage = str('')
-                error_result.errorMessage = self._get_error_message_from_exception(ex)
-                error_result.success = False
-                error_result.updatedInterface = None
-                results.append(error_result)
-
-        return results
-
-    @staticmethod
-    def _get_error_message_from_exception(ex):
-        error_message = ''
-        if hasattr(ex, 'msg'):
-            error_message = ex.msg
-        if hasattr(ex, 'faultMessage'):
-            if hasattr(ex.faultMessage, 'message'):
-                error_message += '. ' + ex.faultMessage.message
-        return error_message
-
-    def _remove_vlan_bulk(self, action, default_network, vm_uuid, connection_details):
-        mappings = []
-        results = []
-
-        interface_attributes = [attr.attributeValue for attr in action.connectorAttributes
-                                if attr.attributeName == 'Interface']
-
-        if not interface_attributes:
-            error_result = ActionResult()
-            error_result.actionId = str(action.actionId)
-            error_result.type = str(action.type)
-            error_result.infoMessage = str('')
-            error_result.errorMessage = 'Interface attribute is missing on connectorAttributes for removeVlan action'
-            error_result.success = False
-            error_result.updatedInterface = None
-            results.append(error_result)
-            return results
-
-        vm_network_remove_mapping = VmNetworkRemoveMapping()
-        vm_network_remove_mapping.mac_address = interface_attributes[0]
-        vm_network_remove_mapping.vm_uuid = vm_uuid
-
-        mappings.append(vm_network_remove_mapping)
-
-        if mappings:
-            try:
-                connection_results = self.command_wrapper.execute_command_with_connection(
-                    connection_details,
-                    self.virtual_switch_disconnect_command.disconnect_from_networks,
-                    vm_uuid,
-                    mappings)
-
-                for connection_result in connection_results:
-                    result = ActionResult()
-                    result.actionId = str(action.actionId)
-                    result.type = str(action.type)
-                    result.infoMessage = 'VLAN successfully set'
-                    result.errorMessage = ''
-                    result.success = True
-                    result.updatedInterface = connection_result.vnic.macAddress
-                    results.append(result)
-
-            except Exception as ex:
-                error_result = ActionResult()
-                error_result.actionId = str(action.actionId)
-                error_result.type = str(action.type)
-                error_result.infoMessage = str('')
-                error_result.errorMessage = self._get_error_message_from_exception(ex)
-                error_result.success = False
-                error_result.updatedInterface = None
-                results.append(error_result)
-
-        return results
