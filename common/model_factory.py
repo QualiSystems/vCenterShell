@@ -1,3 +1,4 @@
+import time
 from qualipy.api.cloudshell_api import ResourceAttribute
 
 
@@ -14,18 +15,20 @@ class ResourceModelParser:
         :param resource_instance: Instance of resource
         :return:
         """
-
+        time.sleep(10)
         instance = ResourceModelParser.create_resource_model_instance(resource_instance)
         props = ResourceModelParser.get_public_properties(instance)
         for attrib in ResourceModelParser.get_resource_attributes(resource_instance):
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
             property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
             if props.__contains__(property_name):
+                print 'Handling property ' + property_name
                 value = self.get_attribute_value(attrib, resource_instance)
                 setattr(instance, property_name, value)
                 if hasattr(instance, property_name_for_attribute_name):
                     setattr(instance, property_name_for_attribute_name, attrib)
                     props.remove(property_name_for_attribute_name)
+                print 'Removing property ' + property_name
                 props.remove(property_name)
 
         if props:
@@ -126,7 +129,6 @@ class ResourceModelParser:
         :param attribute: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
-        print str(type(attribute))
         if isinstance(attribute, str) or isinstance(attribute, unicode):
             attribute_name = attribute
         elif isinstance(attribute, ResourceAttribute):

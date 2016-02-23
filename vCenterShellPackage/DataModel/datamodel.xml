@@ -329,8 +329,6 @@
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="vCenter Template" Value="" />
-			<ns0:AttributeValue Name="VM Cluster" Value="" />
-			<ns0:AttributeValue Name="VM Storage" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>

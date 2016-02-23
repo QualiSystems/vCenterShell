@@ -1,4 +1,5 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import time
 from qualipy.api.cloudshell_api import *
 
 from common.logger import getLogger
@@ -8,7 +9,7 @@ logger = getLogger("App Orchestration Driver")
 
 def execute_app_orchestration():
     # Retrieve data from environment variables
-    # time.sleep(15)
+    time.sleep(10)
     reservation_id = helpers.get_reservation_context_details().id
     resource_details = helpers.get_resource_context_details_dict()
     helpers.get_resource_context_details()
