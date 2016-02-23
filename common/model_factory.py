@@ -1,7 +1,3 @@
-import time
-from qualipy.api.cloudshell_api import ResourceAttribute
-
-
 class ResourceModelParser:
     ATTRIBUTE_NAME_POSTFIX = "_attribute"
 
@@ -15,7 +11,6 @@ class ResourceModelParser:
         :param resource_instance: Instance of resource
         :return:
         """
-        time.sleep(10)
         instance = ResourceModelParser.create_resource_model_instance(resource_instance)
         props = ResourceModelParser.get_public_properties(instance)
         for attrib in ResourceModelParser.get_resource_attributes(resource_instance):
@@ -39,7 +34,7 @@ class ResourceModelParser:
 
     def get_attribute_value(self, attrib, resource_instance):
         attributes = ResourceModelParser.get_resource_attributes(resource_instance)
-        if isinstance(attrib, ResourceAttribute):
+        if hasattr(attrib, 'Value') and hasattr(attrib, 'Name'):
             attribute_by_name = [attribute.Value for attribute in attributes if attribute.Name == attrib.Name]
             if attribute_by_name:
                 return attribute_by_name[0]
@@ -131,7 +126,7 @@ class ResourceModelParser:
         """
         if isinstance(attribute, str) or isinstance(attribute, unicode):
             attribute_name = attribute
-        elif isinstance(attribute, ResourceAttribute):
+        elif hasattr(attribute, 'Name'):
             attribute_name = attribute.Name
         else:
             raise Exception('Attribute type {0} is not supported'.format(str(type(attribute))))

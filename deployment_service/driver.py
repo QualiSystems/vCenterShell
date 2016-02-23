@@ -17,7 +17,6 @@ class DeploymentServiceDriver(object):
         self.resource_model_parser = resource_model_parser
 
     def execute(self):
-        time.sleep(20)
         api = helpers.get_api_session()
         data_holder = self._get_data_holder(api)
         json_data_holder = jsonpickle.encode(data_holder, unpicklable=False)
