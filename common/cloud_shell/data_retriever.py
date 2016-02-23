@@ -1,4 +1,5 @@
 ﻿from common.utilites.common_utils import first_or_default
+from models.VCenterImageModel import VCenterImageModel
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VCenterInventoryPathAttribute import VCenterInventoryPathAttribute
 from models.VCenterTemplateModel import *
@@ -7,6 +8,20 @@ from models.VMClusterModel import *
 
 class CloudshellDataRetrieverService:
     PATH_DELIMITER = "/"
+
+    def get_vcenter_image_attribute_data(self, resource_attributes):
+        model = VCenterImageModel()
+        model.auto_power_on = resource_attributes['Auto Power On']
+        model.auto_power_off = resource_attributes['Auto Power Off']
+        model.vcenter_image = resource_attributes['vCenter Image']
+        model.vcenter_image_arguments = resource_attributes['vCenter Image Arguments']
+        model.vcenter_name = resource_attributes['vCenter Name']
+        model.vm_cluster = resource_attributes['VM Cluster']
+        model.vm_location = resource_attributes['VM Location']
+        model.vm_resource = resource_attributes['VM Resource Pool']
+        model.vm_storage = resource_attributes['VM Storage']
+        model.wait_for_ip = resource_attributes['Wait for IP']
+        return model
 
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """

@@ -9,6 +9,7 @@ from common.cloud_shell.resource_remover import CloudshellResourceRemover
 from common.model_factory import ResourceModelParser
 from common.utilites.command_result import set_command_result
 from common.utilites.common_name import generate_unique_name
+from common.vcenter.ovf_service import OvfImageDeployerService
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
@@ -16,7 +17,7 @@ from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
-from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
+from vCenterShell.commands.deploy_vm import DeployCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
@@ -48,7 +49,11 @@ class CommandOrchestrator(object):
         self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        template_deployer = VirtualMachineDeployer(pv_service=pv_service, name_generator=generate_unique_name)
+        ovf_service = OvfImageDeployerService('C:\\Program Files\\VMware\\VMware OVF Tool\\ovftool.exe',  # get it from config
+                                              getLogger('OvfImageDeployerService'))
+        vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
+                                             name_generator=generate_unique_name,
+                                             ovf_service=ovf_service)
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
         virtual_machine_port_group_configurer = \
@@ -61,7 +66,7 @@ class CommandOrchestrator(object):
         # Command Wrapper
         self.command_wrapper = CommandWrapper(logger=getLogger, pv_service=pv_service)
         # Deploy Command
-        self.deploy_from_template_command = DeployFromTemplateCommand(deployer=template_deployer)
+        self.deploy_command = DeployCommand(deployer=vm_deployer)
 
         # Virtual Switch Revoke
         self.virtual_switch_disconnect_command = \
@@ -112,7 +117,7 @@ class CommandOrchestrator(object):
 
     def deploy_from_template(self, context, deploy_data):
         """
-        Deploy From Template Commnand, will deploy vm from template
+        Deploy From Template Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str deploy_data: represent a json of the parameters, example: {
@@ -143,8 +148,45 @@ class CommandOrchestrator(object):
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             connection_details,
-            self.deploy_from_template_command.execute_deploy_from_template,
+            self.deploy_command.execute_deploy_from_template,
             data_holder)
+
+        return set_command_result(result=result, unpicklable=False)
+
+    def deploy_from_image(self, context, deploy_data):
+        """
+        Deploy From Image Command, will deploy vm from ovf image
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {
+                "image_url": "c:\image.ovf" or
+                             "\\nas\shared\image.ovf" or
+                             "http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf",
+                "cluster_name": "QualiSB Cluster",
+                "resource_pool": "LiverPool",
+                "datastore_name": "eric ds cluster",
+                "datacenter_name": "QualiSB"
+                "power_on": False
+                "app_name": "appName"
+                "user_arguments": ["--compress=9", " --schemaValidate", "--etc"]
+            }
+        :return str deploy results
+        """
+
+        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            connection_details,
+            self.deploy_command.execute_deploy_from_image,
+            data_holder,
+            connection_details)
 
         return set_command_result(result=result, unpicklable=False)
 

@@ -7,7 +7,7 @@ class VCenterShellDriver:
         """
         ctor mast be without arguments, it is created with reflection at run time
         """
-        self.command_orchestrator = None # type: CommandOrchestrator
+        self.command_orchestrator = None  # type: CommandOrchestrator
 
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
@@ -49,3 +49,6 @@ class VCenterShellDriver:
 
     def deploy_from_template(self, context, deploy_data):
         return self.command_orchestrator.deploy_from_template(context, deploy_data)
+
+    def deploy_from_image(self, context, deploy_data):
+        return self.command_orchestrator.deploy_from_image(context, deploy_data)

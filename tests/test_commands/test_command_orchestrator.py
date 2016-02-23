@@ -58,6 +58,12 @@ class Test_command_orchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
+    def test_deploy_from_image(self):
+        # act
+        self.command_orchestrator.deploy_from_image(self.context, '{"name": "name"}')
+        # assert
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
     def test_power_off(self):
         # act
         self.command_orchestrator.power_off(self.context, self.ports)
