@@ -28,7 +28,7 @@ class Test_command_orchestrator(TestCase):
         self.setUp()
         requset = Mock()
 
-        res = self.driver.Connect(self.context, requset)
+        res = self.driver.ApplyConnectivityChanges(self.context, requset)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
