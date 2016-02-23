@@ -12,7 +12,7 @@ class VCenterShellDriver:
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
 
-    def Connect(self, context, request):
+    def ApplyConnectivityChanges(self, context, request):
         time.sleep(10)
         return self.command_orchestrator.connect_bulk(context, request)
 

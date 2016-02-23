@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TopologyInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Details Name="Visualization Starter" Alias="Visualization Starter" Public="false" DefaultDuration="120">
+  <Details Name="Virtualization Starter" Alias="Virtualization Starter" Public="false" DefaultDuration="120">
     <Categories />
     <Scripts>
       <Script Name="Connect All" />
