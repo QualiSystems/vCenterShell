@@ -138,18 +138,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="False" IsReadOnly="false" Name="QnQ" Type="Boolean">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Promiscuous Mode" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -180,7 +168,31 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Shutdown Method" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Power On" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Power Off" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Wait For IP" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Delete" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -250,7 +262,7 @@
 			<ns0:AttributeValue Name="VM Resource Pool" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
 			<ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
-			<ns0:AttributeValue Name="VM Shutdown Method" Value="hard" />
+			<ns0:AttributeValue Name="Shutdown Method" Value="hard" />
 			<ns0:AttributeValue Name="OVF Tools Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
 			<ns0:AttributeValue Name="Executions Server Selector" Value="" />
 			<ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
@@ -274,7 +286,7 @@
           <ns0:AttributeValues />
           <ns0:ParentModels>
             <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
-            <ns0:ParentModelName>vCenter</ns0:ParentModelName>
+            <ns0:ParentModelName>VMware vCenter</ns0:ParentModelName>
           </ns0:ParentModels>
           <ns0:Drivers />
           <ns0:Scripts />
@@ -341,18 +353,42 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter VM From Template" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="true">
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="true">
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Location" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power On" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Wait For IP" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
-            <ns0:AttributeValue Name="vCenter Template" Value="" />
+            <ns0:AttributeValue Name="Auto Power On" Value="True" />
+            <ns0:AttributeValue Name="Auto Power Off" Value="True" />
+            <ns0:AttributeValue Name="Wait For IP" Value="True" />
+            <ns0:AttributeValue Name="Auto Delete" Value="True" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
