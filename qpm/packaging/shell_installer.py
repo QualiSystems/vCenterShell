@@ -1,8 +1,8 @@
 import ConfigParser
 import os
 #from qualipy.api.QualiAPIClient import QualiAPIClient
-from cloudshell.api.cloudshell_api import CloudShellAPISession
-from qualipy.api.QualiAPIClient import QualiAPIClient
+#from cloudshell.api.cloudshell_api import CloudShellAPISession
+#from qualipy.api.QualiAPIClient import QualiAPIClient
 
 
 class ShellInstaller(object):
@@ -17,5 +17,5 @@ class ShellInstaller(object):
         password = config.get('Installation', 'password') or 'admin'
         domain = config.get('Installation', 'domain') or 'Global'
 
-        server = QualiAPIClient(host, port, username, password, domain)
-        server.upload_environment_zip_file(os.path.join(os.getcwd(), package_name + '.zip'))
+        #server = QualiAPIClient(host, port, username, password, domain)
+        #server.upload_environment_zip_file(os.path.join(os.getcwd(), package_name + '.zip'))
