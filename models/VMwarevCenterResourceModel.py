@@ -1,4 +1,4 @@
-class vCenterResourceModel(object):
+class VMwarevCenterResourceModel(object):
     def __init__(self):
         self.user = ''
         self.password = ''

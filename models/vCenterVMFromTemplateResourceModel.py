@@ -6,3 +6,5 @@ class vCenterVMFromTemplateResourceModel(object):
         self.vcenter_template = ''
         self.access_mode = ''
         self.vm_power_state = ''
+        self.vm_cluster = ''
+        self.vm_storage = ''
