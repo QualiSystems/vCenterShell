@@ -132,6 +132,18 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="False" IsReadOnly="false" Name="QnQ" Type="Boolean">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
@@ -281,7 +293,14 @@
       </ns0:Categories>
     </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ServiceType="Regular">
-      <ns0:AttachedAttributes />
+      <ns0:AttachedAttributes>
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="QnQ" UserInput="false">
+          <ns0:AllowedValues />
+        </ns0:AttachedAttribute>
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="CTag" UserInput="false">
+          <ns0:AllowedValues />
+        </ns0:AttachedAttribute>
+      </ns0:AttachedAttributes>
       <ns0:AttributeValues />
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="VLAN Auto" SupportsConcurrentCommands="false">
