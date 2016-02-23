@@ -20,7 +20,7 @@ class PackageManager(object):
 
     def install(self, package_name):
         installer = ShellInstaller()
-        installer.intstall(package_name)
+        installer.install(package_name)
 
 
 
