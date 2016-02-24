@@ -13,10 +13,11 @@
       <DeploymentPath Name="vCenter VM From Template" Default="true">
         <DeploymentService Name="vCenter VM From Template">
           <Attributes>
-            <Attribute Name="VM Cluster" Value="QualiSB Cluster/LiverPool" />
+            <Attribute Name="vCenter Name" Value="VMWare vCenter" />
+            <Attribute Name="vCenter Template" Value="YOUR_FOLDER/YOUR_TEMPLATE" />
+            <Attribute Name="VM Cluster" Value="QualiSB Cluster" />
+            <Attribute Name="VM Resource Pool" Value="LiverPool" />
             <Attribute Name="VM Storage" Value="eric ds cluster" />
-            <Attribute Name="vCenter Template" Value="vCenter/QualiSB/YOUR_FOLDER/YOUR_TEMPLATE" />
-             <Attribute Name="IP Regex" Value="" />
           </Attributes>
         </DeploymentService>
       </DeploymentPath>

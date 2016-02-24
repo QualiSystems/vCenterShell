@@ -1,19 +1,17 @@
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
-import time
 
 
 class VCenterShellDriver:
     def __init__(self):
         """
-        ctor mast be without arguments, it is created with reflection at run time
+        ctor must be without arguments, it is created with reflection at run time
         """
         self.command_orchestrator = None # type: CommandOrchestrator
 
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
 
-    def Connect(self, context, request):
-        time.sleep(10)
+    def ApplyConnectivityChanges(self, context, request):
         return self.command_orchestrator.connect_bulk(context, request)
 
     def disconnect_all(self, context, ports):

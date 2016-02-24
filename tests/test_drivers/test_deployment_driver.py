@@ -3,6 +3,7 @@
 from mock import Mock, MagicMock
 
 from common.cloud_shell.data_retriever import *
+from common.model_factory import ResourceModelParser
 from deployment_service.driver import *
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
@@ -14,20 +15,27 @@ class test_DeploymentService(unittest.TestCase):
         cs.getVCenterTemplateAttributeData = Mock(return_value=VCenterTemplateModel("vCenter", "some_folder",
                                                                                     "vm_template"))
         cs.getPowerStateAttributeData = Mock(return_value=True)
-        cs.getVMClusterAttributeData = Mock(return_value=VMClusterModel("some_cluster", "some_resource_pool"))
         cs.getVMStorageAttributeData = Mock(return_value="some_datastore")
 
-        deploymentService = DeploymentServiceDriver(cs)
+        vcenter_resource_model = Mock()
+        vcenter_resource_model.vm_cluster = 'some_cluster'
+        vcenter_resource_model.vm_resource_pool = 'some_resource_pool'
+
+        resource_model_parser = Mock()
+        resource_model_parser.convert_to_resource_model = Mock(return_value=vcenter_resource_model)
+
+        deployment_service = DeploymentServiceDriver(cs, resource_model_parser)
 
         helpers.get_resource_context_details = Mock()
 
         os.environ["NAME"] = "app name"
 
-        data_holder = deploymentService._get_data_holder()
+        vcenter_instance = Mock()
 
-        self.assertEquals(data_holder.template_model.vCenter_resource_name, "vCenter")
-        self.assertEquals(data_holder.template_model.vm_folder, "some_folder")
-        self.assertEquals(data_holder.template_model.template_name, "vm_template")
+        api = Mock()
+        api.GetResourceDetails = Mock(return_value=vcenter_instance)
+
+        data_holder = deployment_service._get_data_holder(api)
 
         self.assertEquals(data_holder.datastore_name, "some_datastore")
 
@@ -58,7 +66,7 @@ class test_DeploymentService(unittest.TestCase):
                           InputNameValue(DeploymentServiceDriver.INPUT_KEY_DEPLOY_DATA, json_data_holder)]
 
         cs = Mock()
-        deploymentService = DeploymentServiceDriver(cs)
+        deploymentService = DeploymentServiceDriver(cs, ResourceModelParser())
         deploymentService._get_data_holder = Mock(return_value=data_holder)
         deploymentService._get_command_inputs_list = Mock(return_value=command_inputs)
 
@@ -75,7 +83,7 @@ class test_DeploymentService(unittest.TestCase):
         json_data = '{"key1":"value1"}'
 
         cs = Mock()
-        deployment_service = DeploymentServiceDriver(cs)
+        deployment_service = DeploymentServiceDriver(cs, ResourceModelParser())
         command_inputs = deployment_service._get_command_inputs_list(json_data)
 
         self.assertEquals(len(command_inputs), 1)

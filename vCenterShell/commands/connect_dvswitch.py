@@ -41,6 +41,9 @@ class VirtualSwitchConnectCommand:
 
         default_network_instance = self.pv_service.get_network_by_full_name(si, default_network_name)
 
+        if not default_network_instance:
+            raise ValueError('Default Network {0} not found'.format(default_network_name))
+
         mappings = self._prepare_mappings(vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(

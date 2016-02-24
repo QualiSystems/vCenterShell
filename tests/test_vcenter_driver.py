@@ -1,26 +1,35 @@
 from unittest import TestCase
 
-from mock import Mock, patch, MagicMock
+from cloudshell.api.cloudshell_api import ResourceInfo
+from mock import Mock, patch, MagicMock, create_autospec
 
 from vcentershell_driver.driver import VCenterShellDriver
 
-class MockResourceParser(object):
-    @staticmethod
-    def convert_to_resource_model(dummy, resource):
-        return resource
 
-
-class Test_command_orchestrator(TestCase):
+class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
-        self.resource = Mock()
+        self.resource = create_autospec(ResourceInfo)
+        self.resource.ResourceModelName = 'VMwarev Center'
+        self.resource.ResourceAttributes = {'User': 'user',
+                                            'Password': '123',
+                                            'Default dvSwitch': 'switch1',
+                                            'Holding Network': 'anetwork',
+                                            'Default Port Group Location': 'Quali',
+                                            'VM Cluster': 'Quali',
+                                            'VM Location': 'Quali',
+                                            'VM Resource Pool': 'Quali',
+                                            'VM Storage': 'Quali',
+                                            'Shutdown Method': 'hard',
+                                            'OVF Tool Path': 'C\\program files\ovf',
+                                            'Execution Server Selector': '',
+                                            'Promiscuous Mode': 'True'
+                                            }
         self.context = Mock()
         self.context.resource = self.resource
         self.driver.command_orchestrator = MagicMock()
         self.ports = Mock()
 
-    @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
-           MockResourceParser.convert_to_resource_model)
     def test_init(self):
         self.driver.initialize(self.context)
 
@@ -28,7 +37,7 @@ class Test_command_orchestrator(TestCase):
         self.setUp()
         requset = Mock()
 
-        res = self.driver.Connect(self.context, requset)
+        res = self.driver.ApplyConnectivityChanges(self.context, requset)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
