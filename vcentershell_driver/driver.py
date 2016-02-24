@@ -4,7 +4,7 @@ from vCenterShell.commands.command_orchestrator import CommandOrchestrator
 class VCenterShellDriver:
     def __init__(self):
         """
-        ctor mast be without arguments, it is created with reflection at run time
+        ctor must be without arguments, it is created with reflection at run time
         """
         self.command_orchestrator = None # type: CommandOrchestrator
 

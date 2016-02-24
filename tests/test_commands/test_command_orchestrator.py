@@ -1,19 +1,28 @@
 from unittest import TestCase
-from mock import patch, Mock
+
+from cloudshell.api.cloudshell_api import ResourceInfo
+from mock import patch, Mock, create_autospec
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
 
 
-class MockResourceParser(object):
-    @staticmethod
-    def convert_to_resource_model(dummy, resource):
-        return resource
-
-
-class Test_command_orchestrator(TestCase):
-    @patch('common.model_factory.ResourceModelParser.convert_to_resource_model',
-           MockResourceParser.convert_to_resource_model)
+class TestCommandOrchestrator(TestCase):
     def setUp(self):
-        self.resource = Mock()
+        self.resource = create_autospec(ResourceInfo)
+        self.resource.ResourceModelName = 'VMwarev Center'
+        self.resource.ResourceAttributes = {'User': 'user',
+                                            'Password': '123',
+                                            'Default dvSwitch': 'switch1',
+                                            'Holding Network': 'anetwork',
+                                            'Default Port Group Location': 'Quali',
+                                            'VM Cluster': 'Quali',
+                                            'VM Location': 'Quali',
+                                            'VM Resource Pool': 'Quali',
+                                            'VM Storage': 'Quali',
+                                            'Shutdown Method': 'hard',
+                                            'OVF Tool Path': 'C\\program files\ovf',
+                                            'Execution Server Selector': '',
+                                            'Promiscuous Mode': 'True'
+                                            }
         self.context = Mock()
         session = Mock()
         remote_resource = Mock()

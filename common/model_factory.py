@@ -54,6 +54,7 @@ class ResourceModelParser:
             return resource_instance.ResourceAttributes
         if hasattr(resource_instance, "attributes"):
             return resource_instance.attributes
+        raise ValueError('Object {0} does not have any attributes property'.format(str(resource_instance)))
 
     @staticmethod
     def get_public_properties(instance):
