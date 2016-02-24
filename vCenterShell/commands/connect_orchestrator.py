@@ -1,4 +1,5 @@
 import copy
+import traceback
 import uuid
 from multiprocessing.pool import ThreadPool
 
@@ -176,11 +177,11 @@ class ConnectionCommandOrchestrator(object):
 
     @staticmethod
     def _get_error_message_from_exception(ex):
-        error_message = ''
+        error_message = traceback.format_exc()
         if hasattr(ex, 'message'):
-            error_message = ex.message
+            error_message += ex.message
         elif hasattr(ex, 'msg'):
-            error_message = ex.msg
+            error_message += ex.msg
         if hasattr(ex, 'faultMessage'):
             if hasattr(ex.faultMessage, 'message'):
                 error_message += '. ' + ex.faultMessage.message
