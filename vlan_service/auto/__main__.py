@@ -1,6 +1,7 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from qualipy.api.cloudshell_api import AttributeNameValue
 from common.model_factory import ResourceModelParser
+from models import VLANAutoResourceModel
 from vlan_service.resolver.provider import VlanResolverProvider
 from common.utilites.command_result import set_command_result
 from common.logger import getLogger
@@ -12,7 +13,7 @@ def main():
     # get vlan auto resource model
     resource_context = helpers.get_resource_context_details()
     resource_model_parser = ResourceModelParser()
-    vlan_auto_resource_model = resource_model_parser.convert_to_resource_model(resource_context)
+    vlan_auto_resource_model = resource_model_parser.convert_to_resource_model(resource_context, VLANAutoResourceModel)
     # get reservation details
     reservation_context = helpers.get_reservation_context_details()
     # Start api session

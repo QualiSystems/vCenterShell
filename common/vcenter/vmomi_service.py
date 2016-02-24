@@ -371,6 +371,10 @@ class pyVmomiService:
 
         template = self.find_vm_by_name(clone_params.si, clone_params.vm_folder, clone_params.template_name)
 
+        if not template:
+            raise ValueError('Virtual Machine Template with name {0} was not found under folder {1}'
+                             .format(clone_params.template_name, clone_params.vm_folder))
+
         if clone_params.datastore_name is None:
             datastore = template.datastore[0]
         else:

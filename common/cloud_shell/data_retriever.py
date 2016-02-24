@@ -71,6 +71,22 @@ class CloudshellDataRetrieverService:
 
         return VCenterConnectionDetails(vcenter_url, user, password)
 
+    def get_vcenter_connection_details(self, session, vcenter_resource_model, vcenter_resource_instance):
+        """
+        Return a dictionary with vCenter connection details. Methods receives a ResourceDetails object of a vCenter resource
+        and retrieves the connection details from its attributes.
+
+        :param session:                    the cloushell api session, its needed in order to decrypt the password
+        :param vcenter_resource_model:   the VMwarevCenterResourceModel object of a vCenter resource
+        :param vcenter_resource_instance:   the ResourceDetails object of a vCenter resource
+        """
+        user = vcenter_resource_model.user
+        encrypted_pass = vcenter_resource_model.password
+        vcenter_url = vcenter_resource_instance.address
+        password = session.DecryptPassword(encrypted_pass).Value
+
+        return VCenterConnectionDetails(vcenter_url, user, password)
+
     # obsolete
     def getVCenterInventoryPathAttributeData(self, resource_attributes):
         """ get vCenter resource name & virtual machine folder path """
