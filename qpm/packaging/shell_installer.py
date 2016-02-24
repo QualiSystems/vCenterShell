@@ -1,24 +1,19 @@
-from qualipy.api.QualiAPIClient import *
-import argparse
-import sys
+import ConfigParser
+import os
+from quali_api_client import QualiAPIClient
 
 
-class MyParser(argparse.ArgumentParser):
-    def error(self, message):
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(2)
+class ShellInstaller(object):
+    def install(self, package_name):
+        config = ConfigParser.ConfigParser()
 
-parser = MyParser(argparse.ArgumentParser(description='QualiPackage builds and deploys the vCenterShell package to your Cloudshell server'))
-parser.add_argument('--host', type=str, help='ip or hostname of Cloudshell server', default='localhost')
-parser.add_argument('--port', type=int, help='Cloudshell server port for quali api requests (9000 by default)', default=9000)
-parser.add_argument('--username', type=str, help='Admin username for Cloudshell Server', default='admin')
-parser.add_argument('--password', type=str, help='Admin password for Cloudshell Server', default='admin')
-parser.add_argument('--domain', type=str, help='Cloudshell domain, Global by default', default='Global')
-parser.add_argument('--package', type=str, help='Package to upload', required=True)
+        config_path = os.path.join(os.getcwd(), 'qpm.ini')
+        config.readfp(open(config_path))
+        host = config.get('Installation', 'host') or 'localhost'
+        port = config.get('Installation', 'port') or '9000'
+        username = config.get('Installation', 'username') or 'admin'
+        password = config.get('Installation', 'password') or 'admin'
+        domain = config.get('Installation', 'domain') or 'Global'
 
-
-args = parser.parse_args()
-
-server = QualiAPIClient(args.host, args.port, args.username, args.password, args.domain)
-server.upload_environment_zip_file(args.package)
+        server = QualiAPIClient(host, port, username, password, domain)
+        server.upload_environment_zip_file(os.path.join(os.getcwd(), package_name + '.zip'))
