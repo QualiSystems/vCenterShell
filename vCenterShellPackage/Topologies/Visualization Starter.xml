@@ -4,6 +4,7 @@
     <Categories />
     <Scripts>
       <Script Name="Connect All" />
+      <Script Name="Setup" />
     </Scripts>
     <Diagram Zoom="1" />
   </Details>
