@@ -1,8 +1,10 @@
 import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import time
 from qualipy.api.cloudshell_api import *
 
+from models.VCenterTemplateModel import VCenterTemplateModel
+from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from models.DeployDataHolder import DeployDataHolder
 from models.VMClusterModel import VMClusterModel
 
@@ -39,12 +41,11 @@ class DeploymentServiceDriver(object):
         resource_context = helpers.get_resource_context_details()
 
         # get vCenter resource name, template name, template folder
-        template_model = self.cs_retriever_service.getVCenterTemplateAttributeData(resource_context)
-
-        vcenter_instance = api.GetResourceDetails(template_model.vCenter_resource_name)
-        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_instance)
+        vcenter_template_resource_model = self.resource_model_parser.convert_to_resource_model(resource_context,
+                                                                                vCenterVMFromTemplateResourceModel)
+        vcenter_resource_model = self._get_vcenter(api, vcenter_template_resource_model.vcenter_name)
+        template_model = self._create_vcenter_template_model(vcenter_resource_model, vcenter_template_resource_model)
         vm_cluster_model = VMClusterModel(vcenter_resource_model.vm_cluster, vcenter_resource_model.vm_resource_pool)
-        template_model.app_name = os.environ["NAME"]
 
         # get power state of the cloned VM
         power_on = False  # self.cs_retriever_service.getPowerStateAttributeData(resource_context)
@@ -56,6 +57,36 @@ class DeploymentServiceDriver(object):
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
                                                    power_on=power_on)
+
+    def _get_vcenter(self, api, vcenter_name):
+        if not vcenter_name:
+            raise ValueError('VMWare vCenter name is empty')
+        vcenter_instance = api.GetResourceDetails(vcenter_name)
+        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_instance,
+                                                                                      VMwarevCenterResourceModel)
+        return vcenter_resource_model
+
+    def _create_vcenter_template_model(self, vcenter_resource_model, vcenter_template_resource_model):
+        vcenter_name = vcenter_template_resource_model.vcenter_name
+        if not vcenter_name:
+            raise ValueError('VCenter Name is empty')
+        vm_location = vcenter_template_resource_model.vm_location or vcenter_resource_model.vm_location
+        if not vm_location:
+            raise ValueError('VM Location is empty')
+        vcenter_template = vcenter_template_resource_model.vcenter_template or vcenter_resource_model.vcenter_template
+        if not vcenter_template:
+            raise ValueError('VCenter Template is empty')
+        app_name = os.environ["NAME"]
+        if not app_name:
+            raise ValueError('NAME input parameter is empty')
+
+        template_model = VCenterTemplateModel(
+            vcenter_resource_name=vcenter_name,
+            vm_folder=vm_location,
+            template_name=vcenter_template,
+            app_name=app_name
+        )
+        return template_model
 
     def _get_command_inputs_list(self, json_data_holder):
         return [InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]

@@ -13,8 +13,8 @@ class ResourceModelParser:
         :return:
         """
         if resource_model_type:
-            if not callable(resource_model_type):
-                raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
+            #if not callable(resource_model_type):
+            #    raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
             instance = resource_model_type()
         else:
             instance = ResourceModelParser.create_resource_model_instance(resource_instance)
@@ -23,13 +23,11 @@ class ResourceModelParser:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
             property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
             if props.__contains__(property_name):
-                print 'Handling property ' + property_name
                 value = self.get_attribute_value(attrib, resource_instance)
                 setattr(instance, property_name, value)
                 if hasattr(instance, property_name_for_attribute_name):
                     setattr(instance, property_name_for_attribute_name, attrib)
                     props.remove(property_name_for_attribute_name)
-                print 'Removing property ' + property_name
                 props.remove(property_name)
 
         if props:

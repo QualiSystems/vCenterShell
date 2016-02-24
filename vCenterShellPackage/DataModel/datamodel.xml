@@ -385,6 +385,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="vCenter Name" Value="VMWare vCenter" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
             <ns0:AttributeValue Name="Wait For IP" Value="True" />
