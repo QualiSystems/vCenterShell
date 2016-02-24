@@ -1,4 +1,3 @@
-import time
 from logging import getLogger
 
 import jsonpickle
@@ -14,6 +13,7 @@ from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
@@ -45,7 +45,8 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource)
+        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                                  VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         template_deployer = VirtualMachineDeployer(pv_service=pv_service, name_generator=generate_unique_name)
