@@ -18,19 +18,19 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default Port Group Location" Type="String">
+	<ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch" Type="String">
+	<ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity" IsReadOnly="false" Name="Default dvSwitch" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Holding Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default network that we configre whn disconnect from another network." IsReadOnly="false" Name="Holding Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -42,7 +42,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Executions Server Selector" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="This attribute points to a pre-define group of execution servers. Usually used for different sites or domains." IsReadOnly="false" Name="Execution Server Selector" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -52,19 +52,19 @@
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Generic Input" Type="String">
       <ns0:Rules />
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Template" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="vCenter VM tempalte to use in the VM creation. Should include the full path and the template name, for example QualiFolder/Template1" IsReadOnly="false" Name="vCenter Template" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Cluster" Type="String">
+	<ns0:AttributeInfo DefaultValue="" Description="The vCenter cluster or host that will be used when deploying a VM." IsReadOnly="false" Name="VM Cluster" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Storage" Type="String">
+	<ns0:AttributeInfo DefaultValue="" Description="The vCenter storage that will be used when deploying a VM." IsReadOnly="false" Name="VM Storage" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -150,55 +150,61 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Resource Pool" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created." IsReadOnly="false" Name="VM Resource Pool" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Location" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The folder within the vCenter in which the VM will be created." IsReadOnly="false" Name="VM Location" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Shutdown Method" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The shutdown method that will be used when powering off the VM. Possible options are 'Hard' and 'Soft' shutdown." IsReadOnly="false" Name="Shutdown Method" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="OVF Tools Path" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The path for the OVF tool installation. Use the same path for all execution servers." IsReadOnly="false" Name="OVF Tool Path" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Name" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter resource name in CloudShell." IsReadOnly="false" Name="vCenter Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Power On" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Power Off" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power off of an app during reservation Teardown." IsReadOnly="false" Name="Auto Power Off" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Wait For IP" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="If true the app deployment process will wait for the VM to get an IP." IsReadOnly="false" Name="Wait For IP" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Auto Delete" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" Description="The datacenter within the vCenter that will be used for VM deployment. All other settings of this vCenter resource should refer to entities associated with this datacenter." IsReadOnly="false" Name="Default Datacenter" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -245,10 +251,10 @@
                 <ns0:AllowedValue>soft</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="OVF Tools Path">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="OVF Tool Path">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Executions Server Selector">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Execution Server Selector">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Promiscuous Mode">
@@ -269,8 +275,8 @@
 			<ns0:AttributeValue Name="VM Storage" Value="" />
 			<ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
 			<ns0:AttributeValue Name="Shutdown Method" Value="hard" />
-			<ns0:AttributeValue Name="OVF Tools Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
-			<ns0:AttributeValue Name="Executions Server Selector" Value="" />
+			<ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
+			<ns0:AttributeValue Name="Execution Server Selector" Value="" />
 			<ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
           </ns0:AttributeValues>
           <ns0:ParentModels />

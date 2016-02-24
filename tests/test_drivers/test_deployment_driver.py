@@ -37,10 +37,6 @@ class test_DeploymentService(unittest.TestCase):
 
         data_holder = deployment_service._get_data_holder(api)
 
-        self.assertEquals(data_holder.template_model.vCenter_resource_name, "vCenter")
-        self.assertEquals(data_holder.template_model.vm_folder, "some_folder")
-        self.assertEquals(data_holder.template_model.template_name, "vm_template")
-
         self.assertEquals(data_holder.datastore_name, "some_datastore")
 
         self.assertEquals(data_holder.vm_cluster_model.cluster_name, "some_cluster")

@@ -4,7 +4,7 @@ class ResourceModelParser:
     def __init__(self):
         pass
 
-    def convert_to_resource_model(self, resource_instance, resource_model_type = None):
+    def convert_to_resource_model(self, resource_instance, resource_model_type):
         """
         Converts an instance of resource with dictionary of attributes
         to a class instance according to family and assigns its properties
@@ -13,8 +13,8 @@ class ResourceModelParser:
         :return:
         """
         if resource_model_type:
-            #if not callable(resource_model_type):
-            #    raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
+            if not callable(resource_model_type):
+                raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
             instance = resource_model_type()
         else:
             instance = ResourceModelParser.create_resource_model_instance(resource_instance)
