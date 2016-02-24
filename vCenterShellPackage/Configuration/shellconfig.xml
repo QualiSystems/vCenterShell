@@ -20,7 +20,7 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
 			<Attribute Name="VM Storage" Value="" />
 			<Attribute Name="VM Location" Value="QualiSystems" />
 			<Attribute Name="Shutdown Method" Value="Hard" />
-			<Attribute Name="OVF Tools Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
+			<Attribute Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
 			<Attribute Name="Execution Server Selector" Value="" />
         </Attributes>
     </ResourceTemplate>
