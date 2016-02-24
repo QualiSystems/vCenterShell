@@ -1,21 +1,23 @@
-from cloudshell.api.cloudshell_api import ResourceAttribute
-
-
 class ResourceModelParser:
     ATTRIBUTE_NAME_POSTFIX = "_attribute"
 
     def __init__(self):
         pass
 
-    def convert_to_resource_model(self, resource_instance):
+    def convert_to_resource_model(self, resource_instance, resource_model_type):
         """
         Converts an instance of resource with dictionary of attributes
         to a class instance according to family and assigns its properties
         :param resource_instance: Instance of resource
+        :param resource_model_type: Resource Model type to create
         :return:
         """
-
-        instance = ResourceModelParser.create_resource_model_instance(resource_instance)
+        if resource_model_type:
+            if not callable(resource_model_type):
+                raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
+            instance = resource_model_type()
+        else:
+            instance = ResourceModelParser.create_resource_model_instance(resource_instance)
         props = ResourceModelParser.get_public_properties(instance)
         for attrib in ResourceModelParser.get_resource_attributes(resource_instance):
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
@@ -36,7 +38,7 @@ class ResourceModelParser:
 
     def get_attribute_value(self, attrib, resource_instance):
         attributes = ResourceModelParser.get_resource_attributes(resource_instance)
-        if isinstance(attrib, ResourceAttribute):
+        if hasattr(attrib, 'Value') and hasattr(attrib, 'Name'):
             attribute_by_name = [attribute.Value for attribute in attributes if attribute.Name == attrib.Name]
             if attribute_by_name:
                 return attribute_by_name[0]
@@ -52,6 +54,7 @@ class ResourceModelParser:
             return resource_instance.ResourceAttributes
         if hasattr(resource_instance, "attributes"):
             return resource_instance.attributes
+        raise ValueError('Object {0} does not have any attributes property'.format(str(resource_instance)))
 
     @staticmethod
     def get_public_properties(instance):
@@ -105,7 +108,7 @@ class ResourceModelParser:
         try:
             module = __import__(class_path, fromlist=[class_name])
         except ImportError:
-            raise ValueError("Module '%s' could not be imported" % (module_path,))
+            raise ValueError('Class {0} could not be imported'.format(class_path))
 
         try:
             cls = getattr(module, class_name)
@@ -126,10 +129,9 @@ class ResourceModelParser:
         :param attribute: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
-        print str(type(attribute))
         if isinstance(attribute, str) or isinstance(attribute, unicode):
             attribute_name = attribute
-        elif isinstance(attribute, ResourceAttribute):
+        elif hasattr(attribute, 'Name'):
             attribute_name = attribute.Name
         else:
             raise Exception('Attribute type {0} is not supported'.format(str(type(attribute))))

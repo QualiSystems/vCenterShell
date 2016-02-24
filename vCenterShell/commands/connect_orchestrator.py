@@ -1,4 +1,5 @@
 import copy
+import traceback
 import uuid
 from multiprocessing.pool import ThreadPool
 
@@ -17,10 +18,13 @@ class ConnectionCommandOrchestrator(object):
         self.vc_data_model = vc_data_model
 
     def connect_bulk(self, si, request):
-        dv_switch_path = self.vc_data_model.default_dvswitch_path
-        dv_switch_name = self.vc_data_model.default_dvswitch_name
-        port_group_path = self.vc_data_model.default_port_group_path
-        default_network = self.vc_data_model.default_network
+        dv_switch_path_parts = str.split(self.vc_data_model.default_dvswitch, '\\')
+        if len(dv_switch_path_parts) < 2:
+            raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
+        dv_switch_path = dv_switch_path_parts[0]
+        dv_switch_name = dv_switch_path_parts[1]
+        port_group_path = self.vc_data_model.default_port_group_location
+        default_network = self.vc_data_model.holding_network
         holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)
@@ -173,11 +177,11 @@ class ConnectionCommandOrchestrator(object):
 
     @staticmethod
     def _get_error_message_from_exception(ex):
-        error_message = ''
+        error_message = traceback.format_exc()
         if hasattr(ex, 'message'):
-            error_message = ex.message
+            error_message += ex.message
         elif hasattr(ex, 'msg'):
-            error_message = ex.msg
+            error_message += ex.msg
         if hasattr(ex, 'faultMessage'):
             if hasattr(ex.faultMessage, 'message'):
                 error_message += '. ' + ex.faultMessage.message
