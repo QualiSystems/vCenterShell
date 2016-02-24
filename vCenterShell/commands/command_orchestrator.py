@@ -13,6 +13,7 @@ from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
+from models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
@@ -99,7 +100,7 @@ class CommandOrchestrator(object):
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
@@ -135,7 +136,9 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
+                                                                           context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -162,7 +165,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -188,7 +191,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -211,7 +214,7 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -236,7 +239,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -285,7 +288,7 @@ class CommandOrchestrator(object):
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
 
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -306,7 +309,8 @@ class CommandOrchestrator(object):
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
         resource = context.remote_endpoints[0]
-        resource_details = self.resource_model_parser.convert_to_resource_model(resource)
+        resource_details = self.resource_model_parser.convert_to_resource_model(resource,
+                                                                                GenericDeployedAppResourceModel)
         resource_details.fullname = resource.fullname
         return resource_details
 
@@ -314,7 +318,7 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         res = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                    self.vm_power_management_command.power_on,
@@ -334,7 +338,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
