@@ -340,6 +340,38 @@
             <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
+        <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
+          <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Shared</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Access</ns0:AllowedValue>
+                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+          </ns0:AttachedAttributes>
+          <ns0:AttributeValues>
+            <ns0:AttributeValue Name="Isolation Level" Value="Shared" />
+            <ns0:AttributeValue Name="Access Mode" Value="Access" />
+          </ns0:AttributeValues>
+          <ns0:ParentModels />
+          <ns0:Drivers>
+            <ns0:DriverName>Generic Driver</ns0:DriverName>
+          </ns0:Drivers>
+          <ns0:Scripts>
+            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
+          </ns0:Scripts>
+        </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
         <ns0:Category>Virtualization</ns0:Category>
