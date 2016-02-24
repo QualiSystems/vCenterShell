@@ -93,6 +93,32 @@
                 <ns0:Rule Name="Setting" />
             </ns0:Rules>
         </ns0:AttributeInfo>
+
+        <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
+            <ns0:Rules>
+                <ns0:Rule Name="Link Configurations" />
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+            <ns0:Rules>
+                <ns0:Rule Name="Link Configurations" />
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
+            <ns0:Rules>
+                <ns0:Rule Name="Link Configurations" />
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
+            <ns0:Rules>
+                <ns0:Rule Name="Link Configurations" />
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
+            <ns0:Rules>
+                <ns0:Rule Name="Link Configurations" />
+            </ns0:Rules>
+        </ns0:AttributeInfo>
         <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
             <ns0:Rules>
                 <ns0:Rule Name="Configuration" />
