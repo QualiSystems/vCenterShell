@@ -38,7 +38,7 @@ class DeployFromImage(object):
 
     def _get_deployment_info(self, image_model, name):
         """
-        :type image_model: models.VCenterImageModel.VCenterImageModel
+        :type image_model: models.vCenterVMFromImageResourceModel.VCenterImageModel
         """
         # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
         data_cluster_path = image_model.vm_cluster.split('/')
@@ -53,7 +53,7 @@ class DeployFromImage(object):
             "power_on": image_model.auto_power_on,
             "app_name": name,
             "cluster_name": cluster,  # todo: raz a after refactoring of the attributes remove this and use "VM Cluster"
-            "resource_pool": image_model.vm_resource,
+            "resource_pool": image_model.vm_resource_pool,
             "datastore_name": image_model.vm_storage,
             "datacenter_name": datacenter,  # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
             "image_url": image_model.vcenter_image})
