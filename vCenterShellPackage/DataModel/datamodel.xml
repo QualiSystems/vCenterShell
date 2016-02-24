@@ -60,7 +60,7 @@
                 <ns0:Rule Name="Setting" />
             </ns0:Rules>
         </ns0:AttributeInfo>
-        <ns0:AttributeInfo DefaultValue="" Description="The full path to ovftool installed on the system" IsReadOnly="false" Name="OVF Tools Path" Type="String">
+        <ns0:AttributeInfo DefaultValue="C:\\Program Files\\VMware\\VMware OVF Tool\\ovftool.exe" Description="The full path to ovftool installed on the system" IsReadOnly="false" Name="OVF Tools Path" Type="String">
             <ns0:Rules>
                 <ns0:Rule Name="Configuration" />
                 <ns0:Rule Name="Setting" />
@@ -187,6 +187,9 @@
                             <ns0:AllowedValues />
                         </ns0:AttachedAttribute>
                         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Network">
+                            <ns0:AllowedValues />
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="OVF Tools Path">
                             <ns0:AllowedValues />
                         </ns0:AttachedAttribute>
                     </ns0:AttachedAttributes>
