@@ -49,8 +49,8 @@ class CommandOrchestrator(object):
         self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        ovf_service = OvfImageDeployerService('C:\\Program Files\\VMware\\VMware OVF Tool\\ovftool.exe',  # get it from config
-                                              getLogger('OvfImageDeployerService'))
+        ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tools_path, getLogger('OvfImageDeployerService'))
+
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service)

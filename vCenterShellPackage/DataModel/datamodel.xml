@@ -1,421 +1,505 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
-  <ns0:Attributes>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM_UUID" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="User" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Password" Type="Password">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default port group path" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch Path" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default dvSwitch Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Default Network" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Cloud Provider" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Domain Selector" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-        <ns0:Rule Name="Execution Server Selector" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Generic Input" Type="String">
-      <ns0:Rules />
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Template" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Cluster" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM Storage" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-        <ns0:Rule Name="Admin Only" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Isolation Level" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="False" IsReadOnly="false" Name="QnQ" Type="Boolean">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-  </ns0:Attributes>
-  <ns0:ResourceFamilies>
-    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter" SupportsConcurrentCommands="true">
-          <ns0:AttachedAttributes>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Password">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default port group path">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Path">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Name">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Network">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-			<ns0:AttributeValue Name="User" Value="" />
-			<ns0:AttributeValue Name="Password" Value="" />
-			<ns0:AttributeValue Name="Default port group path" Value="" />
-			<ns0:AttributeValue Name="Default dvSwitch Path" Value="" />
-			<ns0:AttributeValue Name="Default dvSwitch Name" Value="" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>VCenter Shell Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsConnectable="true" IsSearchable="true" Name="Temp Command Connector">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Temp Command Connector Model" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels>
-            <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
-            <ns0:ParentModelName>vCenter</ns0:ParentModelName>
-          </ns0:ParentModels>
-          <ns0:Drivers />
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App">
-      <ns0:AttachedAttributes>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-      </ns0:AttachedAttributes>
-      <ns0:AttributeValues>
-        <ns0:AttributeValue Name="VM_UUID" Value="" />
-        <ns0:AttributeValue Name="Cloud Provider" Value="" />
-      </ns0:AttributeValues>
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="VM_UUID" Value="" />
-            <ns0:AttributeValue Name="Cloud Provider" Value="" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-          </ns0:Drivers>
-          <ns0:Scripts>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Installation Options" ServiceType="Installation">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Generic Installation Option" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Generic Input" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Generic Input" Value="" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Deployment Options" ServiceType="Deployment">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="vCenter VM From Template" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="vCenter Template" Value="" />
-			<ns0:AttributeValue Name="VM Cluster" Value="" />
-			<ns0:AttributeValue Name="VM Storage" Value="" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Deploy</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ServiceType="Regular">
-      <ns0:AttachedAttributes>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="QnQ" UserInput="false">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="CTag" UserInput="false">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-      </ns0:AttachedAttributes>
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="VLAN Auto" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges" UserInput="false">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Shared</ns0:AllowedValue>
-                <ns0:AllowedValue>Exclusive</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Access</ns0:AllowedValue>
-                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Allocation Ranges" Value="2-4094" />
-            <ns0:AttributeValue Name="Isolation Level" Value="Exclusive" />
-            <ns0:AttributeValue Name="Access Mode" Value="Access" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Shared</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Access</ns0:AllowedValue>
-                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Isolation Level" Value="Shared" />
-            <ns0:AttributeValue Name="Access Mode" Value="Access" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Apps Orchestration" ServiceType="Orchestration">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Simple" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Deploy App</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
-  </ns0:ResourceFamilies>
-  <ns0:DriverDescriptors>
-    <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
-    <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
-  </ns0:DriverDescriptors>
-  <ns0:ScriptDescriptors>
-    <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput Name="Name" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Auto Resolve Vlan" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-  </ns0:ScriptDescriptors>
+    <ns0:Attributes>
+        <ns0:AttributeInfo Name="VM_UUID" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Cloud Provider" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="QnQ" Type="Boolean" DefaultValue="False" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="CTag" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="User" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Password" Type="Password" DefaultValue="3M3u7nkDzxWb0aJ/IZYeWw==" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Default port group path" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Default dvSwitch Path" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Default dvSwitch Name" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Default Network" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="OVF Tools Path" Type="String" DefaultValue=""
+                           Description="The full path to ovftool installed on the system" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Generic Input" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules/>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="vCenter Template" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VM Cluster" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VM Power State" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VM Storage" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Allocation Ranges" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+                <ns0:Rule Name="Admin Only"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Isolation Level" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Access Mode" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VLAN Id" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Virtual Network" Type="String" DefaultValue="" IsReadOnly="true">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Auto Power Off" Type="Boolean" DefaultValue="True" IsReadOnly="false">
+            <ns0:Rules/>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Auto Power On" Type="Boolean" DefaultValue="True" IsReadOnly="false">
+            <ns0:Rules/>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="Wait for IP" Type="Boolean" DefaultValue="True" IsReadOnly="false">
+            <ns0:Rules/>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VM Location" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="VM Resource Pool" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="vCenter Image" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="vCenter Name" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+        <ns0:AttributeInfo Name="vCenter Image Arguments" Type="String" DefaultValue="" IsReadOnly="false">
+            <ns0:Rules>
+                <ns0:Rule Name="Configuration"/>
+                <ns0:Rule Name="Setting"/>
+            </ns0:Rules>
+        </ns0:AttributeInfo>
+    </ns0:Attributes>
+    <ns0:ResourceFamilies>
+        <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
+            <ns0:AttachedAttributes/>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="vCenter"
+                                   SupportsConcurrentCommands="true">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Password">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default port group path">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Path">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch Name">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Network">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="User" Value=""/>
+                        <ns0:AttributeValue Name="Password" Value=""/>
+                        <ns0:AttributeValue Name="Default port group path" Value=""/>
+                        <ns0:AttributeValue Name="Default dvSwitch Path" Value=""/>
+                        <ns0:AttributeValue Name="Default dvSwitch Name" Value=""/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>VCenter Shell Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories/>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsConnectable="true" IsSearchable="true" Name="Temp Command Connector">
+            <ns0:AttachedAttributes/>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="Temp Command Connector Model"
+                                   SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes/>
+                    <ns0:AttributeValues/>
+                    <ns0:ParentModels>
+                        <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
+                        <ns0:ParentModelName>vCenter</ns0:ParentModelName>
+                    </ns0:ParentModels>
+                    <ns0:Drivers/>
+                    <ns0:Scripts/>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories/>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App">
+            <ns0:AttachedAttributes>
+                <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
+                    <ns0:AllowedValues/>
+                </ns0:AttachedAttribute>
+                <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
+                    <ns0:AllowedValues/>
+                </ns0:AttachedAttribute>
+            </ns0:AttachedAttributes>
+            <ns0:AttributeValues>
+                <ns0:AttributeValue Name="VM_UUID" Value=""/>
+                <ns0:AttributeValue Name="Cloud Provider" Value=""/>
+            </ns0:AttributeValues>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes/>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="VM_UUID" Value=""/>
+                        <ns0:AttributeValue Name="Cloud Provider" Value=""/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories/>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsService="true" Name="Installation Options" ServiceType="Installation">
+            <ns0:AttachedAttributes/>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="Generic Installation Option" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Generic Input"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="Generic Input" Value=""/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Generic Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts/>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories>
+                <ns0:Category>Virtualization</ns0:Category>
+            </ns0:Categories>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsService="true" Name="Deployment Options" ServiceType="Deployment">
+            <ns0:AttachedAttributes/>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="vCenter VM From Template" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="vCenter Template" Value=""/>
+                        <ns0:AttributeValue Name="VM Cluster" Value=""/>
+                        <ns0:AttributeValue Name="VM Storage" Value=""/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Generic Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                        <ns0:ScriptName>Deploy</ns0:ScriptName>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+                <ns0:ResourceModel Name="vCenter VM From Image" Description="Deploy VM from Image with ovftool"
+                                   SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute Name="Auto Power Off" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="Auto Power On" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="Wait for IP" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="VM Cluster" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="VM Location" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="VM Storage" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="VM Resource Pool" IsOverridable="true" IsLocal="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="vCenter Image" IsOverridable="true" IsLocal="true"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="vCenter Name" IsOverridable="true" IsLocal="true" UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute Name="vCenter Image Arguments" IsOverridable="true" IsLocal="true"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="Auto Power Off" Value="True"/>
+                        <ns0:AttributeValue Name="Auto Power On" Value="True"/>
+                        <ns0:AttributeValue Name="Wait for IP" Value="True"/>
+                        <ns0:AttributeValue Name="VM Cluster" Value="QualiSB/QualiSB Cluster"/>
+                        <ns0:AttributeValue Name="VM Location" Value="Qualisystem Images"/>
+                        <ns0:AttributeValue Name="VM Storage" Value="aa"/>
+                        <ns0:AttributeValue Name="VM Resource Pool" Value="LiverPool"/>
+                        <ns0:AttributeValue Name="vCenter Image" Value=""/>
+                        <ns0:AttributeValue Name="vCenter Name" Value=""/>
+                        <ns0:AttributeValue Name="vCenter Image Arguments" Value=""/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Deploy From Image Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts/>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories>
+                <ns0:Category>Virtualization</ns0:Category>
+            </ns0:Categories>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ServiceType="Regular">
+            <ns0:AttachedAttributes>
+                <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="QnQ" UserInput="false">
+                    <ns0:AllowedValues/>
+                </ns0:AttachedAttribute>
+                <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="CTag" UserInput="false">
+                    <ns0:AllowedValues/>
+                </ns0:AttachedAttribute>
+            </ns0:AttachedAttributes>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="VLAN Auto" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges"
+                                               UserInput="false">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level"
+                                               UserInput="false">
+                            <ns0:AllowedValues>
+                                <ns0:AllowedValue>Shared</ns0:AllowedValue>
+                                <ns0:AllowedValue>Exclusive</ns0:AllowedValue>
+                            </ns0:AllowedValues>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
+                            <ns0:AllowedValues>
+                                <ns0:AllowedValue>Access</ns0:AllowedValue>
+                                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
+                            </ns0:AllowedValues>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="Allocation Ranges" Value="2-4094"/>
+                        <ns0:AttributeValue Name="Isolation Level" Value="Exclusive"/>
+                        <ns0:AttributeValue Name="Access Mode" Value="Access"/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Generic Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                        <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+                <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level"
+                                               UserInput="false">
+                            <ns0:AllowedValues>
+                                <ns0:AllowedValue>Shared</ns0:AllowedValue>
+                            </ns0:AllowedValues>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
+                            <ns0:AllowedValues>
+                                <ns0:AllowedValue>Access</ns0:AllowedValue>
+                                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
+                            </ns0:AllowedValues>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network"
+                                               UserInput="true">
+                            <ns0:AllowedValues/>
+                        </ns0:AttachedAttribute>
+                    </ns0:AttachedAttributes>
+                    <ns0:AttributeValues>
+                        <ns0:AttributeValue Name="Isolation Level" Value="Shared"/>
+                        <ns0:AttributeValue Name="Access Mode" Value="Access"/>
+                    </ns0:AttributeValues>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Generic Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                        <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories>
+                <ns0:Category>Virtualization</ns0:Category>
+            </ns0:Categories>
+        </ns0:ResourceFamily>
+        <ns0:ResourceFamily Description="" IsService="true" Name="Apps Orchestration" ServiceType="Orchestration">
+            <ns0:AttachedAttributes/>
+            <ns0:AttributeValues/>
+            <ns0:Models>
+                <ns0:ResourceModel Description="" Name="Simple" SupportsConcurrentCommands="false">
+                    <ns0:AttachedAttributes/>
+                    <ns0:AttributeValues/>
+                    <ns0:ParentModels/>
+                    <ns0:Drivers>
+                        <ns0:DriverName>Generic Driver</ns0:DriverName>
+                    </ns0:Drivers>
+                    <ns0:Scripts>
+                        <ns0:ScriptName>Deploy App</ns0:ScriptName>
+                    </ns0:Scripts>
+                </ns0:ResourceModel>
+            </ns0:Models>
+            <ns0:Categories>
+                <ns0:Category>Virtualization</ns0:Category>
+            </ns0:Categories>
+        </ns0:ResourceFamily>
+    </ns0:ResourceFamilies>
+    <ns0:DriverDescriptors>
+        <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver"/>
+        <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver"/>
+        <ns0:DriverDescriptor DriverType="PythonDriver" Name="Deploy From Image Driver"/>
+    </ns0:DriverDescriptors>
+    <ns0:ScriptDescriptors>
+        <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
+            <ns0:ScriptInputs>
+                <ns0:ScriptInput Name="Name"/>
+            </ns0:ScriptInputs>
+        </ns0:ScriptDescriptor>
+        <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
+            <ns0:ScriptInputs/>
+        </ns0:ScriptDescriptor>
+        <ns0:ScriptDescriptor Name="Auto Resolve Vlan" Version="1.0.0">
+            <ns0:ScriptInputs/>
+        </ns0:ScriptDescriptor>
+        <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
+            <ns0:ScriptInputs/>
+        </ns0:ScriptDescriptor>
+    </ns0:ScriptDescriptors>
 </ns0:DataModelInfo>

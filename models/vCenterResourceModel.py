@@ -6,3 +6,5 @@ class vCenterResourceModel(object):
         self.default_dvswitch_path = ''
         self.default_port_group_path = ''
         self.default_network = ''
+        self.default_network = ''
+        self.ovf_tools_path = ''
