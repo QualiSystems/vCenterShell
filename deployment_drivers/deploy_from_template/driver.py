@@ -79,9 +79,9 @@ class DeploymentServiceDriver(object):
         vcenter_template = vcenter_template_resource_model.vcenter_template or vcenter_resource_model.vcenter_template
         if not vcenter_template:
             raise ValueError('VCenter Template is empty')
-        app_name = os.environ["NAME"]
+        app_name = os.environ["Name"]
         if not app_name:
-            raise ValueError('NAME input parameter is empty')
+            raise ValueError('Name input parameter is empty')
 
         template_model = VCenterTemplateModel(
             vcenter_resource_name=vcenter_name,

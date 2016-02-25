@@ -28,9 +28,8 @@ class RefreshIpCommand(object):
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        if vm.guest.toolsStatus != 'toolsOk':
-            raise ValueError('VMWare Tools status on VM {0} is {1}, while should be toolsOk'
-                             .format(resource_name, vm.guest.toolsStatus))
+        if vm.guest.toolsStatus == 'toolsNotInstalled':
+            raise ValueError('VMWare Tools status on VM {0} are not installed'.format(resource_name))
 
         ip = self._obtain_ip(vm, default_network, match_function)
 
@@ -98,12 +97,13 @@ class RefreshIpCommand(object):
     @staticmethod
     def _get_ip_addresses(vm, default_network):
         ips = []
-        if not vm.guest.ipAddress:
+        if vm.guest.ipAddress:
             ips.append(vm.guest.ipAddress)
         for nic in vm.guest.net:
             if nic.network != default_network:
                 for addr in nic.ipAddress:
-                    ips.append(addr)
+                    if addr:
+                        ips.append(addr)
         return ips
 
     @staticmethod
