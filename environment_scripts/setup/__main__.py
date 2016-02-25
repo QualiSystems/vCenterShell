@@ -1,4 +1,3 @@
-import time
 from environment_scripts.setup.setup_script import EnvironmentSetup
 
 
