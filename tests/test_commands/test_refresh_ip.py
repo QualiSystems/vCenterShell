@@ -1,7 +1,6 @@
 from unittest import TestCase
-from cloudshell.api.cloudshell_api import VmDetails
-from mock import Mock, MagicMock, create_autospec
-from qualipy.api.cloudshell_api import ResourceInfo, VmCustomParam
+from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
+from mock import Mock, create_autospec
 from common.logger.service import LoggingService
 from common.model_factory import ResourceModelParser
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
@@ -31,7 +30,7 @@ class TestRefreshIpCommand(TestCase):
 
         node = Mock()
         node.attrib = {'Name': 'ip_regex', 'Value': '192\.168\..*'}
-        vm_custom_param = VmCustomParam(node)
+        vm_custom_param = VmCustomParam(node, '')
 
         resource_instance = create_autospec(ResourceInfo)
         resource_instance.ResourceModelName = 'Generic Deployed App'
@@ -74,7 +73,7 @@ class TestRefreshIpCommand(TestCase):
 
         node = Mock()
         node.attrib = {'Name': 'ip_regex', 'Value': ''}
-        vm_custom_param = VmCustomParam(node)
+        vm_custom_param = VmCustomParam(node, '')
 
         resource_instance = create_autospec(ResourceInfo)
         resource_instance.ResourceModelName = 'Generic Deployed App'
@@ -117,7 +116,7 @@ class TestRefreshIpCommand(TestCase):
 
         node = Mock()
         node.attrib = {'Name': 'ip_regex', 'Value': '192\.168\..*'}
-        vm_custom_param = VmCustomParam(node)
+        vm_custom_param = VmCustomParam(node, '')
 
         resource_instance = create_autospec(ResourceInfo)
         resource_instance.ResourceModelName = 'Generic Deployed App'
