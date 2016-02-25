@@ -47,7 +47,8 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
+        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                                  VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         template_deployer = VirtualMachineDeployer(pv_service=pv_service, name_generator=generate_unique_name)
@@ -138,7 +139,7 @@ class CommandOrchestrator(object):
                                              context.reservation.domain)
 
         connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
-                                                                           context.resource)
+                                                                   context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -309,10 +310,15 @@ class CommandOrchestrator(object):
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
         resource = context.remote_endpoints[0]
-        resource_details = self.resource_model_parser.convert_to_resource_model(resource,
-                                                                                GenericDeployedAppResourceModel)
-        resource_details.fullname = resource.fullname
-        return resource_details
+
+        dictionary = jsonpickle.decode(resource.app_context.deployed_app_json)
+        holder = DeployDataHolder(dictionary)
+        app_resource_detail = GenericDeployedAppResourceModel()
+        app_resource_detail.vm_uuid = holder.vmdetails.uid
+        app_resource_detail.cloud_provider = context.resource.fullname
+        app_resource_detail.fullname = resource.fullname
+        return app_resource_detail
+
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
         # get connection details
@@ -325,28 +331,4 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    vm_uuid,
                                                                    resource_fullname)
-        return set_command_result(result=res, unpicklable=False)
-
-    def refresh_ip(self, context, ports):
-        """
-        Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
-        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
-        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
-
-        resource_details = self._parse_remote_model(context)
-
-        # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                   self.refresh_ip_command.refresh_ip,
-                                                                   session,
-                                                                   resource_details.vm_uuid,
-                                                                   resource_details.fullname,
-                                                                   self.vc_data_model.holding_network)
         return set_command_result(result=res, unpicklable=False)
