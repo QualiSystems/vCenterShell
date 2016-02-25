@@ -95,6 +95,7 @@ class TestRefreshIpCommand(TestCase):
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
+
     def test_refresh_ip_choose_ip_by_regex(self):
         nic1 = Mock()
         nic1.network = 'A Network'

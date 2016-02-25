@@ -78,6 +78,8 @@ class RefreshIpCommand(object):
                 ips = RefreshIpCommand._select_ip_by_match(ips, match_function)
             if ips:
                 ip = ips[0]
+                if ip:
+                    return ip
                 time_elapsed += interval
                 time.sleep(interval)
         return ip
