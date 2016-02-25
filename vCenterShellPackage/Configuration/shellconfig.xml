@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ShellsConfiguration 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSchema.xsd">
+<ResourceTemplates>
+    <ResourceTemplate Name="vCenter" Model="VMware vCenter" Driver="VCenter Shell Driver">
+        <Description>vCenter template will create a vCenter resource in CloudShell. Once the vCenter is modeled correctly in CloudShell it will be possible to deploy Apps on this vCenter.</Description>
+        <AutoLoad Enable="true">
+            <Description>Checks that the inputs are valid for the target vCenter</Description>
+        </AutoLoad>
+        <Attributes>
+            <Attribute Name="User" Value="" />
+            <Attribute Name="Password" Value="" />
+			<Attribute Name="Default dvSwitch" Value="" />
+			<Attribute Name="Holding Network" Value="" />
+			<Attribute Name="Default Port Group Location" Value="" />
+			<Attribute Name="VM Cluster" Value="" />
+			<Attribute Name="VM Resource Pool" Value="" />
+			<Attribute Name="VM Storage" Value="" />
+			<Attribute Name="VM Location" Value="QualiSystems" />
+			<Attribute Name="Shutdown Method" Value="hard" />
+			<Attribute Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
+			<Attribute Name="Execution Server Selector" Value="" />
+        </Attributes>
+    </ResourceTemplate>
+</ResourceTemplates>
+</ShellsConfiguration>
