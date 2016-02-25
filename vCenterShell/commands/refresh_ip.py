@@ -1,5 +1,4 @@
 import re
-
 import time
 
 from common.logger import getLogger
@@ -50,12 +49,24 @@ class RefreshIpCommand(object):
         ip_regexes = []
         ip_regex = '.*'
 
-        if resource.VmDetails and resource.VmDetails.VmCustomParams:
-            params = resource.VmDetails.VmCustomParams if isinstance(resource.VmDetails.VmCustomParams, list) \
-                else [resource.VmDetails.VmCustomParams]
+        if resource.VmDetails \
+                and hasattr(resource.VmDetails[0], 'VmCustomParam') \
+                and resource.VmDetails[0].VmCustomParam\
+                and hasattr(resource.VmDetails[0].VmCustomParam, 'Name') \
+                and isinstance(resource.VmDetails[0].VmCustomParam.Name, str) \
+                and resource.VmDetails[0].VmCustomParam.Name == 'ip_regex' \
+                and hasattr(resource.VmDetails[0].VmCustomParam, 'Value') \
+                and isinstance(resource.VmDetails[0].VmCustomParam.Value, str):
+            ip_regexes = [resource.VmDetails[0].VmCustomParam.Value]
+        elif resource.VmDetails \
+                and hasattr(resource.VmDetails[0], 'VmCustomParams') \
+                and resource.VmDetails[0].VmCustomParams:
+            custom_params = resource.VmDetails[0].VmCustomParams
+            params = custom_params if isinstance(custom_params, list) else [custom_params]
             ip_regexes = [custom_param.Value for custom_param
                           in params
                           if custom_param.Name == 'ip_regex']
+
         if ip_regexes:
             ip_regex = ip_regexes[0]
             logger.debug('Custom IP Regex to filter IP addresses {0}'.format(ip_regex))
