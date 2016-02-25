@@ -17,7 +17,10 @@ class EnvironmentSetup:
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
         deploy_result = self._deploy_apps_in_reservation(api, reservation_details)
+
+        reservation_details = api.GetReservationDetails(self.reservation_id)
         self._connect_all_routes_in_reservation(api, reservation_details)
+        
         power_on_result = self._power_deployed_apps_and_refresh_ip(api, deploy_result)
 
     def _power_deployed_apps_and_refresh_ip(self, api, deploy_result):
