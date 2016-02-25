@@ -1,0 +1,3 @@
+jsonpickle
+cloudshell-automation-api
+pydevd
