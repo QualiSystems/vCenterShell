@@ -59,7 +59,8 @@ class test_DeploymentService(unittest.TestCase):
         data_holder = DeployDataHolder.create_from_params(template_model=template_model,
                                                           datastore_name="some_datastore",
                                                           vm_cluster_model=vm_cluster_model,
-                                                          power_on=True)
+                                                          power_on=True,
+                                                          ip_regex='')
         json_data_holder = jsonpickle.encode(data_holder, unpicklable=False)
 
         command_inputs = [InputNameValue(DeploymentServiceDriver.INPUT_KEY_COMMAND, "deploy_from_template"),

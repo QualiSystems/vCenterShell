@@ -1,8 +1,9 @@
 from unittest import TestCase
+from cloudshell.api.cloudshell_api import VmDetails
 from mock import Mock, MagicMock, create_autospec
-from qualipy.api.cloudshell_api import ResourceInfo
-
+from qualipy.api.cloudshell_api import ResourceInfo, VmCustomParam
 from common.logger.service import LoggingService
+from common.model_factory import ResourceModelParser
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
 
 
@@ -10,12 +11,17 @@ class TestRefreshIpCommand(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
     def test_refresh_ip(self):
-        nic = Mock()
-        nic.network = 'A Network'
-        nic.ipAddress = ['192.168.1.1']
+        nic1 = Mock()
+        nic1.network = 'A Network'
+        nic1.ipAddress = ['192.168.1.1']
+
+        nic2 = Mock()
+        nic2.network = 'A Network'
+        nic2.ipAddress = ['111.111.111.111']
 
         guest = Mock()
-        guest.net = [nic]
+        guest.toolsStatus = 'toolsOk'
+        guest.net = [nic1, nic2]
 
         vm = Mock()
         vm.guest = guest
@@ -23,37 +29,42 @@ class TestRefreshIpCommand(TestCase):
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service)
+        node = Mock()
+        node.attrib = {'Name': 'ip_regex', 'Value': '192\.168\..*'}
+        vm_custom_param = VmCustomParam(node)
+
+        resource_instance = create_autospec(ResourceInfo)
+        resource_instance.ResourceModelName = 'Generic Deployed App'
+        resource_instance.ResourceAttributes = {'vm_uuis': '123',
+                                                'cloud_provider': 'vCenter'
+                                                }
+        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails.VmCustomParams = [vm_custom_param]
+
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
+        session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
         # Act
-        refresh_ip_command.refresh_ip(session, si, '1234-5678', 'machine1', 'default_network')
+        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
 
     def test_refresh_ip_choose_ipv4(self):
+        nic1 = Mock()
+        nic1.network = 'A Network'
+        nic1.ipAddress = ['192.168.1.1']
 
-        resource_model_parser = Mock()
-
-        qualipy_helpers = MagicMock()
-
-        session = MagicMock()
-
-        qualipy_helpers.get_api_session = Mock(return_value=session)
-
-        nic_ip_v4 = Mock()
-        nic_ip_v4.network = 'A Network'
-        nic_ip_v4.ipAddress = ['192.168.1.1']
-
-        nic_ip_v6 = Mock()
-        nic_ip_v6.network = 'Dark Network'
-        nic_ip_v6.ipAddress = ['00-01-00-01-1B-BE-E5-51-44-8A-5B-BF-AC-4E']
+        nic2 = Mock()
+        nic2.network = 'A Network'
+        nic2.ipAddress = ['2001:0db8:0a0b:12f0:0000:0000:0000:0001']
 
         guest = Mock()
-        guest.net = [nic_ip_v6, nic_ip_v4]
+        guest.toolsStatus = 'toolsOk'
+        guest.net = [nic1, nic2]
 
         vm = Mock()
         vm.guest = guest
@@ -61,47 +72,41 @@ class TestRefreshIpCommand(TestCase):
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, Mock(), qualipy_helpers, resource_model_parser)
+        node = Mock()
+        node.attrib = {'Name': 'ip_regex', 'Value': ''}
+        vm_custom_param = VmCustomParam(node)
 
+        resource_instance = create_autospec(ResourceInfo)
+        resource_instance.ResourceModelName = 'Generic Deployed App'
+        resource_instance.ResourceAttributes = {'vm_uuis': '123',
+                                                'cloud_provider': 'vCenter'
+                                                }
+        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails.VmCustomParams = [vm_custom_param]
+
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
+        session = Mock()
+        session.UpdateResourceAddress = Mock(return_value=True)
+        session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
         # Act
-        refresh_ip_command.refresh_ip(si, '1234-5678', 'machine1')
+        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
 
         # Assert
-        session.UpdateResourceAddress.assert_called_with('machine1', '192.168.1.1')
-
+        self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
     def test_refresh_ip_choose_ip_by_regex(self):
+        nic1 = Mock()
+        nic1.network = 'A Network'
+        nic1.ipAddress = ['192.168.1.1']
 
-        resource_model_parser = Mock()
-
-        qualipy_helpers = MagicMock()
-
-        vm_custom_param = Mock()
-        vm_custom_param.Name = 'IP Regex'
-        vm_custom_param.Value = '255\.255\..*'
-
-        vm_details = Mock()
-        vm_details.VmCustomParam = [vm_custom_param]
-
-        resource = create_autospec(ResourceInfo)
-        resource.VmDetails = [vm_details]
-
-        session = MagicMock()
-        session.GetResourceDetails = Mock(return_value=resource)
-
-        qualipy_helpers.get_api_session = Mock(return_value=session)
-
-        matching_ip = Mock()
-        matching_ip.network = 'Dark Network'
-        matching_ip.ipAddress = ['255.255.1.1']
-
-        not_matching_ip = Mock()
-        not_matching_ip.network = 'A Network'
-        not_matching_ip.ipAddress = ['192.168.1.1']
+        nic2 = Mock()
+        nic2.network = 'A Network'
+        nic2.ipAddress = ['111.111.111.111']
 
         guest = Mock()
-        guest.net = [not_matching_ip, matching_ip]
+        guest.toolsStatus = 'toolsOk'
+        guest.net = [nic1, nic2]
 
         vm = Mock()
         vm.guest = guest
@@ -109,14 +114,26 @@ class TestRefreshIpCommand(TestCase):
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, Mock(), qualipy_helpers, resource_model_parser)
+        node = Mock()
+        node.attrib = {'Name': 'ip_regex', 'Value': '192\.168\..*'}
+        vm_custom_param = VmCustomParam(node)
 
+        resource_instance = create_autospec(ResourceInfo)
+        resource_instance.ResourceModelName = 'Generic Deployed App'
+        resource_instance.ResourceAttributes = {'vm_uuis': '123',
+                                                'cloud_provider': 'vCenter'
+                                                }
+        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails.VmCustomParams = [vm_custom_param]
+
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
+        session = Mock()
+        session.UpdateResourceAddress = Mock(return_value=True)
+        session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
         # Act
-        refresh_ip_command.refresh_ip(si, '1234-5678', 'machine1')
+        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
 
         # Assert
-        session.UpdateResourceAddress.assert_called_with('machine1', '255.255.1.1')
-
-
+        self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))

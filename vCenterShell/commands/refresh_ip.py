@@ -25,7 +25,6 @@ class RefreshIpCommand(object):
         :param str resource_name: Logical resource name to update address property on
         :param vim.Network default_network: the default network
         """
-        time.sleep(20)
         match_function = self._get_ip_match_function(session, resource_name)
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
@@ -51,9 +50,9 @@ class RefreshIpCommand(object):
         ip_regexes = []
         ip_regex = '.*'
 
-        if resource.VmDetails and resource.VmDetails[0].VmCustomParam:
-            params = resource.VmDetails[0].VmCustomParam if isinstance(resource.VmDetails[0].VmCustomParam, list) \
-                else [ resource.VmDetails[0].VmCustomParam]
+        if resource.VmDetails and resource.VmDetails.VmCustomParams:
+            params = resource.VmDetails.VmCustomParams if isinstance(resource.VmDetails.VmCustomParams, list) \
+                else [resource.VmDetails.VmCustomParams]
             ip_regexes = [custom_param.Value for custom_param
                           in params
                           if custom_param.Name == 'ip_regex']

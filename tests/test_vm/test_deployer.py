@@ -36,7 +36,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "resource_pool": "resource_pool"
             },
             "datastore_name": "datastore_name",
-            "power_on": False
+            "power_on": False,
+            'ip_regex': ''
         })
 
         deployer = VirtualMachineDeployer(pv_service, name_gen)
@@ -71,7 +72,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "resource_pool": "resource_pool"
             },
             datastore_name="datastore_name",
-            power_on=False)
+            power_on=False,
+            ip_regex='')
 
         deployer = VirtualMachineDeployer(pv_service, name_gen)
 

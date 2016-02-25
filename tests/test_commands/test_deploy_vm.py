@@ -29,7 +29,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_params = DeployDataHolder.create_from_params(template_model,
                                                             'datastore_name',
                                                             'vm_cluster_model',
-                                                            'power_on')
+                                                            'power_on',
+                                                            'ip_regex')
 
         deploy_command = DeployFromTemplateCommand(deployer)
 
