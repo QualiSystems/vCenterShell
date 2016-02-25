@@ -24,15 +24,18 @@ class CloudshellDriverHelper(object):
                                   password=None,
                                   domain=reservation_domain)
 
-    def get_connection_details(self, session, resource):
+    def get_connection_details(self, session, vcenter_resource_model, resource):
         """
         Receives the context of the command and returns a cloudshell session
         :param CloudShellAPISession session:
+        :param VMwarevCenterResourceModel vcenter_resource_model: Instance of VMwarevCenterResourceModel
         :param ResourceContextDetails resource: the context of the command
-        :type context: models.QualiDriverModels.ResourceRemoteCommandContext or models.QualiDriverModels.ResourceCommandContext
         """
         # get connection details
         connection_details = \
-            self.cloudshell_data_retriever_service.getVCenterConnectionDetails(session=session,
-                                                                               vCenter_resource_details=resource)
+            self.cloudshell_data_retriever_service.get_vcenter_connection_details(
+                session=session,
+                vcenter_resource_model=vcenter_resource_model,
+                vcenter_resource_instance=resource)
+
         return connection_details

@@ -1,11 +1,10 @@
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
-import time
 
 
 class VCenterShellDriver:
     def __init__(self):
         """
-        ctor mast be without arguments, it is created with reflection at run time
+        ctor must be without arguments, it is created with reflection at run time
         """
         self.command_orchestrator = None  # type: CommandOrchestrator
 
@@ -13,7 +12,6 @@ class VCenterShellDriver:
         self.command_orchestrator = CommandOrchestrator(context)
 
     def ApplyConnectivityChanges(self, context, request):
-        time.sleep(10)
         return self.command_orchestrator.connect_bulk(context, request)
 
     def disconnect_all(self, context, ports):
@@ -39,9 +37,6 @@ class VCenterShellDriver:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         return self.command_orchestrator.power_on(context, ports)
-
-    def power_on(self, context, vm_uuid, resource_fullname):
-        self.command_orchestrator.power_on_not_roemote(context, vm_uuid, resource_fullname)
 
     # the name is by the Qualisystems conventions
     def PowerCycle(self, context, ports, delay):

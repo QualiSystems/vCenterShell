@@ -1,3 +1,4 @@
+from models import VMwarevCenterResourceModel
 
 
 class VCenterDataModelRetriever(object):
@@ -7,4 +8,4 @@ class VCenterDataModelRetriever(object):
 
     def get_vcenter_data_model(self):
         resource_context = self.quali_helpers.get_resource_context_details()
-        return self.resource_parser.convert_to_resource_model(resource_context)
+        return self.resource_parser.convert_to_resource_model(resource_context, VMwarevCenterResourceModel)

@@ -1,7 +1,7 @@
-import time
 from logging import getLogger
 
 import jsonpickle
+import time
 from pyVim.connect import SmartConnect, Disconnect
 
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
@@ -15,6 +15,8 @@ from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
 from models.DeployDataHolder import DeployDataHolder
 from models.DriverResponse import DriverResponse, DriverResponseRoot
+from models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from vCenterShell.commands.deploy_vm import DeployCommand
@@ -46,7 +48,8 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource)
+        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                                  VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tools_path, getLogger('OvfImageDeployerService'))
@@ -73,7 +76,7 @@ class CommandOrchestrator(object):
             VirtualSwitchToMachineDisconnectCommand(
                 pyvmomi_service=pv_service,
                 port_group_configurer=virtual_machine_port_group_configurer,
-                default_network=self.vc_data_model.default_network)
+                default_network=self.vc_data_model.holding_network)
 
         # Virtual Switch Connect
         virtual_switch_connect_command = \
@@ -103,7 +106,7 @@ class CommandOrchestrator(object):
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
@@ -139,7 +142,9 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
+                                                                   context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -203,7 +208,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -229,7 +234,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -252,7 +257,7 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -277,7 +282,7 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -287,7 +292,7 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.default_network)
+                                                                   self.vc_data_model.holding_network)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -326,7 +331,7 @@ class CommandOrchestrator(object):
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
 
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -347,43 +352,24 @@ class CommandOrchestrator(object):
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
         resource = context.remote_endpoints[0]
-        resource_details = self.resource_model_parser.convert_to_resource_model(resource)
-        resource_details.fullname = resource.fullname
-        return resource_details
+
+        dictionary = jsonpickle.decode(resource.app_context.deployed_app_json)
+        holder = DeployDataHolder(dictionary)
+        app_resource_detail = GenericDeployedAppResourceModel()
+        app_resource_detail.vm_uuid = holder.vmdetails.uid
+        app_resource_detail.cloud_provider = context.resource.fullname
+        app_resource_detail.fullname = resource.fullname
+        return app_resource_detail
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
         res = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                    self.vm_power_management_command.power_on,
                                                                    session,
                                                                    vm_uuid,
                                                                    resource_fullname)
-        return set_command_result(result=res, unpicklable=False)
-
-    def refresh_ip(self, context, ports):
-        """
-        Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
-        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
-        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
-
-        resource_details = self._parse_remote_model(context)
-
-        # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                   self.refresh_ip_command.refresh_ip,
-                                                                   session,
-                                                                   resource_details.vm_uuid,
-                                                                   resource_details.fullname,
-                                                                   self.vc_data_model.default_network)
         return set_command_result(result=res, unpicklable=False)

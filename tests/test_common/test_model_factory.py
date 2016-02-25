@@ -28,7 +28,7 @@ class TestDataModel(TestCase):
             try:
                 klass = ResourceModelParser().get_class('models.' + model_name)
             except ValueError as value_error:
-                validation_errors.append(value_error.message)
+                validation_errors.append('Failed to parse Model Name {0} with error {1}.'.format(model_name, value_error.message))
                 continue
 
             attribute_names = self.get_model_attributes(ns, resource_model)
