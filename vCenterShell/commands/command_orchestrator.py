@@ -319,7 +319,6 @@ class CommandOrchestrator(object):
         app_resource_detail.fullname = resource.fullname
         return app_resource_detail
 
-
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
