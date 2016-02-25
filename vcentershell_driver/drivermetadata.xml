@@ -2,6 +2,7 @@
     <Layout>
         <Category Name="Deployment">
             <Command Description="" DisplayName="Deploy From Template" Name="deploy_from_template" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Deploy From Image" Name="deploy_from_image" Tags="allow_unreserved" />
         </Category>
         <Category Name="Connectivity">
             <Command Description="" DisplayName="Refresh Ip" Name="remote_refresh_ip" Tags="remote_connectivity,allow_shared" />
