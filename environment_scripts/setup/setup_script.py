@@ -17,7 +17,7 @@ class EnvironmentSetup:
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
         deploy_result = self._deploy_apps_in_reservation(api, reservation_details)
-        connect_result = self._connect_all_routes_in_reservation(api, reservation_details)
+        self._connect_all_routes_in_reservation(api, reservation_details)
         power_on_result = self._power_deployed_apps_and_refresh_ip(api, deploy_result)
 
     def _power_deployed_apps_and_refresh_ip(self, api, deploy_result):
@@ -25,14 +25,23 @@ class EnvironmentSetup:
             logger.info("No deployed apps found in reservation {0}".format(self.reservation_id))
             return None
 
+        results_dict = dict()
+        threads = []
+        thread_lock = threading.Lock()
+
         for resultItem in deploy_result.ResultItems:
             if resultItem.Success:
-                pass
+                thread = PowerOnAppThread(api, self.reservation_id, results_dict, thread_lock)
+                threads.append(thread)
+                thread.start()
             else:
                 logger.info("Failed to deploy app {0} in reservation {1}. Error: {2}."
                             .format(resultItem.AppName, self.reservation_id, resultItem.Error))
 
+        for t in threads:
+            t.join()
 
+        return results_dict
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
@@ -44,7 +53,7 @@ class EnvironmentSetup:
         app_inputs = map(lambda x: DeployAppInput(x.Name, "Name", x.Name), apps)
 
         logger.info(
-                "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, app_names.join(",")))
+                "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
 
         return api.ExecuteDeployAppCommandBulk(self.reservation_id, app_names, app_inputs)
 
@@ -65,15 +74,43 @@ class EnvironmentSetup:
 
 
 class PowerOnAppThread(threading.Thread):
-    POWER_ON_COMMAND = "PowerOn"
-    REFRESH_IP_COMMAND = "Refresh IP"
 
-    def __init__(self, api, reservation_id, app_name, deployed_app_name):
+    def __init__(self, api, reservation_id, deployed_app_name, results_dict, results_lock):
         threading.Thread.__init__(self)
         self.api = api
         self.reservationId = reservation_id
-        self.app_name = app_name
         self.deployed_app_name = deployed_app_name
+        self.results_dict = results_dict
+        self.results_lock = results_lock
 
     def run(self):
-        api.ExecuteResourceConnectedCommand(self.reservationId, self.deployed_app_name, "")
+        try:
+            logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
+                        .format(self.deployed_app_name, self.reservation_id))
+            self.api.ExecuteResourceConnectedCommand(self.deployed_app_name, self.reservationId, "PowerOn", "power")
+        except Exception as exc:
+            logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
+                         .format(self.deployed_app_name, self.reservationId, str(exc)))
+            self._set_result(False)
+            return
+
+        try:
+            logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
+                        .format(self.deployed_app_name, self.reservation_id))
+            self.api.ExecuteResourceConnectedCommand(self.deployed_app_name, self.reservationId, "remote_refresh_ip",
+                                                     "remote_connectivity")
+        except Exception as exc:
+            logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
+                         .format(self.deployed_app_name, self.reservationId, str(exc)))
+            self._set_result(False)
+            return
+
+        self._set_result(True)
+
+    def _set_result(self, success):
+        self.results_lock.acquire()
+        self.results_dict[self.deployed_app_name] = success
+        self.results_lock.release()
+
+
+
