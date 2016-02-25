@@ -12,7 +12,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Wait for IP" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Wait for IP" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -24,25 +24,25 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="User" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="User" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Password" Type="Password">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Password" Type="Password">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity" IsReadOnly="false" Name="Default dvSwitch" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity" IsReadOnly="false" Name="Default dvSwitch" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -76,74 +76,74 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" Description="The vCenter cluster or host that will be used when deploying a VM." IsReadOnly="false" Name="VM Cluster" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter cluster or host that will be used when deploying a VM." IsReadOnly="false" Name="VM Cluster" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" Description="The vCenter storage that will be used when deploying a VM." IsReadOnly="false" Name="VM Storage" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter storage that will be used when deploying a VM." IsReadOnly="false" Name="VM Storage" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-	<ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
-  </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
         <ns0:Rule Name="Admin Only" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-  <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Default VLAN" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Default VLAN" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
-  </ns0:AttributeInfo>
+    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Isolation Level" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -210,12 +210,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="If true the app deployment process will wait for the VM to get an IP." IsReadOnly="false" Name="Wait For IP" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -236,16 +230,16 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="VMware vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Password">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Password">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Port Group Location">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Port Group Location">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default dvSwitch">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Holding Network">
@@ -283,19 +277,19 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
-			<ns0:AttributeValue Name="User" Value="" />
-			<ns0:AttributeValue Name="Password" Value="" />
-			<ns0:AttributeValue Name="Default Port Group Location" Value="" />
-			<ns0:AttributeValue Name="Default dvSwitch" Value="" />
-			<ns0:AttributeValue Name="Holding Network" Value="" />
-			<ns0:AttributeValue Name="VM Cluster" Value="" />
-			<ns0:AttributeValue Name="VM Resource Pool" Value="" />
-			<ns0:AttributeValue Name="VM Storage" Value="" />
-			<ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
-			<ns0:AttributeValue Name="Shutdown Method" Value="hard" />
-			<ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
-			<ns0:AttributeValue Name="Execution Server Selector" Value="" />
-			<ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
+            <ns0:AttributeValue Name="User" Value="" />
+            <ns0:AttributeValue Name="Password" Value="" />
+            <ns0:AttributeValue Name="Default Port Group Location" Value="" />
+            <ns0:AttributeValue Name="Default dvSwitch" Value="" />
+            <ns0:AttributeValue Name="Holding Network" Value="" />
+            <ns0:AttributeValue Name="VM Cluster" Value="" />
+            <ns0:AttributeValue Name="VM Resource Pool" Value="" />
+            <ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
+            <ns0:AttributeValue Name="Shutdown Method" Value="hard" />
+            <ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
+            <ns0:AttributeValue Name="Execution Server Selector" Value="" />
+            <ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
@@ -389,28 +383,28 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Location" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Location" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power On" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power On" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Wait For IP" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Wait for IP" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-			<ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
@@ -418,7 +412,7 @@
             <ns0:AttributeValue Name="vCenter Name" Value="VMWare vCenter" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
-            <ns0:AttributeValue Name="Wait For IP" Value="True" />
+            <ns0:AttributeValue Name="Wait for IP" Value="True" />
             <ns0:AttributeValue Name="Auto Delete" Value="True" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
