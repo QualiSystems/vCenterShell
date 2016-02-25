@@ -17,11 +17,11 @@
             <Attribute Name="Auto Power On" Value="True" />
             <Attribute Name="Wait for IP" Value="True" />
             <Attribute Name="VM Cluster" Value="QualiSB/QualiSB Cluster" />
-            <Attribute Name="VM Location" Value="Qualisystem Images" />
+            <Attribute Name="VM Location" Value="Alex" />
             <Attribute Name="VM Storage" Value="aa" />
             <Attribute Name="VM Resource Pool" Value="LiverPool" />
             <Attribute Name="vCenter Image" Value="http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf" />
-            <Attribute Name="vCenter Name" Value="vCenter" />
+            <Attribute Name="vCenter Name" Value="VMware vCenter" />
             <Attribute Name="vCenter Image Arguments" Value="" />
           </Attributes>
         </DeploymentService>

@@ -52,7 +52,7 @@ class CommandOrchestrator(object):
                                                                                   VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tools_path, getLogger('OvfImageDeployerService'))
+        ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tool_path, getLogger('OvfImageDeployerService'))
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -178,9 +178,10 @@ class CommandOrchestrator(object):
         :return str deploy results
         """
 
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, context.resource)
+        connection_details = self.cs_helper.get_connection_details(session,  self.vc_data_model, context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
