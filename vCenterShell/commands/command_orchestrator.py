@@ -101,7 +101,8 @@ class CommandOrchestrator(object):
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
         # Refresh IP command
-        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
+        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
+                                                   resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
@@ -144,7 +145,7 @@ class CommandOrchestrator(object):
                                              context.reservation.domain)
 
         connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
-                                                                   context.resource)
+                                                                           context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)

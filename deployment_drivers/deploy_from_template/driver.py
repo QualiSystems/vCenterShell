@@ -1,6 +1,8 @@
 import jsonpickle
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import time
 from qualipy.api.cloudshell_api import *
+from common.model_factory import ResourceModelParser
 
 from models.VCenterTemplateModel import VCenterTemplateModel
 from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
@@ -56,7 +58,8 @@ class DeploymentServiceDriver(object):
         return DeployDataHolder.create_from_params(template_model=template_model,
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
-                                                   power_on=power_on)
+                                                   power_on=power_on,
+                                                   ip_regex=vcenter_template_resource_model.ip_regex)
 
     def _get_vcenter(self, api, vcenter_name):
         if not vcenter_name:
