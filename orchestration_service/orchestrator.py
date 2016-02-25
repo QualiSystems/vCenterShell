@@ -22,25 +22,16 @@ def execute_app_orchestration():
     deployment_result = deploy_app(api, app_name, deployment_service, reservation_id)
 
     # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
-    # TODO
-
-    # TODO this is temporary until we move to drivers
-    api.SetAttributesValues(
-        [ResourceAttributesUpdateRequest(
-            deployment_result.LogicalResourceName,
-            [AttributeNameValue("VM_UUID", deployment_result.VmUuid),
-             AttributeNameValue("Cloud Provider", deployment_result.CloudProviderResourceName)])])
-
     connect_routes_on_deployed_app(api, reservation_id, deployment_result.LogicalResourceName)
 
     # "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
+    # refresh ip
+    refresh_ip(api, deployment_result, reservation_id)
+
     # if install service exists on app execute it
     execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id)
-
-    # refresh ip
-    # refresh_ip(api, deployment_result, reservation_id)
 
     # Set live status - deployment done
     api.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
@@ -78,12 +69,11 @@ def connect_routes_on_deployed_app(api, reservation_id, resource_name):
 def refresh_ip(api, deployment_result, reservation_id):
     logger.info("Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
     try:
-        # TODO update the script inputs with data from the installation service
-        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName,
-                           "Resource" "refresh_ip", [InputNameValue('vm_uuid',
-                                                                    deployment_result.VmUuid),
-                                                     InputNameValue('resource_name',
-                                                                    deployment_result.LogicalResourceName)])
+        api.ExecuteResourceConnectedCommand(reservation_id,
+                                            deployment_result.LogicalResourceName,
+                                            "remote_refresh_ip",
+                                            "remote_connectivity")
+
     except CloudShellAPIError as exc:
         print "Error refreshing ip for deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                             exc.rawxml)
@@ -135,9 +125,11 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
         logger.info("Powering on deployed app {0}".format(deployment_result.LogicalResourceName))
         logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
                                                                          deployment_result.VmUuid))
-        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "power_on",
-                           [InputNameValue("vm_uuid", deployment_result.VmUuid),
-                            InputNameValue("resource_fullname", "")])
+        api.ExecuteResourceConnectedCommand(reservation_id,
+                                            deployment_result.LogicalResourceName,
+                                            "PowerOn",
+                                            "power")
+
     except Exception as exc:
         print "Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc))
         logger.error("Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc)))
