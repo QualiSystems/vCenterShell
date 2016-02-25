@@ -20,7 +20,7 @@ class EnvironmentSetup:
 
         reservation_details = api.GetReservationDetails(self.reservation_id)
         self._connect_all_routes_in_reservation(api, reservation_details)
-        
+
         power_on_result = self._power_deployed_apps_and_refresh_ip(api, deploy_result)
 
     def _power_deployed_apps_and_refresh_ip(self, api, deploy_result):
@@ -34,7 +34,8 @@ class EnvironmentSetup:
 
         for resultItem in deploy_result.ResultItems:
             if resultItem.Success:
-                thread = PowerOnAppThread(api, self.reservation_id, results_dict, thread_lock)
+                thread = PowerOnAppThread(api, self.reservation_id, resultItem.AppDeploymentyInfo.LogicalResourceName,
+                                          results_dict, thread_lock)
                 threads.append(thread)
                 thread.start()
             else:
@@ -81,7 +82,7 @@ class PowerOnAppThread(threading.Thread):
     def __init__(self, api, reservation_id, deployed_app_name, results_dict, results_lock):
         threading.Thread.__init__(self)
         self.api = api
-        self.reservationId = reservation_id
+        self.reservation_id = reservation_id
         self.deployed_app_name = deployed_app_name
         self.results_dict = results_dict
         self.results_lock = results_lock
@@ -90,21 +91,22 @@ class PowerOnAppThread(threading.Thread):
         try:
             logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
                         .format(self.deployed_app_name, self.reservation_id))
-            self.api.ExecuteResourceConnectedCommand(self.deployed_app_name, self.reservationId, "PowerOn", "power")
+            self.api.ExecuteResourceConnectedCommand(self.reservation_id, self.deployed_app_name, "PowerOn", "power")
+            self.api.SetResourceLiveStatus(self.deployed_app_name, "Online", "Active")
         except Exception as exc:
             logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
-                         .format(self.deployed_app_name, self.reservationId, str(exc)))
+                         .format(self.deployed_app_name, self.reservation_id, str(exc)))
             self._set_result(False)
             return
 
         try:
             logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
                         .format(self.deployed_app_name, self.reservation_id))
-            self.api.ExecuteResourceConnectedCommand(self.deployed_app_name, self.reservationId, "remote_refresh_ip",
+            self.api.ExecuteResourceConnectedCommand(self.reservation_id, self.deployed_app_name, "remote_refresh_ip",
                                                      "remote_connectivity")
         except Exception as exc:
             logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
-                         .format(self.deployed_app_name, self.reservationId, str(exc)))
+                         .format(self.deployed_app_name, self.reservation_id, str(exc)))
             self._set_result(False)
             return
 
