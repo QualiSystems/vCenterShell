@@ -27,11 +27,11 @@ def execute_app_orchestration():
     # "Power On"
     power_on_deployed_app(api, app_name, deployment_result, reservation_id)
 
-    # if install service exists on app execute it
-    execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id)
-
     # refresh ip
     refresh_ip(api, deployment_result, reservation_id)
+
+    # if install service exists on app execute it
+    execute_installation_if_exist(api, deployment_result, installation_service_data, reservation_id)
 
     # Set live status - deployment done
     api.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
@@ -125,9 +125,11 @@ def power_on_deployed_app(api, app_name, deployment_result, reservation_id):
         logger.info("Powering on deployed app {0}".format(deployment_result.LogicalResourceName))
         logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
                                                                          deployment_result.VmUuid))
-        api.ExecuteCommand(reservation_id, deployment_result.CloudProviderResourceName, "Resource", "power_on",
-                           [InputNameValue("vm_uuid", deployment_result.VmUuid),
-                            InputNameValue("resource_fullname", "")])
+        api.ExecuteResourceConnectedCommand(reservation_id,
+                                            deployment_result.LogicalResourceName,
+                                            "PowerOn",
+                                            "power")
+
     except Exception as exc:
         print "Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc))
         logger.error("Error powering on deployed app {0}. Error: {1}".format(app_name, str(exc)))

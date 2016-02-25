@@ -38,9 +38,6 @@ class VCenterShellDriver:
         """
         return self.command_orchestrator.power_on(context, ports)
 
-    def power_on(self, context, vm_uuid, resource_fullname):
-        self.command_orchestrator.power_on_not_roemote(context, vm_uuid, resource_fullname)
-
     # the name is by the Qualisystems conventions
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
