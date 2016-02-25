@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppTemplateInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <AppResourceInfo Name="VM Deployed From Image" ImagePath="VM Deployed From Image.png">
+    <AppResources>
+      <AppResource ModelName="Generic Deployed App" Driver="">
+        <Attributes>
+          <Attribute Name="Cloud Provider" Value="" />
+          <Attribute Name="VM_UUID" Value="" />
+        </Attributes>
+      </AppResource>
+    </AppResources>
+    <DeploymentPaths>
+      <DeploymentPath Name="vCenter VM From Image" Default="true">
+        <DeploymentService Name="vCenter VM From Image">
+          <Attributes>
+            <Attribute Name="Auto Power Off" Value="True" />
+            <Attribute Name="Auto Power On" Value="True" />
+            <Attribute Name="Wait for IP" Value="True" />
+            <Attribute Name="VM Cluster" Value="QualiSB/QualiSB Cluster" />
+            <Attribute Name="VM Location" Value="Alex" />
+            <Attribute Name="VM Storage" Value="aa" />
+            <Attribute Name="VM Resource Pool" Value="LiverPool" />
+            <Attribute Name="vCenter Image" Value="http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf" />
+            <Attribute Name="vCenter Name" Value="VMware vCenter" />
+            <Attribute Name="vCenter Image Arguments" Value="" />
+          </Attributes>
+        </DeploymentService>
+      </DeploymentPath>
+    </DeploymentPaths>
+  </AppResourceInfo>
+  <Categories>
+    <Category>Virtualization</Category>
+  </Categories>
+</AppTemplateInfo>

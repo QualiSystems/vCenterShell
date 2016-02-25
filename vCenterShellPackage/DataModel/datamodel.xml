@@ -1,5 +1,23 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Wait for IP" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VM_UUID" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -423,6 +441,57 @@
           <ns0:Scripts>
             <ns0:ScriptName>Deploy</ns0:ScriptName>
           </ns0:Scripts>
+        </ns0:ResourceModel>
+        <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
+          <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power On">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Wait for IP">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Location">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+          </ns0:AttachedAttributes>
+          <ns0:AttributeValues>
+            <ns0:AttributeValue Name="Auto Power Off" Value="True" />
+            <ns0:AttributeValue Name="Auto Power On" Value="True" />
+            <ns0:AttributeValue Name="Wait for IP" Value="True" />
+            <ns0:AttributeValue Name="VM Cluster" Value="QualiSB/QualiSB Cluster" />
+            <ns0:AttributeValue Name="VM Location" Value="Qualisystem Images" />
+            <ns0:AttributeValue Name="VM Storage" Value="aa" />
+            <ns0:AttributeValue Name="VM Resource Pool" Value="LiverPool" />
+            <ns0:AttributeValue Name="vCenter Image" Value="" />
+            <ns0:AttributeValue Name="vCenter Name" Value="" />
+            <ns0:AttributeValue Name="vCenter Image Arguments" Value="" />
+          </ns0:AttributeValues>
+          <ns0:ParentModels />
+          <ns0:Drivers>
+            <ns0:DriverName>Deploy From Image Driver</ns0:DriverName>
+          </ns0:Drivers>
+          <ns0:Scripts />
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
