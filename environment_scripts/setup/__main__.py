@@ -1,4 +1,4 @@
-from environment_scripts.setup.setup_script import EnvironmentSetup
+from environment_scripts.setup.setup import EnvironmentSetup
 
 
 def main():
