@@ -1,28 +1,34 @@
 from unittest import TestCase
-
 from mock import Mock
-
 from models.DeployDataHolder import DeployDataHolder
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 
 
 class TestVirtualMachineDeployer(TestCase):
-    def test_vm_deployer(self):
-        name = 'name'
-        uuid = 'uuid'
-        name_gen = Mock(return_value=name)
-        pv_service = Mock()
-        si = Mock()
-        clone_parmas = Mock()
-        clone_res = Mock()
-        clone_res.error = None
-        clone_res.vm = Mock()
-        clone_res.vm.summary = Mock()
-        clone_res.vm.summary.config = Mock()
-        clone_res.vm.summary.config.uuid = uuid
+    def setUp(self):
+        self.name = 'name'
+        self.uuid = 'uuid'
+        self.name_gen = Mock(return_value=self.name)
+        self.pv_service = Mock()
+        self.si = Mock()
+        self.clone_parmas = Mock()
+        self.clone_res = Mock()
+        self.clone_res.error = None
+        self.clone_res.vm = Mock()
+        self.clone_res.vm.summary = Mock()
+        self.clone_res.vm.summary.config = Mock()
+        self.clone_res.vm.summary.config.uuid = self.uuid
+        self.pv_service.CloneVmParameters = Mock(return_value=self.clone_parmas)
+        self.pv_service.clone_vm = Mock(return_value=self.clone_res)
+        self.image_deployer = Mock()
+        self.image_deployer.deploy_image = Mock(return_value=True)
+        self.vm = Mock()
+        self.vm.config = Mock()
+        self.vm.config.uuid = self.uuid
+        self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
+        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer)
 
-        pv_service.CloneVmParameters = Mock(return_value=clone_parmas)
-        pv_service.clone_vm = Mock(return_value=clone_res)
+    def test_vm_deployer(self):
         params = DeployDataHolder({
             "resource_context": None,
             "template_model": {
@@ -39,26 +45,19 @@ class TestVirtualMachineDeployer(TestCase):
             "power_on": False
         })
 
-        deployer = VirtualMachineDeployer(pv_service, name_gen)
-        res = deployer.deploy_from_template(si, params)
+        res = self.deployer.deploy_from_template(self.si, params)
 
-        self.assertEqual(res.vm_name, name)
-        self.assertEqual(res.vm_uuid, uuid)
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
         self.assertEqual(res.cloud_provider_resource_name,
                          params.template_model.vCenter_resource_name)
-        self.assertTrue(pv_service.CloneVmParameters.called)
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_error(self):
-        name = 'name'
-        name_gen = Mock(return_value=name)
-        pv_service = Mock()
-        si = Mock()
-        clone_parmas = Mock()
-        clone_res = Mock()
-        clone_res.error = Mock()
+        self.clone_res.error = Mock()
 
-        pv_service.CloneVmParameters = Mock(return_value=clone_parmas)
-        pv_service.clone_vm = Mock(return_value=clone_res)
+        self.pv_service.CloneVmParameters = Mock(return_value=self.clone_parmas)
+        self.pv_service.clone_vm = Mock(return_value=self.clone_res)
         params = DeployDataHolder.create_from_params(
             template_model={
                 "vCenter_resource_name": "vcenter_resource_name",
@@ -73,7 +72,79 @@ class TestVirtualMachineDeployer(TestCase):
             datastore_name="datastore_name",
             power_on=False)
 
-        deployer = VirtualMachineDeployer(pv_service, name_gen)
+        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, params)
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
 
-        self.assertRaises(Exception, deployer.deploy_from_template, si, params)
-        self.assertTrue(pv_service.CloneVmParameters.called)
+    def test_vm_deployer_image(self):
+        params = DeployDataHolder(
+            {
+                "image_url": "c:\image.ovf",
+                "cluster_name": "QualiSB Cluster",
+                "resource_pool": "LiverPool",
+                "datastore_name": "eric ds cluster",
+                "datacenter_name": "QualiSB",
+                "power_on": False,
+                "vcenter_name": 'vCenter',
+                "app_name": "appName",
+                "user_arguments": ["--compress=9",
+                                   "--schemaValidate", "--etc"
+                                   ]
+            })
+
+        connectivity = Mock()
+        connectivity.address = 'vcenter ip or name'
+        connectivity.user = 'user'
+        connectivity.password = 'password'
+
+        res = self.deployer.deploy_from_image(self.si, params, connectivity)
+
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
+        self.assertEqual(res.cloud_provider_resource_name,
+                         params.vcenter_name)
+
+    def test_vm_deployer_image_no_res(self):
+        self.image_deployer.deploy_image = Mock(return_value=None)
+        params = DeployDataHolder(
+            {
+                "image_url": "c:\image.ovf",
+                "cluster_name": "QualiSB Cluster",
+                "resource_pool": "LiverPool",
+                "datastore_name": "eric ds cluster",
+                "datacenter_name": "QualiSB",
+                "power_on": False,
+                "app_name": "appName",
+                "user_arguments": ["--compress=9",
+                                   "--schemaValidate", "--etc"
+                                   ]
+            })
+
+        connectivity = Mock()
+        connectivity.address = 'vcenter ip or name'
+        connectivity.user = 'user'
+        connectivity.password = 'password'
+
+        self.assertRaises(Exception, self.deployer.deploy_from_image, self.si, params, connectivity)
+
+    def test_vm_deployer_image_no_vm(self):
+        self.pv_service.find_vm_by_name = Mock(return_value=None)
+        params = DeployDataHolder(
+            {
+                "image_url": "c:\image.ovf",
+                "cluster_name": "QualiSB Cluster",
+                "resource_pool": "LiverPool",
+                "datastore_name": "eric ds cluster",
+                "datacenter_name": "QualiSB",
+                "power_on": False,
+                "app_name": "appName",
+                "user_arguments": ["--compress=9",
+                                   "--schemaValidate", "--etc"
+                                   ]
+            })
+
+        connectivity = Mock()
+        connectivity.address = 'vcenter ip or name'
+        connectivity.user = 'user'
+        connectivity.password = 'password'
+
+        self.assertRaises(Exception, self.deployer.deploy_from_image, self.si, params, connectivity)
