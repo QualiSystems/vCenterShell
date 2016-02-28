@@ -68,10 +68,9 @@ class EnvironmentSetup:
         for resultItem in deploy_result.ResultItems:
             if resultItem.Success:
                 pool.apply_async(self._power_on_refresh_ip_install, (api, resultItem))
-
-        else:
-            logger.info("Failed to deploy app {0} in reservation {1}. Error: {2}."
-                        .format(resultItem.AppName, self.reservation_id, resultItem.Error))
+            else:
+                logger.info("Failed to deploy app {0} in reservation {1}. Error: {2}."
+                            .format(resultItem.AppName, self.reservation_id, resultItem.Error))
 
         pool.close()
         pool.join()
@@ -109,7 +108,7 @@ class EnvironmentSetup:
                 script_inputs = []
                 for installation_script_input in installation_info.ScriptInputs:
                     script_inputs.append(
-                            InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+                            InputNameValue(installation_script_input.Name, installation_script_input.Value))
 
                 installation_result = api.ExecuteInstallAppCommand(self.reservation_id, deployed_app_name,
                                                                    installation_info.ScriptCommandName, script_inputs)
