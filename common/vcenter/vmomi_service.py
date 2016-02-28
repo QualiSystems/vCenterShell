@@ -258,10 +258,9 @@ class pyVmomiService:
         :param vimtype:    the type of object too search
         :param name:       the object name to return
         """
-
         obj = None
-        container = content.viewManager.CreateContainerView(
-            content.rootFolder, vimtype, True)
+
+        container = self._get_all_objects_by_type(content, vimtype)
         for c in container.view:
             if name:
                 if c.name == name:
@@ -272,6 +271,18 @@ class pyVmomiService:
                 break
 
         return obj
+
+    @staticmethod
+    def _get_all_objects_by_type(content, vimtype):
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vimtype, True)
+        return container
+
+    def get_default_from_vcenter_by_type(self, si, vimtype, accept_multi):
+        container = self._get_all_objects_by_type(si.content, vimtype)
+        if container and container.view and (len(container.view) == 1 or accept_multi):
+            for a in container.view:
+                return a
 
     def wait_for_task(self, task):
         """ wait for a vCenter task to finish """
@@ -466,9 +477,9 @@ class pyVmomiService:
 
     def get_network_by_mac_address(self, vm, mac_address):
         backing = [device.backing for device in vm.config.hardware.device
-                    if isinstance(device, vim.vm.device.VirtualEthernetCard)
-                    and hasattr(device, 'macAddress')
-                    and device.macAddress == mac_address]
+                   if isinstance(device, vim.vm.device.VirtualEthernetCard)
+                   and hasattr(device, 'macAddress')
+                   and device.macAddress == mac_address]
 
         if backing:
             back = backing[0]
@@ -480,8 +491,8 @@ class pyVmomiService:
 
     def get_vnic_by_mac_address(self, vm, mac_address):
         for device in vm.config.hardware.device:
-            if isinstance(device, vim.vm.device.VirtualEthernetCard)\
-               and hasattr(device, 'macAddress') and device.macAddress == mac_address:
+            if isinstance(device, vim.vm.device.VirtualEthernetCard) \
+                    and hasattr(device, 'macAddress') and device.macAddress == mac_address:
                 # mac address is unique
                 return device
         return None
