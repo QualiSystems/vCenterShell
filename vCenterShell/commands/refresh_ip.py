@@ -48,19 +48,9 @@ class RefreshIpCommand(object):
         ip_regexes = []
         ip_regex = '.*'
 
-        if resource.VmDetails \
-                and hasattr(resource.VmDetails[0], 'VmCustomParam') \
-                and resource.VmDetails[0].VmCustomParam\
-                and hasattr(resource.VmDetails[0].VmCustomParam, 'Name') \
-                and isinstance(resource.VmDetails[0].VmCustomParam.Name, str) \
-                and resource.VmDetails[0].VmCustomParam.Name == 'ip_regex' \
-                and hasattr(resource.VmDetails[0].VmCustomParam, 'Value') \
-                and isinstance(resource.VmDetails[0].VmCustomParam.Value, str):
-            ip_regexes = [resource.VmDetails[0].VmCustomParam.Value]
-        elif resource.VmDetails \
-                and hasattr(resource.VmDetails[0], 'VmCustomParams') \
-                and resource.VmDetails[0].VmCustomParams:
-            custom_params = resource.VmDetails[0].VmCustomParams
+        vm_details = resource.VmDetails
+        if vm_details and hasattr(vm_details, 'VmCustomParams') and vm_details.VmCustomParams:
+            custom_params = vm_details.VmCustomParams
             params = custom_params if isinstance(custom_params, list) else [custom_params]
             ip_regexes = [custom_param.Value for custom_param
                           in params
