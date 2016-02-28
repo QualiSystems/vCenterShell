@@ -273,11 +273,11 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
-    def refresh_ip(self, context, ports):
+    def refresh_ip(self, context, cancellation_context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         # get connection details
@@ -294,7 +294,8 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.holding_network)
+                                                                   self.vc_data_model.holding_network,
+                                                                   cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
