@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ResourceInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="VMware vCenter" FolderFullPath="" Address="" ModelName="VMware vCenter" Driver="VCenter Shell Driver" xmlns="http://schemas.qualisystems.com/ResourceManagement/ResourceSchema.xsd">
-  <Attributes/>
-  <ChildResources />
-  <Connections />
-</ResourceInfo>
