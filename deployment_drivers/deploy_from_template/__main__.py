@@ -1,6 +1,4 @@
-﻿import time
-
-from common.model_factory import ResourceModelParser
+﻿from common.model_factory import ResourceModelParser
 from driver import DeploymentServiceDriver
 from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 

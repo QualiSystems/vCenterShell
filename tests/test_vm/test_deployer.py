@@ -42,7 +42,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "resource_pool": "resource_pool"
             },
             "datastore_name": "datastore_name",
-            "power_on": False
+            "power_on": False,
+            'ip_regex': ''
         })
 
         res = self.deployer.deploy_from_template(self.si, params)
@@ -70,7 +71,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "resource_pool": "resource_pool"
             },
             datastore_name="datastore_name",
-            power_on=False)
+            power_on=False,
+            ip_regex='')
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, params)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
@@ -88,7 +90,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "app_name": "appName",
                 "user_arguments": ["--compress=9",
                                    "--schemaValidate", "--etc"
-                                   ]
+                                   ],
+                'ip_regex': ''
             })
 
         connectivity = Mock()

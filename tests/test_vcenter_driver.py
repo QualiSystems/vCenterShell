@@ -9,7 +9,7 @@ class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
         self.resource = create_autospec(ResourceInfo)
-        self.resource.ResourceModelName = 'VMwarev Center'
+        self.resource.ResourceModelName = 'VMware vCenter'
         self.resource.ResourceAttributes = {'User': 'user',
                                             'Password': '123',
                                             'Default dvSwitch': 'switch1',
@@ -27,6 +27,7 @@ class TestCommandOrchestrator(TestCase):
         self.context = Mock()
         self.context.resource = self.resource
         self.driver.command_orchestrator = MagicMock()
+        self.cancellation_context = Mock()
         self.ports = Mock()
 
     def test_init(self):
@@ -112,7 +113,7 @@ class TestCommandOrchestrator(TestCase):
     def test_refresh_ip(self):
         self.setUp()
 
-        res = self.driver.remote_refresh_ip(self.context, self.ports)
+        res = self.driver.remote_refresh_ip(self.context, self.cancellation_context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, self.ports))
+        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, self.cancellation_context, self.ports))

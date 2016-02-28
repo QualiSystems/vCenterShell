@@ -101,7 +101,8 @@ class CommandOrchestrator(object):
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
         # Refresh IP command
-        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
+        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
+                                                   resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
@@ -144,7 +145,7 @@ class CommandOrchestrator(object):
                                              context.reservation.domain)
 
         connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
-                                                                   context.resource)
+                                                                           context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -272,11 +273,11 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
-    def refresh_ip(self, context, ports):
+    def refresh_ip(self, context, cancellation_context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         # get connection details
@@ -293,7 +294,8 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.holding_network)
+                                                                   self.vc_data_model.holding_network,
+                                                                   cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
