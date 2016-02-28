@@ -23,8 +23,8 @@ class VCenterShellDriver:
     def remote_destroy_vm(self, context, ports):
         return self.command_orchestrator.destroy_vm(context, ports)
 
-    def remote_refresh_ip(self, context, ports):
-        return self.command_orchestrator.refresh_ip(context, ports)
+    def remote_refresh_ip(self, context, cancellation_context, ports):
+        return self.command_orchestrator.refresh_ip(context, cancellation_context, ports)
 
     def PowerOff(self, context, ports):
         return self.command_orchestrator.power_off(context, ports)
