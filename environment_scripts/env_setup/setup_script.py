@@ -1,4 +1,4 @@
-import threading
+from multiprocessing.pool import ThreadPool
 
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
@@ -17,35 +17,15 @@ class EnvironmentSetup:
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
         deploy_result = self._deploy_apps_in_reservation(api, reservation_details)
+        if deploy_result is None:
+            return
 
         reservation_details = api.GetReservationDetails(self.reservation_id)
         self._connect_all_routes_in_reservation(api, reservation_details)
 
-        power_on_result = self._power_deployed_apps_and_refresh_ip(api, deploy_result)
+        self._run_async_power_on_refresh_ip_install(api=api, deploy_result=deploy_result)
 
-    def _power_deployed_apps_and_refresh_ip(self, api, deploy_result):
-        if not deploy_result.ResultItems:
-            logger.info("No deployed apps found in reservation {0}".format(self.reservation_id))
-            return None
-
-        results_dict = dict()
-        threads = []
-        thread_lock = threading.Lock()
-
-        for resultItem in deploy_result.ResultItems:
-            if resultItem.Success:
-                thread = PowerOnAppThread(api, self.reservation_id, resultItem.AppDeploymentyInfo.LogicalResourceName,
-                                          results_dict, thread_lock)
-                threads.append(thread)
-                thread.start()
-            else:
-                logger.info("Failed to deploy app {0} in reservation {1}. Error: {2}."
-                            .format(resultItem.AppName, self.reservation_id, resultItem.Error))
-
-        for t in threads:
-            t.join()
-
-        return results_dict
+        logger.info("Setup for reservation {0} completed".format(self.reservation_id))
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
@@ -68,7 +48,9 @@ class EnvironmentSetup:
             endpoints.append(endpoint.Target)
             endpoints.append(endpoint.Source)
 
-        if len(endpoints) == 0:
+        endpoint = [side for endpoint in connectors for side in [endpoint.Target, endpoint.Source]]
+
+        if not endpoints:
             logger.info("No routes to connect for reservation {0}".format(self.reservation_id))
             return
 
@@ -76,46 +58,65 @@ class EnvironmentSetup:
 
         return api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
 
+    def _run_async_power_on_refresh_ip_install(self, api, deploy_result):
+        if not deploy_result.ResultItems:
+            logger.info("Nothing to power on. No deployed apps found in reservation {0}".format(self.reservation_id))
+            return None
 
-class PowerOnAppThread(threading.Thread):
+        pool = ThreadPool(len(deploy_result.ResultItems))
 
-    def __init__(self, api, reservation_id, deployed_app_name, results_dict, results_lock):
-        threading.Thread.__init__(self)
-        self.api = api
-        self.reservation_id = reservation_id
-        self.deployed_app_name = deployed_app_name
-        self.results_dict = results_dict
-        self.results_lock = results_lock
+        for resultItem in deploy_result.ResultItems:
+            if resultItem.Success:
+                pool.apply_async(self._power_on_refresh_ip_install, (api, resultItem))
 
-    def run(self):
+        else:
+            logger.info("Failed to deploy app {0} in reservation {1}. Error: {2}."
+                        .format(resultItem.AppName, self.reservation_id, resultItem.Error))
+
+        pool.close()
+        pool.join()
+
+    def _power_on_refresh_ip_install(self, api, deployed_app):
+        deployed_app = deployed_app
+        deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
+
         try:
             logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
-                        .format(self.deployed_app_name, self.reservation_id))
-            self.api.ExecuteResourceConnectedCommand(self.reservation_id, self.deployed_app_name, "PowerOn", "power")
-            self.api.SetResourceLiveStatus(self.deployed_app_name, "Online", "Active")
+                        .format(deployed_app_name, self.reservation_id))
+            api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "PowerOn", "power")
+            api.SetResourceLiveStatus(deployed_app_name, "Online", "Active")
         except Exception as exc:
             logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
-                         .format(self.deployed_app_name, self.reservation_id, str(exc)))
-            self._set_result(False)
-            return
+                         .format(deployed_app_name, self.reservation_id, str(exc)))
+            return False
 
         try:
             logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
-                        .format(self.deployed_app_name, self.reservation_id))
-            self.api.ExecuteResourceConnectedCommand(self.reservation_id, self.deployed_app_name, "remote_refresh_ip",
-                                                     "remote_connectivity")
+                        .format(deployed_app_name, self.reservation_id))
+            api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "remote_refresh_ip",
+                                                "remote_connectivity")
         except Exception as exc:
             logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
-                         .format(self.deployed_app_name, self.reservation_id, str(exc)))
-            self._set_result(False)
-            return
+                         .format(deployed_app_name, self.reservation_id, str(exc)))
+            return False
 
-        self._set_result(True)
+        try:
+            installation_info = deployed_app.AppInstallationInfo
+            if installation_info:
+                logger.info("Executing installation script {0} on deployed app {1} in reservation {2}"
+                            .format(installation_info.ScriptCommandName, deployed_app_name, self.reservation_id))
 
-    def _set_result(self, success):
-        self.results_lock.acquire()
-        self.results_dict[self.deployed_app_name] = success
-        self.results_lock.release()
+                script_inputs = []
+                for installation_script_input in installation_info.ScriptInputs:
+                    script_inputs.append(
+                            InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
+                installation_result = api.ExecuteInstallAppCommand(self.reservation_id, deployed_app_name,
+                                                                   installation_info.ScriptCommandName, script_inputs)
+                logger.debug("Installation_result: " + installation_result.Output)
+        except Exception as exc:
+            logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
+                         .format(deployed_app_name, self.reservation_id, str(exc)))
+            return False
 
-
+        return True
