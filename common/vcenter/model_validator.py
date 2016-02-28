@@ -4,6 +4,7 @@ from pyVmomi import vim
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from common.vcenter.vmomi_service import pyVmomiService
+from models.QualiDriverModels import AutoLoadDetails
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
@@ -13,10 +14,12 @@ class VCenterModelValidator(object):
         self.pv_service = pyVmomiService(SmartConnect, Disconnect)
         self.cs_helper = CloudshellDriverHelper()
 
-    def validate(self, context):
+    def validate_and_discover(self, context):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
+        auto_load = AutoLoadDetails(resources=[], attributes=context.resource.attributes)
+
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              None)
@@ -26,10 +29,10 @@ class VCenterModelValidator(object):
         vcenter_model = self.parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
         """:type : models.VMwarevCenterResourceModel.VMwarevCenterResourceModel"""
 
-        si = self._check_if_vcenter_user_pass_valid(context, session, vcenter_model)
+        si = self._check_if_vcenter_user_pass_valid(context, session, auto_load.attributes)
 
-        self._validate_dvswitch_or_set_default(si, vcenter_model)
-        self._validate_holding_network(si, vcenter_model)
+        self._validate_dvswitch_or_set_default(si, auto_load.attributes)
+        self._validate_holding_network(si, auto_load.attributes)
         self._validate_default_port_group(si, vcenter_model)
         self._validate_cluster_or_set_default(si, vcenter_model)
         self._validate_resource_pool(si, vcenter_model)
@@ -37,6 +40,8 @@ class VCenterModelValidator(object):
         self._check_if_attrib_exists(si, vcenter_model.vm_location, 'VM Location')
         self._validate_or_set_default('shut_down_method', vcenter_model, ['hard', 'soft'], 'Shut Down Method')
         self._check_if_bool(vcenter_model.promiscuous_mode, 'Promiscuous Mode')
+
+        return auto_load
 
     def _validate_dvswitch_or_set_default(self, si, vcenter_model):
         if vcenter_model.default_dvswitch:
