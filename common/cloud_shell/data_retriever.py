@@ -24,7 +24,7 @@ class CloudshellDataRetrieverService:
         model.vm_resource_pool = resource_attributes['VM Resource Pool']
         model.vm_storage = resource_attributes['VM Storage']
         model.wait_for_ip = resource_attributes['Wait for IP']
-        return
+        return model
 
     def getVCenterTemplateAttributeData(self, resource_attributes):
         """ get vCenter resource name, template name, template folder from 'vCenter Template' attribute """
