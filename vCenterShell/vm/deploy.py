@@ -1,3 +1,5 @@
+import time
+
 from models.DeployResultModel import DeployResult
 from vCenterShell.vm.ovf_image_params import OvfImageParams
 
@@ -9,6 +11,7 @@ class VirtualMachineDeployer(object):
         self.ovf_service = ovf_service  # type common.vcenter.ovf_service.OvfImageDeployerService
 
     def deploy_from_template(self, si, data_holder):
+
         # generate unique name
         vm_name = self.name_generator(data_holder.template_model.app_name)
 
@@ -27,7 +30,8 @@ class VirtualMachineDeployer(object):
 
         return DeployResult(vm_name,
                             clone_vm_result.vm.summary.config.uuid,
-                            data_holder.template_model.vCenter_resource_name)
+                            data_holder.template_model.vCenter_resource_name,
+                            data_holder.ip_regex)
 
     def deploy_from_image(self, si, data_holder, host_info):
         vm_name = self.name_generator(data_holder.app_name)
@@ -42,7 +46,8 @@ class VirtualMachineDeployer(object):
             if vm:
                 return DeployResult(vm_name,
                                     vm.config.uuid,
-                                    data_holder.vcenter_name)
+                                    data_holder.vcenter_name,
+                                    data_holder.ip_regex)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 

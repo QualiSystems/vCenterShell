@@ -9,7 +9,7 @@ class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
         self.resource = create_autospec(ResourceInfo)
-        self.resource.ResourceModelName = 'VMwarev Center'
+        self.resource.ResourceModelName = 'VMware vCenter'
         self.resource.ResourceAttributes = {'User': 'user',
                                             'Password': '123',
                                             'Default dvSwitch': 'switch1',
