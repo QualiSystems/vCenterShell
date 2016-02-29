@@ -6,6 +6,8 @@
 """
 
 from pyVmomi import vim
+
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.vnic.vnic_service import VNicService
 from common.logger import getLogger
 from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
@@ -17,24 +19,30 @@ class VirtualSwitchToMachineDisconnectCommand(object):
     def __init__(self,
                  pyvmomi_service,
                  port_group_configurer,
-                 default_network):
+                 resource_model_parser
+                 ):
         """
         Disconnect Distributed Virtual Switch from VM Command
         :param pyvmomi_service: vCenter API wrapper
         :param port_group_configurer: Port Group Configurer Service
-        :param <Network obj> default_network: Network which disconnected interface will be attached to
+        :param <ResourceModelParser> resource_model_parser: Network which disconnected interface will be attached to
         :return:
         """
         self.pyvmomi_service = pyvmomi_service
         self.port_group_configurer = port_group_configurer
-        self.default_network = default_network
+        self.resource_model_parser = resource_model_parser
 
-    def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings):
+    def disconnect_from_networks(self, si, vm_uuid, vm_network_remove_mappings, context):
+
+        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                                      VMwarevCenterResourceModel)
+        default_network = vcenter_resource_model.default_network
+
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         if not vm:
             raise ValueError('VM having UUID {0} not found'.format(vm_uuid))
 
-        default_network = self.pyvmomi_service.get_network_by_full_name(si, self.default_network)
+        default_network = self.pyvmomi_service.get_network_by_full_name(si, default_network)
 
         mappings = []
         for vm_network_remove_mapping in vm_network_remove_mappings:

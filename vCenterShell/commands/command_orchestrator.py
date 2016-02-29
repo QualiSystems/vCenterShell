@@ -52,7 +52,7 @@ class CommandOrchestrator(object):
                                                                                   VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tool_path, getLogger('OvfImageDeployerService'))
+        ovf_service = OvfImageDeployerService(self.resource_model_parser, getLogger('OvfImageDeployerService'))
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -76,7 +76,7 @@ class CommandOrchestrator(object):
             VirtualSwitchToMachineDisconnectCommand(
                 pyvmomi_service=pv_service,
                 port_group_configurer=virtual_machine_port_group_configurer,
-                default_network=self.vc_data_model.holding_network)
+                resource_model_parser=self.resource_model_parser)
 
         # Virtual Switch Connect
         virtual_switch_connect_command = \
@@ -87,9 +87,10 @@ class CommandOrchestrator(object):
                 vlan_spec_factory=VlanSpecFactory(),
                 vlan_id_range_parser=VLanIdRangeParser(),
                 logger=getLogger('VirtualSwitchConnectCommand'))
-        self.connection_orchestrator = ConnectionCommandOrchestrator(self.vc_data_model,
-                                                                     virtual_switch_connect_command,
-                                                                     self.virtual_switch_disconnect_command)
+        self.connection_orchestrator = ConnectionCommandOrchestrator(
+            connector=virtual_switch_connect_command,
+            disconnector=self.virtual_switch_disconnect_command,
+            resource_model_parser=self.resource_model_parser)
 
         # Destroy VM Command
         self.destroy_virtual_machine_command = \
@@ -107,11 +108,14 @@ class CommandOrchestrator(object):
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
-                                                                       request)
+                                                                       request,
+                                                                       context)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -144,8 +148,10 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
 
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model,
-                                                                           context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model,
+                                                                   context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -182,7 +188,10 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session,  self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -210,7 +219,9 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -236,7 +247,10 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -259,7 +273,9 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -284,7 +300,9 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -294,7 +312,7 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.holding_network,
+                                                                   vc_data_model.holding_network,
                                                                    cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
@@ -333,8 +351,9 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              context.remote_reservation.domain)
-
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         resource_details = self._parse_remote_model(context)
 
@@ -368,7 +387,9 @@ class CommandOrchestrator(object):
         # get connection details
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                             VMwarevCenterResourceModel)
+        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         res = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                    self.vm_power_management_command.power_on,

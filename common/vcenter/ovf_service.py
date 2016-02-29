@@ -2,6 +2,7 @@ import subprocess
 import urllib
 
 from common.utilites.common_utils import fixurl
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 OVF_DESTENATION_FORMAT = 'vi://{0}:{1}@{2}/{3}/host/{4}{5}'
 
@@ -17,16 +18,20 @@ RESOURCE_POOL_PARAM_TO_URL = '/Resources/{0}'
 
 
 class OvfImageDeployerService(object):
-    def __init__(self, ovf_tool_exe_path, logger):
-        self.ovf_tool_exe_path = ovf_tool_exe_path
+    def __init__(self, resource_model_parser, logger):
+        self.resource_model_parser = resource_model_parser
         self.logger = logger
 
-    def deploy_image(self, image_params):
+    def deploy_image(self, context, image_params):
         """
         Receives ovf image parameters and deploy it on the designated vcenter
+        :param context:
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
         """
-        args = self._get_args(image_params)
+        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
+        ovf_tool_exe_path = vc_data_model.ovf_tool_path
+
+        args = self._get_args(ovf_tool_exe_path, image_params)
         self.logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
         process = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -44,7 +49,7 @@ class OvfImageDeployerService(object):
             return True
 
         image_params.connectivity.password = '******'
-        args_for_error = ' '.join(self._get_args(image_params))
+        args_for_error = ' '.join(self._get_args(ovf_tool_exe_path, image_params))
         self.logger.error('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
         raise Exception('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
 
@@ -52,7 +57,7 @@ class OvfImageDeployerService(object):
     # --noSSLVerify --acceptAllEulas --vmFolder="Raz" --name="raz_test_1" --datastore="aa"
     # "C:\images\test\OVAfile121_QS\OVAfile121_QS.ovf"
     # "vi://qualisystems%5Craz.a:%21QAZ2wsx@192.168.42.110/QualiSB/host/QualiSB Cluster"
-    def _get_args(self, image_params):
+    def _get_args(self, ovf_tool_exe_path, image_params):
         """
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
         """
@@ -66,7 +71,7 @@ class OvfImageDeployerService(object):
         power_state = POWER_ON_PARAM if image_params.power_on else POWER_OFF_PARAM
 
         # build basic args
-        args = [self.ovf_tool_exe_path,
+        args = [ovf_tool_exe_path,
                 NO_SSL_PARAM,
                 ACCEPT_ALL_PARAM,
                 power_state,
