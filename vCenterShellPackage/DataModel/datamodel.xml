@@ -657,5 +657,11 @@
     <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
+    <ns0:ScriptDescriptor Name="Setup" Version="1.0.0">
+      <ns0:ScriptInputs />
+    </ns0:ScriptDescriptor>
+    <ns0:ScriptDescriptor Name="Teardown" Version="1.0.0">
+      <ns0:ScriptInputs />
+    </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>
 </ns0:DataModelInfo>

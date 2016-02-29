@@ -1,4 +1,4 @@
-from environment_scripts.service.environment import EnvironmentService
+from environment_scripts import EnvironmentService
 
 
 def main():
