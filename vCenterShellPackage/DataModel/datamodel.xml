@@ -323,23 +323,6 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsConnectable="true" IsSearchable="true" Name="Temp Command Connector">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Temp Command Connector Model" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels>
-            <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
-            <ns0:ParentModelName>VMware vCenter</ns0:ParentModelName>
-          </ns0:ParentModels>
-          <ns0:Drivers />
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
       <ns0:AttachedAttributes>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
@@ -353,16 +336,12 @@
         </ns0:AttachedAttribute>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
-        <ns0:AttributeValue Name="VM_UUID" Value="" />
-        <ns0:AttributeValue Name="Cloud Provider" Value="" />
         <ns0:AttributeValue Name="Requested Vnic Name" Value="" />
       </ns0:AttributeValues>
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes />
           <ns0:AttributeValues>
-            <ns0:AttributeValue Name="VM_UUID" Value="" />
-            <ns0:AttributeValue Name="Cloud Provider" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
