@@ -53,7 +53,7 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.network = Mock()
 
         # act
-        connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network')
+        connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network', [])
 
         mapping.dv_switch_path = self.vcenter_context.default_dvswitch_path
         mapping.dv_switch_name = self.vcenter_context.default_dvswitch_name

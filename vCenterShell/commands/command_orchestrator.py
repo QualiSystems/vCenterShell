@@ -109,9 +109,14 @@ class CommandOrchestrator(object):
                                              context.reservation.domain)
         connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
 
+        reserved_networks = []
+        if self.vc_data_model.reserved_networks:
+            reserved_networks = [name.strip() for name in self.vc_data_model.reserved_networks.split(',')]
+
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
-                                                                       request)
+                                                                       request,
+                                                                       reserved_networks)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results

@@ -1,5 +1,11 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
+    <ns0:AttributeInfo DefaultValue="Reserved networks separated by Semicolon(;)" IsReadOnly="false" Name="Reserved Networks" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -242,6 +248,9 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="VMware vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -289,6 +298,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="Reserved Networks" Value="" />
             <ns0:AttributeValue Name="User" Value="" />
             <ns0:AttributeValue Name="Password" Value="" />
             <ns0:AttributeValue Name="Default Port Group Location" Value="" />
