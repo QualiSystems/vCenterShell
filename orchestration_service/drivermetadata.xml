@@ -1,0 +1,7 @@
+<Driver Description="Deploy App" MainClass="orchestrator.DeployAppOrchestrationDriver" Name="Deployment Orchestrator" Version="1.0.0">
+    <Layout>
+        <Category Name="App Management">
+            <Command Description="" DisplayName="Deploy App" Name="deploy_app" Tags="allow_shared" />
+        </Category>
+    </Layout>
+</Driver>
