@@ -12,7 +12,7 @@ class DeployAppOrchestrationDriver(object):
     def __init__(self):
         self.cs_helper = CloudshellDriverHelper()
 
-    def deply_app(self, context):
+    def deploy(self, context):
         """
         Deploys app from template
         :type context: models.QualiDriverModels.ResourceCommandContext
