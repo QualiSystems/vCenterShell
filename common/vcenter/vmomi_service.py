@@ -6,6 +6,7 @@ from datetime import datetime
 from pyVmomi import vim
 from common.logger import getLogger
 from common.utilites.io import get_path_and_name
+from common.vcenter.vm_location import VMLocation
 
 logger = getLogger(__name__)
 
@@ -369,11 +370,13 @@ class pyVmomiService:
             result.error = 'Failed to find folder: {0}'.format(clone_params.vm_folder)
             return result
 
-        template = self.find_vm_by_name(clone_params.si, clone_params.vm_folder, clone_params.template_name)
+        vm_location = VMLocation.create_from_full_path(clone_params.template_name)
+
+        template = self.find_vm_by_name(clone_params.si, vm_location.path, vm_location.name)
 
         if not template:
             raise ValueError('Virtual Machine Template with name {0} was not found under folder {1}'
-                             .format(clone_params.template_name, clone_params.vm_folder))
+                             .format(vm_location.name, vm_location.path))
 
         if clone_params.datastore_name is None:
             datastore = template.datastore[0]
