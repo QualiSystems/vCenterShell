@@ -645,10 +645,10 @@
     <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Alias="Setup script" Name="Default Sandbox Setup" Version="1.0.0">
+    <ns0:ScriptDescriptor Alias="Setup script" CategoryName="Hidden Commands" Name="Default Sandbox Setup" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Alias="Teardown script" Name="Default Sandbox Teardown" Version="1.0.0">
+    <ns0:ScriptDescriptor Alias="Teardown script" CategoryName="Hidden Commands" Name="Default Sandbox Teardown" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>
