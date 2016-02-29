@@ -536,6 +536,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
+          <ns0:Scripts />
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -565,6 +566,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
+          <ns0:Scripts />
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="Default VLAN" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -602,6 +604,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
+          <ns0:Scripts />
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
@@ -640,9 +643,6 @@
       </ns0:ScriptInputs>
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Name="Setup" Version="1.0.0">
