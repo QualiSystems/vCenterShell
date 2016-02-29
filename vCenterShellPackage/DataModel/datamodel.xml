@@ -228,6 +228,12 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
@@ -324,7 +330,7 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
       <ns0:AttachedAttributes>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
           <ns0:AllowedValues />
@@ -332,10 +338,14 @@
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested Vnic Name">
+          <ns0:AllowedValues />
+        </ns0:AttachedAttribute>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
         <ns0:AttributeValue Name="VM_UUID" Value="" />
         <ns0:AttributeValue Name="Cloud Provider" Value="" />
+        <ns0:AttributeValue Name="Requested Vnic Name" Value="" />
       </ns0:AttributeValues>
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
