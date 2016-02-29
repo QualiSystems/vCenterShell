@@ -108,7 +108,11 @@ class CommandOrchestrator(object):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
                                              context.reservation.domain)
         connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
-        reserved_networks = self.vc_data_model.reserved_networks.split(',')
+
+        reserved_networks = []
+        if self.vc_data_model.reserved_networks:
+            reserved_networks = [name.strip() for name in self.vc_data_model.reserved_networks.split(',')]
+
         results = self.command_wrapper.execute_command_with_connection(connection_details,
                                                                        self.connection_orchestrator.connect_bulk,
                                                                        request,
