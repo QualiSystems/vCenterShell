@@ -23,6 +23,9 @@ class EnvironmentService(object):
         Connects all the VLAN Auto services to all the Deployed Apps in the same Environment
         :return:
         """
+
+        raise Exception("obsolete")
+
         session = helpers.get_api_session()
         reservation_id = helpers.get_reservation_context_details().id
 
