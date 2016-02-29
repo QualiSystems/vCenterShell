@@ -1,4 +1,4 @@
-from common.vcenter.model_validator import VCenterModelValidator
+from common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 from models.QualiDriverModels import AutoLoadCommandContext
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
 
@@ -55,7 +55,7 @@ class VCenterShellDriver:
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
 
-        validator = VCenterModelValidator()
+        validator = VCenterAutoModelDiscovery()
         validator.validate(context)
         return AutoLoadCommandContext()
 

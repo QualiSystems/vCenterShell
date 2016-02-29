@@ -7,29 +7,50 @@ from common.vcenter.vmomi_service import pyVmomiService
 from models.QualiDriverModels import AutoLoadDetails
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
+USER = 'User'
+PASSWORD = 'Password'
+DEFAULT_DVSWITCH = 'Default dvSwitch'
+DEFAULT_PORT_GROUP_LOCATION = 'Default Port Group Location'
+EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
+HOLDING_NETWORK = 'Holding Network'
+OVF_TOOL_PATH = 'OVF Tool Path'
+PROMISCUOUS_MODE = 'Promiscuous Mode'
+SHUTDOWN_METHOD = 'Shutdown Method'
+VM_CLUSTER = 'VM Cluster'
+VM_LOCATION = 'VM Location'
+VM_RESOURCE_POOL = 'VM Resource Pool'
+VM_STORAGE = 'VM Storage'
 
-class VCenterModelValidator(object):
+class VCenterAutoModelDiscovery(object):
     def __init__(self):
         self.parser = ResourceModelParser()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect)
         self.cs_helper = CloudshellDriverHelper()
 
+    @staticmethod
+    def _get_validation_discovery_method_by_name(string):
+        pass
+
     def validate_and_discover(self, context):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
-        auto_load = AutoLoadDetails(resources=[], attributes=context.resource.attributes)
-
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              None)
-
         self._check_if_attribute_not_empty(context.resource.address, 'Address')
+        resource = context.resource
+        auto_attr = []
 
-        vcenter_model = self.parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
-        """:type : models.VMwarevCenterResourceModel.VMwarevCenterResourceModel"""
+        si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
 
-        si = self._check_if_vcenter_user_pass_valid(context, session, auto_load.attributes)
+
+        for key, value in context.resource.attributes:
+            if key not in ['user', 'password']:
+                continue
+
+
+
 
         self._validate_dvswitch_or_set_default(si, auto_load.attributes)
         self._validate_holding_network(si, auto_load.attributes)
@@ -110,7 +131,7 @@ class VCenterModelValidator(object):
             setattr(model, name, accepet_values[0])
 
     def _check_if_vcenter_user_pass_valid(self, context, session, vcenter_model):
-        self._check_if_attribute_not_empty(vcenter_model.user, 'User')
+        self._check_if_attribute_not_empty(vcenter_model['User'], 'User')
         self._check_if_attribute_not_empty(vcenter_model.password, 'Password')
         connection_details = self.cs_helper.get_connection_details(session, vcenter_model, context.resource)
         si = self.pv_service.connect(connection_details.host,
@@ -125,15 +146,15 @@ class VCenterModelValidator(object):
 
     @staticmethod
     def _check_if_in_restricted_values(attribute, name, values):
-        VCenterModelValidator._check_if_attribute_not_empty(attribute, name)
-        if not VCenterModelValidator._check_if_in(attribute, values):
+        VCenterAutoModelDiscovery._check_if_attribute_not_empty(attribute, name)
+        if not VCenterAutoModelDiscovery._check_if_in(attribute, values):
             raise KeyError('{0} value: {1}, but must be of {2}'.format(name, attribute, values))
 
     @staticmethod
     def _check_if_bool(attribute, name):
-        VCenterModelValidator._check_if_attribute_not_empty(attribute, name)
-        if not (VCenterModelValidator._check_if_in(attribute, [True, 'True', 'true']) or
-                VCenterModelValidator._check_if_in(attribute, [False, 'False', 'false'])):
+        VCenterAutoModelDiscovery._check_if_attribute_not_empty(attribute, name)
+        if not (VCenterAutoModelDiscovery._check_if_in(attribute, [True, 'True', 'true']) or
+                VCenterAutoModelDiscovery._check_if_in(attribute, [False, 'False', 'false'])):
             raise KeyError('{0} must be a boolean instead of {1}'.format(name, attribute))
 
     @staticmethod
