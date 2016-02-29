@@ -17,7 +17,7 @@ class ConnectionCommandOrchestrator(object):
         self.disconnector = disconnector
         self.vc_data_model = vc_data_model
 
-    def connect_bulk(self, si, request):
+    def connect_bulk(self, si, request, reserved_networks):
         dv_switch_path_parts = str.split(self.vc_data_model.default_dvswitch, '\\')
         if len(dv_switch_path_parts) < 2:
             raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
@@ -32,22 +32,27 @@ class ConnectionCommandOrchestrator(object):
 
         pool = ThreadPool()
         async_results = self.run_async_connection_actions(default_network, dv_switch_name, dv_switch_path,
-                                                          port_group_path, si, unified_actions, pool)
+                                                          port_group_path, si, unified_actions, pool, reserved_networks)
 
         results = self._get_async_results(async_results, mappings, pool)
 
         return results
 
     def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
-                                     unified_actions, pool):
+                                     unified_actions, pool, reserved_networks):
         async_results = []
         for action in unified_actions:
             vm_uuid = self._get_vm_uuid(action)
             if action.type == 'setVlan':
                 res = pool.apply_async(self._set_vlan_bulk,
-                                       (action, default_network, dv_switch_name, dv_switch_path,
+                                       (action,
+                                        default_network,
+                                        dv_switch_name,
+                                        dv_switch_path,
                                         port_group_path,
-                                        vm_uuid, si))
+                                        vm_uuid,
+                                        reserved_networks,
+                                        si))
 
             elif action.type == 'removeVlan':
 
@@ -58,7 +63,8 @@ class ConnectionCommandOrchestrator(object):
                 async_results.append(res)
         return async_results
 
-    def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid, si):
+    def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
+                       reserved_networks, si):
 
         mappings = self._create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path)
 
@@ -66,7 +72,7 @@ class ConnectionCommandOrchestrator(object):
         if mappings:
             try:
                 connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
-                                                                        default_network)
+                                                                        default_network, reserved_networks)
                 for connection_result in connection_results:
                     result = CustomActionResult()
                     result.actionId = str(action.actionId)
@@ -218,7 +224,7 @@ class ConnectionCommandOrchestrator(object):
                                                                                    unified_actions, results)
                 else:
                     ConnectionCommandOrchestrator._decombine_failed_action_result(action_result,
-                                                                                   unified_actions, results)
+                                                                                  unified_actions, results)
         return results
 
     @staticmethod
@@ -290,4 +296,3 @@ class ConnectionCommandOrchestrator(object):
 
         method = getattr(self, method_name)
         return method(unified_action, action_result)
-

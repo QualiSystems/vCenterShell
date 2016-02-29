@@ -13,3 +13,4 @@ class VMwarevCenterResourceModel(object):
         self.ovf_tool_path = ''
         self.execution_server_selector = ''
         self.promiscuous_mode = ''
+        self.reserved_networks = ''
