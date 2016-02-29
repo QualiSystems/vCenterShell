@@ -6,7 +6,7 @@ class VCenterShellDriver:
         """
         ctor must be without arguments, it is created with reflection at run time
         """
-        self.command_orchestrator = None # type: CommandOrchestrator
+        self.command_orchestrator = None  # type: CommandOrchestrator
 
     def initialize(self, context):
         self.command_orchestrator = CommandOrchestrator(context)
@@ -23,8 +23,8 @@ class VCenterShellDriver:
     def remote_destroy_vm(self, context, ports):
         return self.command_orchestrator.destroy_vm(context, ports)
 
-    def remote_refresh_ip(self, context, ports):
-        return self.command_orchestrator.refresh_ip(context, ports)
+    def remote_refresh_ip(self, context, cancellation_context, ports):
+        return self.command_orchestrator.refresh_ip(context, cancellation_context, ports)
 
     def PowerOff(self, context, ports):
         return self.command_orchestrator.power_off(context, ports)
@@ -38,12 +38,12 @@ class VCenterShellDriver:
         """
         return self.command_orchestrator.power_on(context, ports)
 
-    def power_on(self, context, vm_uuid, resource_fullname):
-        self.command_orchestrator.power_on_not_roemote(context, vm_uuid, resource_fullname)
-
     # the name is by the Qualisystems conventions
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
     def deploy_from_template(self, context, deploy_data):
         return self.command_orchestrator.deploy_from_template(context, deploy_data)
+
+    def deploy_from_image(self, context, deploy_data):
+        return self.command_orchestrator.deploy_from_image(context, deploy_data)

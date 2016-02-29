@@ -9,6 +9,7 @@ from common.cloud_shell.resource_remover import CloudshellResourceRemover
 from common.model_factory import ResourceModelParser
 from common.utilites.command_result import set_command_result
 from common.utilites.common_name import generate_unique_name
+from common.vcenter.ovf_service import OvfImageDeployerService
 from common.vcenter.task_waiter import SynchronousTaskWaiter
 from common.vcenter.vmomi_service import pyVmomiService
 from common.wrappers.command_wrapper import CommandWrapper
@@ -18,7 +19,7 @@ from models.GenericDeployedAppResourceModel import GenericDeployedAppResourceMod
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
-from vCenterShell.commands.deploy_vm import DeployFromTemplateCommand
+from vCenterShell.commands.deploy_vm import DeployCommand
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
@@ -47,10 +48,15 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
+        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                                  VMwarevCenterResourceModel)
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        template_deployer = VirtualMachineDeployer(pv_service=pv_service, name_generator=generate_unique_name)
+        ovf_service = OvfImageDeployerService(self.vc_data_model.ovf_tool_path, getLogger('OvfImageDeployerService'))
+
+        vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
+                                             name_generator=generate_unique_name,
+                                             ovf_service=ovf_service)
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
         virtual_machine_port_group_configurer = \
@@ -63,7 +69,7 @@ class CommandOrchestrator(object):
         # Command Wrapper
         self.command_wrapper = CommandWrapper(logger=getLogger, pv_service=pv_service)
         # Deploy Command
-        self.deploy_from_template_command = DeployFromTemplateCommand(deployer=template_deployer)
+        self.deploy_command = DeployCommand(deployer=vm_deployer)
 
         # Virtual Switch Revoke
         self.virtual_switch_disconnect_command = \
@@ -95,7 +101,8 @@ class CommandOrchestrator(object):
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
         # Refresh IP command
-        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service)
+        self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
+                                                   resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
         session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
@@ -114,7 +121,7 @@ class CommandOrchestrator(object):
 
     def deploy_from_template(self, context, deploy_data):
         """
-        Deploy From Template Commnand, will deploy vm from template
+        Deploy From Template Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str deploy_data: represent a json of the parameters, example: {
@@ -147,8 +154,46 @@ class CommandOrchestrator(object):
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             connection_details,
-            self.deploy_from_template_command.execute_deploy_from_template,
+            self.deploy_command.execute_deploy_from_template,
             data_holder)
+
+        return set_command_result(result=result, unpicklable=False)
+
+    def deploy_from_image(self, context, deploy_data):
+        """
+        Deploy From Image Command, will deploy vm from ovf image
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {
+                "image_url": "c:\image.ovf" or
+                             "\\nas\shared\image.ovf" or
+                             "http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf",
+                "cluster_name": "QualiSB Cluster",
+                "resource_pool": "LiverPool",
+                "datastore_name": "eric ds cluster",
+                "datacenter_name": "QualiSB"
+                "power_on": False
+                "app_name": "appName"
+                "user_arguments": ["--compress=9", " --schemaValidate", "--etc"]
+            }
+        :return str deploy results
+        """
+
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
+        connection_details = self.cs_helper.get_connection_details(session,  self.vc_data_model, context.resource)
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            connection_details,
+            self.deploy_command.execute_deploy_from_image,
+            data_holder,
+            connection_details)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -228,11 +273,11 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
-    def refresh_ip(self, context, ports):
+    def refresh_ip(self, context, cancellation_context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         # get connection details
@@ -249,7 +294,8 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   self.vc_data_model.holding_network)
+                                                                   self.vc_data_model.holding_network,
+                                                                   cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -309,10 +355,14 @@ class CommandOrchestrator(object):
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
         resource = context.remote_endpoints[0]
-        resource_details = self.resource_model_parser.convert_to_resource_model(resource,
-                                                                                GenericDeployedAppResourceModel)
-        resource_details.fullname = resource.fullname
-        return resource_details
+
+        dictionary = jsonpickle.decode(resource.app_context.deployed_app_json)
+        holder = DeployDataHolder(dictionary)
+        app_resource_detail = GenericDeployedAppResourceModel()
+        app_resource_detail.vm_uuid = holder.vmdetails.uid
+        app_resource_detail.cloud_provider = context.resource.fullname
+        app_resource_detail.fullname = resource.fullname
+        return app_resource_detail
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
         # get connection details
@@ -325,28 +375,4 @@ class CommandOrchestrator(object):
                                                                    session,
                                                                    vm_uuid,
                                                                    resource_fullname)
-        return set_command_result(result=res, unpicklable=False)
-
-    def refresh_ip(self, context, ports):
-        """
-        Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-
-        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
-        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
-        """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        connection_details = self.cs_helper.get_connection_details(session, self.vc_data_model, context.resource)
-
-        resource_details = self._parse_remote_model(context)
-
-        # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                   self.refresh_ip_command.refresh_ip,
-                                                                   session,
-                                                                   resource_details.vm_uuid,
-                                                                   resource_details.fullname,
-                                                                   self.vc_data_model.holding_network)
         return set_command_result(result=res, unpicklable=False)

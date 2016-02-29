@@ -1,16 +1,15 @@
 from unittest import TestCase
-
 from cloudshell.api.cloudshell_api import ResourceInfo
 from mock import Mock, patch, MagicMock, create_autospec
-
 from vcentershell_driver.driver import VCenterShellDriver
+
 
 
 class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
         self.resource = create_autospec(ResourceInfo)
-        self.resource.ResourceModelName = 'VMwarev Center'
+        self.resource.ResourceModelName = 'VMware vCenter'
         self.resource.ResourceAttributes = {'User': 'user',
                                             'Password': '123',
                                             'Default dvSwitch': 'switch1',
@@ -28,6 +27,7 @@ class TestCommandOrchestrator(TestCase):
         self.context = Mock()
         self.context.resource = self.resource
         self.driver.command_orchestrator = MagicMock()
+        self.cancellation_context = Mock()
         self.ports = Mock()
 
     def test_init(self):
@@ -41,18 +41,6 @@ class TestCommandOrchestrator(TestCase):
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
-
-    # def test_connect(self):
-    #     self.setUp()
-    #     vm_uuid = Mock()
-    #     vlan_id = Mock()
-    #     vlan_spec_type = Mock()
-    #
-    #     res = self.driver.connect(self.context, vm_uuid, vlan_id, vlan_spec_type)
-    #
-    #     self.assertIsNotNone(res)
-    #     self.assertTrue(self.driver.command_orchestrator.connect.called_with(self.context, vm_uuid,
-    #                                                                               vlan_id, vlan_spec_type))
 
     def test_disconnect_all(self):
         self.setUp()
@@ -83,11 +71,21 @@ class TestCommandOrchestrator(TestCase):
         self.setUp()
         deploy_data = Mock()
 
-        res = self.driver.remote_destroy_vm(self.context, deploy_data)
+        res = self.driver.deploy_from_template(self.context, deploy_data)
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.deploy_from_template.called_with(self.context,
                                                                                           deploy_data))
+
+    def test_deploy_from_image(self):
+        self.setUp()
+        deploy_data = Mock()
+
+        res = self.driver.deploy_from_image(self.context, deploy_data)
+
+        self.assertIsNotNone(res)
+        self.assertTrue(self.driver.command_orchestrator.deploy_from_image.called_with(self.context,
+                                                                                       deploy_data))
 
     def test_power_off(self):
         self.setUp()
@@ -115,7 +113,7 @@ class TestCommandOrchestrator(TestCase):
     def test_refresh_ip(self):
         self.setUp()
 
-        res = self.driver.remote_refresh_ip(self.context, self.ports)
+        res = self.driver.remote_refresh_ip(self.context, self.cancellation_context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context,self.ports))
+        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, self.cancellation_context, self.ports))

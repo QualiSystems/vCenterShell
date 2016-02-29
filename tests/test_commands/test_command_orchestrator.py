@@ -40,7 +40,7 @@ class TestCommandOrchestrator(TestCase):
         self.command_orchestrator.vc_data_model.default_dvswitch_name = 'dv_name'
         self.command_orchestrator.vc_data_model.default_port_group_location = 'port path'
         self.command_orchestrator.vc_data_model.default_network = 'default network'
-        self.ports = Mock()
+        self.ports = [Mock()]
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
     def test_disconnect_all(self):
@@ -67,6 +67,12 @@ class TestCommandOrchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
+    def test_deploy_from_image(self):
+        # act
+        self.command_orchestrator.deploy_from_image(self.context, '{"name": "name"}')
+        # assert
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
     def test_power_off(self):
         # act
         self.command_orchestrator.power_off(self.context, self.ports)
@@ -87,6 +93,7 @@ class TestCommandOrchestrator(TestCase):
 
     def test_refresh_ip(self):
         # act
-        self.command_orchestrator.refresh_ip(self.context, self.ports)
+        cancellation_context = object()
+        self.command_orchestrator.refresh_ip(self.context, cancellation_context=cancellation_context, ports=self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
