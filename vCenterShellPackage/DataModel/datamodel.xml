@@ -429,10 +429,9 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
+            <ns0:DriverName>Deploy From Template Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts>
-            <ns0:ScriptName>Deploy</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
@@ -639,11 +638,6 @@
     <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
-    <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput Name="Name" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
