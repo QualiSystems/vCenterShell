@@ -13,23 +13,29 @@ from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemove
 
 
 class ConnectionCommandOrchestrator(object):
-    def __init__(self, vc_data_model, connector, disconnector, resource_model_parser):
+    def __init__(self, connector, disconnector, resource_model_parser):
         self.connector = connector
         self.disconnector = disconnector
-        self.vc_data_model = vc_data_model
         self.resource_model_parser = resource_model_parser
 
-    def connect_bulk(self, si, request, reserved_networks):
+    def connect_bulk(self, si, vcenter_data_model, request):
+        """
+        :param si:
+        :param VMwarevCenterResourceModel vcenter_data_model:
+        :param request:
+        :return:
+        """
+        reserved_networks = []
+        if vcenter_data_model.reserved_networks:
+            reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
 
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        dv_switch_path_parts = str.split(vc_data_model.default_dvswitch, '\\')
+        dv_switch_path_parts = str.split(vcenter_data_model.default_dvswitch, '\\')
         if len(dv_switch_path_parts) < 2:
             raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
         dv_switch_path = dv_switch_path_parts[0]
         dv_switch_name = dv_switch_path_parts[1]
-        port_group_path = vc_data_model.default_port_group_location
-        default_network = vc_data_model.holding_network
+        port_group_path = vcenter_data_model.default_port_group_location
+        default_network = vcenter_data_model.holding_network
         holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)
@@ -37,14 +43,15 @@ class ConnectionCommandOrchestrator(object):
 
         pool = ThreadPool()
         async_results = self.run_async_connection_actions(default_network, dv_switch_name, dv_switch_path,
-                                                          port_group_path, si, unified_actions, pool, reserved_networks)
+                                                          port_group_path, si, unified_actions, pool,
+                                                          reserved_networks, vcenter_data_model)
 
         results = self._get_async_results(async_results, mappings, pool)
 
         return results
 
     def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
-                                     unified_actions, pool, reserved_networks):
+                                     unified_actions, pool, reserved_networks, vcenter_data_model):
         async_results = []
         for action in unified_actions:
             vm_uuid = self._get_vm_uuid(action)
@@ -62,7 +69,7 @@ class ConnectionCommandOrchestrator(object):
             elif action.type == 'removeVlan':
 
                 res = pool.apply_async(self._remove_vlan_bulk,
-                                       (action, vm_uuid, si, context))
+                                       (action, vm_uuid, si, vcenter_data_model))
 
             if res:
                 async_results.append(res)
@@ -95,7 +102,7 @@ class ConnectionCommandOrchestrator(object):
 
         return results
 
-    def _remove_vlan_bulk(self, action, vm_uuid, si, context):
+    def _remove_vlan_bulk(self, action, vm_uuid, si, vcenter_data_model):
         mappings = self._create_disconnection_mappings(action, vm_uuid)
 
         results = []
@@ -110,7 +117,8 @@ class ConnectionCommandOrchestrator(object):
             results = [error_result]
         else:
             try:
-                connection_results = self.disconnector.disconnect_from_networks(si, vm_uuid, mappings, context)
+                connection_results = self.disconnector.disconnect_from_networks(si, vcenter_data_model,
+                                                                                vm_uuid, mappings)
 
                 for connection_result in connection_results:
                     result = self._create_successful_result(action, connection_result)

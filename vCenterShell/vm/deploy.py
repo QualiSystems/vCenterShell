@@ -33,10 +33,14 @@ class VirtualMachineDeployer(object):
                             data_holder.template_model.vCenter_resource_name,
                             data_holder.ip_regex)
 
-    def deploy_from_image(self, si, data_holder, host_info):
+    def deploy_from_image(self, si, session, data_holder, resource_context, vcenter_data_model):
         vm_name = self.name_generator(data_holder.app_name)
 
-        image_params = self._get_deploy_image_params(data_holder, host_info, vm_name)
+        connection_details = self.cs_helper.get_connection_details(session=session,
+                                                                   vcenter_resource_model=vcenter_data_model,
+                                                                   resource_context=resource_context)
+
+        image_params = self._get_deploy_image_params(data_holder, connection_details, vm_name)
 
         res = self.ovf_service.deploy_image(image_params)
         if res:

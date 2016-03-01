@@ -109,20 +109,11 @@ class CommandOrchestrator(object):
                                                    resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-                                             context.reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
-        reserved_networks = []
-        if self.vc_data_model.reserved_networks:
-            reserved_networks = [name.strip() for name in self.vc_data_model.reserved_networks.split(',')]
-
-        results = self.command_wrapper.execute_command_with_connection(connection_details,
-                                                                       self.connection_orchestrator.connect_bulk,
-                                                                       request,
-                                                                       reserved_networks)
+        results = self.command_wrapper.execute_command_with_connection(
+                context,
+                self.connection_orchestrator.connect_bulk,
+                request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -150,14 +141,6 @@ class CommandOrchestrator(object):
             }
         :return str deploy results
         """
-
-        # get connection details
-        #session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-        #                                     context.reservation.domain)
-
-        #vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-        #                                                                     VMwarevCenterResourceModel)
-        #connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -190,25 +173,16 @@ class CommandOrchestrator(object):
             }
         :return str deploy results
         """
-
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
-            connection_details,
+            context,
             self.deploy_command.execute_deploy_from_image,
             data_holder,
-            connection_details)
+            context.resource)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -221,19 +195,10 @@ class CommandOrchestrator(object):
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         resource_details = self._parse_remote_model(context)
-
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
-            connection_details,
+            context,
             self.virtual_switch_disconnect_command.disconnect_all,
             resource_details.vm_uuid)
         return set_command_result(result=res, unpicklable=False)
@@ -248,21 +213,10 @@ class CommandOrchestrator(object):
         :param str network_name: the name of the network to disconnect from
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
-
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         resource_details = self._parse_remote_model(context)
-
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
-            connection_details,
+            context,
             self.virtual_switch_disconnect_command.disconnect,
             resource_details.vm_uuid,
             network_name)
@@ -276,20 +230,11 @@ class CommandOrchestrator(object):
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         resource_details = self._parse_remote_model(context)
-
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
-            connection_details,
+            context,
             self.destroy_virtual_machine_command.destroy,
-            session,
             resource_details.vm_uuid,
             resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
@@ -302,23 +247,12 @@ class CommandOrchestrator(object):
         :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         resource_details = self._parse_remote_model(context)
-
         # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
+        res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.refresh_ip_command.refresh_ip,
-                                                                   session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   vc_data_model.holding_network,
                                                                    cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
@@ -353,20 +287,11 @@ class CommandOrchestrator(object):
         return self.power_on(context, ports)
 
     def _power_command(self, context, ports, command):
-        # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             context.remote_reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
         resource_details = self._parse_remote_model(context)
 
         # execute command
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
+        res = self.command_wrapper.execute_command_with_connection(context,
                                                                    command,
-                                                                   session,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
@@ -391,15 +316,8 @@ class CommandOrchestrator(object):
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
         # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-                                             context.reservation.domain)
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
-
-        res = self.command_wrapper.execute_command_with_connection(connection_details,
+        res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.vm_power_management_command.power_on,
-                                                                   session,
                                                                    vm_uuid,
                                                                    resource_fullname)
         return set_command_result(result=res, unpicklable=False)

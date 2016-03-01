@@ -3,6 +3,7 @@ import inspect
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from common.vcenter.vmomi_service import pyVmomiService
+from models.QualiDriverModels import ResourceRemoteCommandContext
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
@@ -33,6 +34,9 @@ class CommandWrapper:
         return self.execute_command_with_connection(None, command, *args)
 
     def execute_command_with_connection(self, context, command, *args):
+        """
+        Note: session & vcenter_data_model objects will be injected dynamically to the command
+        """
         if not self.logger:
             print LOGGER_CANNOT_BE_NONE
             raise Exception(LOGGER_CANNOT_BE_NONE)
@@ -46,18 +50,19 @@ class CommandWrapper:
             logger.info(LOG_FORMAT.format(START, command_name))
             command_args = []
             si = None
+            session = None
             connection_details = None
-            vc_data_model = None
+            vcenter_data_model = None
 
             # get connection details
             if context:
                 session = self.cs_helper.get_session(server_address=context.connectivity.server_address,
                                                      token=context.connectivity.admin_auth_token,
-                                                     reservation_domain=context.reservation.domain)
-                vc_data_model = self.resource_model_parser.convert_to_resource_model(
+                                                     reservation_domain=self._get_domain(context))
+                vcenter_data_model = self.resource_model_parser.convert_to_resource_model(
                         resource_instance=context.resource, resource_model_type=VMwarevCenterResourceModel)
                 connection_details = self.cs_helper.get_connection_details(session=session,
-                                                                           vcenter_resource_model=vc_data_model,
+                                                                           vcenter_resource_model=vcenter_data_model,
                                                                            resource_context=context.resource)
 
             if connection_details:
@@ -75,10 +80,11 @@ class CommandWrapper:
                 logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
                 command_args.append(si)
 
-            command_args.extend(args)
+            self._try_inject_arg(command=command, command_args=command_args, arg_object=session, arg_name='session')
+            self._try_inject_arg(command=command, command_args=command_args, arg_object=vcenter_data_model,
+                                 arg_name='vcenter_data_model')
 
-            if vc_data_model and self._should_inject_vc_data_model(command):
-                command_args.extend(vc_data_model)
+            command_args.extend(args)
 
             logger.info(EXECUTING_COMMAND.format(command_name))
             logger.debug(DEBUG_COMMAND_PARAMS.format(COMMA.join([str(x) for x in command_args])))
@@ -102,6 +108,31 @@ class CommandWrapper:
                 self.pv_service.disconnect(si)
             logger.info(LOG_FORMAT.format(END, command_name))
 
-    def _should_inject_vc_data_model(self, command):
+    @staticmethod
+    def _get_domain(context):
+        # noinspection PyBroadException
+        try:
+            return context.remote_reservation.domain
+        except:
+            return context.reservation.domain
+
+    def _try_inject_arg(self, command, command_args, arg_object, arg_name):
+        try:
+            if not arg_object:
+                return
+
+            command_args_spec = self._get_command_args(command)
+            if not command_args:
+                return
+
+            index = command_args_spec.index(arg_name)
+            if index >= 0:
+                command_args.insert(index, arg_object)
+        except:
+            pass
+
+    def _get_command_args(self, command):
         command_args = inspect.getargspec(command)[0]
-        return command_args and command_args[-1] == 'vc_data_model'
+        if command_args and command_args[0] == 'self':
+            command_args.pop(0)
+        return command_args

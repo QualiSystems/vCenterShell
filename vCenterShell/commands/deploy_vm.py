@@ -13,6 +13,7 @@ class DeployCommand(object):
         deploy_result = self.deployer.deploy_from_template(si, deployment_params)
         return deploy_result
 
-    def execute_deploy_from_image(self, si, deployment_params, connectivity):
-        deploy_result = self.deployer.deploy_from_image(si, deployment_params, connectivity)
+    def execute_deploy_from_image(self, si, session, vcenter_data_model, deployment_params, resource_context):
+        deploy_result = self.deployer.deploy_from_image(si, session, deployment_params, resource_context,
+                                                        vcenter_data_model)
         return deploy_result
