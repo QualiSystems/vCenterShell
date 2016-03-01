@@ -3,13 +3,16 @@ import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
 from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
+from common.model_factory import ResourceModelParser
 from models.DeployDataHolder import DeployDataHolder
+from models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
 
 
 class DeployFromImage(object):
     def __init__(self):
         self.cs_helper = CloudshellDriverHelper()
         self.cs_data_retriever = CloudshellDataRetrieverService()
+        self.resource_model_parser = ResourceModelParser()
 
     def initialize(self, context):
         pass
@@ -24,10 +27,13 @@ class DeployFromImage(object):
                                              context.reservation.domain)
 
         # get vCenter resource name, template name, template folder
-        image_model = self.cs_data_retriever.get_vcenter_image_attribute_data(context.resource.attributes)
-        vcenter_res = image_model.vcenter_name
+        vcenter_image_resource_model = \
+            self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                 vCenterVMFromImageResourceModel)
 
-        deployment_info = self._get_deployment_info(image_model, Name)
+        vcenter_res = vcenter_image_resource_model.vcenter_name
+
+        deployment_info = self._get_deployment_info(vcenter_image_resource_model, Name)
         result = session.ExecuteCommand(context.reservation.reservation_id,
                                         vcenter_res,
                                         "Resource",
@@ -38,7 +44,7 @@ class DeployFromImage(object):
 
     def _get_deployment_info(self, image_model, name):
         """
-        :type image_model: models.vCenterVMFromImageResourceModel.VCenterImageModel
+        :type image_model: vCenterVMFromImageResourceModel
         """
         # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
         data_cluster_path = image_model.vm_cluster.split('/')
@@ -56,7 +62,8 @@ class DeployFromImage(object):
             "resource_pool": image_model.vm_resource_pool,
             "datastore_name": image_model.vm_storage,
             "datacenter_name": datacenter,  # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
-            "image_url": image_model.vcenter_image})
+            "image_url": image_model.vcenter_image,
+            "ip_regex": image_model.ip_regex})
 
     def _get_command_inputs_list(self, data_holder):
         return [InputNameValue('deploy_data', jsonpickle.encode(data_holder, unpicklable=False))]
