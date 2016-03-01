@@ -1,0 +1,2 @@
+jsonpickle
+cloudshell-automation-api
