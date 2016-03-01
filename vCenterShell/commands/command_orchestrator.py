@@ -67,7 +67,10 @@ class CommandOrchestrator(object):
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
         # Command Wrapper
-        self.command_wrapper = CommandWrapper(logger=getLogger, pv_service=pv_service)
+        self.command_wrapper = CommandWrapper(logger=getLogger,
+                                              pv_service=pv_service,
+                                              cloud_shell_helper=self.cs_helper,
+                                              resource_model_parser=self.resource_model_parser)
         # Deploy Command
         self.deploy_command = DeployCommand(deployer=vm_deployer)
 
@@ -149,13 +152,12 @@ class CommandOrchestrator(object):
         """
 
         # get connection details
-        session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
-                                             context.reservation.domain)
+        #session = self.cs_helper.get_session(context.connectivity.server_address, context.connectivity.admin_auth_token,
+        #                                     context.reservation.domain)
 
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                             VMwarevCenterResourceModel)
-        connection_details = self.cs_helper.get_connection_details(session, vc_data_model,
-                                                                   context.resource)
+        #vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
+        #                                                                     VMwarevCenterResourceModel)
+        #connection_details = self.cs_helper.get_connection_details(session, vc_data_model, context.resource)
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
@@ -163,7 +165,7 @@ class CommandOrchestrator(object):
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
-            connection_details,
+            context,
             self.deploy_command.execute_deploy_from_template,
             data_holder)
 
