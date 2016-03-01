@@ -13,3 +13,4 @@ class vCenterVMFromImageResourceModel(object):
         self.auto_power_off = True
         self.wait_for_ip = ''
         self.auto_delete = ''
+        self.ip_regex = ''

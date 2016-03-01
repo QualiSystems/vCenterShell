@@ -1,5 +1,11 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
+    <ns0:AttributeInfo DefaultValue="Reserved networks separated by Semicolon(;)" IsReadOnly="false" Name="Reserved Networks" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -228,6 +234,12 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
@@ -236,6 +248,9 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="VMware vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -283,6 +298,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="Reserved Networks" Value="" />
             <ns0:AttributeValue Name="User" Value="" />
             <ns0:AttributeValue Name="Password" Value="" />
             <ns0:AttributeValue Name="Default Port Group Location" Value="" />
@@ -307,24 +323,7 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsConnectable="true" IsSearchable="true" Name="Temp Command Connector">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Temp Command Connector Model" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels>
-            <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
-            <ns0:ParentModelName>VMware vCenter</ns0:ParentModelName>
-          </ns0:ParentModels>
-          <ns0:Drivers />
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
       <ns0:AttachedAttributes>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
           <ns0:AllowedValues />
@@ -332,17 +331,17 @@
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested Vnic Name">
+          <ns0:AllowedValues />
+        </ns0:AttachedAttribute>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
-        <ns0:AttributeValue Name="VM_UUID" Value="" />
-        <ns0:AttributeValue Name="Cloud Provider" Value="" />
+        <ns0:AttributeValue Name="Requested Vnic Name" Value="" />
       </ns0:AttributeValues>
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes />
           <ns0:AttributeValues>
-            <ns0:AttributeValue Name="VM_UUID" Value="" />
-            <ns0:AttributeValue Name="Cloud Provider" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
@@ -468,6 +467,9 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
@@ -536,9 +538,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
-          </ns0:Scripts>
+          <ns0:Scripts />
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -568,9 +568,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
-          </ns0:Scripts>
+          <ns0:Scripts />
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="Default VLAN" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -608,9 +606,7 @@
           <ns0:Drivers>
             <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Auto Resolve Vlan</ns0:ScriptName>
-          </ns0:Scripts>
+          <ns0:Scripts />
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
@@ -651,10 +647,10 @@
     <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Auto Resolve Vlan" Version="1.0.0">
+    <ns0:ScriptDescriptor Alias="Setup script" CategoryName="Hidden Commands" Name="Default Sandbox Setup" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Name="Connect All" Version="1.0.0">
+    <ns0:ScriptDescriptor Alias="Teardown script" CategoryName="Hidden Commands" Name="Default Sandbox Teardown" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>

@@ -1,4 +1,4 @@
-cloudshell-automation-api
+cloudshell-automation-api==7.0.0.66
 pyvmomi==6.0.0
 jsonpickle
 enum

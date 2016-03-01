@@ -21,7 +21,8 @@ class TestCommandOrchestrator(TestCase):
                                             'Shutdown Method': 'hard',
                                             'OVF Tool Path': 'C\\program files\ovf',
                                             'Execution Server Selector': '',
-                                            'Promiscuous Mode': 'True'
+                                            'Promiscuous Mode': 'True',
+                                            'Reserved Networks': 'vlan65'
                                             }
         self.context = Mock()
         session = Mock()
@@ -40,6 +41,7 @@ class TestCommandOrchestrator(TestCase):
         self.command_orchestrator.vc_data_model.default_dvswitch_name = 'dv_name'
         self.command_orchestrator.vc_data_model.default_port_group_location = 'port path'
         self.command_orchestrator.vc_data_model.default_network = 'default network'
+        self.command_orchestrator.vc_data_model.reserved_networks = 'reserved'
         self.ports = [Mock()]
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
