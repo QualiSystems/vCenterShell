@@ -31,5 +31,6 @@ class TestDriverHelper(TestCase):
 
     def test_get_connection_details(self):
         session = Mock()
-        res = self.helper.get_connection_details(session, self.context, None)
+        vcenter_data_model = Mock()
+        res = self.helper.get_connection_details(session, vcenter_data_model, self.context)
         self.assertTrue(res)
