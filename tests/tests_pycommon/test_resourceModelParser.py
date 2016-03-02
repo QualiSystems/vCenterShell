@@ -113,12 +113,15 @@ class TestResourceModelParser(TestCase):
     def test_parse_response_info(self):
         resource_info = create_autospec(ResourceInfo)
         resource_info.ResourceModelName = 'Generic Deployed App'
+
         vm_uuid_attribute = create_autospec(ResourceAttribute)
         vm_uuid_attribute.Name = 'VM_UUID'
         vm_uuid_attribute.Value = '422258cd-8b76-e375-8c3b-8e1bf86a4713'
+
         cloud_provider_attribute = create_autospec(ResourceAttribute)
         cloud_provider_attribute.Name = 'Cloud Provider'
         cloud_provider_attribute.Value = 'vCenter'
+
         resource_info.ResourceAttributes = [vm_uuid_attribute, cloud_provider_attribute]
 
         resource_model_parser = ResourceModelParser()

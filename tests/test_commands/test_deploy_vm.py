@@ -48,11 +48,14 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         connectivity = Mock()
         res = Mock()
         deployer.deploy_from_image = Mock(return_value=res)
+        session = Mock()
+        vcenter_data_model = Mock()
 
         deploy_command = DeployCommand(deployer)
 
         # act
-        result = deploy_command.execute_deploy_from_image(si, deployment_params, connectivity)
+        result = deploy_command.execute_deploy_from_image(si, session, vcenter_data_model,
+                                                          deployment_params, connectivity)
 
         # assert
         self.assertTrue(result)

@@ -56,7 +56,8 @@ class CommandOrchestrator(object):
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
-                                             ovf_service=ovf_service)
+                                             ovf_service=ovf_service,
+                                             cs_helper=self.cs_helper)
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
         virtual_machine_port_group_configurer = \

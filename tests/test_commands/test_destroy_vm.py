@@ -28,10 +28,11 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         pv_service.find_by_uuid = Mock(return_value=vm)
 
         session = Mock()
+        vcenter_data_model = Mock()
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy(si, session, uuid, resource_name)
+        res = destroyer.destroy(si, session, vcenter_data_model, uuid, resource_name)
 
         # assert
         self.assertTrue(res)

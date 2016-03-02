@@ -22,14 +22,13 @@ class OvfImageDeployerService(object):
         self.resource_model_parser = resource_model_parser
         self.logger = logger
 
-    def deploy_image(self, context, image_params):
+    def deploy_image(self, vcenter_data_model, image_params):
         """
         Receives ovf image parameters and deploy it on the designated vcenter
-        :param context:
+        :param VMwarevCenterResourceModel vcenter_data_model:
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
         """
-        vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource, VMwarevCenterResourceModel)
-        ovf_tool_exe_path = vc_data_model.ovf_tool_path
+        ovf_tool_exe_path = vcenter_data_model.ovf_tool_path
 
         args = self._get_args(ovf_tool_exe_path, image_params)
         self.logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
