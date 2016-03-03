@@ -52,7 +52,6 @@ class DeployFromImage(object):
         cluster = data_cluster_path[1]
         datacenter = data_cluster_path[0]
 
-
         return DeployDataHolder({
             "vcenter_name": image_model.vcenter_name,
             "vm_folder": image_model.vm_location,
