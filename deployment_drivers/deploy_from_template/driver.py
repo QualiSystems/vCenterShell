@@ -1,7 +1,5 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
-
-from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from models.VCenterTemplateModel import VCenterTemplateModel
@@ -13,7 +11,6 @@ from models.VMClusterModel import VMClusterModel
 
 class DeployFromTemplateDriver(object):
     def __init__(self):
-        self.cs_retriever_service = CloudshellDataRetrieverService()
         self.resource_model_parser = ResourceModelParser()
         self.cs_helper = CloudshellDriverHelper()
 

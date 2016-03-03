@@ -1,7 +1,5 @@
-import time
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
-from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from models.DeployDataHolder import DeployDataHolder
@@ -11,7 +9,6 @@ from models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceMod
 class DeployFromImage(object):
     def __init__(self):
         self.cs_helper = CloudshellDriverHelper()
-        self.cs_data_retriever = CloudshellDataRetrieverService()
         self.resource_model_parser = ResourceModelParser()
 
     def initialize(self, context):
