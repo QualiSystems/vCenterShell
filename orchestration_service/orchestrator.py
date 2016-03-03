@@ -46,8 +46,8 @@ class DeployAppOrchestrationDriver(object):
         # Set live status - deployment done
         session.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
-        logger.info("Deployed {0} Successfully".format(app_name))
-        return "Deployed {0} Successfully".format(app_name)
+        logger.info("Deployed {0} Successfully".format(deployment_result.LogicalResourceName))
+        return "Deployed {0} Successfully".format(deployment_result.LogicalResourceName)
 
     @staticmethod
     def connect_routes_on_deployed_app(api, reservation_id, resource_name):
