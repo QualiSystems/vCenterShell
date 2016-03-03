@@ -111,7 +111,7 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Selected Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
