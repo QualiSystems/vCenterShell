@@ -14,3 +14,4 @@ class vCenterVMFromImageResourceModel(object):
         self.wait_for_ip = ''
         self.auto_delete = ''
         self.ip_regex = ''
+        self.default_datacenter = ''

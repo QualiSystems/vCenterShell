@@ -22,7 +22,8 @@ class TestCommandOrchestrator(TestCase):
                                             'OVF Tool Path': 'C\\program files\ovf',
                                             'Execution Server Selector': '',
                                             'Promiscuous Mode': 'True',
-                                            'Reserved Networks': 'vlan65'
+                                            'Reserved Networks': 'vlan65',
+                                            'Default Datacenter': 'QualiSB'
                                             }
         self.context = Mock()
         session = Mock()
