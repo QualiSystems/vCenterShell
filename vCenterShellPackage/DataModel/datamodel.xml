@@ -111,7 +111,7 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Selected Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
@@ -467,6 +467,9 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
