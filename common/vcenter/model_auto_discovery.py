@@ -12,6 +12,7 @@ ADDRESS = 'address'
 USER = 'User'
 PASSWORD = 'Password'
 DEFAULT_DVSWITCH = 'Default dvSwitch'
+DEFAULT_DATACENTER = 'Default Datacenter'
 DEFAULT_PORT_GROUP_LOCATION = 'Default Port Group Location'
 EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
 HOLDING_NETWORK = 'Holding Network'
@@ -42,6 +43,9 @@ class VCenterAutoModelDiscovery(object):
         auto_attr = []
 
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
+        self._check_if_attribute_not_empty(resource.attributes, DEFAULT_DATACENTER)
+
+        dc = self.pv_service.find_datacenter_by_name(si, '', resource.attributes[DEFAULT_DATACENTER])
 
         for key, value in resource.attributes.items():
             if key in [USER, PASSWORD]:
