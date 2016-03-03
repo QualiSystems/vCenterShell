@@ -56,8 +56,7 @@ class VCenterShellDriver:
         """
 
         validator = VCenterAutoModelDiscovery()
-        validator.validate(context)
-        return AutoLoadCommandContext()
+        return validator.validate_and_discover(context)
 
 
 

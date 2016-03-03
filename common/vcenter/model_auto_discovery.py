@@ -4,9 +4,11 @@ from pyVmomi import vim
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from common.vcenter.vmomi_service import pyVmomiService
-from models.QualiDriverModels import AutoLoadDetails
+from models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
+from models.VCenterConnectionDetails import VCenterConnectionDetails
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
+ADDRESS = 'address'
 USER = 'User'
 PASSWORD = 'Password'
 DEFAULT_DVSWITCH = 'Default dvSwitch'
@@ -21,15 +23,12 @@ VM_LOCATION = 'VM Location'
 VM_RESOURCE_POOL = 'VM Resource Pool'
 VM_STORAGE = 'VM Storage'
 
+
 class VCenterAutoModelDiscovery(object):
     def __init__(self):
         self.parser = ResourceModelParser()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect)
         self.cs_helper = CloudshellDriverHelper()
-
-    @staticmethod
-    def _get_validation_discovery_method_by_name(string):
-        pass
 
     def validate_and_discover(self, context):
         """
@@ -38,130 +37,74 @@ class VCenterAutoModelDiscovery(object):
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              None)
-        self._check_if_attribute_not_empty(context.resource.address, 'Address')
+        self._check_if_attribute_not_empty(context.resource, ADDRESS)
         resource = context.resource
         auto_attr = []
 
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
 
-
-        for key, value in context.resource.attributes:
-            if key not in ['user', 'password']:
+        for key, value in resource.attributes.items():
+            if key in [USER, PASSWORD]:
                 continue
+            validation_method = self._get_validation_method(key)
+            discovered = validation_method(si, key, value)
+            if discovered:
+                auto_attr.append(discovered)
 
+        return AutoLoadDetails([resource], auto_attr)
 
-
-
-        self._validate_dvswitch_or_set_default(si, auto_load.attributes)
-        self._validate_holding_network(si, auto_load.attributes)
-        self._validate_default_port_group(si, vcenter_model)
-        self._validate_cluster_or_set_default(si, vcenter_model)
-        self._validate_resource_pool(si, vcenter_model)
-        self._validate_storage_or_set_default(si, vcenter_model)
-        self._check_if_attrib_exists(si, vcenter_model.vm_location, 'VM Location')
-        self._validate_or_set_default('shut_down_method', vcenter_model, ['hard', 'soft'], 'Shut Down Method')
-        self._check_if_bool(vcenter_model.promiscuous_mode, 'Promiscuous Mode')
-
-        return auto_load
-
-    def _validate_dvswitch_or_set_default(self, si, vcenter_model):
-        if vcenter_model.default_dvswitch:
-            self._validate_attr(si, vcenter_model.default_dvswitch, 'Default DvSwitch')
-        else:
-            default = self.pv_service.get_default_from_vcenter_by_type(self, si, vim.Cluster, False)
-            vcenter_model.default_dvswitch = '{0}/{1}'.format(default.parent.name, default.name)
-
-    def _validate_holding_network(self, si, vcenter_model):
-        self._check_if_attribute_not_empty(vcenter_model.holding_network, 'Holding Network')
-
-        default = self.pv_service.get_default_from_vcenter_by_type(si, vim.Datastore, True)
-        self._validate_attr(default, default, 'Holding Network')
-
-    def _validate_default_port_group(self, si, vcenter_model):
-        if vcenter_model.default_port_group_location:
-            self._validate_attr(si,
-                                '{0}/{1}'.format(vcenter_model.default_dvswitch,
-                                                 vcenter_model.default_port_group_location),
-                                'Default Port Group Location')
-
-    def _validate_cluster_or_set_default(self, si, vcenter_model):
-        if vcenter_model.vm_cluster:
-            self._validate_attr(si, vcenter_model.vm_cluster, 'VM Cluster')
-        else:
-            default = self.pv_service.get_default_from_vcenter_by_type(self, si, vim.Cluster, False)
-            vcenter_model.vm_cluster = '{0}/{1}'.format(default.parent.name, default.name)
-
-    def _validate_resource_pool(self, si, vcenter_model):
-        if not vcenter_model.vm_resource_pool:
-            return
-        self._check_if_key_in_vcenter(si, vcenter_model.vm_cluster + '/' + vcenter_model.vm_resource_pool,
-                                      'VM Resource Pool')
-
-    def _validate_storage_or_set_default(self, si, vcenter_model):
-        if vcenter_model.vm_storage:
-            self._validate_attr(si, vcenter_model.vm_storage, 'VM Storage')
-        else:
-            default = self.pv_service.get_default_from_vcenter_by_type(self, si, vim.Datastore, False)
-            vcenter_model.vm_storage = '{0}/{1}'.format(default.parent.name, default.name)
-
-    def _validate_attr(self, si, attr, msg):
-        a = self.pv_service.find_obj_by_path(si, attr, msg)
-        self._check_if_resource_found(a, msg, attr)
-
-    def _check_if_attrib_exists(self, si, attrib, msg):
-        self._check_if_attribute_not_empty(attrib, msg)
-        self._check_if_key_in_vcenter(si, attrib, msg)
-
-    def _check_if_key_in_vcenter(self, si, attrib, msg):
-        resource = self.pv_service.get_folder(si, attrib)
-        self._check_if_resource_found(attrib, msg, resource)
-
-    @staticmethod
-    def _check_if_resource_found(attrib, msg, resource):
-        if resource:
-            raise KeyError('could not found: {0} at path: {1}'.format(msg, attrib))
-
-    def _validate_or_set_default(self, name, model, accepet_values, msg):
-        attribute = getattr(model, name)
-        if not isinstance(accepet_values, list):
-            accepet_values = [accepet_values]
-        if attribute:
-            self._check_if_in_restricted_values(attribute, msg, accepet_values)
-        else:
-            setattr(model, name, accepet_values[0])
-
-    def _check_if_vcenter_user_pass_valid(self, context, session, vcenter_model):
-        self._check_if_attribute_not_empty(vcenter_model['User'], 'User')
-        self._check_if_attribute_not_empty(vcenter_model.password, 'Password')
-        connection_details = self.cs_helper.get_connection_details(session, vcenter_model, context.resource)
-        si = self.pv_service.connect(connection_details.host,
-                                     connection_details.username,
-                                     connection_details.password,
-                                     connection_details.port)
-        if not si:
+    def _check_if_vcenter_user_pass_valid(self, context, session, attributes):
+        self._check_if_attribute_not_empty(attributes, USER)
+        self._check_if_attribute_not_empty(attributes, PASSWORD)
+        connection_details = self._get_connection_details(session,
+                                                          attributes[PASSWORD],
+                                                          attributes[USER],
+                                                          context.resource.address)
+        try:
+            si = self.pv_service.connect(connection_details.host,
+                                         connection_details.username,
+                                         connection_details.password,
+                                         connection_details.port)
+        except Exception:
             raise KeyError('could not connect to the vcenter: {0}, with the given credentials ({1})'.format(
                 connection_details.host,
                 connection_details.username))
         return si
 
-    @staticmethod
-    def _check_if_in_restricted_values(attribute, name, values):
-        VCenterAutoModelDiscovery._check_if_attribute_not_empty(attribute, name)
-        if not VCenterAutoModelDiscovery._check_if_in(attribute, values):
-            raise KeyError('{0} value: {1}, but must be of {2}'.format(name, attribute, values))
+    def _validate_default_dvswitch(self, si, key, value):
+        if value:
+            dvswitch = self.pv_service.get_network_by_full_name(si, value)
+            self._is_found(dvswitch, key)
+        else:
+            dvswitch = self.pv_service.get_default_from_vcenter_by_type(si, vim.DistributedVirtualSwitch, False)
+            self._is_found(dvswitch, key)
+            return AutoLoadAttribute(key, key, dvswitch.name)
 
     @staticmethod
-    def _check_if_bool(attribute, name):
-        VCenterAutoModelDiscovery._check_if_attribute_not_empty(attribute, name)
-        if not (VCenterAutoModelDiscovery._check_if_in(attribute, [True, 'True', 'true']) or
-                VCenterAutoModelDiscovery._check_if_in(attribute, [False, 'False', 'false'])):
-            raise KeyError('{0} must be a boolean instead of {1}'.format(name, attribute))
+    def _is_found(dvswitch, key):
+        if not dvswitch:
+            raise KeyError('The {0} could not be found in the given vCenter'.format(key))
 
     @staticmethod
-    def _check_if_in(attribute, arr):
-        return attribute in arr
+    def _get_connection_details(session, password, user, address):
+        password = session.DecryptPassword(password).Value
+        return VCenterConnectionDetails(address, user, password)
 
     @staticmethod
-    def _check_if_attribute_not_empty(attribute, name):
-        if not attribute:
+    def _check_if_attribute_not_empty(attributes, name):
+        if not ((hasattr(attributes, name) and getattr(attributes, name)) or
+                    (isinstance(attributes, dict) and name in attributes and attributes[name])):
             raise KeyError('{0} cannot be empty'.format(name))
+
+    @staticmethod
+    def _validate_empty(si, key, value):
+        return
+
+    def _get_validation_method(self, name):
+        if not name:
+            return self._validate_empty()
+        name = name.lower()
+        name = name.split(' ')
+        name = '_'.join(name)
+        method_name = '_validate_{0}'.format(name)
+        return getattr(self, method_name, self._validate_empty)
