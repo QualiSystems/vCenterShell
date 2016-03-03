@@ -14,3 +14,4 @@ class VMwarevCenterResourceModel(object):
         self.execution_server_selector = ''
         self.promiscuous_mode = ''
         self.reserved_networks = ''
+        self.default_datacenter = ''
