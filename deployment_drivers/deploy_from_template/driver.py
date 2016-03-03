@@ -54,10 +54,8 @@ class DeployFromTemplateDriver(object):
         vm_cluster_model = VMClusterModel(vcenter_resource_model.vm_cluster, vcenter_resource_model.vm_resource_pool)
 
         # get power state of the cloned VM
-        power_on = False  # self.cs_retriever_service.getPowerStateAttributeData(resource_context)
-
-        # get datastore
-        datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
+        power_on = False
+        datastore_name = vcenter_template_resource_model.vm_storage
 
         return DeployDataHolder.create_from_params(template_model=template_model,
                                                    datastore_name=datastore_name,
