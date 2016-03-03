@@ -296,6 +296,9 @@
                 <ns0:AllowedValue>Reject</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="Reserved Networks" Value="" />
@@ -470,6 +473,9 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>

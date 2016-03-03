@@ -1,13 +1,9 @@
-import time
 from cloudshell.api.cloudshell_api import CloudShellAPISession
-
-from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
 class CloudshellDriverHelper(object):
     def __init__(self):
-        self.cloudshell_data_retriever_service = CloudshellDataRetrieverService()
         self.session_class = CloudShellAPISession
 
     def get_session(self, server_address, token, reservation_domain):

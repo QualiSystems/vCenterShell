@@ -1,7 +1,5 @@
-import time
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
-from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from models.DeployDataHolder import DeployDataHolder
@@ -11,7 +9,6 @@ from models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceMod
 class DeployFromImage(object):
     def __init__(self):
         self.cs_helper = CloudshellDriverHelper()
-        self.cs_data_retriever = CloudshellDataRetrieverService()
         self.resource_model_parser = ResourceModelParser()
 
     def initialize(self, context):
@@ -46,21 +43,16 @@ class DeployFromImage(object):
         """
         :type image_model: vCenterVMFromImageResourceModel
         """
-        # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
-        data_cluster_path = image_model.vm_cluster.split('/')
-
-        cluster = data_cluster_path[1]
-        datacenter = data_cluster_path[0]
 
         return DeployDataHolder({
             "vcenter_name": image_model.vcenter_name,
             "vm_folder": image_model.vm_location,
             "power_on": image_model.auto_power_on,
             "app_name": name,
-            "cluster_name": cluster,  # todo: raz a after refactoring of the attributes remove this and use "VM Cluster"
+            "cluster_name": image_model.vm_cluster,
             "resource_pool": image_model.vm_resource_pool,
             "datastore_name": image_model.vm_storage,
-            "datacenter_name": datacenter,  # todo: raz a after refactoring of the attributes remove this and use "VM Datacenter"
+            "datacenter_name": image_model.default_datacenter,
             "image_url": image_model.vcenter_image,
             "ip_regex": image_model.ip_regex})
 

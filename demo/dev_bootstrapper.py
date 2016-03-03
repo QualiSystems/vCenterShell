@@ -4,7 +4,6 @@ import sys
 from pyVim.connect import SmartConnect, Disconnect
 
 from common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
-from common.cloud_shell.data_retriever import CloudshellDataRetrieverService
 from common.vcenter.vmomi_service import pyVmomiService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
