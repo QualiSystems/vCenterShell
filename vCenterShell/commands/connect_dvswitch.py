@@ -25,7 +25,7 @@ class VirtualSwitchConnectCommand:
         self.vlan_id_range_parser = vlan_id_range_parser
         self.logger = logger
 
-    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name):
+    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name, reserved_networks):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter
@@ -47,7 +47,7 @@ class VirtualSwitchConnectCommand:
         mappings = self._prepare_mappings(vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
-            si, vm, mappings, default_network_instance)
+            si, vm, mappings, default_network_instance, reserved_networks)
 
         connection_results = []
         for updated_mapping in updated_mappings:

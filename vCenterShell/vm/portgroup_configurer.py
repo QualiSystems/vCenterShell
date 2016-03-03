@@ -32,11 +32,11 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_to_network_mapper = vnic_to_network_mapper
         self.vnic_service = vnic_service
 
-    def connect_vnic_to_networks(self, vm, mapping, default_network):
+    def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks):
         vnic_mapping = self.vnic_service.map_vnics(vm)
 
         vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
-            mapping, vnic_mapping, vm.network, default_network)
+            mapping, vnic_mapping, vm.network, default_network, reserved_networks)
 
         update_mapping = []
         for vnic_name, network in vnic_to_network_mapping.items():

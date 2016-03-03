@@ -40,7 +40,7 @@ class VirtualSwitchToMachineConnector(object):
         self.dv_port_group_creator = dv_port_group_creator
         self.virtual_machine_port_group_configurer = virtual_machine_port_group_configurer
 
-    def connect_by_mapping(self, si, vm, mapping, default_network):
+    def connect_by_mapping(self, si, vm, mapping, default_network, reserved_networks):
         """
         gets the mapping to the vnics and connects it to the vm
         :param default_network:
@@ -66,4 +66,7 @@ class VirtualSwitchToMachineConnector(object):
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
         logger.debug(str(request_mapping))
-        return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm, request_mapping, default_network)
+        return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm,
+                                                                                   request_mapping,
+                                                                                   default_network,
+                                                                                   reserved_networks)
