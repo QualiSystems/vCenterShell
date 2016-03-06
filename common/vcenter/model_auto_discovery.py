@@ -6,7 +6,6 @@ from common.model_factory import ResourceModelParser
 from common.vcenter.vmomi_service import pyVmomiService
 from models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
 from models.VCenterConnectionDetails import VCenterConnectionDetails
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 ADDRESS = 'address'
 USER = 'User'
@@ -43,24 +42,33 @@ class VCenterAutoModelDiscovery(object):
         auto_attr = []
 
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
-        all_items_in_vc = self.pv_service.get_all_items_in_vcenter(si, None)
+        all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
 
-        dc = self._validate_datacenter(si, all_items_in_vc, auto_attr, resource.attributes)
+        dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
+
+        all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
+
         dc_name = dc.name
 
         for key, value in resource.attributes.items():
-            if key in [USER, PASSWORD]:
+            if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
                 continue
             validation_method = self._get_validation_method(key)
-            validation_method(si, all_items_in_vc, auto_attr, dc_name, resource.attributes, key)
+            validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
 
         return AutoLoadDetails([], auto_attr)
 
     @staticmethod
     def _get_default_from_vc_by_type_and_name(items_in_vc, vim_type, name=None):
-        items = [item for item in items_in_vc
-                 if isinstance(item, vim_type) and
-                 (not name or item.name == name)]
+        items = []
+        for item in items_in_vc:
+            if item.name == name:
+                return item
+
+            item_type = type(item)
+            if [t for t in vim_type if item_type is t]:
+                items.append(item)
+
         if len(items) == 1:
             return items[0]
         if len(items) > 1:
@@ -80,9 +88,11 @@ class VCenterAutoModelDiscovery(object):
             if prefix:
                 att_value = '{0}/{1}'.format(prefix, att_value)
 
-            obj = self.pv_service.find_item_in_path_by_type(si, att_value, vim_type)
+            obj = self.pv_service.get_folder(si, att_value)
             if not obj or isinstance(obj, str):
                 raise KeyError('Could not find the {0}: {1}'.format(name, attributes[name]))
+            if vim_type and not isinstance(obj, vim_type):
+                raise KeyError('The given {0}: {1} is not of the correct type'.format(name, attributes[name]))
             return obj
         return False
 
@@ -111,13 +121,83 @@ class VCenterAutoModelDiscovery(object):
         return si
 
     def _validate_default_dvswitch(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        d_switch = self._validate_attribute(si, attributes, vim.DistributedVirtualSwitch, key, dc_name)
+        accepted_types = (vim.DistributedVirtualSwitch, vim.VmwareDistributedVirtualSwitch)
+        d_switch = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not d_switch:
-            d_switch = self._get_default(all_items_in_vc, vim.DistributedVirtualSwitch, key)
+            d_switch = self._get_default(all_items_in_vc, accepted_types, key)
             d_name = self.get_full_name(dc_name, d_switch)
+            # removing the upper folder
+            d_name = d_name.replace('network/', '')
         else:
             d_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, d_name))
+
+    def _validate_vm_storage(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        accepted_types = vim.Datastore
+        datastore = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
+        if not datastore:
+            datastore = self._get_default(all_items_in_vc, accepted_types, key)
+            d_name = self.get_full_name(dc_name, datastore)
+            # removing the upper folder
+            d_name = d_name.replace('datastore/', '')
+        else:
+            d_name = attributes[key]
+        auto_att.append(AutoLoadAttribute('', key, d_name))
+
+    def _validate_vm_location(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        accepted_types = None
+        folder = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
+        if not folder:
+            raise KeyError('VM folder cannot be empty')
+
+        f_name = attributes[key]
+        auto_att.append(AutoLoadAttribute('', key, f_name))
+
+    def _validate_vm_cluster(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        accepted_types = vim.ClusterComputeResource
+        cluster = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
+        if not cluster:
+            cluster = self._get_default(all_items_in_vc, accepted_types, key)
+            c_name = self.get_full_name(dc_name, cluster)
+            # removing the upper folder
+            c_name = c_name.replace('host/', '')
+        else:
+            c_name = attributes[key]
+        auto_att.append(AutoLoadAttribute('', key, c_name))
+        return cluster
+
+    def _validate_vm_resource_pool(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        cluster = self._validate_vm_cluster(si, all_items_in_vc, auto_att, dc_name, attributes, VM_CLUSTER)
+
+        if key not in attributes and attributes[key]:
+            return
+        pool_name = attributes[key]
+        pool = self._find_resource_pool_by_path(pool_name, cluster)
+        if pool:
+            auto_att.append(AutoLoadAttribute('', key, pool_name))
+            return
+
+        raise KeyError('The given resource pool not found: {0}'.format(pool_name))
+
+    def _find_resource_pool_by_path(self, name, root):
+        paths = name.split('/')
+        for path in paths:
+            root = self._find_resource_pool(path, root)
+        return root
+
+    def _find_resource_pool(self, name, root):
+        if hasattr(root, 'resourcePool') and hasattr(root.resourcePool, 'resourcePool'):
+            for pool in root.resourcePool.resourcePool:
+                if pool.name == name:
+                    return pool
+
+    def _validate_holding_network(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        holding_network = self._validate_attribute(si, attributes, vim.Network, key, dc_name)
+        if not holding_network:
+            raise KeyError('Holdeing net work can not be empty')
+
+        n_name = attributes[key]
+        auto_att.append(AutoLoadAttribute('', key, n_name))
 
     @staticmethod
     def _is_found(item, key):
@@ -150,7 +230,7 @@ class VCenterAutoModelDiscovery(object):
 
     @staticmethod
     def get_full_name(dc_name, managed_object, name=''):
-        if name and name.find(dc_name) > -1:
+        if managed_object.name == dc_name:
             return name
         curr_path = managed_object.name
         if name:

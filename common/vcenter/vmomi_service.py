@@ -289,8 +289,9 @@ class pyVmomiService:
         raise KeyError('Could not find item of the given type')
 
     @staticmethod
-    def get_all_items_in_vcenter(si, type_filter):
-        container = si.content.viewManager.CreateContainerView(container=si.content.rootFolder, recursive=True)
+    def get_all_items_in_vcenter(si, type_filter, root=None):
+        root = root if root else si.content.rootFolder
+        container = si.content.viewManager.CreateContainerView(container=root, recursive=True)
         return [item for item in container.view if not type_filter or isinstance(item, type_filter)]
 
     def wait_for_task(self, task):
