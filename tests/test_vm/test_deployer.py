@@ -75,7 +75,8 @@ class TestVirtualMachineDeployer(TestCase):
             },
             datastore_name="datastore_name",
             power_on=False,
-            ip_regex='')
+            ip_regex='',
+            refresh_ip_timeout=10)
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, params)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
