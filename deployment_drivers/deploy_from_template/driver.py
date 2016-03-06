@@ -84,10 +84,15 @@ class DeployFromTemplateDriver(object):
         if not app_name:
             raise ValueError('Name input parameter is empty')
 
+        default_datacenter = vcenter_resource_model.default_datacenter
+        if not default_datacenter:
+            raise ValueError('Default Datacenter attribute on VMWare vCenter is empty')
+
         template_model = VCenterTemplateModel(
             vcenter_resource_name=vcenter_name,
             vm_folder=vm_location,
             template_name=vcenter_template,
-            app_name=app_name
+            app_name=app_name,
+            default_datacenter = default_datacenter
         )
         return template_model

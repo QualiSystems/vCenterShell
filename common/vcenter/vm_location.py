@@ -11,6 +11,10 @@ class VMLocation(object):
     @staticmethod
     def create_from_full_path(full_path):
         path_parts = re.split('/|\\\\', full_path)
-        path = VMLocation.FORWARD_SLASH.join(path_parts[0:-1])
+        path = VMLocation.combine(path_parts[0:-1])
         name = path_parts[-1]
         return VMLocation(path=path, name=name)
+
+    @staticmethod
+    def combine(path_parts):
+        return VMLocation.FORWARD_SLASH.join(path_parts)

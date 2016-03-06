@@ -1,5 +1,4 @@
-import time
-
+from common.vcenter.vm_location import VMLocation
 from models.DeployResultModel import DeployResult
 from vCenterShell.vm.ovf_image_params import OvfImageParams
 
@@ -12,14 +11,16 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
 
     def deploy_from_template(self, si, data_holder):
-
         # generate unique name
         vm_name = self.name_generator(data_holder.template_model.app_name)
+
+        vm_folder = VMLocation.combine([data_holder.template_model.default_datacenter,
+                                        data_holder.template_model.vm_folder])
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=data_holder.template_model.template_name,
                                                    vm_name=vm_name,
-                                                   vm_folder=data_holder.template_model.vm_folder,
+                                                   vm_folder=vm_folder,
                                                    datastore_name=data_holder.datastore_name,
                                                    cluster_name=data_holder.vm_cluster_model.cluster_name,
                                                    resource_pool=data_holder.vm_cluster_model.resource_pool,
