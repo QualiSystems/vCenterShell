@@ -30,11 +30,10 @@ class ConnectionCommandOrchestrator(object):
         if vcenter_data_model.reserved_networks:
             reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
 
-        dv_switch_path_parts = str.split(vcenter_data_model.default_dvswitch, '\\')
-        if len(dv_switch_path_parts) < 2:
-            raise ValueError('Default dvSwitch should contains full path to distributed virtual switch')
-        dv_switch_path = dv_switch_path_parts[0]
-        dv_switch_name = dv_switch_path_parts[1]
+        dvswitch_location = VMLocation.create_from_full_path(vcenter_data_model.default_dvswitch)
+
+        dv_switch_path = VMLocation.combine([vcenter_data_model.default_datacenter, dvswitch_location.path])
+        dv_switch_name = dvswitch_location.name
         port_group_path = vcenter_data_model.default_port_group_location
         default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
