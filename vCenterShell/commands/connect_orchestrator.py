@@ -5,6 +5,7 @@ from multiprocessing.pool import ThreadPool
 
 import jsonpickle
 
+from common.vcenter.vm_location import VMLocation
 from models.ActionResult import ActionResult, CustomActionResult
 from models.DeployDataHolder import DeployDataHolder
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -35,7 +36,8 @@ class ConnectionCommandOrchestrator(object):
         dv_switch_path = dv_switch_path_parts[0]
         dv_switch_name = dv_switch_path_parts[1]
         port_group_path = vcenter_data_model.default_port_group_location
-        default_network = vcenter_data_model.holding_network
+        default_network = VMLocation.combine(
+            [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
         holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)
