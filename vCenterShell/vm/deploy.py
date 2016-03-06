@@ -32,7 +32,8 @@ class VirtualMachineDeployer(object):
         return DeployResult(vm_name,
                             clone_vm_result.vm.summary.config.uuid,
                             data_holder.template_model.vCenter_resource_name,
-                            data_holder.ip_regex)
+                            data_holder.ip_regex,
+                            data_holder.refresh_ip_timeout)
 
     def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context):
         vm_name = self.name_generator(data_holder.app_name)
@@ -52,7 +53,8 @@ class VirtualMachineDeployer(object):
                 return DeployResult(vm_name,
                                     vm.config.uuid,
                                     data_holder.vcenter_name,
-                                    data_holder.ip_regex)
+                                    data_holder.ip_regex,
+                                    data_holder.refresh_ip_timeout)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 

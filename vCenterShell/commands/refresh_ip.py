@@ -8,7 +8,7 @@ logger = getLogger(__name__)
 
 
 class RefreshIpCommand(object):
-    TIMEOUT = 600
+    INTERVAL = 5
     IP_V4_PATTERN = re.compile('^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$')
 
     def __init__(self, pyvmomi_service, resource_model_parser):
@@ -28,50 +28,67 @@ class RefreshIpCommand(object):
         """
         default_network = vcenter_data_model.holding_network  # the default network
 
-        match_function = self._get_ip_match_function(session, resource_name)
+        resource = session.GetResourceDetails(resource_name)
+
+        match_function = self._get_ip_match_function(resource)
+
+        timeout = self._get_ip_refresh_timeout(resource)
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if vm.guest.toolsStatus == 'toolsNotInstalled':
             raise ValueError('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(resource_name))
 
-        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context)
+        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout)
 
         if ip_result.reason == IpReason.Timeout:
             raise ValueError('IP address of VM \'{0}\' could not be obtained during {1} seconds'
-                             .format(resource_name, self.TIMEOUT))
+                             .format(resource_name, timeout))
 
         if ip_result.reason == IpReason.Success:
             session.UpdateResourceAddress(resource_name, ip_result.ip_address)
 
     @staticmethod
-    def _get_ip_match_function(session, resource_name):
+    def _get_ip_match_function(resource):
+        ip_regex = RefreshIpCommand._get_custom_param(
+            resource=resource,
+            custom_param_name='ip_regex')
 
-        logger.debug('Trying to obtain IP address for \'{0}\''.format(resource_name))
+        ip_regex = ip_regex or '.*'
 
-        resource = session.GetResourceDetails(resource_name)
-        ip_regexes = []
-        ip_regex = '.*'
+        return re.compile(ip_regex).match
 
+    @staticmethod
+    def _get_ip_refresh_timeout(resource):
+        timeout = RefreshIpCommand._get_custom_param(
+            resource=resource,
+            custom_param_name='refresh_ip_timeout')
+
+        if not timeout:
+            raise ValueError('Refresh IP Timeout is not set')
+
+        return timeout
+
+    @staticmethod
+    def _get_custom_param(resource, custom_param_name):
+        custom_param_values = []
         vm_details = resource.VmDetails
         if vm_details and hasattr(vm_details, 'VmCustomParams') and vm_details.VmCustomParams:
             custom_params = vm_details.VmCustomParams
             params = custom_params if isinstance(custom_params, list) else [custom_params]
-            ip_regexes = [custom_param.Value for custom_param
-                          in params
-                          if custom_param.Name == 'ip_regex']
+            custom_param_values = [custom_param.Value for custom_param
+                                   in params
+                                   if custom_param.Name == custom_param_name]
 
-        if ip_regexes:
-            ip_regex = ip_regexes[0]
-            logger.debug('Custom IP Regex to filter IP addresses \'{0}\''.format(ip_regex))
+        if custom_param_values:
+            return custom_param_values[0]
+        return None
 
-        return re.compile(ip_regex).match
-
-    def _obtain_ip(self, vm, default_network, match_function, cancellation_context):
+    def _obtain_ip(self, vm, default_network, match_function, cancellation_context, timeout):
         time_elapsed = 0
         ip = None
-        interval = self.TIMEOUT / 100
-        while time_elapsed < self.TIMEOUT and ip is None:
+        interval = self.INTERVAL
+        while time_elapsed < timeout and ip is None:
             if cancellation_context.is_cancelled:
                 return IpResult(ip, IpReason.Cancelled)
             ips = RefreshIpCommand._get_ip_addresses(vm, default_network)

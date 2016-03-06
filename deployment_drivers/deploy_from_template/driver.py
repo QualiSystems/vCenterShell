@@ -1,4 +1,5 @@
 import jsonpickle
+import time
 from cloudshell.api.cloudshell_api import InputNameValue
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
@@ -58,7 +59,8 @@ class DeployFromTemplateDriver(object):
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
                                                    power_on=power_on,
-                                                   ip_regex=vcenter_template_resource_model.ip_regex)
+                                                   ip_regex=vcenter_template_resource_model.ip_regex,
+                                                   refresh_ip_timeout=vcenter_template_resource_model.refresh_ip_timeout)
 
     def _get_vcenter(self, api, vcenter_name):
         if not vcenter_name:
