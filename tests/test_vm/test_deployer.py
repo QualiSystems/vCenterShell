@@ -45,7 +45,8 @@ class TestVirtualMachineDeployer(TestCase):
             },
             "datastore_name": "datastore_name",
             "power_on": False,
-            'ip_regex': ''
+            'ip_regex': '',
+            'refresh_ip_timeout': '10'
         })
 
         res = self.deployer.deploy_from_template(self.si, params)
@@ -95,7 +96,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "user_arguments": ["--compress=9",
                                    "--schemaValidate", "--etc"
                                    ],
-                'ip_regex': ''
+                'ip_regex': '',
+                'refresh_ip_timeout': '10'
             })
 
         connectivity = Mock()
