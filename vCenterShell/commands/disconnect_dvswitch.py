@@ -7,6 +7,7 @@
 
 from pyVmomi import vim
 
+from common.vcenter.vm_location import VMLocation
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.vnic.vnic_service import VNicService
 from common.logger import getLogger
@@ -33,7 +34,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
     def disconnect_from_networks(self, si, vcenter_data_model, vm_uuid, vm_network_remove_mappings):
 
-        default_network = vcenter_data_model.holding_network
+        default_network = VMLocation.combine(
+            [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         if not vm:
@@ -92,7 +94,10 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         else:
             network = None
 
-        default_network = self.pyvmomi_service.get_network_by_full_name(si, vcenter_data_model.holding_network)
+        network_full_name = VMLocation.combine(
+            [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
+
+        default_network = self.pyvmomi_service.get_network_by_full_name(si, network_full_name)
         if network:
             return self.port_group_configurer.disconnect_network(vm, network, default_network)
         else:

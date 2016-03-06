@@ -36,7 +36,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "vCenter_resource_name": "vcenter_resource_name",
                 "vm_folder": "vfolder_name",
                 "template_name": "template_name",
-                "app_name": "some_name"
+                "app_name": "some_name",
+                "default_datacenter": "DataCenter"
             },
             "vm_cluster_model": {
                 "cluster_name": "cluster_name",
@@ -65,7 +66,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "vCenter_resource_name": "vcenter_resource_name",
                 "vm_folder": "vfolder_name",
                 "template_name": "template_name",
-                "app_name": "app_name"
+                "app_name": "app_name",
+                "default_datacenter": "DataCenter"
             },
             vm_cluster_model={
                 "cluster_name": "cluster_name",

@@ -3,13 +3,14 @@ from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
 from mock import Mock, create_autospec
 from common.logger.service import LoggingService
 from common.model_factory import ResourceModelParser
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
 
 
 class TestRefreshIpCommand(TestCase):
     LoggingService("CRITICAL", "DEBUG", None)
 
-    def ignore_refresh_ip(self):
+    def test_refresh_ip(self):
         nic1 = Mock()
         nic1.network = 'A Network'
         nic1.ipAddress = ['192.168.1.1']
@@ -46,13 +47,23 @@ class TestRefreshIpCommand(TestCase):
         session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
+        center_resource_model = VMwarevCenterResourceModel()
+        center_resource_model.default_datacenter = 'QualiSB'
+        center_resource_model.holding_network = 'anetwork'
+        cancellation_context = Mock()
+
         # Act
-        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
+        refresh_ip_command.refresh_ip(si=si,
+                                      session=session,
+                                      vcenter_data_model= center_resource_model,
+                                      vm_uuid='machine1',
+                                      resource_name='default_network',
+                                      cancellation_context=cancellation_context)
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
 
-    def ignore_refresh_ip_choose_ipv4(self):
+    def test_refresh_ip_choose_ipv4(self):
         nic1 = Mock()
         nic1.network = 'A Network'
         nic1.ipAddress = ['192.168.1.1']
@@ -89,13 +100,24 @@ class TestRefreshIpCommand(TestCase):
         session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
+        center_resource_model = VMwarevCenterResourceModel()
+        center_resource_model.default_datacenter = 'QualiSB'
+        center_resource_model.holding_network = 'anetwork'
+        cancellation_context = Mock()
+
         # Act
-        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
+        refresh_ip_command.refresh_ip(
+            si=si,
+            session=session,
+            vcenter_data_model=center_resource_model,
+            vm_uuid='machine1',
+            resource_name='default_network',
+            cancellation_context=cancellation_context)
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
 
-    def ignore_refresh_ip_choose_ip_by_regex(self):
+    def test_refresh_ip_choose_ip_by_regex(self):
         nic1 = Mock()
         nic1.network = 'A Network'
         nic1.ipAddress = ['192.168.1.1']
@@ -132,8 +154,19 @@ class TestRefreshIpCommand(TestCase):
         session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
+        center_resource_model = VMwarevCenterResourceModel()
+        center_resource_model.default_datacenter = 'QualiSB'
+        center_resource_model.holding_network = 'anetwork'
+        cancellation_context = Mock()
+
         # Act
-        refresh_ip_command.refresh_ip(si, session, '1234-5678', 'machine1', 'default_network')
+        refresh_ip_command.refresh_ip(
+            si=si,
+            session=session,
+            vcenter_data_model=center_resource_model,
+            vm_uuid='machine1',
+            resource_name='default_network',
+            cancellation_context=cancellation_context)
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
