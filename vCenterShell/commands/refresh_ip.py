@@ -67,7 +67,7 @@ class RefreshIpCommand(object):
         if not timeout:
             raise ValueError('Refresh IP Timeout is not set')
 
-        return timeout
+        return float(timeout)
 
     @staticmethod
     def _get_custom_param(resource, custom_param_name):

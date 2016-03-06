@@ -421,7 +421,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Refresh IP Timeout" UserInput="false">
@@ -479,7 +479,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Refresh IP Timeout" UserInput="false">
