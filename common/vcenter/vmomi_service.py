@@ -281,13 +281,17 @@ class pyVmomiService:
 
     @staticmethod
     def get_default_from_vcenter_by_type(si, vimtype, accept_multi):
-        container = si.content.viewManager.CreateContainerView(container=si.content.rootFolder, recursive=True)
-        arr_items = [item for item in container.view if isinstance(item, vimtype)]
+        arr_items = pyVmomiService.get_all_items_in_vcenter(si, vimtype)
         if arr_items:
             if accept_multi or len(arr_items) == 1:
                 return arr_items[0]
             raise Exception('There is more the one items of the given type')
         raise KeyError('Could not find item of the given type')
+
+    @staticmethod
+    def get_all_items_in_vcenter(si, type_filter):
+        container = si.content.viewManager.CreateContainerView(container=si.content.rootFolder, recursive=True)
+        return [item for item in container.view if not type_filter or isinstance(item, type_filter)]
 
     def wait_for_task(self, task):
         """ wait for a vCenter task to finish """
