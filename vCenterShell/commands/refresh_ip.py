@@ -2,6 +2,7 @@ import re
 import time
 
 from common.logger import getLogger
+from common.vcenter.vm_location import VMLocation
 from vCenterShell.commands.ip_result import IpResult, IpReason
 
 logger = getLogger(__name__)
@@ -26,7 +27,7 @@ class RefreshIpCommand(object):
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         :param cancellation_context:
         """
-        default_network = vcenter_data_model.holding_network  # the default network
+        default_network = VMLocation.combine([vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
         match_function = self._get_ip_match_function(session, resource_name)
 
