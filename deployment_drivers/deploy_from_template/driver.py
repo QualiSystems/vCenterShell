@@ -24,13 +24,15 @@ class DeployFromTemplateDriver(object):
                                              context.connectivity.admin_auth_token,
                                              context.reservation.domain)
 
-        data_holder = self._get_data_holder(context.resource, session, Name)
+        vcenter_template_resource_model = \
+            self.resource_model_parser.convert_to_resource_model(context.resource,
+                                                                 vCenterVMFromTemplateResourceModel)
 
-        params = [InputNameValue('deploy_data', jsonpickle.encode(data_holder, unpicklable=False))]
+        params = [InputNameValue('deploy_data', jsonpickle.encode(vcenter_template_resource_model, unpicklable=False))]
 
         reservation_id = context.reservation.reservation_id
         result = session.ExecuteCommand(reservation_id,
-                                        data_holder.template_model.vCenter_resource_name,
+                                        vcenter_template_resource_model.vcenter_name,
                                         "Resource",
                                         "deploy_from_template",
                                         params,
@@ -38,32 +40,21 @@ class DeployFromTemplateDriver(object):
 
         return result.Output
 
-    def _get_data_holder(self, resource, session, name):
-
-        resource_context = resource
+    def _get_data_holder(self, resource_context, session, name):
 
         # get vCenter resource name, template name, template folder
         vcenter_template_resource_model = \
             self.resource_model_parser.convert_to_resource_model(resource_context,
                                                                  vCenterVMFromTemplateResourceModel)
-        vcenter_resource_model = self._get_vcenter(session, vcenter_template_resource_model.vcenter_name)
-        template_model = self._create_vcenter_template_model(vcenter_resource_model, vcenter_template_resource_model,
-                                                             name)
-        vm_cluster_model = VMClusterModel(vcenter_resource_model.vm_cluster, vcenter_resource_model.vm_resource_pool)
+        # vcenter_resource_model = self._get_vcenter(session, vcenter_template_resource_model.vcenter_name)
+        # template_model = self._create_vcenter_template_model(vcenter_resource_model, vcenter_template_resource_model, name)
+        # vm_cluster_model = VMClusterModel(vcenter_resource_model.vm_cluster, vcenter_resource_model.vm_resource_pool)
 
         # get power state of the cloned VM
-        power_on = False
-        datastore_name = vcenter_template_resource_model.vm_storage
+        # power_on = False
+        # datastore_name = vcenter_template_resource_model.vm_storage
 
-        return DeployDataHolder.create_from_params(template_model=template_model,
-                                                   datastore_name=datastore_name,
-                                                   vm_cluster_model=vm_cluster_model,
-                                                   ip_regex=vcenter_template_resource_model.ip_regex,
-                                                   refresh_ip_timeout=vcenter_template_resource_model.refresh_ip_timeout,
-                                                   auto_power_on=vcenter_template_resource_model.auto_power_on,
-                                                   auto_power_off=vcenter_template_resource_model.auto_power_off,
-                                                   wait_for_ip=vcenter_template_resource_model.wait_for_ip,
-                                                   auto_delete=vcenter_template_resource_model.auto_delete)
+        return vcenter_template_resource_model
 
     def _get_vcenter(self, api, vcenter_name):
         """
