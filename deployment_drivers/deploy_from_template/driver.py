@@ -1,14 +1,13 @@
 import jsonpickle
-import time
 from cloudshell.api.cloudshell_api import InputNameValue
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
 from common.vcenter.vm_location import VMLocation
-from models.VCenterTemplateModel import VCenterTemplateModel
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from models.DeployDataHolder import DeployDataHolder
+from models.VCenterTemplateModel import VCenterTemplateModel
 from models.VMClusterModel import VMClusterModel
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
 
 class DeployFromTemplateDriver(object):
@@ -68,6 +67,11 @@ class DeployFromTemplateDriver(object):
                                                    auto_delete=vcenter_template_resource_model.auto_delete)
 
     def _get_vcenter(self, api, vcenter_name):
+        """
+        :param api:
+        :param vcenter_name:
+        :return:  VMwarevCenterResourceModel
+        """
         if not vcenter_name:
             raise ValueError('VMWare vCenter name is empty')
         vcenter_instance = api.GetResourceDetails(vcenter_name)
