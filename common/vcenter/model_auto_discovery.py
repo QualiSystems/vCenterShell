@@ -1,4 +1,7 @@
+import os
+
 from pyVim.connect import SmartConnect, Disconnect
+import collections
 
 from pyVmomi import vim
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
@@ -22,6 +25,8 @@ VM_CLUSTER = 'VM Cluster'
 VM_LOCATION = 'VM Location'
 VM_RESOURCE_POOL = 'VM Resource Pool'
 VM_STORAGE = 'VM Storage'
+PROMISCUOUS_MODES = ['on', 'off']
+SHUTDOWN_METHODS = ['soft', 'hard']
 
 
 class VCenterAutoModelDiscovery(object):
@@ -61,6 +66,8 @@ class VCenterAutoModelDiscovery(object):
     @staticmethod
     def _get_default_from_vc_by_type_and_name(items_in_vc, vim_type, name=None):
         items = []
+        if not isinstance(vim_type, collections.Iterable):
+            vim_type = [vim_type]
         for item in items_in_vc:
             if item.name == name:
                 return item
@@ -133,7 +140,7 @@ class VCenterAutoModelDiscovery(object):
         auto_att.append(AutoLoadAttribute('', key, d_name))
 
     def _validate_vm_storage(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        accepted_types = vim.Datastore
+        accepted_types = (vim.Datastore, vim.StoragePod)
         datastore = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not datastore:
             datastore = self._get_default(all_items_in_vc, accepted_types, key)
@@ -169,7 +176,7 @@ class VCenterAutoModelDiscovery(object):
     def _validate_vm_resource_pool(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         cluster = self._validate_vm_cluster(si, all_items_in_vc, auto_att, dc_name, attributes, VM_CLUSTER)
 
-        if key not in attributes and attributes[key]:
+        if key not in attributes or not attributes[key]:
             return
         pool_name = attributes[key]
         pool = self._find_resource_pool_by_path(pool_name, cluster)
@@ -183,13 +190,24 @@ class VCenterAutoModelDiscovery(object):
         paths = name.split('/')
         for path in paths:
             root = self._find_resource_pool(path, root)
+            if not root:
+                return None
         return root
 
     def _find_resource_pool(self, name, root):
-        if hasattr(root, 'resourcePool') and hasattr(root.resourcePool, 'resourcePool'):
-            for pool in root.resourcePool.resourcePool:
-                if pool.name == name:
-                    return pool
+        if hasattr(root, 'resourcePool'):
+            resource_pool = root.resourcePool
+            if hasattr(resource_pool, 'name') and resource_pool.name == name:
+                return resource_pool
+
+            if isinstance(resource_pool, collections.Iterable):
+                for pool in resource_pool:
+                    if pool.name == name:
+                        return pool
+
+            if hasattr(resource_pool, 'resourcePool'):
+                return self._find_resource_pool(name, resource_pool)
+        return None
 
     def _validate_holding_network(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         holding_network = self._validate_attribute(si, attributes, vim.Network, key, dc_name)
@@ -198,6 +216,28 @@ class VCenterAutoModelDiscovery(object):
 
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
+
+    def _validate_ovf_tool_path(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        file_path = attributes[key]
+        if not (file_path and os.path.exists(file_path)):
+            raise KeyError('OVF tool not found in the given path: {0}'.format(file_path))
+        auto_att.append(AutoLoadAttribute('', key, file_path))
+
+    def _validate_promiscuous_mode(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        mode = attributes[key]
+        if self._is_in_array(key, mode, PROMISCUOUS_MODES):
+            auto_att.append(AutoLoadAttribute('', key, mode))
+
+    def _validate_shutdown_method(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        method = attributes[key]
+        if self._is_in_array(key, method, SHUTDOWN_METHODS):
+            auto_att.append(AutoLoadAttribute('', key, method))
+
+    @staticmethod
+    def _is_in_array(key, value, arr):
+        if value in arr:
+            return True
+        raise KeyError('{0} can only be: {1} instead of: {2}'.format(key, arr, value))
 
     @staticmethod
     def _is_found(item, key):
