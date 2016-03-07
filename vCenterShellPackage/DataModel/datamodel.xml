@@ -1,6 +1,6 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
-    <ns0:AttributeInfo DefaultValue="Reserved networks separated by Semicolon(;)" IsReadOnly="false" Name="Reserved Networks" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Reserved Networks" Type="String" Description="Reserved networks separated by Semicolon(;), vNICs configured to those networks won't be used for VM connectivity.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -54,7 +54,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The default network that we configre whn disconnect from another network. Should be under the Default Datacenter." IsReadOnly="false" Name="Holding Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default network that will be configured when disconnecting from another network. Should be under the Default Datacenter." IsReadOnly="false" Name="Holding Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -121,12 +121,12 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source Vnic Name" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source vNIC Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target Vnic Name" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target vNIC Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
@@ -186,7 +186,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created." IsReadOnly="false" Name="VM Resource Pool" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created. Should be under the defined VM Cluster." IsReadOnly="false" Name="VM Resource Pool" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
