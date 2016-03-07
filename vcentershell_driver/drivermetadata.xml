@@ -11,7 +11,7 @@
             <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
         </Category>
         <Category Name="App Management">
-            <Command Description="" DisplayName="Destroy App" Name="remote_destroy_vm" Tags="remote_app_management,allow_shared" />
+            <Command Description="" DisplayName="Delete" Name="remote_destroy_vm" Tags="remote_app_management,allow_shared" />
         </Category>
         <Category Name="Power">
             <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />
