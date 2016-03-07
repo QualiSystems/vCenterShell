@@ -66,6 +66,8 @@ class TestRefreshIpCommand(TestCase):
         node = Mock()
         node.attrib = {'Name': name, 'Value': value}
         vm_custom_param = VmCustomParam(node, '')
+        vm_custom_param.Name = name
+        vm_custom_param.Value = value
         return vm_custom_param
 
     def test_refresh_ip_choose_ipv4(self):
