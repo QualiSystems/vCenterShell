@@ -49,19 +49,22 @@ class VirtualMachinePortGroupConfigurer(object):
         return update_mapping
 
     def erase_network_by_mapping(self, networks, reserved_networks):
-        for network in networks:
+        nets = dict()
+        for net in networks:
+            nets[net.name] = net
+
+        for network in nets.values():
             if self.network_name_gen.is_generated_name(network.name) \
-               and (not reserved_networks or network.name not in reserved_networks) \
-               and not network.vm:
+                    and (not reserved_networks or network.name not in reserved_networks) \
+                    and not network.vm:
 
                 task = self.destroy_port_group_task(network)
                 if task:
                     try:
                         self.synchronous_task_waiter.wait_for_task(task=task,
                                                                    action_name='Erase dv Port Group')
-                    except vim.fault.ResourceInUse:
-                        pass
-                        logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
+                    except Exception as e:
+                        logger.warning("Cannot delete portgroup: {0} because: {1}".format(network, e))
 
     def disconnect_all_networks(self, vm, default_network, reserved_networks):
         vnics = self.vnic_service.map_vnics(vm)
