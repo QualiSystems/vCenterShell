@@ -2,6 +2,7 @@ import re
 import time
 
 from common.logger import getLogger
+from common.vcenter.vm_location import VMLocation
 from vCenterShell.commands.ip_result import IpResult, IpReason
 
 logger = getLogger(__name__)
@@ -15,7 +16,7 @@ class RefreshIpCommand(object):
         self.pyvmomi_service = pyvmomi_service
         self.resource_model_parser = resource_model_parser
 
-    def refresh_ip(self, si, session, vm_uuid, resource_name, default_network, cancellation_context):
+    def refresh_ip(self, si, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 
@@ -23,9 +24,11 @@ class RefreshIpCommand(object):
         :param vCenterShell.driver.SecureCloudShellApiSession session: cloudshell session
         :param str vm_uuid: UUID of Virtual Machine
         :param str resource_name: Logical resource name to update address property on
-        :param vim.Network default_network: the default network
+        :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         :param cancellation_context:
         """
+        default_network = VMLocation.combine([vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
+
         match_function = self._get_ip_match_function(session, resource_name)
 
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)

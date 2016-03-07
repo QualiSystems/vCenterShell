@@ -1,14 +1,14 @@
+from models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
 class ResourceConnectionDetailsRetriever:
-    def __init__(self, qualipy_helpers, cs_retriever_service):
+    def __init__(self, qualipy_helpers):
         """
         :param qualipy.scripts.cloudshell_scripts_helpers qualipy_helpers:
         :param cs_retriever_service:
         :return:
         """
         self.qualipy_helpers = qualipy_helpers
-        self.csRetrieverService = cs_retriever_service
 
     def connection_details(self):
         """ Retrieves connection details to vCenter from specified resource
@@ -21,4 +21,9 @@ class ResourceConnectionDetailsRetriever:
         resource_context = self.qualipy_helpers.get_resource_context_details()
 
         # get vCenter connection details from vCenter resource
-        return self.csRetrieverService.getVCenterConnectionDetails(session, resource_context)
+        user = resource_context.attributes["User"]
+        encrypted_pass = resource_context.attributes["Password"]
+        vcenter_url = resource_context.address
+        password = session.DecryptPassword(encrypted_pass).Value
+
+        return VCenterConnectionDetails(vcenter_url, user, password)

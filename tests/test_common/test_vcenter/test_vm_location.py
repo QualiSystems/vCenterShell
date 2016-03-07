@@ -14,3 +14,8 @@ class TestVmLocation(unittest.TestCase):
 
         self.assertEqual(vm_location.path, 'QualiSB/Alex')
         self.assertEqual(vm_location.name, 'test')
+
+    def test_combine(self):
+        combined_path = VMLocation.combine(['QualiSB', 'Alex'])
+
+        self.assertEqual(combined_path, 'QualiSB/Alex')

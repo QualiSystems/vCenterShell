@@ -1,12 +1,18 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
+    <ns0:AttributeInfo DefaultValue="Reserved networks separated by Semicolon(;)" IsReadOnly="false" Name="Reserved Networks" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String" Description="Customized properties of the image. Example for OVF: --allowExtraConfig --prop:Hostname=ASAvtest --prop:HARole=Standalone --prop:SSHEnable=True --prop:DHCP=True --net:Management0-0='Office LAN 41' --net:GigabitEthernet0-0='VLAN_access_101'">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image" Type="String" Description="The full path to the image file. Note that the path should be accessible to the Execution Servers.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -36,19 +42,19 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter (under the Default Datacenter) in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity" IsReadOnly="false" Name="Default dvSwitch" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity. Should be under the Default Datacenter." IsReadOnly="false" Name="Default dvSwitch" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The default network that we configre whn disconnect from another network." IsReadOnly="false" Name="Holding Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The default network that we configre whn disconnect from another network. Should be under the Default Datacenter." IsReadOnly="false" Name="Holding Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -70,13 +76,13 @@
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Generic Input" Type="String">
       <ns0:Rules />
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="vCenter VM tempalte to use in the VM creation. Should include the full path and the template name, for example QualiFolder/Template1" IsReadOnly="false" Name="vCenter Template" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="vCenter VM template to use in the VM creation. Should include the full path and the template name, for example QualiFolder/Template1" IsReadOnly="false" Name="vCenter Template" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The vCenter cluster or host that will be used when deploying a VM." IsReadOnly="false" Name="VM Cluster" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter cluster or host that will be used when deploying a VM. Should be under the Default Datacenter." IsReadOnly="false" Name="VM Cluster" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -88,13 +94,13 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String" Description="The interface VLAN mode that will be configured. Possible values are Access or Trunk.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String" Description="Enter a number between 2-4096 or a range.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -105,7 +111,7 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Selected Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Selected Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
@@ -125,32 +131,32 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200', '10,20,40-100'.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
         <ns0:Rule Name="Admin Only" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String" Description="The allocated network.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Default VLAN" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Default VLAN" Type="String" Description="Determines if a VLAN service is a default VLAN service used for P2P connectivity.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Isolation Level" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Isolation Level" Type="String" Description="Defines if the allocated VLAN can be shared by others or exclusively used. Possible values are Shared or Exclusive.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="IP Regex" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="IP Regex" Type="String" Description="Filters the IP that can be selected as an App's address.">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -162,7 +168,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String" Description="Enter an ID or range to configure VLAN as Selective Q-in-Q. Examples - '100-200','10,20,40-100'">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -228,6 +234,12 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Vnic Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
@@ -236,6 +248,9 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="VMware vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -281,8 +296,12 @@
                 <ns0:AllowedValue>Reject</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="Reserved Networks" Value="" />
             <ns0:AttributeValue Name="User" Value="" />
             <ns0:AttributeValue Name="Password" Value="" />
             <ns0:AttributeValue Name="Default Port Group Location" Value="" />
@@ -307,24 +326,7 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsConnectable="true" IsSearchable="true" Name="Temp Command Connector">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Temp Command Connector Model" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels>
-            <ns0:ParentModelName>Generic Deployed App</ns0:ParentModelName>
-            <ns0:ParentModelName>VMware vCenter</ns0:ParentModelName>
-          </ns0:ParentModels>
-          <ns0:Drivers />
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories />
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
       <ns0:AttachedAttributes>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
           <ns0:AllowedValues />
@@ -332,17 +334,17 @@
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested Vnic Name">
+          <ns0:AllowedValues />
+        </ns0:AttachedAttribute>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
-        <ns0:AttributeValue Name="VM_UUID" Value="" />
-        <ns0:AttributeValue Name="Cloud Provider" Value="" />
+        <ns0:AttributeValue Name="Requested Vnic Name" Value="" />
       </ns0:AttributeValues>
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes />
           <ns0:AttributeValues>
-            <ns0:AttributeValue Name="VM_UUID" Value="" />
-            <ns0:AttributeValue Name="Cloud Provider" Value="" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
@@ -430,10 +432,9 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
+            <ns0:DriverName>Deploy From Template Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts>
-            <ns0:ScriptName>Deploy</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
@@ -469,6 +470,12 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
@@ -623,10 +630,9 @@
           <ns0:AttributeValues />
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
+            <ns0:DriverName>Deployment Orchestrator</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts>
-            <ns0:ScriptName>Deploy App</ns0:ScriptName>
           </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
@@ -640,14 +646,6 @@
     <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
-    <ns0:ScriptDescriptor Description="Used by App deployment service" Name="Deploy" Version="1.0.0">
-      <ns0:ScriptInputs>
-        <ns0:ScriptInput Name="Name" />
-      </ns0:ScriptInputs>
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Description="Orchestration Driver Deployment Script" Name="Deploy App" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Alias="Setup script" CategoryName="Hidden Commands" Name="Default Sandbox Setup" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>

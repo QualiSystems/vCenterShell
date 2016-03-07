@@ -26,7 +26,8 @@ class TestVirtualMachineDeployer(TestCase):
         self.vm.config = Mock()
         self.vm.config.uuid = self.uuid
         self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
-        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer)
+        self.cs_helper = Mock()
+        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer, self.cs_helper)
 
     def test_vm_deployer(self):
         params = DeployDataHolder({
@@ -35,7 +36,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "vCenter_resource_name": "vcenter_resource_name",
                 "vm_folder": "vfolder_name",
                 "template_name": "template_name",
-                "app_name": "some_name"
+                "app_name": "some_name",
+                "default_datacenter": "DataCenter"
             },
             "vm_cluster_model": {
                 "cluster_name": "cluster_name",
@@ -64,7 +66,8 @@ class TestVirtualMachineDeployer(TestCase):
                 "vCenter_resource_name": "vcenter_resource_name",
                 "vm_folder": "vfolder_name",
                 "template_name": "template_name",
-                "app_name": "app_name"
+                "app_name": "app_name",
+                "default_datacenter": "DataCenter"
             },
             vm_cluster_model={
                 "cluster_name": "cluster_name",
@@ -99,7 +102,13 @@ class TestVirtualMachineDeployer(TestCase):
         connectivity.user = 'user'
         connectivity.password = 'password'
 
-        res = self.deployer.deploy_from_image(self.si, params, connectivity)
+        self.cs_helper.get_connection_details = Mock(return_value=connectivity)
+
+        session = Mock()
+        vcenter_data_model = Mock()
+        resource_context = Mock()
+
+        res = self.deployer.deploy_from_image(self.si, session, vcenter_data_model, params, resource_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)

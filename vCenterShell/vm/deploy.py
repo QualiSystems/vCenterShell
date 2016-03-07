@@ -1,24 +1,26 @@
-import time
-
+from common.vcenter.vm_location import VMLocation
 from models.DeployResultModel import DeployResult
 from vCenterShell.vm.ovf_image_params import OvfImageParams
 
 
 class VirtualMachineDeployer(object):
-    def __init__(self, pv_service, name_generator, ovf_service):
+    def __init__(self, pv_service, name_generator, ovf_service, cs_helper):
         self.pv_service = pv_service
         self.name_generator = name_generator
         self.ovf_service = ovf_service  # type common.vcenter.ovf_service.OvfImageDeployerService
+        self.cs_helper = cs_helper  # type CloudshellDriverHelper
 
     def deploy_from_template(self, si, data_holder):
-
         # generate unique name
         vm_name = self.name_generator(data_holder.template_model.app_name)
+
+        vm_folder = VMLocation.combine([data_holder.template_model.default_datacenter,
+                                        data_holder.template_model.vm_folder])
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=data_holder.template_model.template_name,
                                                    vm_name=vm_name,
-                                                   vm_folder=data_holder.template_model.vm_folder,
+                                                   vm_folder=vm_folder,
                                                    datastore_name=data_holder.datastore_name,
                                                    cluster_name=data_holder.vm_cluster_model.cluster_name,
                                                    resource_pool=data_holder.vm_cluster_model.resource_pool,
@@ -33,12 +35,16 @@ class VirtualMachineDeployer(object):
                             data_holder.template_model.vCenter_resource_name,
                             data_holder.ip_regex)
 
-    def deploy_from_image(self, si, data_holder, host_info):
+    def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context):
         vm_name = self.name_generator(data_holder.app_name)
 
-        image_params = self._get_deploy_image_params(data_holder, host_info, vm_name)
+        connection_details = self.cs_helper.get_connection_details(session=session,
+                                                                   vcenter_resource_model=vcenter_data_model,
+                                                                   resource_context=resource_context)
 
-        res = self.ovf_service.deploy_image(image_params)
+        image_params = self._get_deploy_image_params(data_holder, connection_details, vm_name)
+
+        res = self.ovf_service.deploy_image(vcenter_data_model, image_params)
         if res:
             vm_path = image_params.datacenter + '/' + \
                       image_params.vm_folder if hasattr(image_params, 'vm_name') and image_params.vm_folder else ''

@@ -21,6 +21,6 @@ class TestVnicToNetworkMapper(TestCase):
         request2 = ConnectRequest(None, 'ab')
         requests = [request1, request2]
         mapper = VnicToNetworkMapper(DvPortGroupNameGenerator())
-        mappig = mapper.map_request_to_vnics(requests, vnics, [], network1)
+        mappig = mapper.map_request_to_vnics(requests, vnics, [], network1, [])
         self.assertTrue(mappig[request1.vnic_name], request1.network)
         self.assertTrue(mappig['net 1'], request2.network)

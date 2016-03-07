@@ -45,9 +45,12 @@ class TestOvfImageService(unittest.TestCase):
         image_params.vm_folder = 'Raz'
         # image_params.image_url = "C:\\images\\test\\OVAfile121_QS\\OVAfile121_QS.ovf"
         image_params.image_url = "http://192.168.65.88/ovf/Debian 64 - Yoav.ovf"
-
         image_params.user_arguments = ['--vlan="anetwork"']
-        res = ovf.deploy_image(image_params)
+
+        vcenter_data_model = Mock()
+        vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
+
+        res = ovf.deploy_image(vcenter_data_model, image_params)
 
         self.assertTrue(res)
         self.assertEqual(PROCESS.args, expected_args)
@@ -68,9 +71,12 @@ class TestOvfImageService(unittest.TestCase):
         image_params.datastore = 'aa'
         # image_params.image_url = "C:\\images\\test\\OVAfile121_QS\\OVAfile121_QS.ovf"
         image_params.image_url = "http://192.168.65.88/ovf/Debian 64 - Yoav.ovf"
-
         image_params.user_arguments = ['--vlan="anetwork"']
-        self.assertRaises(Exception, ovf.deploy_image, image_params)
+
+        vcenter_data_model = Mock()
+        vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
+
+        self.assertRaises(Exception, ovf.deploy_image, vcenter_data_model, image_params)
         self.assertTrue(PROCESS.stdin.close.called)
 
     @patch('subprocess.Popen', ProccesMock.Popen)
@@ -90,8 +96,11 @@ class TestOvfImageService(unittest.TestCase):
 
         image_params.user_arguments = ['--vlan="anetwork"']
 
+        vcenter_data_model = Mock()
+        vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
+
         try:
-            ovf.deploy_image(image_params)
+            ovf.deploy_image(vcenter_data_model, image_params)
             # should not reach here
             self.assertTrue(False)
         except Exception as inst:

@@ -1,9 +1,7 @@
 import jsonpickle
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-import time
-from qualipy.api.cloudshell_api import *
+from cloudshell.api.cloudshell_api import InputNameValue
+from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
-
 from models.VCenterTemplateModel import VCenterTemplateModel
 from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -11,49 +9,50 @@ from models.DeployDataHolder import DeployDataHolder
 from models.VMClusterModel import VMClusterModel
 
 
-class DeploymentServiceDriver(object):
-    INPUT_KEY_COMMAND = "COMMAND"
-    INPUT_KEY_DEPLOY_DATA = "deploy_data"
-    COMMAND_DEPLOY_FROM_TEMPLATE = "deploy_from_template"
+class DeployFromTemplateDriver(object):
+    def __init__(self):
+        self.resource_model_parser = ResourceModelParser()
+        self.cs_helper = CloudshellDriverHelper()
 
-    def __init__(self, cs_retriever_service, resource_model_parser):
-        self.cs_retriever_service = cs_retriever_service
-        self.resource_model_parser = resource_model_parser
+    def Deploy(self, context, Name=None):
+        """
+        Deploys app from template
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        """
+        session = self.cs_helper.get_session(context.connectivity.server_address,
+                                             context.connectivity.admin_auth_token,
+                                             context.reservation.domain)
 
-    def execute(self):
-        api = helpers.get_api_session()
-        data_holder = self._get_data_holder(api)
-        json_data_holder = jsonpickle.encode(data_holder, unpicklable=False)
+        data_holder = self._get_data_holder(context.resource, session, Name)
 
-        reservation_id = helpers.get_reservation_context_details().id
-        result = api.ExecuteCommand(reservation_id,
-                                    data_holder.template_model.vCenter_resource_name,
-                                    "Resource",
-                                    self.COMMAND_DEPLOY_FROM_TEMPLATE,
-                                    self._get_command_inputs_list(json_data_holder),
-                                    False)
+        params = [InputNameValue('deploy_data', jsonpickle.encode(data_holder, unpicklable=False))]
 
-        if hasattr(result, 'Output'):
-            print result.Output
-        else:
-            print jsonpickle.encode(result, unpicklable=False)
+        reservation_id = context.reservation.reservation_id
+        result = session.ExecuteCommand(reservation_id,
+                                        data_holder.template_model.vCenter_resource_name,
+                                        "Resource",
+                                        "deploy_from_template",
+                                        params,
+                                        False)
 
-    def _get_data_holder(self, api):
+        return result.Output
 
-        resource_context = helpers.get_resource_context_details()
+    def _get_data_holder(self, resource, session, name):
+
+        resource_context = resource
 
         # get vCenter resource name, template name, template folder
-        vcenter_template_resource_model = self.resource_model_parser.convert_to_resource_model(resource_context,
-                                                                                vCenterVMFromTemplateResourceModel)
-        vcenter_resource_model = self._get_vcenter(api, vcenter_template_resource_model.vcenter_name)
-        template_model = self._create_vcenter_template_model(vcenter_resource_model, vcenter_template_resource_model)
+        vcenter_template_resource_model = \
+            self.resource_model_parser.convert_to_resource_model(resource_context,
+                                                                 vCenterVMFromTemplateResourceModel)
+        vcenter_resource_model = self._get_vcenter(session, vcenter_template_resource_model.vcenter_name)
+        template_model = self._create_vcenter_template_model(vcenter_resource_model, vcenter_template_resource_model,
+                                                             name)
         vm_cluster_model = VMClusterModel(vcenter_resource_model.vm_cluster, vcenter_resource_model.vm_resource_pool)
 
         # get power state of the cloned VM
-        power_on = False  # self.cs_retriever_service.getPowerStateAttributeData(resource_context)
-
-        # get datastore
-        datastore_name = self.cs_retriever_service.getVMStorageAttributeData(resource_context)
+        power_on = False
+        datastore_name = vcenter_template_resource_model.vm_storage
 
         return DeployDataHolder.create_from_params(template_model=template_model,
                                                    datastore_name=datastore_name,
@@ -69,7 +68,7 @@ class DeploymentServiceDriver(object):
                                                                                       VMwarevCenterResourceModel)
         return vcenter_resource_model
 
-    def _create_vcenter_template_model(self, vcenter_resource_model, vcenter_template_resource_model):
+    def _create_vcenter_template_model(self, vcenter_resource_model, vcenter_template_resource_model, name):
         vcenter_name = vcenter_template_resource_model.vcenter_name
         if not vcenter_name:
             raise ValueError('VCenter Name is empty')
@@ -79,17 +78,19 @@ class DeploymentServiceDriver(object):
         vcenter_template = vcenter_template_resource_model.vcenter_template or vcenter_resource_model.vcenter_template
         if not vcenter_template:
             raise ValueError('VCenter Template is empty')
-        app_name = os.environ["Name"]
+        app_name = name
         if not app_name:
             raise ValueError('Name input parameter is empty')
+
+        default_datacenter = vcenter_resource_model.default_datacenter
+        if not default_datacenter:
+            raise ValueError('Default Datacenter attribute on VMWare vCenter is empty')
 
         template_model = VCenterTemplateModel(
             vcenter_resource_name=vcenter_name,
             vm_folder=vm_location,
             template_name=vcenter_template,
-            app_name=app_name
+            app_name=app_name,
+            default_datacenter = default_datacenter
         )
         return template_model
-
-    def _get_command_inputs_list(self, json_data_holder):
-        return [InputNameValue(self.INPUT_KEY_DEPLOY_DATA, json_data_holder)]

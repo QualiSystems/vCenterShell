@@ -2,6 +2,7 @@ from unittest import TestCase
 from mock import Mock, patch
 from pyVmomi import vim
 from common.logger.service import LoggingService
+from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 
@@ -29,8 +30,10 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         # virtual_switch_to_machine_connector.remove_interfaces_from_vm = Mock(return_value=True)
         connector.get_network_by_name = lambda x, y: Mock()
 
+        vcenter_data_model = VMwarevCenterResourceModel()
+
         # act
-        res = connector.disconnect(si, uuid)
+        res = connector.disconnect(si, vcenter_data_model, uuid)
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,
                                                        connection_detail.username,
@@ -63,8 +66,10 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
 
         connector = VirtualSwitchToMachineDisconnectCommand(pv_service, Mock(), 'anetwork')
 
+        vcenter_data_model = VMwarevCenterResourceModel()
+
         # act
-        res = connector.disconnect(si, uuid, network_name)
+        res = connector.disconnect(si, vcenter_data_model, uuid, network_name)
 
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,

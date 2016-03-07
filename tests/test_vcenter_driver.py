@@ -22,8 +22,9 @@ class TestCommandOrchestrator(TestCase):
                                             'Shutdown Method': 'hard',
                                             'OVF Tool Path': 'C\\program files\ovf',
                                             'Execution Server Selector': '',
-                                            'Promiscuous Mode': 'True'
-                                            }
+                                            'Promiscuous Mode': 'True',
+                                            'Reserved Networks': 'vlan65',
+                                            'Default Datacenter': 'QualiSB'}
         self.context = Mock()
         self.context.resource = self.resource
         self.driver.command_orchestrator = MagicMock()
@@ -40,7 +41,7 @@ class TestCommandOrchestrator(TestCase):
         res = self.driver.ApplyConnectivityChanges(self.context, requset)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset))
+        self.assertTrue(self.driver.command_orchestrator.connect_bulk.called_with(self.context, requset, []))
 
     def test_disconnect_all(self):
         self.setUp()
