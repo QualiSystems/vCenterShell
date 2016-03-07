@@ -34,7 +34,11 @@ class EnvironmentTeardown:
 
         logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
 
-        return api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
+        try:
+            api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
+        except Exception as exc:
+            logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
+                         .format(self.reservation_id, str(exc)))
 
     def _power_off_all_vm_resources(self, api, reservation_details):
         resources = reservation_details.ReservationDescription.Resources
