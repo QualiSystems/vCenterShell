@@ -58,7 +58,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         networks_to_remove = self.port_group_configurer.get_networks_on_vnics(vm, vnics)
 
         res = self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
-        self.port_group_configurer.erase_network_by_mapping(networks_to_remove)
+        self.port_group_configurer.erase_network_by_mapping(networks_to_remove, vcenter_data_model.reserved_networks)
         return res
 
     def remove_vnic(self, si, vm_uuid, network_name=None):
@@ -106,9 +106,9 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         default_network = self.pyvmomi_service.get_network_by_full_name(si, network_full_name)
         if network:
-            return self.port_group_configurer.disconnect_network(vm, network, default_network)
+            return self.port_group_configurer.disconnect_network(vm, network, default_network, vcenter_data_model.reserved_networks)
         else:
-            return self.port_group_configurer.disconnect_all_networks(vm, default_network)
+            return self.port_group_configurer.disconnect_all_networks(vm, default_network, vcenter_data_model.reserved_networks)
 
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """

@@ -58,15 +58,15 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertIsNotNone(res)
 
     def test_erase_network_by_mapping(self):
-        res = self.configurer.erase_network_by_mapping([self.network])
+        res = self.configurer.erase_network_by_mapping([self.network], [])
         self.assertIsNone(res)
 
     def test_disconnect_all_networks(self):
-        mapping = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network))
+        mapping = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network), [])
         self.assertFalse(mapping[0].connect)
 
     def test_disconnect_network(self):
-        mapping = self.configurer.disconnect_network(self.vm, self.network, Mock(spec=vim.Network))
+        mapping = self.configurer.disconnect_network(self.vm, self.network, Mock(spec=vim.Network), '')
         self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):

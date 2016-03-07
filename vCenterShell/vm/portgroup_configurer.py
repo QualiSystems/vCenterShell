@@ -48,9 +48,12 @@ class VirtualMachinePortGroupConfigurer(object):
         self.update_vnic_by_mapping(vm, update_mapping)
         return update_mapping
 
-    def erase_network_by_mapping(self, networks):
+    def erase_network_by_mapping(self, networks, reserved_networks):
         for network in networks:
-            if self.network_name_gen.is_generated_name(network.name):
+            if self.network_name_gen.is_generated_name(network.name) \
+               and (not reserved_networks or network.name not in reserved_networks) \
+               and not network.vm:
+
                 task = self.destroy_port_group_task(network)
                 if task:
                     try:
@@ -60,12 +63,12 @@ class VirtualMachinePortGroupConfigurer(object):
                         pass
                         logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
 
-    def disconnect_all_networks(self, vm, default_network):
+    def disconnect_all_networks(self, vm, default_network, reserved_networks):
         vnics = self.vnic_service.map_vnics(vm)
-        network_for_removal = self.get_networks_on_vnics(vm, vnics)
+        network_for_removal = self.get_networks_on_vnics(vm, vnics.values())
         update_mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
         res = self.update_vnic_by_mapping(vm, update_mapping)
-        self.erase_network_by_mapping(network_for_removal)
+        self.erase_network_by_mapping(network_for_removal, reserved_networks)
         return res
 
     def get_networks_on_vnics(self, vm, vnics):
@@ -85,16 +88,16 @@ class VirtualMachinePortGroupConfigurer(object):
                    if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
         return mapping
 
-    def disconnect_network(self, vm, network, default_network):
+    def disconnect_network(self, vm, network, default_network, reserved_networks):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
-        network_to_remove = self.get_networks_on_vnics(vm, vnics)
+        network_to_remove = self.get_networks_on_vnics(vm, vnics.values())
         mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
                    for vnic_name, vnic in vnics.items()
                    if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
         res = self.update_vnic_by_mapping(vm, mapping)
-        self.erase_network_by_mapping(network_to_remove)
+        self.erase_network_by_mapping(network_to_remove, reserved_networks)
         return res
 
     def update_vnic_by_mapping(self, vm, mapping):
