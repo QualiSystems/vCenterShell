@@ -46,7 +46,12 @@ class TestVirtualMachineDeployer(TestCase):
             "datastore_name": "datastore_name",
             "power_on": False,
             'ip_regex': '',
-            'refresh_ip_timeout': '10'
+            'refresh_ip_timeout': '10',
+            'auto_power_on': True,
+            'auto_power_off': True,
+            'wait_for_ip': True,
+            'auto_delete': True
+
         })
 
         res = self.deployer.deploy_from_template(self.si, params)
@@ -77,7 +82,11 @@ class TestVirtualMachineDeployer(TestCase):
             datastore_name="datastore_name",
             power_on=False,
             ip_regex='',
-            refresh_ip_timeout=10)
+            refresh_ip_timeout=10,
+            auto_power_on=True,
+            auto_power_off=True,
+            wait_for_ip=True,
+            auto_delete=True)
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, params)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
@@ -97,7 +106,11 @@ class TestVirtualMachineDeployer(TestCase):
                                    "--schemaValidate", "--etc"
                                    ],
                 'ip_regex': '',
-                'refresh_ip_timeout': '10'
+                'refresh_ip_timeout': '10',
+                'auto_power_on': True,
+                'auto_power_off': True,
+                'wait_for_ip': True,
+                'auto_delete': True
             })
 
         connectivity = Mock()
