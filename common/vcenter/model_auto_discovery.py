@@ -155,7 +155,7 @@ class VCenterAutoModelDiscovery(object):
         accepted_types = None
         folder = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not folder:
-            raise KeyError('VM folder cannot be empty')
+            raise ValueError('VM folder cannot be empty')
 
         f_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, f_name))
@@ -189,7 +189,7 @@ class VCenterAutoModelDiscovery(object):
             auto_att.append(AutoLoadAttribute('', key, pool_name))
             return
 
-        raise KeyError('The given resource pool not found: {0}'.format(pool_name))
+        raise ValueError('The given resource pool not found: {0}'.format(pool_name))
 
     def _find_resource_pool_by_path(self, name, root):
         paths = name.split('/')
@@ -217,7 +217,7 @@ class VCenterAutoModelDiscovery(object):
     def _validate_holding_network(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         holding_network = self._validate_attribute(si, attributes, vim.Network, key, dc_name)
         if not holding_network:
-            raise KeyError('Holdeing net work can not be empty')
+            raise ValueError('Holdeing net work can not be empty')
 
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
@@ -225,7 +225,7 @@ class VCenterAutoModelDiscovery(object):
     def _validate_ovf_tool_path(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         file_path = attributes[key]
         if not (file_path and os.path.exists(file_path)):
-            raise KeyError('OVF tool not found in the given path: {0}'.format(file_path))
+            raise ValueError('OVF tool not found in the given path: {0}'.format(file_path))
         auto_att.append(AutoLoadAttribute('', key, file_path))
 
     def _validate_promiscuous_mode(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
@@ -242,12 +242,12 @@ class VCenterAutoModelDiscovery(object):
     def _is_in_array(key, value, arr):
         if value in arr:
             return True
-        raise KeyError('{0} can only be: {1} instead of: {2}'.format(key, arr, value))
+        raise ValueError('{0} can only be: {1} instead of: {2}'.format(key, arr, value))
 
     @staticmethod
     def _is_found(item, key):
         if not item:
-            raise KeyError('The {0} could not be found in the given vCenter'.format(key))
+            raise ValueError('The {0} could not be found in the given vCenter'.format(key))
 
     @staticmethod
     def _get_connection_details(session, password, user, address):
@@ -258,7 +258,7 @@ class VCenterAutoModelDiscovery(object):
     def _check_if_attribute_not_empty(attributes, name):
         if not ((hasattr(attributes, name) and getattr(attributes, name)) or
                     (isinstance(attributes, dict) and name in attributes and attributes[name])):
-            raise KeyError('{0} cannot be empty'.format(name))
+            raise ValueError('{0} cannot be empty'.format(name))
 
     @staticmethod
     def _validate_empty(ai, all_items_in_vc, attributes, auto_attr, dc_name, key):
