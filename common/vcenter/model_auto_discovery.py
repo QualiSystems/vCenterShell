@@ -25,7 +25,7 @@ VM_CLUSTER = 'VM Cluster'
 VM_LOCATION = 'VM Location'
 VM_RESOURCE_POOL = 'VM Resource Pool'
 VM_STORAGE = 'VM Storage'
-PROMISCUOUS_MODES = ['on', 'off']
+PROMISCUOUS_MODES = ['Accept', 'Reject']
 SHUTDOWN_METHODS = ['soft', 'hard']
 
 
@@ -160,8 +160,13 @@ class VCenterAutoModelDiscovery(object):
         f_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, f_name))
 
+    def _validate_default_port_group_location(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        if not attributes[key]:
+            return
+        self._validate_attribute(si, attributes, None, key, dc_name)
+
     def _validate_vm_cluster(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        accepted_types = vim.ClusterComputeResource
+        accepted_types = (vim.ClusterComputeResource, vim.HostSystem)
         cluster = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not cluster:
             cluster = self._get_default(all_items_in_vc, accepted_types, key)

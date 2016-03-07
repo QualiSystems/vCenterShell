@@ -215,6 +215,11 @@ class pyVmomiService:
 
             '#checks if the current path is nested as a child'
             child = None
+            try:
+                child = search_index.FindChild(sub_folder, currPath)
+            except:
+                child = None
+
             if hasattr(sub_folder, self.ChildEntity):
                 child = search_index.FindChild(sub_folder, currPath)
 
