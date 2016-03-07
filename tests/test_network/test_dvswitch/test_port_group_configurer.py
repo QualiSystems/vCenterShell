@@ -23,6 +23,7 @@ class TestDvPortGroupConfigurer(TestCase):
 
         self.network = Mock()
         self.network.key = "network-key"
+        self.network.name = "QS_123"
         self.network.config.distributedVirtualSwitch.uuid = "422254d5-5226-946e-26fb-60c21898b73f"
         self.py_vmomi_service = Mock()
 
@@ -49,11 +50,15 @@ class TestDvPortGroupConfigurer(TestCase):
         self.configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service,
                                                             self.synchronous_task_waiter,
                                                             self.vnic_to_network_mapper,
-                                                            self.vnic_service)
+                                                            self.vnic_service,
+                                                            Mock())
+
+    def test_get_networks_on_vnics(self):
+        res = self.configurer.get_networks_on_vnics(self.vm, [self.vnic])
+        self.assertIsNotNone(res)
 
     def test_erase_network_by_mapping(self):
-        mapping = [self.vnic, self.network, False, None]
-        res = self.configurer.erase_network_by_mapping(self.vm, [mapping])
+        res = self.configurer.erase_network_by_mapping([self.network])
         self.assertIsNone(res)
 
     def test_disconnect_all_networks(self):
@@ -61,11 +66,11 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertFalse(mapping[0].connect)
 
     def test_disconnect_network(self):
-        mapping = self.configurer.disconnect_network(self.vm, self.network,  Mock(spec=vim.Network))
+        mapping = self.configurer.disconnect_network(self.vm, self.network, Mock(spec=vim.Network))
         self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):
-        req  = ConnectRequest('vnic 1', Mock(spec=vim.Network))
+        req = ConnectRequest('vnic 1', Mock(spec=vim.Network))
         mapping = [ConnectRequest('vnic 1', Mock(spec=vim.Network))]
         res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network), [])
         self.assertIsNotNone(res[0].vnic)

@@ -463,7 +463,7 @@ class pyVmomiService:
 
     def get_network_by_key_from_vm(self, vm, network_key):
         for network in vm.network:
-            if network_key == network.key:
+            if hasattr(network, 'key') and network_key == network.key:
                 return network
         return
 
