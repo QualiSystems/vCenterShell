@@ -103,8 +103,8 @@ class RefreshIpCommand(object):
                 ip = ips[0]
                 if ip:
                     return IpResult(ip, IpReason.Success)
-                time_elapsed += interval
-                time.sleep(interval)
+            time_elapsed += interval
+            time.sleep(interval)
         return IpResult(ip, IpReason.Timeout)
 
     @staticmethod
