@@ -240,7 +240,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Vnic Name" Type="String">
+    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested vNIC Name" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -340,12 +340,12 @@
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested Vnic Name">
+        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested vNIC Name">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
-        <ns0:AttributeValue Name="Requested Vnic Name" Value="" />
+        <ns0:AttributeValue Name="Requested vNIC Name" Value="" />
       </ns0:AttributeValues>
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
