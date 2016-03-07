@@ -3,6 +3,7 @@ import time
 from cloudshell.api.cloudshell_api import InputNameValue
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
+from common.vcenter.vm_location import VMLocation
 from models.VCenterTemplateModel import VCenterTemplateModel
 from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -88,11 +89,13 @@ class DeployFromTemplateDriver(object):
         if not default_datacenter:
             raise ValueError('Default Datacenter attribute on VMWare vCenter is empty')
 
+        vcenter_template = VMLocation.combine([default_datacenter, vcenter_template])
+
         template_model = VCenterTemplateModel(
             vcenter_resource_name=vcenter_name,
             vm_folder=vm_location,
             template_name=vcenter_template,
             app_name=app_name,
-            default_datacenter = default_datacenter
+            default_datacenter=default_datacenter
         )
         return template_model
