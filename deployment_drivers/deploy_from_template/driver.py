@@ -58,7 +58,6 @@ class DeployFromTemplateDriver(object):
         return DeployDataHolder.create_from_params(template_model=template_model,
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
-                                                   power_on=power_on,
                                                    ip_regex=vcenter_template_resource_model.ip_regex,
                                                    refresh_ip_timeout=vcenter_template_resource_model.refresh_ip_timeout,
                                                    auto_power_on=vcenter_template_resource_model.auto_power_on,

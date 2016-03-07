@@ -24,7 +24,7 @@ class VirtualMachineDeployer(object):
                                                    datastore_name=data_holder.datastore_name,
                                                    cluster_name=data_holder.vm_cluster_model.cluster_name,
                                                    resource_pool=data_holder.vm_cluster_model.resource_pool,
-                                                   power_on=data_holder.power_on)
+                                                   power_on=data_holder.auto_power_on)
 
         clone_vm_result = self.pv_service.clone_vm(params)
         if clone_vm_result.error:
