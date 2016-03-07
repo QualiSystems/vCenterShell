@@ -1,3 +1,5 @@
+from common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
+from models.QualiDriverModels import AutoLoadCommandContext
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
 
 
@@ -47,3 +49,14 @@ class VCenterShellDriver:
 
     def deploy_from_image(self, context, deploy_data):
         return self.command_orchestrator.deploy_from_image(context, deploy_data)
+
+    def get_inventory(self, context):
+        """
+        :type context: models.QualiDriverModels.AutoLoadCommandContext
+        """
+
+        validator = VCenterAutoModelDiscovery()
+        return validator.validate_and_discover(context)
+
+
+
