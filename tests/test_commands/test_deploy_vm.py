@@ -30,7 +30,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                                                             'datastore_name',
                                                             'vm_cluster_model',
                                                             'power_on',
-                                                            'ip_regex')
+                                                            'ip_regex',
+                                                            'refresh_ip_timeout')
 
         deploy_command = DeployCommand(deployer)
 
