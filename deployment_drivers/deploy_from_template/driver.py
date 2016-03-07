@@ -1,7 +1,9 @@
 import jsonpickle
+import time
 from cloudshell.api.cloudshell_api import InputNameValue
 from common.cloud_shell.driver_helper import CloudshellDriverHelper
 from common.model_factory import ResourceModelParser
+from common.vcenter.vm_location import VMLocation
 from models.VCenterTemplateModel import VCenterTemplateModel
 from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -58,7 +60,12 @@ class DeployFromTemplateDriver(object):
                                                    datastore_name=datastore_name,
                                                    vm_cluster_model=vm_cluster_model,
                                                    power_on=power_on,
-                                                   ip_regex=vcenter_template_resource_model.ip_regex)
+                                                   ip_regex=vcenter_template_resource_model.ip_regex,
+                                                   refresh_ip_timeout=vcenter_template_resource_model.refresh_ip_timeout,
+                                                   auto_power_on=vcenter_template_resource_model.auto_power_on,
+                                                   auto_power_off=vcenter_template_resource_model.auto_power_off,
+                                                   wait_for_ip=vcenter_template_resource_model.wait_for_ip,
+                                                   auto_delete=vcenter_template_resource_model.auto_delete)
 
     def _get_vcenter(self, api, vcenter_name):
         if not vcenter_name:
@@ -86,11 +93,13 @@ class DeployFromTemplateDriver(object):
         if not default_datacenter:
             raise ValueError('Default Datacenter attribute on VMWare vCenter is empty')
 
+        vcenter_template = VMLocation.combine([default_datacenter, vcenter_template])
+
         template_model = VCenterTemplateModel(
             vcenter_resource_name=vcenter_name,
             vm_folder=vm_location,
             template_name=vcenter_template,
             app_name=app_name,
-            default_datacenter = default_datacenter
+            default_datacenter=default_datacenter
         )
         return template_model

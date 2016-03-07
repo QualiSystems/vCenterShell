@@ -30,10 +30,16 @@ class VirtualMachineDeployer(object):
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
 
-        return DeployResult(vm_name,
-                            clone_vm_result.vm.summary.config.uuid,
-                            data_holder.template_model.vCenter_resource_name,
-                            data_holder.ip_regex)
+        return DeployResult(vm_name=vm_name,
+                            vm_uuid=clone_vm_result.vm.summary.config.uuid,
+                            cloud_provider_resource_name=data_holder.template_model.vCenter_resource_name,
+                            ip_regex=data_holder.ip_regex,
+                            refresh_ip_timeout=data_holder.refresh_ip_timeout,
+                            auto_power_on=data_holder.auto_power_on,
+                            auto_power_off=data_holder.auto_power_off,
+                            wait_for_ip=data_holder.wait_for_ip,
+                            auto_delete=data_holder.auto_delete
+                            )
 
     def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context):
         vm_name = self.name_generator(data_holder.app_name)
@@ -50,10 +56,15 @@ class VirtualMachineDeployer(object):
                       image_params.vm_folder if hasattr(image_params, 'vm_name') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
-                return DeployResult(vm_name,
-                                    vm.config.uuid,
-                                    data_holder.vcenter_name,
-                                    data_holder.ip_regex)
+                return DeployResult(vm_name=vm_name,
+                                    vm_uuid=vm.config.uuid,
+                                    cloud_provider_resource_name=data_holder.vcenter_name,
+                                    ip_regex=data_holder.ip_regex,
+                                    refresh_ip_timeout=data_holder.refresh_ip_timeout,
+                                    auto_power_on=data_holder.auto_power_on,
+                                    auto_power_off=data_holder.auto_power_off,
+                                    wait_for_ip=data_holder.wait_for_ip,
+                                    auto_delete=data_holder.auto_delete)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 

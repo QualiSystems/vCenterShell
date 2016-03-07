@@ -7,7 +7,8 @@ class vCenterVMFromTemplateResourceModel(object):
         self.ip_regex = ''
         self.vm_resource_pool = ''
         self.vm_location = ''
-        self.auto_power_on = ''
-        self.auto_power_off = ''
-        self.wait_for_ip = ''
-        self.auto_delete = ''
+        self.auto_power_on = True
+        self.auto_power_off = True
+        self.wait_for_ip = True
+        self.auto_delete = True
+        self.refresh_ip_timeout = 0

@@ -54,7 +54,13 @@ class DeployFromImage(object):
             "datastore_name": image_model.vm_storage,
             "datacenter_name": image_model.default_datacenter,
             "image_url": image_model.vcenter_image,
-            "ip_regex": image_model.ip_regex})
+            "ip_regex": image_model.ip_regex,
+            "refresh_ip_timeout": image_model.refresh_ip_timeout,
+            'auto_power_on': image_model.auto_power_on,
+            'auto_power_off': image_model.auto_power_off,
+            'wait_for_ip': image_model.wait_for_ip,
+            'auto_delete': image_model.auto_delete
+        })
 
     def _get_command_inputs_list(self, data_holder):
         return [InputNameValue('deploy_data', jsonpickle.encode(data_holder, unpicklable=False))]
