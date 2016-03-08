@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from pyVmomi import vim
 from common.logger import getLogger
+from common.utilites.common_utils import str2bool
 from common.utilites.io import get_path_and_name
 from common.vcenter.vm_location import VMLocation
 
@@ -320,7 +321,7 @@ class pyVmomiService:
             self.datastore_name = datastore_name
             self.cluster_name = cluster_name
             self.resource_pool = resource_pool
-            self.power_on = power_on
+            self.power_on = str2bool(power_on)
 
     class CloneVmResult:
         """

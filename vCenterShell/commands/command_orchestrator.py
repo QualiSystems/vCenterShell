@@ -57,7 +57,9 @@ class CommandOrchestrator(object):
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             cs_helper=self.cs_helper)
+                                             cs_helper=self.cs_helper,
+                                             resource_model_parser=ResourceModelParser())
+
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
         virtual_machine_port_group_configurer = \
@@ -151,7 +153,8 @@ class CommandOrchestrator(object):
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder)
+            data_holder,
+            context.resource)
 
         return set_command_result(result=result, unpicklable=False)
 

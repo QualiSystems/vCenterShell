@@ -1,3 +1,6 @@
+from common.utilites.common_utils import str2bool
+
+
 class DeployResult(object):
     def __init__(self, vm_name, vm_uuid, cloud_provider_resource_name, ip_regex, refresh_ip_timeout, auto_power_on,
                  auto_power_off, wait_for_ip, auto_delete):
@@ -18,7 +21,7 @@ class DeployResult(object):
         self.cloud_provider_resource_name = cloud_provider_resource_name
         self.ip_regex = ip_regex
         self.refresh_ip_timeout = float(refresh_ip_timeout)
-        self.auto_power_on = bool(auto_power_on)
-        self.auto_power_off = bool(auto_power_off)
-        self.wait_for_ip = bool(wait_for_ip)
-        self.auto_delete = bool(auto_delete)
+        self.auto_power_on = str2bool(auto_power_on)
+        self.auto_power_off = str2bool(auto_power_off)
+        self.wait_for_ip = str2bool(wait_for_ip)
+        self.auto_delete = str2bool(auto_delete)
