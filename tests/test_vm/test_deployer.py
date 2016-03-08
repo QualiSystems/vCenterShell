@@ -1,6 +1,12 @@
 from unittest import TestCase
-from mock import Mock
+
+from cloudshell.api.cloudshell_api import ResourceInfo
+from mock import Mock, create_autospec
+
+from common.model_factory import ResourceModelParser
 from models.DeployDataHolder import DeployDataHolder
+from models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 
 
@@ -27,68 +33,57 @@ class TestVirtualMachineDeployer(TestCase):
         self.vm.config.uuid = self.uuid
         self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
         self.cs_helper = Mock()
-        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer, self.cs_helper)
+        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer, self.cs_helper,
+                                               ResourceModelParser())
 
     def test_vm_deployer(self):
-        params = DeployDataHolder({
-            "resource_context": None,
-            "template_model": {
-                "vCenter_resource_name": "vcenter_resource_name",
-                "vm_folder": "vfolder_name",
-                "template_name": "template_name",
-                "app_name": "some_name",
-                "default_datacenter": "DataCenter"
-            },
-            "vm_cluster_model": {
-                "cluster_name": "cluster_name",
-                "resource_pool": "resource_pool"
-            },
-            "datastore_name": "datastore_name",
-            "power_on": False,
-            'ip_regex': '',
-            'refresh_ip_timeout': '10',
-            'auto_power_on': True,
-            'auto_power_off': True,
-            'wait_for_ip': True,
-            'auto_delete': True
+        deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
 
-        })
+        resource_context = self._create_vcenter_resource_context()
 
-        res = self.deployer.deploy_from_template(self.si, params)
+        res = self.deployer.deploy_from_template(
+            si=self.si,
+            data_holder=deploy_from_template_details,
+            resource_context=resource_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
-        self.assertEqual(res.cloud_provider_resource_name,
-                         params.template_model.vCenter_resource_name)
+        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
         self.assertTrue(self.pv_service.CloneVmParameters.called)
+
+    def _create_vcenter_resource_context(self):
+        resource_context = create_autospec(ResourceInfo)
+        resource_context.ResourceModelName = 'VMwarev Center'
+        resource_context.ResourceAttributes = {'User': 'user',
+                                               'Password': '123',
+                                               'Default dvSwitch': 'switch1',
+                                               'Holding Network': 'anetwork',
+                                               'Default Port Group Location': 'Quali',
+                                               'VM Cluster': 'Quali',
+                                               'VM Location': 'Quali',
+                                               'VM Resource Pool': 'Quali',
+                                               'VM Storage': 'Quali',
+                                               'Shutdown Method': 'hard',
+                                               'OVF Tool Path': 'C\\program files\ovf',
+                                               'Execution Server Selector': '',
+                                               'Promiscuous Mode': 'True',
+                                               'Reserved Networks': 'vlan65',
+                                               'Default Datacenter': 'QualiSB'
+                                               }
+        return resource_context
 
     def test_vm_deployer_error(self):
         self.clone_res.error = Mock()
 
         self.pv_service.CloneVmParameters = Mock(return_value=self.clone_parmas)
         self.pv_service.clone_vm = Mock(return_value=self.clone_res)
-        params = DeployDataHolder.create_from_params(
-            template_model={
-                "vCenter_resource_name": "vcenter_resource_name",
-                "vm_folder": "vfolder_name",
-                "template_name": "template_name",
-                "app_name": "app_name",
-                "default_datacenter": "DataCenter"
-            },
-            vm_cluster_model={
-                "cluster_name": "cluster_name",
-                "resource_pool": "resource_pool"
-            },
-            datastore_name="datastore_name",
-            power_on=False,
-            ip_regex='',
-            refresh_ip_timeout=10,
-            auto_power_on=True,
-            auto_power_off=True,
-            wait_for_ip=True,
-            auto_delete=True)
+        deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
 
-        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, params)
+        resource_context = self._create_vcenter_resource_context()
+
+        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, deploy_from_template_details, resource_context)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):

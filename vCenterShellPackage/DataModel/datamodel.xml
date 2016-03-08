@@ -1,18 +1,18 @@
 <ns0:DataModelInfo xmlns:ns0="http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd">
   <ns0:Attributes>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Reserved Networks" Type="String" Description="Reserved networks separated by Semicolon(;), vNICs configured to those networks won't be used for VM connectivity.">
+    <ns0:AttributeInfo DefaultValue="" Description="Reserved networks separated by Semicolon(;), vNICs configured to those networks won't be used for VM connectivity." IsReadOnly="false" Name="Reserved Networks" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image Arguments" Type="String" Description="Customized properties of the image. Example for OVF: --allowExtraConfig --prop:Hostname=ASAvtest --prop:HARole=Standalone --prop:SSHEnable=True --prop:DHCP=True --net:Management0-0='Office LAN 41' --net:GigabitEthernet0-0='VLAN_access_101'">
+    <ns0:AttributeInfo DefaultValue="" Description="Customized properties of the image. Example for OVF: --allowExtraConfig --prop:Hostname=ASAvtest --prop:HARole=Standalone --prop:SSHEnable=True --prop:DHCP=True --net:Management0-0='Office LAN 41' --net:GigabitEthernet0-0='VLAN_access_101'" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="vCenter Image" Type="String" Description="The full path to the image file. Note that the path should be accessible to the Execution Servers.">
+    <ns0:AttributeInfo DefaultValue="" Description="The full path to the image file. Note that the path should be accessible to the Execution Servers." IsReadOnly="false" Name="vCenter Image" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -94,13 +94,13 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Access Mode" Type="String" Description="The interface VLAN mode that will be configured. Possible values are Access or Trunk.">
+    <ns0:AttributeInfo DefaultValue="" Description="The interface VLAN mode that will be configured. Possible values are Access or Trunk." IsReadOnly="false" Name="Access Mode" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="VLAN Id" Type="String" Description="Enter a number between 2-4096 or a range.">
+    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4096 or a range." IsReadOnly="false" Name="VLAN Id" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -131,32 +131,32 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Allocation Ranges" Type="String" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200', '10,20,40-100'.">
+    <ns0:AttributeInfo DefaultValue="" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200', '10,20,40-100'." IsReadOnly="false" Name="Allocation Ranges" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
         <ns0:Rule Name="Admin Only" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Virtual Network" Type="String" Description="The allocated network.">
+    <ns0:AttributeInfo DefaultValue="" Description="The allocated network." IsReadOnly="true" Name="Virtual Network" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Default VLAN" Type="String" Description="Determines if a VLAN service is a default VLAN service used for P2P connectivity.">
+    <ns0:AttributeInfo DefaultValue="" Description="Determines if a VLAN service is a default VLAN service used for P2P connectivity." IsReadOnly="true" Name="Default VLAN" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Isolation Level" Type="String" Description="Defines if the allocated VLAN can be shared by others or exclusively used. Possible values are Shared or Exclusive.">
+    <ns0:AttributeInfo DefaultValue="" Description="Defines if the allocated VLAN can be shared by others or exclusively used. Possible values are Shared or Exclusive." IsReadOnly="false" Name="Isolation Level" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="IP Regex" Type="String" Description="Filters the IP that can be selected as an App's address.">
+    <ns0:AttributeInfo DefaultValue="" Description="Filters the IP that can be selected as an App's address." IsReadOnly="false" Name="IP Regex" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -174,7 +174,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="CTag" Type="String" Description="Enter an ID or range to configure VLAN as Selective Q-in-Q. Examples - '100-200','10,20,40-100'">
+    <ns0:AttributeInfo DefaultValue="" Description="Enter an ID or range to configure VLAN as Selective Q-in-Q. Examples - '100-200','10,20,40-100'" IsReadOnly="false" Name="CTag" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />

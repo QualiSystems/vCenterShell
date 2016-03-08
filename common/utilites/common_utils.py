@@ -68,6 +68,8 @@ def fixurl(url):
 
 
 def str2bool(boolean_as_string):
+    if isinstance(boolean_as_string, bool):
+        return boolean_as_string
     if boolean_as_string.lower() == 'true':
         return True
     if boolean_as_string.lower() == 'false':
