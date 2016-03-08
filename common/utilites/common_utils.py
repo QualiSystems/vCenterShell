@@ -65,3 +65,13 @@ def fixurl(url):
     # put it back together
     netloc = ''.join((user, colon1, pass_, at, host, colon2, port))
     return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+
+
+def str2bool(boolean_as_string):
+    if isinstance(boolean_as_string, bool):
+        return boolean_as_string
+    if boolean_as_string.lower() == 'true':
+        return True
+    if boolean_as_string.lower() == 'false':
+        return False
+    raise ValueError('{0} should be True or False '.format(boolean_as_string))
