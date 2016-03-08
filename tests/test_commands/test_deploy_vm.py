@@ -1,10 +1,9 @@
 ﻿import os
 import sys
 import unittest
-
 from mock import Mock
-
-from models.DeployDataHolder import DeployDataHolder
+from models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from vCenterShell.commands.deploy_vm import DeployCommand
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
@@ -26,25 +25,23 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         template_model.vm_folder = 'temp folder'
         deployer.deploy_from_template = Mock(return_value=deploy_res)
 
-        deploy_params = DeployDataHolder.create_from_params(template_model,
-                                                            'datastore_name',
-                                                            'vm_cluster_model',
-                                                            power_on=True,
-                                                            ip_regex='',
-                                                            refresh_ip_timeout=20,
-                                                            auto_power_on=True,
-                                                            auto_power_off=True,
-                                                            wait_for_ip=True,
-                                                            auto_delete=True)
+        template_resource_model = vCenterVMFromTemplateResourceModel()
+
+        deploy_params = DeployFromTemplateDetails(template_resource_model, 'VM Deployment')
 
         deploy_command = DeployCommand(deployer)
 
+        resource_context = Mock()
+
         # act
-        result = deploy_command.execute_deploy_from_template(si, deploy_params)
+        result = deploy_command.execute_deploy_from_template(
+            si=si,
+            deployment_params= deploy_params,
+            resource_context=resource_context)
 
         # assert
         self.assertTrue(result)
-        self.assertTrue(deployer.deploy_from_template.called_with(si, deploy_params))
+        self.assertTrue(deployer.deploy_from_template.called_with(si, deploy_params, resource_context))
 
     def test_deploy_image_execute(self):
         deployer = Mock()
