@@ -4,6 +4,7 @@ import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
 
 from common.logger import getLogger
+from common.vcenter.vm_details import get_vm_custom_param
 
 logger = getLogger("CloudShell Sandbox Setup")
 
@@ -76,24 +77,54 @@ class EnvironmentSetup:
         pool.join()
 
     def _power_on_refresh_ip_install(self, api, deployed_app):
+        """
+        :param CloudShellAPISession api:
+        :param deployed_app:
+        :return:
+        """
         deployed_app = deployed_app
         deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
+        power_on = "true"
+        wait_for_ip = "true"
+
         try:
-            logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
+            logger.info("Getting resource details for deployed app {0} in reservation {1}"
                         .format(deployed_app_name, self.reservation_id))
-            api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "PowerOn", "power")
-            api.SetResourceLiveStatus(deployed_app_name, "Online", "Active")
+            resource_details = api.GetResourceDetails(deployed_app_name)
+            auto_power_on_param = get_vm_custom_param(resource_details.VmDetails.VmCustomParams, "auto_power_on")
+            if auto_power_on_param:
+                power_on = auto_power_on_param.Value
+            wait_for_ip_param = get_vm_custom_param(resource_details.VmDetails.VmCustomParams, "wait_for_ip")
+            if wait_for_ip_param:
+                wait_for_ip = wait_for_ip_param.Value
+        except Exception as exc:
+            logger.error("Error getting resource details for deployed app {0} in reservation {1}. "
+                         "Will use default settings. Error: {2}".format(deployed_app_name, self.reservation_id, str(exc)))
+
+        try:
+            if power_on.lower() == "true":
+                logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
+                            .format(deployed_app_name, self.reservation_id))
+                api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "PowerOn", "power")
+                api.SetResourceLiveStatus(deployed_app_name, "Online", "Active")
+            else:
+                logger.info("Auto Power On is off for deployed app {0} in reservation {1}"
+                            .format(deployed_app_name, self.reservation_id))
         except Exception as exc:
             logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
                          .format(deployed_app_name, self.reservation_id, str(exc)))
             return False
 
         try:
-            logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
-                        .format(deployed_app_name, self.reservation_id))
-            api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "remote_refresh_ip",
-                                                "remote_connectivity")
+            if wait_for_ip.lower() == "true":
+                logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
+                            .format(deployed_app_name, self.reservation_id))
+                api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "remote_refresh_ip",
+                                                    "remote_connectivity")
+            else:
+                logger.info("Wait For IP is off for deployed app {0} in reservation {1}"
+                            .format(deployed_app_name, self.reservation_id))
         except Exception as exc:
             logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
                          .format(deployed_app_name, self.reservation_id, str(exc)))
