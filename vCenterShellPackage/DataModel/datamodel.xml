@@ -488,9 +488,6 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Delete" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />

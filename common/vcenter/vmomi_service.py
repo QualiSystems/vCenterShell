@@ -215,6 +215,11 @@ class pyVmomiService:
 
             '#checks if the current path is nested as a child'
             child = None
+            try:
+                child = search_index.FindChild(sub_folder, currPath)
+            except:
+                child = None
+
             if hasattr(sub_folder, self.ChildEntity):
                 child = search_index.FindChild(sub_folder, currPath)
 
@@ -259,10 +264,9 @@ class pyVmomiService:
         :param vimtype:    the type of object too search
         :param name:       the object name to return
         """
-
         obj = None
-        container = content.viewManager.CreateContainerView(
-            content.rootFolder, vimtype, True)
+
+        container = self._get_all_objects_by_type(content, vimtype)
         for c in container.view:
             if name:
                 if c.name == name:
@@ -273,6 +277,27 @@ class pyVmomiService:
                 break
 
         return obj
+
+    @staticmethod
+    def _get_all_objects_by_type(content, vimtype):
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vimtype, True)
+        return container
+
+    @staticmethod
+    def get_default_from_vcenter_by_type(si, vimtype, accept_multi):
+        arr_items = pyVmomiService.get_all_items_in_vcenter(si, vimtype)
+        if arr_items:
+            if accept_multi or len(arr_items) == 1:
+                return arr_items[0]
+            raise Exception('There is more the one items of the given type')
+        raise KeyError('Could not find item of the given type')
+
+    @staticmethod
+    def get_all_items_in_vcenter(si, type_filter, root=None):
+        root = root if root else si.content.rootFolder
+        container = si.content.viewManager.CreateContainerView(container=root, recursive=True)
+        return [item for item in container.view if not type_filter or isinstance(item, type_filter)]
 
     def wait_for_task(self, task):
         """ wait for a vCenter task to finish """
@@ -463,15 +488,15 @@ class pyVmomiService:
 
     def get_network_by_key_from_vm(self, vm, network_key):
         for network in vm.network:
-            if network_key == network.key:
+            if hasattr(network, 'key') and network_key == network.key:
                 return network
         return
 
     def get_network_by_mac_address(self, vm, mac_address):
         backing = [device.backing for device in vm.config.hardware.device
-                    if isinstance(device, vim.vm.device.VirtualEthernetCard)
-                    and hasattr(device, 'macAddress')
-                    and device.macAddress == mac_address]
+                   if isinstance(device, vim.vm.device.VirtualEthernetCard)
+                   and hasattr(device, 'macAddress')
+                   and device.macAddress == mac_address]
 
         if backing:
             back = backing[0]
@@ -483,8 +508,8 @@ class pyVmomiService:
 
     def get_vnic_by_mac_address(self, vm, mac_address):
         for device in vm.config.hardware.device:
-            if isinstance(device, vim.vm.device.VirtualEthernetCard)\
-               and hasattr(device, 'macAddress') and device.macAddress == mac_address:
+            if isinstance(device, vim.vm.device.VirtualEthernetCard) \
+                    and hasattr(device, 'macAddress') and device.macAddress == mac_address:
                 # mac address is unique
                 return device
         return None

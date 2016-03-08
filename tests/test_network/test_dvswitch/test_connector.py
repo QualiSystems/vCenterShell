@@ -65,7 +65,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service,
                                                             self.synchronous_task_waiter,
                                                             vnic_to_network_mapper,
-                                                            Mock())
+                                                            Mock(), Mock())
 
         # pyvmomi_service, synchronous_task_waiter, vnic_to_network_mapper, vnic_common
 

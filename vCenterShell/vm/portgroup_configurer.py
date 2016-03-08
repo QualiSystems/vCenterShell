@@ -15,11 +15,12 @@ class VNicDeviceMapper(object):
 
 
 class VirtualMachinePortGroupConfigurer(object):
-    def __init__(self, 
-                 pyvmomi_service, 
-                 synchronous_task_waiter, 
-                 vnic_to_network_mapper, 
-                 vnic_service):
+    def __init__(self,
+                 pyvmomi_service,
+                 synchronous_task_waiter,
+                 vnic_to_network_mapper,
+                 vnic_service,
+                 name_gen):
         """
         :param pyvmomi_service: vCenter API wrapper
         :param synchronous_task_waiter: Task Performer Service
@@ -31,6 +32,7 @@ class VirtualMachinePortGroupConfigurer(object):
         self.synchronous_task_waiter = synchronous_task_waiter
         self.vnic_to_network_mapper = vnic_to_network_mapper
         self.vnic_service = vnic_service
+        self.network_name_gen = name_gen
 
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks):
         vnic_mapping = self.vnic_service.map_vnics(vm)
@@ -46,23 +48,35 @@ class VirtualMachinePortGroupConfigurer(object):
         self.update_vnic_by_mapping(vm, update_mapping)
         return update_mapping
 
-    def erase_network_by_mapping(self, vm, update_mapping):
-        for item in update_mapping:
-            network = item[1] or self.vnic_service.vnic_get_network_attached(vm, item[0], self.pyvmomi_service)
-            if network:
+    def erase_network_by_mapping(self, networks, reserved_networks):
+        nets = dict()
+        for net in networks:
+            nets[net.name] = net
+
+        for network in nets.values():
+            if self.network_name_gen.is_generated_name(network.name) \
+                    and (not reserved_networks or network.name not in reserved_networks) \
+                    and not network.vm:
+
                 task = self.destroy_port_group_task(network)
                 if task:
                     try:
                         self.synchronous_task_waiter.wait_for_task(task=task,
                                                                    action_name='Erase dv Port Group')
-                    except vim.fault.ResourceInUse:
-                        pass
-                        logger.debug(u"Port Group '{}' cannot be destroyed because of it using".format(network))
+                    except Exception as e:
+                        logger.warning("Cannot delete portgroup: {0} because: {1}".format(network, e))
 
-    def disconnect_all_networks(self, vm, default_network):
+    def disconnect_all_networks(self, vm, default_network, reserved_networks):
         vnics = self.vnic_service.map_vnics(vm)
+        network_for_removal = self.get_networks_on_vnics(vm, vnics.values())
         update_mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
-        return self.update_vnic_by_mapping(vm, update_mapping)
+        res = self.update_vnic_by_mapping(vm, update_mapping)
+        self.erase_network_by_mapping(network_for_removal, reserved_networks)
+        return res
+
+    def get_networks_on_vnics(self, vm, vnics):
+        return [self.vnic_service.vnic_get_network_attached(vm, vnic, self.pyvmomi_service)
+                for vnic in vnics]
 
     def create_mappings_for_all_networks(self, vm, default_network):
         vnics = self.vnic_service.map_vnics(vm)
@@ -77,15 +91,17 @@ class VirtualMachinePortGroupConfigurer(object):
                    if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
         return mapping
 
-    def disconnect_network(self, vm, network, default_network):
+    def disconnect_network(self, vm, network, default_network, reserved_networks):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
-
+        network_to_remove = self.get_networks_on_vnics(vm, vnics.values())
         mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
-                        for vnic_name, vnic in vnics.items()
-                        if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
+                   for vnic_name, vnic in vnics.items()
+                   if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
-        return self.update_vnic_by_mapping(vm, mapping)
+        res = self.update_vnic_by_mapping(vm, mapping)
+        self.erase_network_by_mapping(network_to_remove, reserved_networks)
+        return res
 
     def update_vnic_by_mapping(self, vm, mapping):
         vnics_change = []
@@ -103,7 +119,7 @@ class VirtualMachinePortGroupConfigurer(object):
         task = self.pyvmomi_service.vm_reconfig_task(vm, device_change)
         logger.debug('reconfigure task: {0}'.format(task.info))
         res = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                          action_name='Reconfigure VM')
+                                                         action_name='Reconfigure VM')
         if res:
             logger.debug('reconfigure task result {0}'.format(res))
         return res

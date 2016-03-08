@@ -38,9 +38,9 @@ class EnvironmentSetup:
         app_inputs = map(lambda x: DeployAppInput(x.Name, "Name", x.Name), apps)
 
         logger.info(
-                "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
+            "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
 
-        return api.ExecuteDeployAppCommandBulk(self.reservation_id, app_names, app_inputs)
+        return api.DeployAppToCloudProviderBulk(self.reservation_id, app_names, app_inputs)
 
     def _connect_all_routes_in_reservation(self, api, reservation_details):
         connectors = reservation_details.ReservationDescription.Connectors
@@ -139,10 +139,10 @@ class EnvironmentSetup:
                 script_inputs = []
                 for installation_script_input in installation_info.ScriptInputs:
                     script_inputs.append(
-                            InputNameValue(installation_script_input.Name, installation_script_input.Value))
+                        InputNameValue(installation_script_input.Name, installation_script_input.Value))
 
-                installation_result = api.ExecuteInstallAppCommand(self.reservation_id, deployed_app_name,
-                                                                   installation_info.ScriptCommandName, script_inputs)
+                installation_result = api.InstallApp(self.reservation_id, deployed_app_name,
+                                                     installation_info.ScriptCommandName, script_inputs)
                 logger.debug("Installation_result: " + installation_result.Output)
         except Exception as exc:
             logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
