@@ -217,7 +217,7 @@ class VCenterAutoModelDiscovery(object):
     def _validate_holding_network(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         holding_network = self._validate_attribute(si, attributes, vim.Network, key, dc_name)
         if not holding_network:
-            raise ValueError('Holdeing net work can not be empty')
+            raise ValueError('Holding network cannot be empty')
 
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
