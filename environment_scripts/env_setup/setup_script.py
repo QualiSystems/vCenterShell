@@ -46,16 +46,16 @@ class EnvironmentSetup:
         connectors = reservation_details.ReservationDescription.Connectors
         endpoints = []
         for endpoint in connectors:
-            endpoints.append(endpoint.Target)
-            endpoints.append(endpoint.Source)
-
-        endpoint = [side for endpoint in connectors for side in [endpoint.Target, endpoint.Source]]
+            if endpoint.Target and endpoint.Source:
+                endpoints.append(endpoint.Target)
+                endpoints.append(endpoint.Source)
 
         if not endpoints:
             logger.info("No routes to connect for reservation {0}".format(self.reservation_id))
             return
 
         logger.info("Executing connect routes for reservation {0}".format(self.reservation_id))
+        logger.debug("Connecting: {0}".format(",".join(endpoints)))
 
         return api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
 
