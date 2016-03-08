@@ -4,6 +4,7 @@ import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
 
 from common.logger import getLogger
+from common.vcenter.vm_details import get_vm_custom_param
 
 logger = getLogger("CloudShell Sandbox Teardown")
 
@@ -48,16 +49,43 @@ class EnvironmentTeardown:
         for resource in resources:
             resource_details = api.GetResourceDetails(resource.Name)
             if resource_details.VmDetails:
-                pool.apply_async(self._power_off_resource, (api, resource_details.Name))
+                pool.apply_async(self._power_off_or_delete_deployed_app, (api, resource_details))
 
         pool.close()
         pool.join()
 
-    def _power_off_resource(self, api, resource_name):
+    def _power_off_or_delete_deployed_app(self, api, resource_info):
+        """
+        :param api:
+        :param ResourceInfo resource_info:
+        :return:
+        """
         try:
-            logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
-                        .format(resource_name, self.reservation_id))
-            api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
+            resource_name = resource_info.Name
+
+            delete = "true"
+            auto_delete_param = get_vm_custom_param(resource_info.VmDetails.VmCustomParams, "auto_delete")
+            if auto_delete_param:
+                delete = auto_delete_param.Value
+
+            if delete.lower() == "true":
+                logger.info("Executing 'Delete' on deployed app {0} in reservation {1}"
+                            .format(resource_name, self.reservation_id))
+                api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "remote_destroy_vm",
+                                                    "remote_app_management")
+            else:
+                power_off = "true"
+                auto_power_off_param = get_vm_custom_param(resource_info.VmDetails.VmCustomParams, "auto_power_off")
+                if auto_power_off_param:
+                    power_off = auto_power_off_param.Value
+
+                if power_off.lower() == "true":
+                    logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
+                                .format(resource_name, self.reservation_id))
+                    api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
+                else:
+                    logger.info("Auto Power Off is disabled for deployed app {0} in reservation {1}"
+                                .format(resource_name, self.reservation_id))
             return True
         except Exception as exc:
             logger.error("Error powering off deployed app {0} in reservation {1}. Error: {2}"

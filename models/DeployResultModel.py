@@ -21,7 +21,7 @@ class DeployResult(object):
         self.cloud_provider_resource_name = cloud_provider_resource_name
         self.ip_regex = ip_regex
         self.refresh_ip_timeout = float(refresh_ip_timeout)
-        self.auto_power_on = str2bool(auto_power_on)
-        self.auto_power_off = str2bool(auto_power_off)
-        self.wait_for_ip = str2bool(wait_for_ip)
-        self.auto_delete = str2bool(auto_delete)
+        self.auto_power_on = str(auto_power_on)
+        self.auto_power_off = str(auto_power_off)
+        self.wait_for_ip = str(wait_for_ip)
+        self.auto_delete = str(auto_delete)

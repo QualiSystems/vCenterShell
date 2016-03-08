@@ -93,6 +93,8 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         _logger.debug("Disconnect Interface VM: '{0}' Network: '{1}' ...".format(vm_uuid, network_name or "ALL"))
         if vm is None:
             vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+            if not vm:
+                return "Warning: failed to locate vm {0} in vCenter".format(vm_uuid)
 
         if network_name:
             network = self.pyvmomi_service.vm_get_network_by_name(vm, network_name)
