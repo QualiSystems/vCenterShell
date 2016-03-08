@@ -109,7 +109,7 @@ class DeployAppOrchestrationDriver(object):
 
         logger.info(
             "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
-            .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
+                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
         try:
 
             script_inputs = []
@@ -117,8 +117,8 @@ class DeployAppOrchestrationDriver(object):
                 script_inputs.append(
                     InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
-            installation_result = api.ExecuteInstallAppCommand(reservation_id, deployment_result.LogicalResourceName,
-                                                               installation_script_name, script_inputs)
+            installation_result = api.InstallApp(reservation_id, deployment_result.LogicalResourceName,
+                                                 installation_script_name, script_inputs)
             logger.debug("Installation_result: " + installation_result.Output)
         except CloudShellAPIError as exc:
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
@@ -153,7 +153,7 @@ class DeployAppOrchestrationDriver(object):
     def deploy_app(api, app_name, deployment_service, reservation_id):
         try:
             logger.info("Executing '{0}' on app '{1}'...".format(deployment_service, app_name))
-            return api.ExecuteDeployAppCommand(reservation_id, app_name, [InputNameValue("Name", app_name)])
+            return api.DeployAppToCloudProvider(reservation_id, app_name, [InputNameValue("Name", app_name)])
         except CloudShellAPIError as exc:
             print "Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml)
             logger.error("Error deploying app {0}. Error: {1}".format(app_name, exc.rawxml))
