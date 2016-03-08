@@ -66,7 +66,8 @@ class CommandOrchestrator(object):
             VirtualMachinePortGroupConfigurer(pyvmomi_service=pv_service,
                                               synchronous_task_waiter=synchronous_task_waiter,
                                               vnic_to_network_mapper=vnic_to_network_mapper,
-                                              vnic_service=VNicService())
+                                              vnic_service=VNicService(),
+                                              name_gen=port_group_name_generator)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
         # Command Wrapper
@@ -112,11 +113,10 @@ class CommandOrchestrator(object):
                                                    resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
-
         results = self.command_wrapper.execute_command_with_connection(
-                context,
-                self.connection_orchestrator.connect_bulk,
-                request)
+            context,
+            self.connection_orchestrator.connect_bulk,
+            request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results

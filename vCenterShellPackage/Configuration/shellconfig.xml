@@ -12,6 +12,7 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
         <Attributes>
             <Attribute Name="User" Value="" />
             <Attribute Name="Password" Value="" />
+			<Attribute Name="Default Datacenter" Value="" />
 			<Attribute Name="Default dvSwitch" Value="" />
 			<Attribute Name="Holding Network" Value="" />
 			<Attribute Name="Default Port Group Location" Value="" />
@@ -23,7 +24,7 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
 			<Attribute Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
 			<Attribute Name="Execution Server Selector" Value="" />
 			<Attribute Name="Reserved Networks" Value="" />
-			<Attribute Name="Default Datacenter" Value="" />
+			<Attribute Name="Promiscuous Mode" Value="" />
         </Attributes>
     </ResourceTemplate>
 </ResourceTemplates>
