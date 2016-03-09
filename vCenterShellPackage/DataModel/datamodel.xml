@@ -312,7 +312,7 @@
             <ns0:AttributeValue Name="Password" Value="" />
             <ns0:AttributeValue Name="Default Port Group Location" Value="" />
             <ns0:AttributeValue Name="Default dvSwitch" Value="" />
-            <ns0:AttributeValue Name="Holding Network" Value="" />
+            <ns0:AttributeValue Name="Holding Network" Value="holding" />
             <ns0:AttributeValue Name="VM Cluster" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="VM Storage" Value="" />

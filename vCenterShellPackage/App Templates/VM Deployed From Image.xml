@@ -20,7 +20,7 @@
             <Attribute Name="VM Location" Value="Alex" />
             <Attribute Name="VM Storage" Value="aa" />
             <Attribute Name="VM Resource Pool" Value="LiverPool" />
-            <Attribute Name="vCenter Image" Value="http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf" />
+            <Attribute Name="vCenter Image" Value="" />
             <Attribute Name="vCenter Name" Value="VMware vCenter" />
             <Attribute Name="vCenter Image Arguments" Value="" />
           </Attributes>
