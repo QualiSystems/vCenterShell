@@ -83,8 +83,8 @@ class OvfImageDeployerService(object):
 
         # append args that are user inputs
         if hasattr(image_params, 'user_arguments') and image_params.user_arguments:
-            args += [key
-                     for key in image_params.user_arguments]
+            args += [key.strip()
+                     for key in image_params.user_arguments.split(',')]
 
         # get ovf destination
         ovf_destination = self._get_ovf_destenation(image_params)

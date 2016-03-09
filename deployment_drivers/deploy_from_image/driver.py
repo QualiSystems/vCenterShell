@@ -44,23 +44,9 @@ class DeployFromImage(object):
         :type image_model: vCenterVMFromImageResourceModel
         """
 
-        return DeployDataHolder({
-            "vcenter_name": image_model.vcenter_name,
-            "vm_folder": image_model.vm_location,
-            "power_on": image_model.auto_power_on,
-            "app_name": name,
-            "cluster_name": image_model.vm_cluster,
-            "resource_pool": image_model.vm_resource_pool,
-            "datastore_name": image_model.vm_storage,
-            "datacenter_name": image_model.default_datacenter,
-            "image_url": image_model.vcenter_image,
-            "ip_regex": image_model.ip_regex,
-            "refresh_ip_timeout": image_model.refresh_ip_timeout,
-            'auto_power_on': image_model.auto_power_on,
-            'auto_power_off': image_model.auto_power_off,
-            'wait_for_ip': image_model.wait_for_ip,
-            'auto_delete': image_model.auto_delete
-        })
+        return DeployDataHolder({'app_name': name,
+                                 'image_params': image_model
+                                 })
 
     def _get_command_inputs_list(self, data_holder):
         return [InputNameValue('deploy_data', jsonpickle.encode(data_holder, unpicklable=False))]
