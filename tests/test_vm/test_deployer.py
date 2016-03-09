@@ -83,30 +83,33 @@ class TestVirtualMachineDeployer(TestCase):
 
         resource_context = self._create_vcenter_resource_context()
 
-        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, deploy_from_template_details, resource_context)
+        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, deploy_from_template_details,
+                          resource_context)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):
-        params = DeployDataHolder(
-            {
-                "image_url": "c:\image.ovf",
-                "cluster_name": "QualiSB Cluster",
-                "resource_pool": "LiverPool",
-                "datastore_name": "eric ds cluster",
-                "datacenter_name": "QualiSB",
-                "power_on": False,
-                "vcenter_name": 'vCenter',
-                "app_name": "appName",
-                "user_arguments": ["--compress=9",
-                                   "--schemaValidate", "--etc"
-                                   ],
-                'ip_regex': '',
-                'refresh_ip_timeout': '10',
-                'auto_power_on': True,
-                'auto_power_off': True,
-                'wait_for_ip': True,
-                'auto_delete': True
-            })
+        params = DeployDataHolder({
+            'app_name': 'appName',
+            'vcenter_name': 'vCenter',
+            'image_params':
+                {
+                    "vcenter_image": "c:\image.ovf",
+                    "vm_cluster": "QualiSB Cluster",
+                    "vm_resource_pool": "LiverPool",
+                    "vm_storage": "eric ds cluster",
+                    "default_datacenter": "QualiSB",
+                    "vm_location": "vm_location",
+                    "auto_power_on": 'False',
+                    "vcenter_name": 'vCenter',
+                    "vcenter_image_arguments": "--compress=9,--schemaValidate,--etc",
+                    'ip_regex': '',
+                    'refresh_ip_timeout': '10',
+                    'auto_power_on': 'True',
+                    'auto_power_off': 'True',
+                    'wait_for_ip': 'True',
+                    'auto_delete': 'True'
+                }
+        })
 
         connectivity = Mock()
         connectivity.address = 'vcenter ip or name'
@@ -117,6 +120,7 @@ class TestVirtualMachineDeployer(TestCase):
 
         session = Mock()
         vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'qualisb'
         resource_context = Mock()
 
         res = self.deployer.deploy_from_image(self.si, session, vcenter_data_model, params, resource_context)
