@@ -38,7 +38,8 @@ class RefreshIpCommand(object):
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         if vm.guest.toolsStatus == 'toolsNotInstalled':
-            raise ValueError('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(resource_name))
+            logger.warning('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(resource_name))
+            return None
 
         ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout)
 

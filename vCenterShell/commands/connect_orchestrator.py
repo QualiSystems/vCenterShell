@@ -57,23 +57,24 @@ class ConnectionCommandOrchestrator(object):
         for action in unified_actions:
             vm_uuid = self._get_vm_uuid(action)
             if action.type == 'setVlan':
-                res = pool.apply_async(self._set_vlan_bulk,
-                                       (action,
-                                        default_network,
-                                        dv_switch_name,
-                                        dv_switch_path,
-                                        port_group_path,
-                                        vm_uuid,
-                                        reserved_networks,
-                                        si))
+                async_results.append(pool.apply_async(self._set_vlan_bulk,
+                                                      (action,
+                                                       default_network,
+                                                       dv_switch_name,
+                                                       dv_switch_path,
+                                                       port_group_path,
+                                                       vm_uuid,
+                                                       reserved_networks,
+                                                       si)))
 
             elif action.type == 'removeVlan':
 
-                res = pool.apply_async(self._remove_vlan_bulk,
-                                       (action, vm_uuid, si, vcenter_data_model))
+                async_results.append(pool.apply_async(self._remove_vlan_bulk,
+                                                      (action,
+                                                       vm_uuid,
+                                                       si,
+                                                       vcenter_data_model)))
 
-            if res:
-                async_results.append(res)
         return async_results
 
     def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
