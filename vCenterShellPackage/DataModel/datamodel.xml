@@ -449,6 +449,9 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
