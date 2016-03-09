@@ -3,4 +3,7 @@
   <Category Name="Virtualization" Catalog="Service">
     <ChildCategories />
   </Category>
+  <Category Name="Applications" Catalog="Service">
+    <ChildCategories />
+  </Category>
 </CategoryList>
