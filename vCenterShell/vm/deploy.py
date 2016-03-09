@@ -40,20 +40,19 @@ class VirtualMachineDeployer(object):
                                                                                       VMwarevCenterResourceModel)
 
         template_resource_model = data_holder.template_resource_model
-        vcenter_details = VCenterDetailsFactory.create_vcenter_details(
-            vcenter_resource_model=vcenter_resource_model,
-            vcenter_template_resource_model=template_resource_model)
+        VCenterDetailsFactory.set_deplyment_vcenter_params(
+            vcenter_resource_model=vcenter_resource_model, deploy_params=template_resource_model)
 
-        template_name = VMLocation.combine([vcenter_details.default_datacenter,
+        template_name = VMLocation.combine([template_resource_model.default_datacenter,
                                             template_resource_model.vcenter_template])
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=template_name,
                                                    vm_name=vm_name,
-                                                   vm_folder=vcenter_details.vm_location,
-                                                   datastore_name=vcenter_details.vm_storage,
-                                                   cluster_name=vcenter_details.vm_cluster,
-                                                   resource_pool=vcenter_details.vm_resource_pool,
+                                                   vm_folder=template_resource_model.vm_location,
+                                                   datastore_name=template_resource_model.vm_storage,
+                                                   cluster_name=template_resource_model.vm_cluster,
+                                                   resource_pool=template_resource_model.vm_resource_pool,
                                                    power_on=template_resource_model.auto_power_on)
 
         clone_vm_result = self.pv_service.clone_vm(params)
@@ -78,40 +77,46 @@ class VirtualMachineDeployer(object):
                                                                    vcenter_resource_model=vcenter_data_model,
                                                                    resource_context=resource_context)
 
-        image_params = self._get_deploy_image_params(data_holder, connection_details, vm_name)
+        VCenterDetailsFactory.set_deplyment_vcenter_params(vcenter_resource_model=vcenter_data_model,
+                                                           deploy_params=data_holder.image_params)
+
+        image_params = self._get_deploy_image_params(data_holder.image_params, connection_details, vm_name)
 
         res = self.ovf_service.deploy_image(vcenter_data_model, image_params)
         if res:
             vm_path = image_params.datacenter + '/' + \
-                      image_params.vm_folder if hasattr(image_params, 'vm_name') and image_params.vm_folder else ''
+                      image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
                 return DeployResult(vm_name=vm_name,
                                     vm_uuid=vm.config.uuid,
-                                    cloud_provider_resource_name=data_holder.vcenter_name,
-                                    ip_regex=data_holder.ip_regex,
-                                    refresh_ip_timeout=data_holder.refresh_ip_timeout,
-                                    auto_power_on=data_holder.auto_power_on,
-                                    auto_power_off=data_holder.auto_power_off,
-                                    wait_for_ip=data_holder.wait_for_ip,
-                                    auto_delete=data_holder.auto_delete)
+                                    cloud_provider_resource_name=data_holder.image_params.vcenter_name,
+                                    ip_regex=data_holder.image_params.ip_regex,
+                                    refresh_ip_timeout=data_holder.image_params.refresh_ip_timeout,
+                                    auto_power_on=data_holder.image_params.auto_power_on,
+                                    auto_power_off=data_holder.image_params.auto_power_off,
+                                    wait_for_ip=data_holder.image_params.wait_for_ip,
+                                    auto_delete=data_holder.image_params.auto_delete)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 
     @staticmethod
     def _get_deploy_image_params(data_holder, host_info, vm_name):
+        """
+        :type data_holder: models.vCenterVMFromImageResourceModel.vCenterVMFromImageResourceModel
+        """
         image_params = OvfImageParams()
-        if hasattr(data_holder, 'user_arguments') and data_holder.user_arguments:
-            image_params.user_arguments = data_holder.user_arguments
-        if hasattr(data_holder, 'vm_folder') and data_holder.vm_folder:
-            image_params.vm_folder = data_holder.vm_folder
-        image_params.cluster = data_holder.cluster_name
-        image_params.resource_pool = data_holder.resource_pool
+        if hasattr(data_holder, 'vcenter_image_arguments') and data_holder.vcenter_image_arguments:
+            image_params.user_arguments = data_holder.vcenter_image_arguments
+        if hasattr(data_holder, 'vm_location') and data_holder.vm_location:
+            image_params.vm_folder = data_holder.vm_location.replace(data_holder.default_datacenter + '/', '')
+        image_params.cluster = data_holder.vm_cluster
+        image_params.resource_pool = data_holder.vm_resource_pool
         image_params.connectivity = host_info
         image_params.vm_name = vm_name
-        image_params.datastore = data_holder.datastore_name
-        image_params.datacenter = data_holder.datacenter_name
-        image_params.image_url = data_holder.image_url
-        image_params.power_on = data_holder.power_on
+        image_params.datastore = data_holder.vm_storage
+        image_params.datacenter = data_holder.default_datacenter
+        image_params.image_url = data_holder.vcenter_image
+        image_params.power_on = data_holder.auto_power_on
         image_params.vcenter_name = data_holder.vcenter_name
         return image_params
