@@ -1,2 +1,2 @@
 jsonpickle
-cloudshell-automation-api==7.0.0.66
+cloudshell-automation-api==7.0.0.70
