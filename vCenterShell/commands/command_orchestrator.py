@@ -235,12 +235,14 @@ class CommandOrchestrator(object):
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
         resource_details = self._parse_remote_model(context)
+        reservation_id = context.remote_reservation.reservation_id
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             context,
             self.destroy_virtual_machine_command.destroy,
             resource_details.vm_uuid,
-            resource_details.fullname)
+            resource_details.fullname,
+            reservation_id)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
