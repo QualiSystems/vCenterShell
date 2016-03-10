@@ -1,3 +1,5 @@
+from cloudshell.api.cloudshell_api import ReservationDescriptionInfo, GetReservationDescriptionResponseInfo
+
 from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
@@ -27,12 +29,17 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         resource_remover.remove_resource = Mock(return_value=True)
         pv_service.find_by_uuid = Mock(return_value=vm)
 
+        reservation_details = Mock()
+        reservation_details.ReservationDescription = Mock()
+        reservation_details.ReservationDescription.Connectors = []
+
         session = Mock()
+        session.GetReservationDetails = Mock(return_value=reservation_details)
         vcenter_data_model = Mock()
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy(si, session, vcenter_data_model, uuid, resource_name)
+        res = destroyer.destroy(si, session, vcenter_data_model, uuid, resource_name, "reservation_id")
 
         # assert
         self.assertTrue(res)
