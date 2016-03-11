@@ -13,7 +13,7 @@ from vCenterShell.common.vcenter import pyVmomiService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 
-from vCenterShell.common import getLogger
+from vCenterShell.common.logger import getLogger
 
 logger = getLogger(__name__)
 

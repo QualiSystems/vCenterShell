@@ -3,7 +3,7 @@ from threading import Lock
 
 from pyVmomi import vim
 
-from vCenterShell.common import getLogger
+from vCenterShell.common.logger import getLogger
 
 logger = getLogger("vCenterCommon")
 

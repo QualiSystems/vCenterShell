@@ -5,8 +5,8 @@ Pretty much trivial logging demo
 Default log file - './logs/vCenter.log'
 """
 
-from vCenterShell.common import configure_loglevel
-from vCenterShell.common import getLogger
+from vCenterShell.common.logger import configure_loglevel
+from vCenterShell.common.logger import getLogger
 
 _logger = getLogger(__name__)           # Default logger is using
 # _logger = getLogger("vCenterShell")     # for Shell App itself

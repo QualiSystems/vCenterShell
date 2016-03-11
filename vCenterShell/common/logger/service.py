@@ -2,7 +2,7 @@
 """
 Defines logging service
 """
-from vCenterShell.common import getLogger, configure_loglevel
+from vCenterShell.common.logger import getLogger, configure_loglevel
 
 _logger = getLogger("vCenterCommon")
 

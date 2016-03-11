@@ -2,7 +2,7 @@ import time
 
 from pyVmomi import vim
 
-from vCenterShell.common import getLogger
+from vCenterShell.common.logger import getLogger
 
 logger = getLogger(__name__)
 # configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))

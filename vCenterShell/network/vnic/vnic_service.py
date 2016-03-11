@@ -6,7 +6,7 @@ from vCenterShell.common.vcenter import pyVmomiService
 from vCenterShell.network import *
 
 #from vCenterShell.vm import vm_reconfig_task
-from vCenterShell.common import getLogger
+from vCenterShell.common.logger import getLogger
 
 
 logger = getLogger("vCenterCommon")
