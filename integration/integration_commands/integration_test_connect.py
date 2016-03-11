@@ -6,7 +6,7 @@ from pyVmomi import vim
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.common.vcenter import SynchronousTaskWaiter
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory

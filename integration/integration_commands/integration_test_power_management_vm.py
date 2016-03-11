@@ -5,7 +5,7 @@ from pyVim.connect import SmartConnect, Disconnect
 
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.common.vcenter import task_waiter
 
 

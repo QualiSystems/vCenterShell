@@ -2,7 +2,7 @@
 
 from pyVmomi import vim
 
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.network import *
 
 #from vCenterShell.vm import vm_reconfig_task

@@ -7,7 +7,7 @@ from pyVmomi import vim
 
 from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
 
 ADDRESS = 'address'

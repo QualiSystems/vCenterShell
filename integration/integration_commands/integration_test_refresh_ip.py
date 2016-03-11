@@ -6,7 +6,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from tests.utils import helpers
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.models import VCenterConnectionDetails
 
 

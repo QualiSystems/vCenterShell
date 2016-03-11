@@ -9,7 +9,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
 

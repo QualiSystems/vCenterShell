@@ -2,7 +2,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 from testing_credentials import TestCredentials
-from vCenterShell.common.vcenter import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
 
 def get_uuid(virtual_machine_name):
