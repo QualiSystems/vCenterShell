@@ -1,4 +1,4 @@
-from vCenterShell.common.vcenter import VMLocation
+from vCenterShell.common.vcenter.vm_location import VMLocation
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 

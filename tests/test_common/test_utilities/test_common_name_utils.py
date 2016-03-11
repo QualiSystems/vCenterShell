@@ -1,6 +1,6 @@
 ﻿import unittest
 
-from vCenterShell.common.utilites import generate_unique_name
+from vCenterShell.common.utilites.common_name import generate_unique_name
 
 
 class test_common_name_utils(unittest.TestCase):

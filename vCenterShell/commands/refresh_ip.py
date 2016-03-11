@@ -4,7 +4,7 @@ import time
 from vCenterShell.common.logger import getLogger
 
 from vCenterShell.commands.ip_result import IpResult, IpReason
-from vCenterShell.common.vcenter import VMLocation
+from vCenterShell.common.vcenter.vm_location import VMLocation
 
 logger = getLogger(__name__)
 

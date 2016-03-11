@@ -4,7 +4,7 @@ from mock import Mock, create_autospec
 from pyVmomi import vim
 
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
-from vCenterShell.common import LoggingService
+from vCenterShell.common.logger.service import LoggingService
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
 

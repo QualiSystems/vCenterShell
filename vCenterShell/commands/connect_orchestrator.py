@@ -8,7 +8,7 @@ from vCenterShell.models.ActionResult import CustomActionResult
 from vCenterShell.models.DeployDataHolder import DeployDataHolder
 
 from vCenterShell.commands.combine_action import CombineAction
-from vCenterShell.common.vcenter import VMLocation
+from vCenterShell.common.vcenter.vm_location import VMLocation
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
 

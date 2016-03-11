@@ -17,8 +17,8 @@ from vCenterShell.commands.refresh_ip import RefreshIpCommand
 from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from vCenterShell.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.common.utilites import generate_unique_name
-from vCenterShell.common.utilites import set_command_result
+from vCenterShell.common.utilites.common_name import generate_unique_name
+from vCenterShell.common.utilites.command_result import set_command_result
 from vCenterShell.common.vcenter.ovf_service import OvfImageDeployerService
 from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
 from vCenterShell.common.vcenter.vmomi_service import pyVmomiService

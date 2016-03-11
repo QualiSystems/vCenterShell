@@ -1,6 +1,6 @@
 from vCenterShell.models.DeployResultModel import DeployResult
 
-from vCenterShell.common.vcenter import VMLocation
+from vCenterShell.common.vcenter.vm_location import VMLocation
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.vm.ovf_image_params import OvfImageParams
 from vCenterShell.vm.vcenter_details_factory import VCenterDetailsFactory

@@ -10,7 +10,7 @@ import time
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 from bootstrap import Bootstrapper
 
-from vCenterShell.common import LoggingService
+from vCenterShell.common.logger.service import LoggingService
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
 

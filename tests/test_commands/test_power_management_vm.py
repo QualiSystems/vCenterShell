@@ -4,7 +4,7 @@ from mock import Mock
 from pyVmomi import vim
 
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
-from vCenterShell.common import LoggingService
+from vCenterShell.common.logger.service import LoggingService
 
 
 class TestVirtualMachinePowerManagementCommand(TestCase):

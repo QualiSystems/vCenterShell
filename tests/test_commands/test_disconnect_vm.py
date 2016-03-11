@@ -4,7 +4,7 @@ from mock import Mock
 from pyVmomi import vim
 
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.common import LoggingService
+from vCenterShell.common.logger.service import LoggingService
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.vnic.vnic_service import VNicService
 

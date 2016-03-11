@@ -5,7 +5,7 @@ from vCenterShell.common.model_factory import ResourceModelParser
 from mock import Mock
 from pyVmomi import vim
 
-from vCenterShell.common.utilites import generate_unique_name
+from vCenterShell.common.utilites.common_name import generate_unique_name
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
