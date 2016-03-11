@@ -1,11 +1,9 @@
-from common.vcenter.vm_location import VMLocation
-from models.DeployResultModel import DeployResult
+from vCenterShell.models.DeployResultModel import DeployResult
+
+from vCenterShell.common.vcenter import VMLocation
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.vm.ovf_image_params import OvfImageParams
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
-from models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from vCenterShell.vm.vcenter_details_factory import VCenterDetailsFactory
-from common.model_factory import ResourceModelParser
 
 
 class VirtualMachineDeployer(object):

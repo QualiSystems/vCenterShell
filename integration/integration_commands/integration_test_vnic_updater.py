@@ -1,12 +1,13 @@
 import os
 from unittest import TestCase
 
-from pyVim.connect import SmartConnect, Disconnect
 import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-from common.vcenter.vmomi_service import pyVmomiService
-from tests.utils.testing_credentials import TestCredentials
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
+from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+
+from tests.utils.testing_credentials import TestCredentials
+from vCenterShell.common.vcenter import pyVmomiService
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

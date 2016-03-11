@@ -3,8 +3,8 @@ import urllib
 
 from mock import Mock, patch
 
-from common.vcenter.ovf_service import OvfImageDeployerService
-from models.VCenterConnectionDetails import VCenterConnectionDetails
+from vCenterShell.common.vcenter import OvfImageDeployerService
+from vCenterShell.models import VCenterConnectionDetails
 
 PROCESS = Mock()
 

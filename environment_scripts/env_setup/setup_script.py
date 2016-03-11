@@ -2,9 +2,9 @@ from multiprocessing.pool import ThreadPool
 
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
+from vCenterShell.common.logger import getLogger
 
-from common.logger import getLogger
-from common.vcenter.vm_details import get_vm_custom_param
+from vCenterShell.common.vcenter import get_vm_custom_param
 
 logger = getLogger("CloudShell Sandbox Setup")
 

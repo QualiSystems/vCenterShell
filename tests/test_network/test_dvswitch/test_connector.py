@@ -1,13 +1,14 @@
 from unittest import TestCase
+
+from vCenterShell.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from vCenterShell.common.model_factory import ResourceModelParser
 from mock import Mock
 from pyVmomi import vim
 
-from common.model_factory import ResourceModelParser
-from common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from vCenterShell.common.utilites import generate_unique_name
 from vCenterShell.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from common.utilites.common_name import generate_unique_name
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):

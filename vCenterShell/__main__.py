@@ -6,10 +6,11 @@ runs command defined with 'COMMAND' OS environment variable
 import os
 import sys
 import time
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 
+import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
 from bootstrap import Bootstrapper
-from common.logger.service import LoggingService
+
+from vCenterShell.common import LoggingService
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"
 

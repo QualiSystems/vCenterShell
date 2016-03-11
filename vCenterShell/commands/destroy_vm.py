@@ -1,5 +1,6 @@
-﻿from common.logger import getLogger
-from cloudshell.api.cloudshell_api import CloudShellAPISession
+﻿from cloudshell.api.cloudshell_api import CloudShellAPISession
+
+from vCenterShell.common.logger import getLogger
 
 logger = getLogger(__name__)
 

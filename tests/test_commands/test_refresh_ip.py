@@ -1,10 +1,12 @@
 from unittest import TestCase
+
 from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
 from mock import Mock, create_autospec
-from common.logger.service import LoggingService
-from common.model_factory import ResourceModelParser
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
+from vCenterShell.common.logger.service import LoggingService
+from vCenterShell.common.model_factory import ResourceModelParser
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
 class TestRefreshIpCommand(TestCase):

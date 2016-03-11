@@ -6,7 +6,7 @@ Very much common Input/Output Utils
 
 import os.path
 
-from common.logger import getLogger
+from vCenterShell.common import getLogger
 _logger = getLogger("vCenterCommon")
 
 

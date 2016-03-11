@@ -1,8 +1,10 @@
 from unittest import TestCase
-from mock import Mock, MagicMock
+
+from mock import Mock
 from pyVmomi import vim
-from common.logger.service import LoggingService
+
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
+from vCenterShell.common import LoggingService
 
 
 class TestVirtualMachinePowerManagementCommand(TestCase):

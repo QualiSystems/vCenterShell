@@ -1,4 +1,4 @@
-﻿from models.DeployFromTemplateDetails import DeployFromTemplateDetails
+﻿from vCenterShell.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
 class DeployCommand(object):
     """ Command to Create a VM from a template """

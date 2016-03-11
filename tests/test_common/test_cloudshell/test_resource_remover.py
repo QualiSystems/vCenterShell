@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from common.cloud_shell.resource_remover import CloudshellResourceRemover
+from vCenterShell.common.cloud_shell import CloudshellResourceRemover
 
 
 class TestResourceRemover(TestCase):

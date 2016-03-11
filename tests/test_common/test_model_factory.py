@@ -4,8 +4,9 @@ import xml.etree.ElementTree as ET
 from os import listdir
 from unittest import TestCase
 
-from common.model_factory import ResourceModelParser
-from common.logger.service import LoggingService
+from vCenterShell.common.logger.service import LoggingService
+
+from vCenterShell.common.model_factory import ResourceModelParser
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))

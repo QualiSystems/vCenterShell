@@ -1,7 +1,8 @@
 from unittest import TestCase
 
 from mock import Mock
-from common.wrappers.command_wrapper import CommandWrapper
+
+from vCenterShell.common import CommandWrapper
 
 
 class TestCommandWrapper(TestCase):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# from common.logger import getLogger
+# from vCenterShell.common.logger import getLogger
 
 ### NOT USED:
 # _logger = getLogger("vCenterCommon")

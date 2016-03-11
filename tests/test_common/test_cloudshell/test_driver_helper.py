@@ -1,9 +1,8 @@
 from unittest import TestCase
 
-from mock import Mock, patch, MagicMock
-from cloudshell.api.cloudshell_api import CloudShellAPISession
+from mock import Mock
 
-from common.cloud_shell.driver_helper import CloudshellDriverHelper
+from vCenterShell.common.cloud_shell import CloudshellDriverHelper
 
 
 class TestDriverHelper(TestCase):

@@ -2,14 +2,14 @@
 """
 Defines logging service
 """
-from common.logger import getLogger, configure_loglevel
+from vCenterShell.common import getLogger, configure_loglevel
 
 _logger = getLogger("vCenterCommon")
 
 
 class LoggingService(object):
     def __init__(self, log_level_console, log_level_file, filename):
-        from common.utilites.io import extract_folder_name, compose_folder_if_not_existed
+        from vCenterShell.common.utilites import extract_folder_name, compose_folder_if_not_existed
 
         log_level_file = log_level_file or log_level_console
 

@@ -1,8 +1,7 @@
 import subprocess
-import urllib
 
-from common.utilites.common_utils import fixurl
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from vCenterShell.common.utilites import fixurl
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 OVF_DESTENATION_FORMAT = 'vi://{0}:{1}@{2}/{3}/host/{4}{5}'
 

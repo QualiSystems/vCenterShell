@@ -2,14 +2,12 @@
 import sys
 import unittest
 
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from mock import Mock, create_autospec
 from pyVmomi import vim
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-from models.VCenterConnectionDetails import *
-from vCenterShell.commands.get_vnic_from_vm import NetworkAdaptersRetrieverCommand, ConnectionException
+from vCenterShell.commands.get_vnic_from_vm import NetworkAdaptersRetrieverCommand
 
 
 class TestNetworkAdaptersRetriever(unittest.TestCase):

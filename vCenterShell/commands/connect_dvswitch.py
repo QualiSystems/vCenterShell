@@ -1,5 +1,4 @@
-from models.ConnectionResult import ConnectionResult
-from common.utilites.common_utils import get_object_as_string
+from vCenterShell.models.ConnectionResult import ConnectionResult
 
 
 class VirtualSwitchConnectCommand:

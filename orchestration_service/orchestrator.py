@@ -1,9 +1,9 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.api.common_cloudshell_api import CloudShellAPIError
+from vCenterShell.common.logger import getLogger
 
-from common.cloud_shell.driver_helper import CloudshellDriverHelper
-from common.logger import getLogger
+from vCenterShell.common.cloud_shell import CloudshellDriverHelper
 
 logger = getLogger("App Orchestration Driver")
 

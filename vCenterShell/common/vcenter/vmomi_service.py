@@ -1,13 +1,12 @@
-﻿import requests
-import time
-import os
+﻿import time
 
-from datetime import datetime
+import requests
+from vCenterShell.common.logger import getLogger
+from vCenterShell.common.vcenter.vm_location import VMLocation
 from pyVmomi import vim
-from common.logger import getLogger
-from common.utilites.common_utils import str2bool
-from common.utilites.io import get_path_and_name
-from common.vcenter.vm_location import VMLocation
+
+from vCenterShell.common.utilites import get_path_and_name
+from vCenterShell.common.utilites import str2bool
 
 logger = getLogger(__name__)
 

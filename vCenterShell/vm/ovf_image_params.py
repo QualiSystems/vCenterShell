@@ -1,9 +1,6 @@
-import models.VCenterConnectionDetails
-
-
 class OvfImageParams(object):
     def __init__(self):
-        self.connectivity = None  # type: models.VCenterConnectionDetails
+        self.connectivity = None  # type: vCenterShell.models.VCenterConnectionDetails
         self.datacenter = None  # type: str
         self.cluster = None  # type: str
         self.resource_pool = None  # type: str

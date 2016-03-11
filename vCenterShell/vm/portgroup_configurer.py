@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from pyVmomi import vim
-from common.vcenter.vmomi_service import *
 from vCenterShell.network import network_is_portgroup
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 

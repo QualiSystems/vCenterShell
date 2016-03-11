@@ -1,5 +1,3 @@
-from common.vcenter.vmomi_service import *
-
 class VmNetworkMapping(object):
     def __init__(self):
         self.vnic_name = ''

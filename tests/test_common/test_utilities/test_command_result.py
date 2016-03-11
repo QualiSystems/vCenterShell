@@ -1,8 +1,10 @@
 from unittest import TestCase
-from common.utilites.command_result import get_result_from_command_output, set_command_result
-from models.ActionResult import ActionResult
-from models.ConnectionResult import ConnectionResult
-from models.DriverResponse import DriverResponse, DriverResponseRoot
+
+from vCenterShell.models.ActionResult import ActionResult
+from vCenterShell.models.ConnectionResult import ConnectionResult
+
+from vCenterShell.common.utilites import get_result_from_command_output, set_command_result
+from vCenterShell.models.DriverResponse import DriverResponse, DriverResponseRoot
 
 
 class TestCommandResult(TestCase):
