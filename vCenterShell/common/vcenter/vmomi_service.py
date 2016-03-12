@@ -5,8 +5,8 @@ from vCenterShell.common.logger import getLogger
 from vCenterShell.common.vcenter.vm_location import VMLocation
 from pyVmomi import vim
 
-from vCenterShell.common.utilites import get_path_and_name
-from vCenterShell.common.utilites import str2bool
+from vCenterShell.common.utilites.io import get_path_and_name
+from vCenterShell.common.utilites.common_utils import str2bool
 
 logger = getLogger(__name__)
 
