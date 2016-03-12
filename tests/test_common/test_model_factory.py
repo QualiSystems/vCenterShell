@@ -53,7 +53,7 @@ class TestDataModel(TestCase):
             for deployment_node in deployment_nodes:
                 resource_model_name = self.get_class_name_from_model_node(deployment_node)
                 try:
-                    klass = ResourceModelParser().get_class('models.' + resource_model_name)
+                    klass = ResourceModelParser().get_class('vCenterShell.models.' + resource_model_name)
                 except ValueError as value_error:
                     validation_errors.append(value_error.message)
                     continue
