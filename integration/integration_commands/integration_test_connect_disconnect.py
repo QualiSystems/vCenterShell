@@ -13,6 +13,8 @@ from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerato
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.portgroup_configurer import *
 from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):

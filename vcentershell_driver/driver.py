@@ -1,5 +1,5 @@
 from vCenterShell.commands.command_orchestrator import CommandOrchestrator
-from vCenterShell.common.vcenter import VCenterAutoModelDiscovery
+from vCenterShell.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 
 
 class VCenterShellDriver:

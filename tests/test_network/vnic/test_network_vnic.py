@@ -4,6 +4,8 @@ from mock import Mock, MagicMock, create_autospec
 from pyVmomi import vim
 
 from vCenterShell.network.vnic.vnic_service import VNicService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+
 
 
 class TestNetwork(TestCase):

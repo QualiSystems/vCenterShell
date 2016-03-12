@@ -1,4 +1,4 @@
-from vCenterShell.common.vcenter import DeploymentDetails
+from vCenterShell.common.vcenter.deployment_details import DeploymentDetails
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 

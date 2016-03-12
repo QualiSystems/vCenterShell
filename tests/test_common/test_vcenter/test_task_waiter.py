@@ -3,7 +3,7 @@ import unittest
 from mock import Mock, patch
 from pyVmomi import vim
 
-from vCenterShell.common.vcenter import SynchronousTaskWaiter
+from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
 
 task = Mock(spec=vim.Task)
 

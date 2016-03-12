@@ -3,7 +3,7 @@ import unittest
 from mock import Mock, create_autospec
 
 from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.common.vcenter import VCenterDataModelRetriever
+from vCenterShell.common.vcenter.data_model_retriever import VCenterDataModelRetriever
 from vCenterShell.models.QualiDriverModels import ResourceContextDetails
 
 

@@ -3,7 +3,7 @@ from multiprocessing.pool import ThreadPool
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from vCenterShell.common.logger import getLogger
 
-from vCenterShell.common.vcenter import get_vm_custom_param
+from vCenterShell.common.vcenter.vm_details import get_vm_custom_param
 
 logger = getLogger("CloudShell Sandbox Teardown")
 
