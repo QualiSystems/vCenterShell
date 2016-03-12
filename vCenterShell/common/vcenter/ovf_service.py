@@ -1,6 +1,6 @@
 import subprocess
 
-from vCenterShell.common.utilites import fixurl
+from vCenterShell.common.utilites.common_utils import fixurl
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 OVF_DESTENATION_FORMAT = 'vi://{0}:{1}@{2}/{3}/host/{4}{5}'
