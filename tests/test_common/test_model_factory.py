@@ -27,7 +27,7 @@ class TestDataModel(TestCase):
             model_name = ResourceModelParser().get_resource_model_class_name(resource_model.attrib['Name'])
 
             try:
-                klass = ResourceModelParser().get_class('models.' + model_name)
+                klass = ResourceModelParser().get_class('vCenterShell.models.' + model_name)
             except ValueError as value_error:
                 validation_errors.append('Failed to parse Model Name {0} with error {1}.'.format(model_name, value_error.message))
                 continue
