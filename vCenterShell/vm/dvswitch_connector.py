@@ -1,3 +1,6 @@
+from vCenterShell.common.logger import getLogger
+logger=getLogger(__name__)
+
 class VmNetworkMapping(object):
     def __init__(self):
         self.vnic_name = ''

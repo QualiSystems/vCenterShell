@@ -4,7 +4,7 @@ import urllib
 from mock import Mock, patch
 
 from vCenterShell.common.vcenter.ovf_service import OvfImageDeployerService
-from vCenterShell.models import VCenterConnectionDetails
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 PROCESS = Mock()
 

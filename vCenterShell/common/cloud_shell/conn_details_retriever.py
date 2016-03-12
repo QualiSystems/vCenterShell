@@ -1,4 +1,4 @@
-from vCenterShell.models import VCenterConnectionDetails
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
 class ResourceConnectionDetailsRetriever:
