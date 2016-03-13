@@ -3,9 +3,9 @@ from unittest import TestCase
 from cloudshell.api.cloudshell_api import ResourceInfo, ResourceAttribute
 from mock import create_autospec
 from qualipy.scripts.cloudshell_scripts_helpers import ResourceContextDetails
+from cloudshell.cp.vcenter.models.VLANAutoResourceModel import VLANAutoResourceModel
 
-from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.models.VLANAutoResourceModel import VLANAutoResourceModel
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class TestResourceModelParser(TestCase):

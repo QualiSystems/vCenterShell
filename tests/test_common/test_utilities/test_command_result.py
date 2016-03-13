@@ -1,10 +1,10 @@
 from unittest import TestCase
 
-from vCenterShell.models.ActionResult import ActionResult
-from vCenterShell.models.ConnectionResult import ConnectionResult
+from cloudshell.cp.vcenter.models.ActionResult import ActionResult
+from cloudshell.cp.vcenter.models.ConnectionResult import ConnectionResult
+from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
 
-from vCenterShell.common.utilites.command_result import get_result_from_command_output, set_command_result
-from vCenterShell.models.DriverResponse import DriverResponse, DriverResponseRoot
+from cloudshell.cp.vcenter.common.utilites.command_result import get_result_from_command_output, set_command_result
 
 
 class TestCommandResult(TestCase):

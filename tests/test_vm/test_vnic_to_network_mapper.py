@@ -1,11 +1,11 @@
 from unittest import TestCase
 
 from mock import Mock
-
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.vm.dvswitch_connector import ConnectRequest
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from pyVmomi import vim
+from cloudshell.cp.vcenter.vm.dvswitch_connector import ConnectRequest
+from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
+
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 
 
 class TestVnicToNetworkMapper(TestCase):

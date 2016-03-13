@@ -5,9 +5,7 @@ import unittest
 from mock import Mock, create_autospec
 from pyVmomi import vim
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-from vCenterShell.commands.get_vnic_from_vm import NetworkAdaptersRetrieverCommand
+from cloudshell.cp.vcenter.commands.get_vnic_from_vm import NetworkAdaptersRetrieverCommand
 
 
 class TestNetworkAdaptersRetriever(unittest.TestCase):

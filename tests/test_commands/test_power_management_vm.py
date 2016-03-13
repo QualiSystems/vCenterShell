@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from mock import Mock
 from pyVmomi import vim
+from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
-from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
-from vCenterShell.common.logger.service import LoggingService
+from cloudshell.cp.vcenter.common.logger.service import LoggingService
 
 
 class TestVirtualMachinePowerManagementCommand(TestCase):

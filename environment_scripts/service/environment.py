@@ -1,9 +1,9 @@
 import qualipy.scripts.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import InputNameValue, AttributeNameValue
-from vCenterShell.common.cloud_shell.resource_helper import get_attribute
-from vCenterShell.common.logger.service import getLogger
+from cloudshell.cp.vcenter.common.cloud_shell.resource_helper import get_attribute
+from cloudshell.cp.vcenter.common.logger.service import getLogger
 
-from vCenterShell.common.utilites.command_result import get_result_from_command_output
+from cloudshell.cp.vcenter.common.utilites.command_result import get_result_from_command_output
 
 _logger = getLogger('EnvironmentConnector')
 

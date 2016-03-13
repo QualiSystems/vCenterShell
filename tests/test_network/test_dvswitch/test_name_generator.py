@@ -1,5 +1,6 @@
 from unittest import TestCase
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
+
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 
 
 class TestDvPortGroupCreator(TestCase):

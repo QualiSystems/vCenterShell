@@ -4,9 +4,7 @@ import os.path
 import sys
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-from vCenterShell.common.logger.service import LoggingService
+from cloudshell.cp.vcenter.common.logger.service import LoggingService
 
 
 class TestLoggingService(unittest.TestCase):

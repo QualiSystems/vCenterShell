@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
+from cloudshell.cp.vcenter.network.vlan.range_parser import VLanIdRangeParser
 
 
 class TestVLanIdRangeParser(TestCase):

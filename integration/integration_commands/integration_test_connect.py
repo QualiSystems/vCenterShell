@@ -2,19 +2,19 @@ from unittest import TestCase
 
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.network.vlan.factory import VlanSpecFactory
+from cloudshell.cp.vcenter.network.vlan.range_parser import VLanIdRangeParser
+from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
+from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
+from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
+from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
+from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
-from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vlan.factory import VlanSpecFactory
-from vCenterShell.network.vlan.range_parser import VLanIdRangeParser
-from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
-from vCenterShell.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

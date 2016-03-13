@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from mock import Mock, MagicMock, create_autospec
 from pyVmomi import vim
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
-from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 
 
 
