@@ -222,12 +222,6 @@ class VCenterAutoModelDiscovery(object):
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
 
-    def _validate_ovf_tool_path(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        file_path = attributes[key]
-        if not (file_path and os.path.exists(file_path)):
-            raise ValueError('OVF tool not found in the given path: {0}'.format(file_path))
-        auto_att.append(AutoLoadAttribute('', key, file_path))
-
     def _validate_promiscuous_mode(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         mode = attributes[key]
         if self._is_in_array(key, mode, PROMISCUOUS_MODES):
