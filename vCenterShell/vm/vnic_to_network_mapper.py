@@ -19,7 +19,7 @@ class VnicToNetworkMapper(object):
         for request in requests:
             if request.vnic_name:
                 if request.vnic_name not in vnics_to_network_mapping:
-                    raise ValueError('The vNIC: {0} does not exist'.format(request.vnic))
+                    raise ValueError('No vNIC by that name "{0}" exist'.format(request.vnic_name))
                 net_at_requsted_vnic = vnics_to_network_mapping[request.vnic_name]
                 if self.quali_name_generator.is_generated_name(net_at_requsted_vnic):
                     raise ValueError('The vNIC: "{0}" is already set with: "{1}"'.format(request.vnic_name,
