@@ -117,4 +117,4 @@ class TestCommandOrchestrator(TestCase):
         res = self.driver.remote_refresh_ip(self.context, self.cancellation_context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.refresh_ip.called_with(self.context, self.cancellation_context, self.ports))
+        self.assertTrue(self.driver.command_orchestrator._refresh_ip.called_with(self.context, self.cancellation_context, self.ports))
