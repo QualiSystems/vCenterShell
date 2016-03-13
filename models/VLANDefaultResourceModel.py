@@ -1,4 +1,4 @@
-class DefaultVLANResourceModel(object):
+class VLANDefaultResourceModel(object):
     def __init__(self):
         self.access_mode = ''
         self.allocation_ranges = ''
