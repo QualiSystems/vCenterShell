@@ -9,7 +9,7 @@ install:
     - pip install coveralls
 
 script:
-    nosetests --with-coverage  --cover-package=vCenterShell,common,models --exclude-dir=integration
+    nosetests --with-coverage  --cover-package=package,common,models --exclude-dir=integration
 
 after_success:
     coveralls
