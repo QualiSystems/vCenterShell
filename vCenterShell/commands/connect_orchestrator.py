@@ -54,11 +54,12 @@ class ConnectionCommandOrchestrator(object):
     def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
                                      unified_actions, pool, reserved_networks, vcenter_data_model):
         async_results = []
-        for action in unified_actions:
-            vm_uuid = self._get_vm_uuid(action)
-            if action.type == 'setVlan':
+        for key, actions in unified_actions.items():
+            first_action = actions[0]
+            vm_uuid = self._get_vm_uuid(first_action)
+            if first_action.type == 'setVlan':
                 async_results.append(pool.apply_async(self._set_vlan_bulk,
-                                                      (action,
+                                                      (actions,
                                                        default_network,
                                                        dv_switch_name,
                                                        dv_switch_path,
@@ -67,40 +68,40 @@ class ConnectionCommandOrchestrator(object):
                                                        reserved_networks,
                                                        si)))
 
-            elif action.type == 'removeVlan':
-
-                async_results.append(pool.apply_async(self._remove_vlan_bulk,
-                                                      (action,
-                                                       vm_uuid,
-                                                       si,
-                                                       vcenter_data_model)))
+            elif first_action.type == 'removeVlan':
+                for action in actions:
+                    async_results.append(pool.apply_async(self._remove_vlan_bulk,
+                                                          (action,
+                                                           vm_uuid,
+                                                           si,
+                                                           vcenter_data_model)))
 
         return async_results
 
-    def _set_vlan_bulk(self, action, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
+    def _set_vlan_bulk(self, actions, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
                        reserved_networks, si):
-
-        mappings = self._create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path)
-
         results = []
-        if mappings:
-            try:
-                connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
-                                                                        default_network, reserved_networks)
-                for connection_result in connection_results:
-                    result = CustomActionResult()
-                    result.actionId = str(action.actionId)
-                    result.type = str(action.type)
-                    result.infoMessage = 'VLAN successfully set'
-                    result.errorMessage = ''
-                    result.success = True
-                    result.updatedInterface = connection_result.mac_address
-                    result.network_name = connection_result.network_name
-                    results.append(result)
+        for action in actions:
+            mappings = self._create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path)
 
-            except Exception as ex:
-                error_result = self._create_failure_result(action, ex)
-                results.append(error_result)
+            if mappings:
+                try:
+                    connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
+                                                                            default_network, reserved_networks)
+                    for connection_result in connection_results:
+                        result = CustomActionResult()
+                        result.actionId = str(action.actionId)
+                        result.type = str(action.type)
+                        result.infoMessage = 'VLAN successfully set'
+                        result.errorMessage = ''
+                        result.success = True
+                        result.updatedInterface = connection_result.mac_address
+                        result.network_name = connection_result.network_name
+                        results.append(result)
+
+                except Exception as ex:
+                    error_result = self._create_failure_result(action, ex)
+                    results.append(error_result)
 
         return results
 
@@ -151,9 +152,11 @@ class ConnectionCommandOrchestrator(object):
         # group by machine and vlan mode and action type
         for action in actions:
             vm_uuid = ConnectionCommandOrchestrator._get_vm_uuid(action)
-            vlan_mode = action.connectionParams.mode
+            # vlan_mode = action.connectionParams.mode
             action_type = action.type
-            key = (vm_uuid, vlan_mode, action_type)
+            key = (vm_uuid,
+                   # vlan_mode,
+                   action_type)
             if key not in key_to_actions:
                 key_to_actions[key] = []
             key_to_actions[key].append(action)
@@ -164,14 +167,23 @@ class ConnectionCommandOrchestrator(object):
 
     @staticmethod
     def _create_new_action_by_mapping(mapping):
-        actions = []
+        actions = dict()
 
         for key, actions_arr in mapping.items():
-            action = copy.deepcopy(actions_arr[0])
-            action.actionId = key
-            for act in actions_arr[1:]:
-                CombineAction.combine(action, act)
-            actions.append(action)
+            actions_by_modes = dict()
+            for action in actions_arr:
+                if action.connectionParams.mode not in actions_by_modes:
+                    actions_by_modes[action.connectionParams.mode] = []
+                actions_by_modes[action.connectionParams.mode].append(action)
+
+            for mode, actions_by_mode_arr in actions_by_modes.items():
+                act = copy.deepcopy(actions_by_mode_arr[0])
+                act.actionId = key
+                for act_to_combine in actions_by_mode_arr[1:]:
+                    CombineAction.combine(act, act_to_combine)
+                if key not in actions:
+                    actions[key] = []
+                actions[key].append(act)
         return actions
 
     @staticmethod
