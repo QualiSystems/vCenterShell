@@ -496,6 +496,7 @@
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Wait for IP" Value="True" />
+            <ns0:AttributeValue Name="Auto Delete" Value="True" />
             <ns0:AttributeValue Name="VM Cluster" Value="QualiSB/QualiSB Cluster" />
             <ns0:AttributeValue Name="VM Location" Value="Qualisystem Images" />
             <ns0:AttributeValue Name="VM Storage" Value="aa" />
