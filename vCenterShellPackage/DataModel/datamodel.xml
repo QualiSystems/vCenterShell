@@ -593,12 +593,12 @@
           </ns0:Drivers>
           <ns0:Scripts />
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="Default VLAN" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="VLAN Default" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="true">
               <ns0:AllowedValues>
                 <ns0:AllowedValue>Shared</ns0:AllowedValue>
                 <ns0:AllowedValue>Exclusive</ns0:AllowedValue>
