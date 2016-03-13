@@ -2,11 +2,11 @@ from unittest import TestCase
 
 from cloudshell.api.cloudshell_api import ResourceInfo
 from mock import Mock, create_autospec
+from vCenterShell.models.DeployDataHolder import DeployDataHolder
+from vCenterShell.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
-from common.model_factory import ResourceModelParser
-from models.DeployDataHolder import DeployDataHolder
-from models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from vCenterShell.common.model_factory import ResourceModelParser
+from vCenterShell.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 
 

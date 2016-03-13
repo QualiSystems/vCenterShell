@@ -1,6 +1,8 @@
 from unittest import TestCase
+
 import jsonpickle
-from models.DeployDataHolder import DeployDataHolder
+
+from vCenterShell.models.DeployDataHolder import DeployDataHolder
 
 
 class TestDeployDataHolder(TestCase):

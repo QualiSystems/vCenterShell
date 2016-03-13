@@ -1,5 +1,5 @@
 from TimerWrapper import TimerWrapper
-from common.logger import getLogger
+from vCenterShell.common.logger import getLogger
 
 
 class PerfMethodWrapper:

@@ -1,5 +1,6 @@
 from cloudshell.api.cloudshell_api import CloudShellAPISession
-from models.VCenterConnectionDetails import VCenterConnectionDetails
+
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
 class CloudshellDriverHelper(object):

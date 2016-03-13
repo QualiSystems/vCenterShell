@@ -1,4 +1,4 @@
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
 class VCenterDataModelRetriever(object):

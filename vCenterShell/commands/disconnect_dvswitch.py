@@ -7,10 +7,10 @@
 
 from pyVmomi import vim
 
-from common.vcenter.vm_location import VMLocation
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from vCenterShell.common.logger import getLogger
+from vCenterShell.common.vcenter.vm_location import VMLocation
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.vnic.vnic_service import VNicService
-from common.logger import getLogger
 from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
 
 _logger = getLogger("vCenterShell")

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from pyVmomi import vim
-from common.vcenter.vmomi_service import *
 from vCenterShell.network import network_is_portgroup
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+from vCenterShell.common.logger import getLogger
+logger = getLogger(__name__)
 
 
 class VNicDeviceMapper(object):
@@ -15,6 +15,7 @@ class VNicDeviceMapper(object):
 
 
 class VirtualMachinePortGroupConfigurer(object):
+
     def __init__(self,
                  pyvmomi_service,
                  synchronous_task_waiter,
@@ -33,6 +34,7 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_to_network_mapper = vnic_to_network_mapper
         self.vnic_service = vnic_service
         self.network_name_gen = name_gen
+
 
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks):
         vnic_mapping = self.vnic_service.map_vnics(vm)

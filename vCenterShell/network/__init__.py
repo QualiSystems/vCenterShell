@@ -6,7 +6,7 @@ The most common network/Distributed Virtual Switch staff
 
 from pyVmomi import vim
 
-from common.logger import getLogger
+from vCenterShell.common.logger import getLogger
 _logger = getLogger("vCenterCommon")
 
 

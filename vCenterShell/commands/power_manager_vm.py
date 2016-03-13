@@ -1,4 +1,4 @@
-from common.logger import getLogger
+from vCenterShell.common.logger import getLogger
 
 _logger = getLogger("vCenterShell")
 

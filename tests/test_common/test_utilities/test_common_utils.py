@@ -1,5 +1,6 @@
 import unittest
-from common.utilites.common_utils import get_object_as_string, str2bool
+
+from vCenterShell.common.utilites.common_utils import get_object_as_string, str2bool
 
 
 class TestCommonUtils(unittest.TestCase):

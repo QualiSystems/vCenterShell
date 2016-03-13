@@ -3,12 +3,12 @@ from unittest import TestCase
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 
-from common.utilites.common_name import generate_unique_name
-from common.vcenter.ovf_service import OvfImageDeployerService
-from common.vcenter.vmomi_service import pyVmomiService
-from models.DeployDataHolder import DeployDataHolder
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.deploy_vm import DeployCommand
+from vCenterShell.common.utilites.common_name import generate_unique_name
+from vCenterShell.common.vcenter.ovf_service import OvfImageDeployerService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+from vCenterShell.models.DeployDataHolder import DeployDataHolder
 from vCenterShell.vm.deploy import VirtualMachineDeployer
 
 

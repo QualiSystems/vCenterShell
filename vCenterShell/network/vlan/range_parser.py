@@ -1,6 +1,6 @@
 from pyVmomi import vim
 
-from common.utilites.common_utils import represents_int
+from vCenterShell.common.utilites.common_utils import represents_int
 
 
 class VLanIdRangeParser(object):

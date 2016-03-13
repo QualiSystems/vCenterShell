@@ -1,8 +1,10 @@
 import unittest
+
 from mock import Mock, create_autospec
-from common.model_factory import ResourceModelParser
-from common.vcenter.data_model_retriever import VCenterDataModelRetriever
-from models.QualiDriverModels import ResourceContextDetails
+
+from vCenterShell.common.model_factory import ResourceModelParser
+from vCenterShell.common.vcenter.data_model_retriever import VCenterDataModelRetriever
+from vCenterShell.models.QualiDriverModels import ResourceContextDetails
 
 
 class TestVCenterDataModelRetriever(unittest.TestCase):

@@ -1,10 +1,6 @@
 import inspect
 
-from common.cloud_shell.driver_helper import CloudshellDriverHelper
-from common.model_factory import ResourceModelParser
-from common.vcenter.vmomi_service import pyVmomiService
-from models.QualiDriverModels import ResourceRemoteCommandContext
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
 COMMAND_ERROR = 'error has occurred while executing command: {0}'

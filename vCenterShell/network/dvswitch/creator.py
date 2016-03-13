@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from pyVmomi import vim
-from common.logger import getLogger
 from threading import Lock
+
+from pyVmomi import vim
+
+from vCenterShell.common.logger import getLogger
 
 logger = getLogger("vCenterCommon")
 

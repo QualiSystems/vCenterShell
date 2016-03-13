@@ -1,5 +1,5 @@
-from common.vcenter.deployment_details import DeploymentDetails
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from vCenterShell.common.vcenter.deployment_details import DeploymentDetails
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
 class DeploymentDetailsFactory(object):

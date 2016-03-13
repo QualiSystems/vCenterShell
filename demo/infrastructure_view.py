@@ -6,7 +6,7 @@ import os
 
 from demo import DevBootstrapper
 #from vCenterShell.demo.dev_bootstrapper import attachAndGetResourceContext
-from common.logger.service import LoggingService
+from vCenterShell.common.logger.service import LoggingService
 
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"

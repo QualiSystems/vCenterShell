@@ -1,10 +1,12 @@
 ﻿import os
 import sys
 import unittest
+
 from mock import Mock
-from models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from vCenterShell.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+
 from vCenterShell.commands.deploy_vm import DeployCommand
+from vCenterShell.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 

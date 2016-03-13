@@ -1,10 +1,12 @@
 from unittest import TestCase
+
 from mock import Mock, create_autospec
-from common.logger.service import LoggingService
+from pyVmomi import vim
+
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
+from vCenterShell.common.logger.service import LoggingService
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping
 from vCenterShell.vm.portgroup_configurer import VNicDeviceMapper
-from pyVmomi import vim
 
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):

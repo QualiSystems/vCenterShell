@@ -1,14 +1,14 @@
+import collections
 import os
 
+from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
 from pyVim.connect import SmartConnect, Disconnect
-import collections
-
 from pyVmomi import vim
-from common.cloud_shell.driver_helper import CloudshellDriverHelper
-from common.model_factory import ResourceModelParser
-from common.vcenter.vmomi_service import pyVmomiService
-from models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
-from models.VCenterConnectionDetails import VCenterConnectionDetails
+
+from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from vCenterShell.common.model_factory import ResourceModelParser
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+from vCenterShell.models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
 
 ADDRESS = 'address'
 USER = 'User'

@@ -1,14 +1,14 @@
 import os.path
 import sys
 
+from vCenterShell.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
 from pyVim.connect import SmartConnect, Disconnect
 
-from common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
-from common.vcenter.vmomi_service import pyVmomiService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
-from common.logger import getLogger
+from vCenterShell.common.logger import getLogger
 _logger = getLogger(__name__)
 
 def getConnectDataContext():

@@ -1,9 +1,11 @@
 from unittest import TestCase
-from mock import Mock, MagicMock, create_autospec
 
+from mock import Mock, MagicMock, create_autospec
 from pyVmomi import vim
-from common.vcenter.vmomi_service import *
+
 from vCenterShell.network.vnic.vnic_service import VNicService
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+
 
 
 class TestNetwork(TestCase):

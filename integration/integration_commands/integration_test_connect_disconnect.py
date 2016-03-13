@@ -1,18 +1,19 @@
-import uuid
 from unittest import TestCase
-from mock import Mock, MagicMock
-from pyVmomi import vim
+
+from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
-from common.logger.service import LoggingService
-from common.utilites.debug import print_attributes
-from models.VCenterConnectionDetails import VCenterConnectionDetails
+from pyVmomi import vim
+
 from tests.utils.testing_credentials import TestCredentials
-from common.vcenter.task_waiter import SynchronousTaskWaiter
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
+from vCenterShell.common.logger.service import LoggingService
+from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
+from vCenterShell.models import VCenterConnectionDetails
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vnic.vnic_service import VNicService
 from vCenterShell.vm.portgroup_configurer import *
+from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
 
 

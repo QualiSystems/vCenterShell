@@ -1,7 +1,5 @@
-from common.vcenter.vm_location import VMLocation
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
-from models.VCenterDetails import VCenterDetails
+from vCenterShell.common.vcenter.vm_location import VMLocation
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
 class VCenterDetailsFactory(object):

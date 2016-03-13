@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# from models.named_entry import NamedEntry
+# from vCenterShell.models.named_entry import NamedEntry
 
-# from common.logger import getLogger
+# from vCenterShell.common.logger import getLogger
 
 ### NOT USED:
 # _logger = getLogger("vCenterCommon")

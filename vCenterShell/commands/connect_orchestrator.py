@@ -4,12 +4,12 @@ import uuid
 from multiprocessing.pool import ThreadPool
 
 import jsonpickle
+from vCenterShell.models.ActionResult import CustomActionResult
+from vCenterShell.models.DeployDataHolder import DeployDataHolder
 
-from common.vcenter.vm_location import VMLocation
-from models.ActionResult import ActionResult, CustomActionResult
-from models.DeployDataHolder import DeployDataHolder
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.combine_action import CombineAction
+from vCenterShell.common.vcenter.vm_location import VMLocation
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
 
 

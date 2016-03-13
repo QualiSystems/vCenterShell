@@ -1,4 +1,4 @@
-from models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from vCenterShell.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
 
 class DeployFromTemplateDetails(object):

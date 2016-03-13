@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from pyVmomi import vim
-from models.VirtualNicModel import VirtualNicModel
-from common.logger import getLogger
+
+from vCenterShell.common.logger import getLogger
+from vCenterShell.models.VirtualNicModel import VirtualNicModel
 
 _logger = getLogger("vCenterShell")
 

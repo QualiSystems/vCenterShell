@@ -1,14 +1,12 @@
 from unittest import TestCase
 
-from mock import Mock
+from vCenterShell.common.logger.service import LoggingService
 from pyVim.connect import SmartConnect, Disconnect
 
-from common.logger.service import LoggingService
-from common.vcenter import task_waiter
-from common.vcenter.vmomi_service import pyVmomiService
-from models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+from vCenterShell.common.vcenter import task_waiter
 
 
 class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):

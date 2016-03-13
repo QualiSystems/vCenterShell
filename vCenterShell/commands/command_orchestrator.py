@@ -1,22 +1,12 @@
+import time
 from logging import getLogger
 
 import jsonpickle
-import time
+from vCenterShell.models.DeployDataHolder import DeployDataHolder
+from vCenterShell.models.DriverResponse import DriverResponse, DriverResponseRoot
+from vCenterShell.models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
 from pyVim.connect import SmartConnect, Disconnect
 
-from common.cloud_shell.driver_helper import CloudshellDriverHelper
-from common.cloud_shell.resource_remover import CloudshellResourceRemover
-from common.model_factory import ResourceModelParser
-from common.utilites.command_result import set_command_result
-from common.utilites.common_name import generate_unique_name
-from common.vcenter.ovf_service import OvfImageDeployerService
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from common.vcenter.vmomi_service import pyVmomiService
-from common.wrappers.command_wrapper import CommandWrapper
-from models.DeployDataHolder import DeployDataHolder
-from models.DriverResponse import DriverResponse, DriverResponseRoot
-from models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
-from models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from vCenterShell.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from vCenterShell.commands.deploy_vm import DeployCommand
@@ -24,6 +14,16 @@ from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
 from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from vCenterShell.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from vCenterShell.commands.refresh_ip import RefreshIpCommand
+from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from vCenterShell.common.cloud_shell.resource_remover import CloudshellResourceRemover
+from vCenterShell.common.model_factory import ResourceModelParser
+from vCenterShell.common.utilites.common_name import generate_unique_name
+from vCenterShell.common.utilites.command_result import set_command_result
+from vCenterShell.common.vcenter.ovf_service import OvfImageDeployerService
+from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
+from vCenterShell.common.wrappers.command_wrapper import CommandWrapper
+from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory

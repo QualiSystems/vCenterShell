@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from pyVmomi import vim
-from common.vcenter.vmomi_service import pyVmomiService
+
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.network import *
+
 #from vCenterShell.vm import vm_reconfig_task
-from common.logger import getLogger
+from vCenterShell.common.logger import getLogger
 
 
 logger = getLogger("vCenterCommon")

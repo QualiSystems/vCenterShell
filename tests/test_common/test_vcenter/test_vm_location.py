@@ -1,5 +1,6 @@
 import unittest
-from common.vcenter.vm_location import VMLocation
+
+from vCenterShell.common.vcenter.vm_location import VMLocation
 
 
 class TestVmLocation(unittest.TestCase):

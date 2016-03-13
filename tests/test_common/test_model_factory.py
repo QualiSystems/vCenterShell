@@ -4,8 +4,9 @@ import xml.etree.ElementTree as ET
 from os import listdir
 from unittest import TestCase
 
-from common.model_factory import ResourceModelParser
-from common.logger.service import LoggingService
+from vCenterShell.common.logger.service import LoggingService
+
+from vCenterShell.common.model_factory import ResourceModelParser
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
@@ -26,7 +27,7 @@ class TestDataModel(TestCase):
             model_name = ResourceModelParser().get_resource_model_class_name(resource_model.attrib['Name'])
 
             try:
-                klass = ResourceModelParser().get_class('models.' + model_name)
+                klass = ResourceModelParser().get_class('vCenterShell.models.' + model_name)
             except ValueError as value_error:
                 validation_errors.append('Failed to parse Model Name {0} with error {1}.'.format(model_name, value_error.message))
                 continue
@@ -52,7 +53,7 @@ class TestDataModel(TestCase):
             for deployment_node in deployment_nodes:
                 resource_model_name = self.get_class_name_from_model_node(deployment_node)
                 try:
-                    klass = ResourceModelParser().get_class('models.' + resource_model_name)
+                    klass = ResourceModelParser().get_class('vCenterShell.models.' + resource_model_name)
                 except ValueError as value_error:
                     validation_errors.append(value_error.message)
                     continue

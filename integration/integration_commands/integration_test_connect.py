@@ -2,11 +2,11 @@ from unittest import TestCase
 
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from common.vcenter.vmomi_service import pyVmomiService
+
 from tests.utils.testing_credentials import TestCredentials
 from vCenterShell.commands.connect_dvswitch import VirtualSwitchConnectCommand
+from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
+from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
 from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from vCenterShell.network.vlan.factory import VlanSpecFactory

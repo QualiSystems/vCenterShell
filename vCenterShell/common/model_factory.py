@@ -77,7 +77,7 @@ class ResourceModelParser:
         resource_class_name = ResourceModelParser.get_resource_model_class_name(
                 resource_model)
         # print 'Family name is ' + resource_class_name
-        instance = ResourceModelParser.get_class('models.' + resource_class_name)
+        instance = ResourceModelParser.get_class('vCenterShell.models.' + resource_class_name)
         return instance
 
     @staticmethod
