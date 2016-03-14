@@ -13,7 +13,7 @@ class TestDataModel(TestCase):
 
     def test_resource_models(self):
         ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
-        datamodel_path = os.path.join(os.path.dirname(__file__), '../../../vCenterShellPackage/DataModel/datamodel.xml')
+        datamodel_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/DataModel/datamodel.xml')
         tree = ET.parse(datamodel_path)
         root = tree.getroot()
         resource_models = root.findall('.//default:ResourceModel', ns)
@@ -49,7 +49,7 @@ class TestDataModel(TestCase):
             for deployment_node in deployment_nodes:
                 resource_model_name = self.get_class_name_from_model_node(deployment_node)
                 try:
-                    klass = ResourceModelParser().get_class('vCenterShell.models.' + resource_model_name)
+                    klass = ResourceModelParser().get_class('cloudshell.cp.vcenter.models.' + resource_model_name)
                 except ValueError as value_error:
                     validation_errors.append(value_error.message)
                     continue
@@ -67,7 +67,7 @@ class TestDataModel(TestCase):
         self.assertSequenceEqual(validation_errors, [])
 
     def get_app_templates_xml_files(self):
-        app_templates_path = os.path.join(os.path.dirname(__file__), '../../../vCenterShellPackage/App Templates/')
+        app_templates_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/App Templates/')
         xml_files = [os.path.join(app_templates_path, f)
                      for f in listdir(app_templates_path)
                      if os.path.splitext(f)[1] == '.xml']

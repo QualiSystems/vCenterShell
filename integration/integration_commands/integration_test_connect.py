@@ -15,6 +15,7 @@ from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, Virtua
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from tests.utils.testing_credentials import TestCredentials
+from mock import Mock
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

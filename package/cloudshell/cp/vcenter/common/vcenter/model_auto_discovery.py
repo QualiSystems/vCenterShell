@@ -7,7 +7,7 @@ from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnect
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
-from cloudshell.cp.vcenter.common import pyVmomiService
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
 ADDRESS = 'address'
 USER = 'User'

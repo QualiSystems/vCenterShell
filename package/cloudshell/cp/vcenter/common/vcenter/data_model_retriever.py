@@ -1,4 +1,4 @@
-from cloudshell.cp.vcenter.models import VMwarevCenterResourceModel
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 
 class VCenterDataModelRetriever(object):
