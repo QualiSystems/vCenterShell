@@ -1,5 +1,5 @@
 from multiprocessing.pool import ThreadPool
-
+import cProfile, pstats, datetime
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
 
@@ -14,12 +14,25 @@ def get_vm_custom_param(vm_custom_params, param_name):
             return param
     return None
 
+### http://stackoverflow.com/questions/5375624/a-decorator-that-profiles-a-method-call-and-logs-the-profiling-result ###
+def profileit(name):
+    def inner(func):
+        def wrapper(*args, **kwargs):
+            prof = cProfile.Profile()
+            retval = prof.runcall(func, *args, **kwargs)
+            s = open(r"//qsnas1/shared/vcentershell_profiling/" + name + "_" + str(datetime.datetime.now()).replace(':', '_') + ".text", 'w')
+            stats = pstats.Stats(prof, stream=s)
+            stats.strip_dirs().sort_stats('cumtime').print_stats()
+            return retval
+        return wrapper
+    return inner
 
 class EnvironmentTeardown:
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup",reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Teardown",reservation_id=self.reservation_id)
 
+    @profileit("CloudShell_Sandbox_Teardown")
     def execute(self):
         api = helpers.get_api_session()
         reservation_details = api.GetReservationDetails(self.reservation_id)
