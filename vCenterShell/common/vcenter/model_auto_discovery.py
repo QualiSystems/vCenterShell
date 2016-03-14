@@ -19,13 +19,11 @@ DEFAULT_PORT_GROUP_LOCATION = 'Default Port Group Location'
 EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
 HOLDING_NETWORK = 'Holding Network'
 OVF_TOOL_PATH = 'OVF Tool Path'
-PROMISCUOUS_MODE = 'Promiscuous Mode'
 SHUTDOWN_METHOD = 'Shutdown Method'
 VM_CLUSTER = 'VM Cluster'
 VM_LOCATION = 'VM Location'
 VM_RESOURCE_POOL = 'VM Resource Pool'
 VM_STORAGE = 'VM Storage'
-PROMISCUOUS_MODES = ['Accept', 'Reject']
 SHUTDOWN_METHODS = ['soft', 'hard']
 
 
@@ -221,11 +219,6 @@ class VCenterAutoModelDiscovery(object):
 
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
-
-    def _validate_promiscuous_mode(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        mode = attributes[key]
-        if self._is_in_array(key, mode, PROMISCUOUS_MODES):
-            auto_att.append(AutoLoadAttribute('', key, mode))
 
     def _validate_shutdown_method(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         method = attributes[key]
