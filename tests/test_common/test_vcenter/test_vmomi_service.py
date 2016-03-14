@@ -77,6 +77,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -93,7 +95,6 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertTrue(vim_mock.vm.CloneSpec.called)
         self.assertTrue(pv_service.get_folder.called)
         self.assertTrue(pv_service.find_vm_by_name.called)
-        self.assertTrue(pv_service.get_obj.called)
         self.assertTrue(pv_service.wait_for_task.called)
 
     def test_clone_vm_resource_pool_is_not_empty(self):
@@ -119,6 +120,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -135,10 +138,9 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertTrue(vim_mock.vm.CloneSpec.called)
         self.assertTrue(pv_service.get_folder.called)
         self.assertTrue(pv_service.find_vm_by_name.called)
-        self.assertTrue(pv_service.get_obj.called)
         self.assertTrue(pv_service.wait_for_task.called)
 
-    def test_clone_vm_datastore_nmae_is_not_none(self):
+    def test_clone_vm_datastore_name_is_not_none(self):
         """
         Checks clone_vm
         """
@@ -161,6 +163,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -177,7 +181,6 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertTrue(vim_mock.vm.CloneSpec.called)
         self.assertTrue(pv_service.get_folder.called)
         self.assertTrue(pv_service.find_vm_by_name.called)
-        self.assertTrue(pv_service.get_obj.called)
         self.assertTrue(pv_service.wait_for_task.called)
 
     def test_clone_vm_destenation_folder_is_unsupported(self):
@@ -203,22 +206,20 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=folder)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder='my_folder')
 
-        '#act'
-        res = pv_service.clone_vm(params)
-
         '#assert'
-        self.assertIsNotNone(res.error)
+        self.assertRaises(ValueError, pv_service.clone_vm, params)
         self.assertTrue(pv_service.get_folder.called)
         self.assertFalse(vim_mock.vm.RelocateSpec.called)
         self.assertFalse(vim_mock.vm.CloneSpec.called)
         self.assertFalse(pv_service.find_vm_by_name.called)
-        self.assertFalse(pv_service.get_obj.called)
         self.assertFalse(pv_service.wait_for_task.called)
 
     def test_clone_vm_destenation_folder_is_folder_type(self):
@@ -244,6 +245,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=folder)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -259,10 +262,9 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertTrue(vim_mock.vm.CloneSpec.called)
         self.assertTrue(pv_service.get_folder.called)
         self.assertTrue(pv_service.find_vm_by_name.called)
-        self.assertTrue(pv_service.get_obj.called)
         self.assertTrue(pv_service.wait_for_task.called)
 
-    def test_clone_vm_datastore_nmae_is_none(self):
+    def test_clone_vm_datastore_name_is_none(self):
         """
         Checks clone_vm
         """
@@ -284,6 +286,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service.wait_for_task = Mock()
+        pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
+        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -299,7 +303,6 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         self.assertTrue(vim_mock.vm.CloneSpec.called)
         self.assertTrue(pv_service.get_folder.called)
         self.assertTrue(pv_service.find_vm_by_name.called)
-        self.assertTrue(pv_service.get_obj.called)
         self.assertTrue(pv_service.wait_for_task.called)
 
     def test_clone_vm_vm_folder_is_none(self):

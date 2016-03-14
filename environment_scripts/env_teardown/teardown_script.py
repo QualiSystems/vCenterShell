@@ -1,16 +1,24 @@
 from multiprocessing.pool import ThreadPool
 
 import cloudshell.api.cloudshell_scripts_helpers as helpers
-from vCenterShell.common.logger import getLogger
+from cloudshell.core.logger import qs_logger
 
-from vCenterShell.common.vcenter.vm_details import get_vm_custom_param
-
-logger = getLogger("CloudShell Sandbox Teardown")
+def get_vm_custom_param(vm_custom_params, param_name):
+    """
+    :param list[VmCustomParam] vm_custom_params:
+    :param param_name:
+    :return:
+    """
+    for param in vm_custom_params:
+        if param.Name == param_name:
+            return param
+    return None
 
 
 class EnvironmentTeardown:
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
+        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup",reservation_id=self.reservation_id)
 
     def execute(self):
         api = helpers.get_api_session()
@@ -19,7 +27,7 @@ class EnvironmentTeardown:
         self._disconnect_all_routes_in_reservation(api, reservation_details)
         self._power_off_all_vm_resources(api, reservation_details)
 
-        logger.info("Teardown for reservation {0} completed".format(self.reservation_id))
+        self.logger.info("Teardown for reservation {0} completed".format(self.reservation_id))
 
     def _disconnect_all_routes_in_reservation(self, api, reservation_details):
         connectors = reservation_details.ReservationDescription.Connectors
@@ -29,15 +37,15 @@ class EnvironmentTeardown:
             endpoints.append(endpoint.Source)
 
         if len(endpoints) == 0:
-            logger.info("No routes to disconnect for reservation {0}".format(self.reservation_id))
+            self.logger.info("No routes to disconnect for reservation {0}".format(self.reservation_id))
             return
 
-        logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
+        self.logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
 
         try:
             api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
         except Exception as exc:
-            logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
+            self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
                          .format(self.reservation_id, str(exc)))
 
     def _power_off_all_vm_resources(self, api, reservation_details):
@@ -68,7 +76,7 @@ class EnvironmentTeardown:
                 delete = auto_delete_param.Value
 
             if delete.lower() == "true":
-                logger.info("Executing 'Delete' on deployed app {0} in reservation {1}"
+                self.logger.info("Executing 'Delete' on deployed app {0} in reservation {1}"
                             .format(resource_name, self.reservation_id))
                 api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "remote_destroy_vm",
                                                     "remote_app_management")
@@ -79,14 +87,14 @@ class EnvironmentTeardown:
                     power_off = auto_power_off_param.Value
 
                 if power_off.lower() == "true":
-                    logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
+                    self.logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
                                 .format(resource_name, self.reservation_id))
                     api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
                 else:
-                    logger.info("Auto Power Off is disabled for deployed app {0} in reservation {1}"
+                    self.logger.info("Auto Power Off is disabled for deployed app {0} in reservation {1}"
                                 .format(resource_name, self.reservation_id))
             return True
         except Exception as exc:
-            logger.error("Error powering off deployed app {0} in reservation {1}. Error: {2}"
+            self.logger.error("Error powering off deployed app {0} in reservation {1}. Error: {2}"
                          .format(resource_name, self.reservation_id, str(exc)))
             return False
