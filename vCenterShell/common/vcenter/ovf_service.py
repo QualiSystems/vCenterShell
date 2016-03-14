@@ -1,5 +1,6 @@
+import os
 import subprocess
-
+from urllib2 import urlopen
 from vCenterShell.common.utilites.common_utils import fixurl
 from vCenterShell.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
@@ -89,6 +90,8 @@ class OvfImageDeployerService(object):
         ovf_destination = self._get_ovf_destenation(image_params)
 
         image_url = image_params.image_url
+        self._validate_image_exists(image_url)
+
         # set location and destination
         args += [image_url,
                  ovf_destination]
@@ -115,3 +118,16 @@ class OvfImageDeployerService(object):
         if str(param).find(' ') > -1:
             return '\"{0}\"'.format(param)
         return param
+
+    @staticmethod
+    def _validate_image_exists(image_url):
+        try:
+            f = urlopen(image_url)
+            if f:
+                return True
+        except Exception:  # invalid URL
+            exists = os.path.exists(image_url) and os.path.isfile(image_url)
+            if exists:
+                return True
+
+        raise ValueError('Image cannot be open at: "{0}"'.format(image_url))
