@@ -24,7 +24,6 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
 			<Attribute Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
 			<Attribute Name="Execution Server Selector" Value="" />
 			<Attribute Name="Reserved Networks" Value="" />
-			<Attribute Name="Promiscuous Mode" Value="" />
         </Attributes>
     </ResourceTemplate>
 </ResourceTemplates>

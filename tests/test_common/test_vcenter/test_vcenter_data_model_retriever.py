@@ -28,7 +28,6 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'shutdown_method': '',
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
-                                   'promiscuous_mode': '',
                                    'reserved_networks': '',
                                    'default_datacenter': ''}
 
@@ -59,7 +58,6 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'shutdown_method': '',
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
-                                   'promiscuous_mode': '',
                                    'reserved_networks': '',
                                    'default_datacenter': ''}
 

@@ -22,7 +22,6 @@ class TestCommandOrchestrator(TestCase):
                                             'Shutdown Method': 'hard',
                                             'OVF Tool Path': 'C\\program files\ovf',
                                             'Execution Server Selector': '',
-                                            'Promiscuous Mode': 'True',
                                             'Reserved Networks': 'vlan65',
                                             'Default Datacenter': 'QualiSB'}
         self.context = Mock()
