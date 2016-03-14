@@ -22,8 +22,6 @@ class VCenterDetailsFactory(object):
             raise ValueError('VM Cluster is empty')
         if not deploy_params.vm_storage:
             raise ValueError('VM Storage is empty')
-        if not deploy_params.vm_resource_pool:
-            raise ValueError('VM Resource Pool is empty')
         if not deploy_params.vm_location:
             raise ValueError('VM Location is empty')
         if not deploy_params.default_datacenter:

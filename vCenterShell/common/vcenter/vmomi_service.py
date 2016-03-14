@@ -386,43 +386,23 @@ class pyVmomiService:
             result.error = 'vm_folder param cannot be None'
             return result
 
-        managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
-        if isinstance(managed_object, self.vim.Datacenter):
-            dest_folder = managed_object.vmFolder
-        elif isinstance(managed_object, self.vim.Folder):
-            dest_folder = managed_object
-        else:
-            result.error = 'Failed to find folder: {0}'.format(clone_params.vm_folder)
-            return result
+        dest_folder = self._get_destination_folder(clone_params)
 
         vm_location = VMLocation.create_from_full_path(clone_params.template_name)
 
-        template = self.find_vm_by_name(clone_params.si, vm_location.path, vm_location.name)
+        template = self._get_template(clone_params, vm_location)
 
-        if not template:
-            raise ValueError('Virtual Machine Template with name {0} was not found under folder {1}'
-                             .format(vm_location.name, vm_location.path))
+        datastore = self._get_datastore(clone_params)
 
-        if clone_params.datastore_name is None:
-            datastore = template.datastore[0]
-        else:
-            datastore = self.get_obj(clone_params.si.content, [self.vim.Datastore], clone_params.datastore_name)
-
-        if clone_params.resource_pool:
-            resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
-        else:
-            '# if None, get the first one'
-            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
-                                   clone_params.cluster_name)
-            resource_pool = cluster.resourcePool
+        resource_pool = self._get_resource_pool(clone_params)
 
         '# set relo_spec'
-        relo_spec = self.vim.vm.RelocateSpec()
-        relo_spec.datastore = datastore
-        relo_spec.pool = resource_pool
+        placement = self.vim.vm.RelocateSpec()
+        placement.datastore = datastore
+        placement.pool = resource_pool
 
         clone_spec = self.vim.vm.CloneSpec()
-        clone_spec.location = relo_spec
+        clone_spec.location = placement
         clone_spec.powerOn = clone_params.power_on
 
         logger.info("cloning VM...")
@@ -431,6 +411,57 @@ class pyVmomiService:
         vm = self.wait_for_task(task)
         result.vm = vm
         return result
+
+    def _get_destination_folder(self, clone_params):
+        managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
+        dest_folder = ''
+        if isinstance(managed_object, self.vim.Datacenter):
+            dest_folder = managed_object.vmFolder
+        elif isinstance(managed_object, self.vim.Folder):
+            dest_folder = managed_object
+        if not dest_folder:
+            raise ValueError('Failed to find folder: {0}'.format(clone_params.vm_folder))
+        return dest_folder
+
+    def _get_template(self, clone_params, vm_location):
+        template = self.find_vm_by_name(clone_params.si, vm_location.path, vm_location.name)
+        if not template:
+            raise ValueError('Virtual Machine Template with name {0} was not found under folder {1}'
+                             .format(vm_location.name, vm_location.path))
+        return template
+
+    def _get_datastore(self, clone_params):
+        datastore = ''
+        if clone_params.datastore_name:
+            datastore = self.get_obj(clone_params.si.content,
+                                     [self.vim.Datastore],
+                                     clone_params.datastore_name)
+        if not datastore:
+            datastore = self.get_obj(clone_params.si.content,
+                                     [self.vim.StoragePod],
+                                     clone_params.datastore_name)
+            if datastore:
+                datastore = sorted(datastore.childEntity,
+                                   key=lambda data: data.summary.freeSpace,
+                                   reverse=True)[0]
+
+        if not datastore:
+            raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
+        return datastore
+
+    def _get_resource_pool(self, clone_params):
+        resource_pool = ''
+        if clone_params.resource_pool:
+            resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
+        if resource_pool:
+            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
+                                   clone_params.cluster_name)
+            resource_pool = cluster.resourcePool
+        if not resource_pool:
+            raise ValueError('Could not find Cluster or Resource Pool by the names: "{0}", "{1}"'.
+                             format(clone_params.cluster_name,
+                                    clone_params.resource_pool))
+        return resource_pool
 
     def destroy_vm(self, vm):
         """ 
