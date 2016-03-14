@@ -16,11 +16,11 @@
             <Attribute Name="Auto Power Off" Value="True" />
             <Attribute Name="Auto Power On" Value="True" />
             <Attribute Name="Wait for IP" Value="True" />
-            <Attribute Name="VM Cluster" Value="QualiSB/QualiSB Cluster" />
-            <Attribute Name="VM Location" Value="Alex" />
-            <Attribute Name="VM Storage" Value="aa" />
-            <Attribute Name="VM Resource Pool" Value="LiverPool" />
-            <Attribute Name="vCenter Image" Value="" />
+            <Attribute Name="VM Cluster" Value="" />
+            <Attribute Name="VM Location" Value="" />
+            <Attribute Name="VM Storage" Value="" />
+            <Attribute Name="VM Resource Pool" Value="" />
+            <Attribute Name="vCenter Image" Value="The/url/to/the/template" />
             <Attribute Name="vCenter Name" Value="VMware vCenter" />
             <Attribute Name="vCenter Image Arguments" Value="" />
           </Attributes>
