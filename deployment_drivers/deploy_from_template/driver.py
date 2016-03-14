@@ -1,10 +1,10 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
-from vCenterShell.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
-from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
-from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class DeployFromTemplateDriver(object):

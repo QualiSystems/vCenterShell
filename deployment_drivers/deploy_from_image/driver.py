@@ -1,10 +1,10 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
-from vCenterShell.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
+from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
+from cloudshell.cp.vcenter.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
 
-from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
-from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.models.DeployDataHolder import DeployDataHolder
+from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class DeployFromImage(object):

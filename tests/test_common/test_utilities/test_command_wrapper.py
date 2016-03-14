@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from vCenterShell.common.wrappers.command_wrapper import CommandWrapper
+from cloudshell.cp.vcenter.common.wrappers.command_wrapper import CommandWrapper
 
 
 class TestCommandWrapper(TestCase):

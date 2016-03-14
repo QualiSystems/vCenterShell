@@ -180,12 +180,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Promiscuous Mode" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created. Should be under the defined VM Cluster." IsReadOnly="false" Name="VM Resource Pool" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -254,9 +248,6 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" ImagePath="vCenter_Model.png" Name="VMware vCenter" SupportsConcurrentCommands="true">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="User">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -264,6 +255,9 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Holding Network">
@@ -276,9 +270,6 @@
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Port Group Location">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster">
@@ -299,11 +290,8 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="OVF Tool Path">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Promiscuous Mode">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Accept</ns0:AllowedValue>
-                <ns0:AllowedValue>Reject</ns0:AllowedValue>
-              </ns0:AllowedValues>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
+              <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
@@ -320,7 +308,6 @@
             <ns0:AttributeValue Name="Shutdown Method" Value="hard" />
             <ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
             <ns0:AttributeValue Name="Execution Server Selector" Value="" />
-            <ns0:AttributeValue Name="Promiscuous Mode" Value="Accept" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>

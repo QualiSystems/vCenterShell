@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from vCenterShell.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from cloudshell.cp.vcenter.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
 
 
 class TestConnectionDetailRetriever(TestCase):

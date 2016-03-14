@@ -1,6 +1,6 @@
 import unittest
 
-from vCenterShell.common.utilites.common_utils import get_object_as_string, str2bool
+from cloudshell.cp.vcenter.common.utilites.common_utils import get_object_as_string, str2bool
 
 
 class TestCommonUtils(unittest.TestCase):

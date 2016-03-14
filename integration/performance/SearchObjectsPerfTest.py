@@ -2,13 +2,13 @@ import ConfigParser
 import os
 from unittest import TestCase
 
-from vCenterShell.common.logger import getLogger
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 from PerfMethodWrapper import PerfMethodWrapper
+from cloudshell.cp.vcenter.common.logger import getLogger
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
 # consts
 START = 'START'

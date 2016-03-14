@@ -5,8 +5,8 @@ vCenter Shell Starter
 import os
 
 from demo import DevBootstrapper
-#from vCenterShell.demo.dev_bootstrapper import attachAndGetResourceContext
-from vCenterShell.common.logger.service import LoggingService
+#from cloudshell.cp.vcenter.demo.dev_bootstrapper import attachAndGetResourceContext
+from cloudshell.cp.vcenter.common import LoggingService
 
 
 INITIAL_LOG_LEVEL = os.environ.get("LOG_LEVEL") or "DEBUG"

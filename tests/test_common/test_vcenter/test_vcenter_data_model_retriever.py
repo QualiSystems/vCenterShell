@@ -1,10 +1,10 @@
 import unittest
 
 from mock import Mock, create_autospec
+from cloudshell.cp.vcenter.models.QualiDriverModels import ResourceContextDetails
 
-from vCenterShell.common.model_factory import ResourceModelParser
-from vCenterShell.common.vcenter.data_model_retriever import VCenterDataModelRetriever
-from vCenterShell.models.QualiDriverModels import ResourceContextDetails
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
+from cloudshell.cp.vcenter.common.vcenter.data_model_retriever import VCenterDataModelRetriever
 
 
 class TestVCenterDataModelRetriever(unittest.TestCase):
@@ -28,7 +28,6 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'shutdown_method': '',
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
-                                   'promiscuous_mode': '',
                                    'reserved_networks': '',
                                    'default_datacenter': ''}
 
@@ -59,7 +58,6 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'shutdown_method': '',
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
-                                   'promiscuous_mode': '',
                                    'reserved_networks': '',
                                    'default_datacenter': ''}
 

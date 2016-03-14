@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from mock import Mock
 
-from vCenterShell.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 
 
 class TestDriverHelper(TestCase):

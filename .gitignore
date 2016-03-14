@@ -73,7 +73,6 @@ vCenterShellPackage/Topology Scripts/*.*
 debug.txt
 tests/utils/config.ini
 vCenterShellPackage/Resource Drivers - Python/VCenter Shell Driver.zip
-vCenterShellPackage/Resource Drivers - Python/VCenter Shell Driver.zip
 
 #IDE Helpers
 deployment.xml

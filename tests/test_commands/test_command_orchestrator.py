@@ -1,8 +1,9 @@
 from unittest import TestCase
 
 from cloudshell.api.cloudshell_api import ResourceInfo
-from mock import patch, Mock, create_autospec
-from vCenterShell.commands.command_orchestrator import CommandOrchestrator
+from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
+from mock import Mock, create_autospec
+
 
 
 class TestCommandOrchestrator(TestCase):
@@ -21,7 +22,6 @@ class TestCommandOrchestrator(TestCase):
                                             'Shutdown Method': 'hard',
                                             'OVF Tool Path': 'C\\program files\ovf',
                                             'Execution Server Selector': '',
-                                            'Promiscuous Mode': 'True',
                                             'Reserved Networks': 'vlan65',
                                             'Default Datacenter': 'QualiSB'
                                             }
