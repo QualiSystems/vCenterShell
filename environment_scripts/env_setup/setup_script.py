@@ -28,8 +28,8 @@ def profileit(name):
         performance = 'performance' in helpers.get_global_inputs()
         reservation_id = helpers.get_reservation_context_details().id
         def wrapper(*args, **kwargs):
-            if not performance and not reservation_id:
-                raise Exception('Missing critical data for profile it')
+            if not performance or not reservation_id:
+                return func(*args, **kwargs)
             prof = cProfile.Profile()
             retval = prof.runcall(func, *args, **kwargs)
             s = open(r"//qsnas1/shared/vcentershell_profiling/" + name + "_" + reservation_id + ".text", 'w')
