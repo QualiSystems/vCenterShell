@@ -397,12 +397,12 @@ class pyVmomiService:
         resource_pool = self._get_resource_pool(clone_params)
 
         '# set relo_spec'
-        relo_spec = self.vim.vm.RelocateSpec()
-        relo_spec.datastore = datastore
-        relo_spec.pool = resource_pool
+        placement = self.vim.vm.RelocateSpec()
+        placement.datastore = datastore
+        placement.pool = resource_pool
 
         clone_spec = self.vim.vm.CloneSpec()
-        clone_spec.location = relo_spec
+        clone_spec.location = placement
         clone_spec.powerOn = clone_params.power_on
 
         logger.info("cloning VM...")
@@ -433,7 +433,18 @@ class pyVmomiService:
     def _get_datastore(self, clone_params):
         datastore = ''
         if clone_params.datastore_name:
-            datastore = self.get_obj(clone_params.si.content, [self.vim.Datastore], clone_params.datastore_name)
+            datastore = self.get_obj(clone_params.si.content,
+                                     [self.vim.Datastore],
+                                     clone_params.datastore_name)
+        if not datastore:
+            datastore = self.get_obj(clone_params.si.content,
+                                     [self.vim.StoragePod],
+                                     clone_params.datastore_name)
+            if datastore:
+                datastore = sorted(datastore.childEntity,
+                                   key=lambda data: data.summary.freeSpace,
+                                   reverse=True)[0]
+
         if not datastore:
             raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
         return datastore
