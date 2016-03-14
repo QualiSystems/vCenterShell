@@ -1,2 +1,2 @@
 cloudshell-shell-core
-cloudshell-cp-vcenter
+cloudshell-cp-vcenter>=1.0.0
