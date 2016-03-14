@@ -1,4 +1,4 @@
-from cloudshell.cp.vcenter.models import vCenterVMFromTemplateResourceModel
+from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
 
 class DeployFromTemplateDetails(object):

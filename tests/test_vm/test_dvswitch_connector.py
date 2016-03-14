@@ -6,7 +6,7 @@ from pyVmomi import vim
 from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.cp.vcenter.models import VCenterConnectionDetails
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.dvswitch_connector import *
 from cloudshell.cp.vcenter.vm.portgroup_configurer import *
