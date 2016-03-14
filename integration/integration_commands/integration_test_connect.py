@@ -2,18 +2,18 @@ from unittest import TestCase
 
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from cloudshell.cp.vcenter.network.vlan.factory import VlanSpecFactory
 from cloudshell.cp.vcenter.network.vlan.range_parser import VLanIdRangeParser
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
-
-from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
-from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from tests.utils.testing_credentials import TestCredentials
 
 
@@ -25,10 +25,12 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         synchronous_task_waiter = SynchronousTaskWaiter()
         mapper = VnicToNetworkMapper(DvPortGroupNameGenerator())
         dv_port_group_creator = DvPortGroupCreator(py_vmomi_service, synchronous_task_waiter)
+        port_group_name_generator = DvPortGroupNameGenerator()
         virtual_machine_port_group_configurer = VirtualMachinePortGroupConfigurer(py_vmomi_service,
                                                                                   synchronous_task_waiter,
                                                                                   mapper,
-                                                                                  VNicService())
+                                                                                  VNicService(),
+                                                                                  port_group_name_generator)
 
         mapping = VmNetworkMapping()
         mapping.vlan_id = [vim.NumericRange(start=65, end=65)]

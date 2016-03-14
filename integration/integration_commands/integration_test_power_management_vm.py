@@ -1,11 +1,11 @@
 from unittest import TestCase
 
 from pyVim.connect import SmartConnect, Disconnect
-from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
+from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.common.logger.service import LoggingService
-from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import task_waiter
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
 
 

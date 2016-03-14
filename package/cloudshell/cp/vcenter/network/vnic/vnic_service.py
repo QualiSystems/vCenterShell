@@ -6,7 +6,7 @@ from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.network import *
 #from cloudshell.cp.vcenter.vm import vm_reconfig_task
 from cloudshell.cp.vcenter.common.logger import getLogger
-
+from cloudshell.cp.vcenter.network.network_specifications import network_is_standard, network_is_portgroup
 
 logger = getLogger("vCenterCommon")
 

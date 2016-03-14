@@ -2,13 +2,13 @@ from unittest import TestCase
 
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
+
+from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 from cloudshell.cp.vcenter.common.utilites.common_name import generate_unique_name
 from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerService
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
-
-from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 from tests.utils.testing_credentials import TestCredentials
 
 

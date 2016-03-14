@@ -1,9 +1,9 @@
 from unittest import TestCase
 
 from cloudshell.api.cloudshell_api import ResourceInfo
+from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 from mock import Mock, create_autospec
 
-from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 
 
 class TestCommandOrchestrator(TestCase):

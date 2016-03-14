@@ -1,4 +1,4 @@
-from cloudshell.cp.vcenter.models import VCenterConnectionDetails
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
 class ResourceConnectionDetailsRetriever:

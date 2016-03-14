@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from mock import Mock
 from pyVmomi import vim
 
