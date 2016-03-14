@@ -28,6 +28,9 @@ class DeployFromTemplateDriver(object):
             self.resource_model_parser.convert_to_resource_model(context.resource,
                                                                  vCenterVMFromTemplateResourceModel)
 
+        if not Name:
+            Name=jsonpickle.decode(context.resource.app_context.app_request_json)['name']
+
         deploy_from_template_details = DeployFromTemplateDetails(vcenter_template_resource_model, Name)
 
         params = [InputNameValue('deploy_data', jsonpickle.encode(deploy_from_template_details, unpicklable=False))]

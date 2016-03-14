@@ -100,6 +100,7 @@ class ConnectionCommandOrchestrator(object):
                         results.append(result)
 
                 except Exception as ex:
+                    # todo: write exception stacktrace to log
                     error_result = self._create_failure_result(action, ex)
                     results.append(error_result)
 
@@ -210,7 +211,7 @@ class ConnectionCommandOrchestrator(object):
 
     @staticmethod
     def _get_error_message_from_exception(ex):
-        error_message = traceback.format_exc()
+        error_message = ''  # traceback.format_exc()
         if hasattr(ex, 'message'):
             error_message += ex.message
         elif hasattr(ex, 'msg'):
