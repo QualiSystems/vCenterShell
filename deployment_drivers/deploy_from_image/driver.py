@@ -31,6 +31,9 @@ class DeployFromImage(object):
 
         vcenter_res = vcenter_image_resource_model.vcenter_name
 
+        if not Name:
+            Name=jsonpickle.decode(context.resource.app_context.app_request_json)['name']
+
         deployment_info = self._get_deployment_info(vcenter_image_resource_model, Name)
         result = session.ExecuteCommand(context.reservation.reservation_id,
                                         vcenter_res,
