@@ -1,3 +1,5 @@
+class Test(object):
+    pass
 
 class ActionResult(object):
 

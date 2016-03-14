@@ -9,7 +9,7 @@ install:
     - pip install coveralls
 
 script:
-    nosetests --with-coverage  --cover-package=package,common,models --exclude-dir=integration
+    python runtests.py --with-coverage  --cover-package=package,common,models --exclude-dir=integration
 
 after_success:
     coveralls
