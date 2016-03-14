@@ -21,12 +21,18 @@ def get_vm_custom_param(vm_custom_params, param_name):
 ### util methods to help us benchmark the application ###
 
 ### http://stackoverflow.com/questions/5375624/a-decorator-that-profiles-a-method-call-and-logs-the-profiling-result ###
+### todo: make what arguments passes more explicit; find better way to say runProfiler or not ###
 def profileit(name):
     def inner(func):
+        import cloudshell.api.cloudshell_scripts_helpers as helpers
+        performance = 'performance' in helpers.get_global_inputs()
+        reservation_id = helpers.get_reservation_context_details().id
         def wrapper(*args, **kwargs):
+            if not performance and not reservation_id:
+                raise Exception('Missing critical data for profile it')
             prof = cProfile.Profile()
             retval = prof.runcall(func, *args, **kwargs)
-            s = open(r"//qsnas1/shared/vcentershell_profiling/" + name + "_" + str(datetime.datetime.now()).replace(':', '_') + ".text", 'w')
+            s = open(r"//qsnas1/shared/vcentershell_profiling/" + name + "_" + reservation_id + ".text", 'w')
             stats = pstats.Stats(prof, stream=s)
             stats.strip_dirs().sort_stats('cumtime').print_stats()
             return retval
