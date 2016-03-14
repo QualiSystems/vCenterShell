@@ -1,4 +1,4 @@
-﻿from cloudshell.cp.vcenter.models import DeployFromTemplateDetails
+﻿from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
 class DeployCommand(object):
     """ Command to Create a VM from a template """

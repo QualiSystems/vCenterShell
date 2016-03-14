@@ -1,6 +1,6 @@
 import inspect
 
-from cloudshell.cp.vcenter.models import VMwarevCenterResourceModel
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
 COMMAND_ERROR = 'error has occurred while executing command: {0}'
