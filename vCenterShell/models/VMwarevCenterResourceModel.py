@@ -11,6 +11,6 @@ class VMwarevCenterResourceModel(object):
         self.vm_location = ''
         self.shutdown_method = ''
         self.ovf_tool_path = ''
-        self.execution_server_selector = ''
+        self.execution_server_selector = '' 
         self.reserved_networks = ''
         self.default_datacenter = ''
