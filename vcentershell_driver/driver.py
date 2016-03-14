@@ -1,5 +1,6 @@
-from vCenterShell.commands.command_orchestrator import CommandOrchestrator
-from vCenterShell.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
+from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
+
+from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 
 
 class VCenterShellDriver:

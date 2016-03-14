@@ -2,9 +2,9 @@ import unittest
 import urllib
 
 from mock import Mock, patch
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 
-from vCenterShell.common.vcenter.ovf_service import OvfImageDeployerService
-from vCenterShell.models.VCenterConnectionDetails import VCenterConnectionDetails
+from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerService
 
 PROCESS = Mock()
 

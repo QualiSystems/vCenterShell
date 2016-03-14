@@ -3,11 +3,11 @@ from unittest import TestCase
 from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 
+from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 from tests.utils import helpers
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.commands.refresh_ip import RefreshIpCommand
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
-from vCenterShell.models import VCenterConnectionDetails
 
 
 class TestRefreshIpCommand(TestCase):

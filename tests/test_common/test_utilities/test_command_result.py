@@ -1,10 +1,11 @@
 from unittest import TestCase
 
-from vCenterShell.models.ActionResult import ActionResult
-from vCenterShell.models.ConnectionResult import ConnectionResult
+from cloudshell.cp.vcenter.models.ActionResult import Test
+from cloudshell.cp.vcenter.models.ActionResult import ActionResult
+from cloudshell.cp.vcenter.models.ConnectionResult import ConnectionResult
+from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
 
-from vCenterShell.common.utilites.command_result import get_result_from_command_output, set_command_result
-from vCenterShell.models.DriverResponse import DriverResponse, DriverResponseRoot
+from cloudshell.cp.vcenter.common.utilites.command_result import get_result_from_command_output, set_command_result
 
 
 class TestCommandResult(TestCase):
@@ -37,7 +38,7 @@ class TestCommandResult(TestCase):
         self.assertEqual(results[0]['network_key'], 'DD')
 
     def test_get_result_from_command_output_with_result(self):
-        output_result = 'command_json_result=[{"py/object": "vCenterShell.models.ConnectionResult.ConnectionResult", "vm_uuid": "422258ab-47e9-d57c-3741-6832a432bc3a", "network_name": "QualiSB/anetwork", "mac_address": "00:50:56:a2:23:76"}]=command_json_result_end'
+        output_result = 'command_json_result=[{"py/object": "cloudshell.cp.vcenter.models.ConnectionResult.ConnectionResult", "vm_uuid": "422258ab-47e9-d57c-3741-6832a432bc3a", "network_name": "QualiSB/anetwork", "mac_address": "00:50:56:a2:23:76"}]=command_json_result_end'
         results = get_result_from_command_output(output_result)
 
         self.assertEqual(results[0].mac_address, '00:50:56:a2:23:76')

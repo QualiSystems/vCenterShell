@@ -3,12 +3,10 @@ import sys
 import unittest
 
 from mock import Mock
-from vCenterShell.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 
-from vCenterShell.commands.deploy_vm import DeployCommand
-from vCenterShell.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
+from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 
 
 class TestDeployFromTemplateCommand(unittest.TestCase):

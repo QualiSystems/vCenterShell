@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from mock import Mock, create_autospec
 from pyVmomi import vim
-from vCenterShell.network.dvswitch.creator import DvPortGroupCreator
+
+from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
 
 
 class TestDvPortGroupCreator(TestCase):

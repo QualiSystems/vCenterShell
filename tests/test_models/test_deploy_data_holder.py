@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import jsonpickle
 
-from vCenterShell.models.DeployDataHolder import DeployDataHolder
+from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 
 
 class TestDeployDataHolder(TestCase):

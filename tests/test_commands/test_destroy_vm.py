@@ -1,6 +1,4 @@
-from cloudshell.api.cloudshell_api import ReservationDescriptionInfo, GetReservationDescriptionResponseInfo
-
-from vCenterShell.commands.destroy_vm import DestroyVirtualMachineCommand
+from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
 
 __author__ = 'shms'
 
@@ -9,8 +7,6 @@ import sys
 import unittest
 from mock import Mock, create_autospec
 from pyVmomi import vim
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell/vCenterShell'))
 
 
 class test_destroyVirtualMachineCommand(unittest.TestCase):

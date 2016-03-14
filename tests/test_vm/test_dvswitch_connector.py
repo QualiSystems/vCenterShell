@@ -3,18 +3,17 @@ from unittest import TestCase
 from mock import Mock, MagicMock
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+from cloudshell.cp.vcenter.common.logger.service import LoggingService
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
+from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
+from cloudshell.cp.vcenter.vm.dvswitch_connector import *
+from cloudshell.cp.vcenter.vm.portgroup_configurer import *
+from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.common.logger.service import LoggingService
-from vCenterShell.common.vcenter.task_waiter import SynchronousTaskWaiter
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
-from vCenterShell.models import VCenterConnectionDetails
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.vm.dvswitch_connector import *
-from vCenterShell.vm.portgroup_configurer import *
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
-
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):

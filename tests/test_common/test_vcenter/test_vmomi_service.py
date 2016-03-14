@@ -3,17 +3,15 @@ import sys
 import unittest
 from datetime import datetime
 
-from vCenterShell.common.logger.service import LoggingService
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
+from cloudshell.cp.vcenter.common.logger.service import LoggingService
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from tests.utils.testing_credentials import TestCredentials
-from vCenterShell.common.vcenter.vmomi_service import pyVmomiService
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../vCenterShell'))
-
-from vCenterShell.common.logger import getLogger
+from cloudshell.cp.vcenter.common.logger import getLogger
 
 logger = getLogger(__name__)
 

@@ -1,9 +1,10 @@
 from unittest import TestCase
+
+from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from mock import Mock
 from pyVmomi import vim
 
-from vCenterShell.vm.dvswitch_connector import ConnectRequest
-from vCenterShell.vm.portgroup_configurer import *
+from cloudshell.cp.vcenter.vm.dvswitch_connector import ConnectRequest
 
 
 class TestDvPortGroupConfigurer(TestCase):
