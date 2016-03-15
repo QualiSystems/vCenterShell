@@ -8,8 +8,8 @@ from cloudshell.cp.vcenter.commands.combine_action import CombineAction
 from cloudshell.cp.vcenter.models.ActionResult import CustomActionResult
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
-
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
+from cloudshell.cp.vcenter.common.utilites.common_utils import get_error_message_from_exception
 
 
 class ConnectionCommandOrchestrator(object):
@@ -203,22 +203,10 @@ class ConnectionCommandOrchestrator(object):
         error_result.actionId = str(action.actionId)
         error_result.type = str(action.type)
         error_result.infoMessage = str('')
-        error_result.errorMessage = ConnectionCommandOrchestrator._get_error_message_from_exception(ex)
+        error_result.errorMessage = get_error_message_from_exception(ex)
         error_result.success = False
         error_result.updatedInterface = None
         return error_result
-
-    @staticmethod
-    def _get_error_message_from_exception(ex):
-        error_message = ''  # traceback.format_exc()
-        if hasattr(ex, 'message'):
-            error_message += ex.message
-        elif hasattr(ex, 'msg'):
-            error_message += ex.msg
-        if hasattr(ex, 'faultMessage'):
-            if hasattr(ex.faultMessage, 'message'):
-                error_message += '. ' + ex.faultMessage.message
-        return error_message
 
     @staticmethod
     def _get_vm_uuid(action):
