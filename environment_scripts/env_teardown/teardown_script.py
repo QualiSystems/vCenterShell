@@ -1,7 +1,8 @@
 from multiprocessing.pool import ThreadPool
-import cProfile, pstats, os
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
+from environment_scripts.profiler.env_profiler import profileit
+from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
 
 class EnvironmentTeardown:
     def __init__(self):
@@ -87,33 +88,3 @@ class EnvironmentTeardown:
             self.logger.error("Error powering off deployed app {0} in reservation {1}. Error: {2}"
                          .format(resource_name, self.reservation_id, str(exc)))
             return False
-
-
-def get_vm_custom_param(vm_custom_params, param_name):
-    """
-    :param list[VmCustomParam] vm_custom_params:
-    :param param_name:
-    :return:
-    """
-    for param in vm_custom_params:
-        if param.Name == param_name:
-            return param
-    return None
-
-### http://stackoverflow.com/questions/5375624/a-decorator-that-profiles-a-method-call-and-logs-the-profiling-result ###
-def profileit(scriptName):
-    def inner(func):
-        import cloudshell.api.cloudshell_scripts_helpers as helpers
-        profiling = helpers.get_global_inputs().get('quali_profiling')
-        environment_name = helpers.get_reservation_context_details().environment_name
-        def wrapper(*args, **kwargs):
-            if not profiling:
-                return func(*args, **kwargs)
-            prof = cProfile.Profile()
-            retval = prof.runcall(func, *args, **kwargs)
-            s = open(os.path.join(profiling, scriptName + "_" + environment_name + ".text"), 'w')
-            stats = pstats.Stats(prof, stream=s)
-            stats.strip_dirs().sort_stats('cumtime').print_stats()
-            return retval
-        return wrapper
-    return inner
