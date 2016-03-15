@@ -1,8 +1,8 @@
 import os
 from unittest import TestCase
 
-import qualipy.scripts.cloudshell_dev_helpers as dev_helpers
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import cloudshell.api.cloudshell_dev_helpers as dev_helpers
+import cloudshell.api.cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
