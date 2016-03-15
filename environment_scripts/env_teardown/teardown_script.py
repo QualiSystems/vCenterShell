@@ -1,25 +1,15 @@
 from multiprocessing.pool import ThreadPool
-
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
-
-def get_vm_custom_param(vm_custom_params, param_name):
-    """
-    :param list[VmCustomParam] vm_custom_params:
-    :param param_name:
-    :return:
-    """
-    for param in vm_custom_params:
-        if param.Name == param_name:
-            return param
-    return None
-
+from environment_scripts.profiler.env_profiler import profileit
+from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
 
 class EnvironmentTeardown:
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup",reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Teardown",reservation_id=self.reservation_id)
 
+    @profileit(scriptName="Teardown")
     def execute(self):
         api = helpers.get_api_session()
         reservation_details = api.GetReservationDetails(self.reservation_id)
