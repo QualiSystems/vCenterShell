@@ -5,7 +5,6 @@ python:
 install:
     - pip install -r package/requirements.txt
     - pip install -r test_requirements.txt
-    - pip install 3rdParty/qualipy-1.0.790.zip
     - pip install coveralls
 
 script:

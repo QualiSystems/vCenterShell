@@ -1,4 +1,4 @@
-import qualipy.scripts.cloudshell_scripts_helpers as helpers
+import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import InputNameValue, AttributeNameValue
 from cloudshell.cp.vcenter.common.cloud_shell.resource_helper import get_attribute
 from cloudshell.cp.vcenter.common.logger.service import getLogger
