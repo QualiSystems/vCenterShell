@@ -4,10 +4,6 @@ The most common network/Distributed Virtual Switch staff
 
 from pyVmomi import vim
 
-from cloudshell.cp.vcenter.common.logger import getLogger
-_logger = getLogger("vCenterCommon")
-
-
 def network_is_standard(network):
     return isinstance(network, vim.Network) or (network and str(network).startswith("vim.Network:"))
 

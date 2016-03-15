@@ -1,4 +1,4 @@
-import jsonpickle
+import json
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.api.common_cloudshell_api import CloudShellAPIError
 from cloudshell.core.logger.qs_logger import get_qs_logger
@@ -24,7 +24,7 @@ class DeployAppOrchestrationDriver(object):
         reservation_id = context.reservation.reservation_id
         resource_details = context.resource
         app_name = resource_details.name
-        app_data = jsonpickle.decode(resource_details.app_context.app_request_json)
+        app_data = json.loads(resource_details.app_context.app_request_json)
         deployment_service = app_data["deploymentService"]["name"]
         installation_service_data = app_data["installationService"]
 
