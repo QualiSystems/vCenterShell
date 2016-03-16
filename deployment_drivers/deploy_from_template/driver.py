@@ -5,12 +5,19 @@ from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCen
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
+from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 
 
-class DeployFromTemplateDriver(object):
+class DeployFromTemplateDriver(ResourceDriverInterface):
     def __init__(self):
         self.resource_model_parser = ResourceModelParser()
         self.cs_helper = CloudshellDriverHelper()
+
+    def cleanup(self):
+        pass
+
+    def initialize(self, context):
+        pass
 
     def Deploy(self, context, Name=None):
         """

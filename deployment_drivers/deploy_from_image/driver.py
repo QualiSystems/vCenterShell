@@ -1,5 +1,7 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
+from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
+
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
 
@@ -7,7 +9,10 @@ from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDri
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
-class DeployFromImage(object):
+class DeployFromImage(ResourceDriverInterface):
+    def cleanup(self):
+        pass
+
     def __init__(self):
         self.cs_helper = CloudshellDriverHelper()
         self.resource_model_parser = ResourceModelParser()

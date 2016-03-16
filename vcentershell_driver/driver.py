@@ -1,9 +1,13 @@
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-
+from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 
 
-class VCenterShellDriver:
+class VCenterShellDriver (ResourceDriverInterface):
+
+    def cleanup(self):
+        pass
+
     def __init__(self):
         """
         ctor must be without arguments, it is created with reflection at run time

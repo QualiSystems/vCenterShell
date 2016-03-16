@@ -100,7 +100,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4096 or a range." IsReadOnly="false" Name="VLAN Id" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4094 or a range." IsReadOnly="false" Name="VLAN Id" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -321,12 +321,6 @@
     </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
       <ns0:AttachedAttributes>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM_UUID">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Cloud Provider">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Requested vNIC Name">
           <ns0:AllowedValues />
         </ns0:AttachedAttribute>
@@ -369,7 +363,6 @@
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
       </ns0:Categories>
     </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsService="true" Name="Deployment Options" ServiceType="Deployment">
@@ -501,7 +494,6 @@
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
       </ns0:Categories>
     </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ServiceType="Regular">
@@ -639,7 +631,6 @@
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
-        <ns0:Category>Virtualization</ns0:Category>
       </ns0:Categories>
     </ns0:ResourceFamily>
   </ns0:ResourceFamilies>
