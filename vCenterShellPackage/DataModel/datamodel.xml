@@ -480,6 +480,7 @@
             <ns0:AttributeValue Name="VM Cluster" Value="" />
             <ns0:AttributeValue Name="VM Location" Value="" />
             <ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="IP Regex" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="vCenter Image" Value="" />
             <ns0:AttributeValue Name="vCenter Name" Value="" />
