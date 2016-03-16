@@ -79,9 +79,9 @@ def str2bool(boolean_as_string):
 
 def get_error_message_from_exception(ex):
     error_message = ''  # traceback.format_exc()
-    if hasattr(ex, 'message'):
+    if hasattr(ex, 'message') and ex.message:
         error_message += ex.message
-    elif hasattr(ex, 'msg'):
+    elif hasattr(ex, 'msg') and ex.msg:
         error_message += ex.msg
     if hasattr(ex, 'faultMessage'):
         if hasattr(ex.faultMessage, 'message'):
