@@ -480,6 +480,7 @@
             <ns0:AttributeValue Name="VM Cluster" Value="" />
             <ns0:AttributeValue Name="VM Location" Value="" />
             <ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="IP Regex" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="vCenter Image" Value="" />
             <ns0:AttributeValue Name="vCenter Name" Value="" />
@@ -538,7 +539,6 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts />
         </ns0:ResourceModel>
@@ -568,7 +568,6 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts />
         </ns0:ResourceModel>
@@ -606,7 +605,6 @@
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
           </ns0:Drivers>
           <ns0:Scripts />
         </ns0:ResourceModel>
