@@ -194,7 +194,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
-    def get_folder(self, si, path):
+    def get_folder(self, si, path, root=None):
         """
         Finds folder in the vCenter or returns "None"
 
@@ -203,48 +203,45 @@ class pyVmomiService:
         """
 
         search_index = si.content.searchIndex
-        sub_folder = si.content.rootFolder
+        sub_folder = root if root else si.content.rootFolder
 
-        if path is None or not path:
+        if not path:
             return sub_folder
+
         paths = path.split("/")
 
-        for currPath in paths:
-            if currPath is None or not currPath:
-                continue
+        child = None
+        if hasattr(sub_folder, self.ChildEntity):
+            new_root = search_index.FindChild(sub_folder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            '#checks if the current path is nested as a child'
-            child = None
-            try:
-                child = search_index.FindChild(sub_folder, currPath)
-            except:
-                child = None
+        if child is None and hasattr(sub_folder, self.VM):
+            new_root = search_index.FindChild(sub_folder.vmFolder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            if hasattr(sub_folder, self.ChildEntity):
-                child = search_index.FindChild(sub_folder, currPath)
+        if child is None and hasattr(sub_folder, self.Datastore):
+            new_root = search_index.FindChild(sub_folder.datastoreFolder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            if child is None and hasattr(sub_folder, self.VM):
-                child = search_index.FindChild(sub_folder.vmFolder, currPath)
+        if child is None and hasattr(sub_folder, self.Network):
+            new_root = search_index.FindChild(sub_folder.networkFolder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            if child is None and hasattr(sub_folder, self.Datastore):
-                child = search_index.FindChild(sub_folder.datastoreFolder, currPath)
+        if child is None and hasattr(sub_folder, self.Host):
+            new_root = search_index.FindChild(sub_folder.hostFolder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            if child is None and hasattr(sub_folder, self.Network):
-                child = search_index.FindChild(sub_folder.networkFolder, currPath)
+        if child is None and hasattr(sub_folder, self.Datacenter):
+            new_root = search_index.FindChild(sub_folder.datacenterFolder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
-            if child is None and hasattr(sub_folder, self.Host):
-                child = search_index.FindChild(sub_folder.hostFolder, currPath)
-
-            if child is None and hasattr(sub_folder, self.Datacenter):
-                child = search_index.FindChild(sub_folder.datacenterFolder, currPath)
-
-            if child is None:
-                return None
-            else:
-                sub_folder = child
-                child = None
-
-        return sub_folder
+        return child
 
     def get_network_by_full_name(self, si, default_network_full_name):
         """
