@@ -9,6 +9,7 @@ from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDri
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
+DOMAIN = 'Global'
 ADDRESS = 'address'
 USER = 'User'
 PASSWORD = 'Password'
@@ -38,7 +39,7 @@ class VCenterAutoModelDiscovery(object):
         """
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
-                                             None)
+                                             DOMAIN)
         self._check_if_attribute_not_empty(context.resource, ADDRESS)
         resource = context.resource
         auto_attr = []
