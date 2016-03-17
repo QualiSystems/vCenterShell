@@ -75,3 +75,15 @@ def str2bool(boolean_as_string):
     if boolean_as_string.lower() == 'false':
         return False
     raise ValueError('{0} should be True or False '.format(boolean_as_string))
+
+
+def get_error_message_from_exception(ex):
+    error_message = ''  # traceback.format_exc()
+    if hasattr(ex, 'message') and ex.message:
+        error_message += ex.message
+    elif hasattr(ex, 'msg') and ex.msg:
+        error_message += ex.msg
+    if hasattr(ex, 'faultMessage'):
+        if hasattr(ex.faultMessage, 'message'):
+            error_message += '. ' + ex.faultMessage.message
+    return error_message

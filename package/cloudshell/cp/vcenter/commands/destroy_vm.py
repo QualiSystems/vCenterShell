@@ -1,6 +1,8 @@
 ﻿from cloudshell.api.cloudshell_api import CloudShellAPISession
+from cloudshell.api.common_cloudshell_api import CloudShellAPIError
 
 from cloudshell.cp.vcenter.common.logger import getLogger
+from cloudshell.cp.vcenter.common.utilites.common_utils import get_error_message_from_exception
 
 logger = getLogger(__name__)
 
@@ -60,4 +62,4 @@ class DestroyVirtualMachineCommand(object):
             session.DisconnectRoutesInReservation(reservation_id, endpoints)
         except Exception as exc:
             logger.error("Error disconnecting routes for resource {0} in reservation {1}. Error: {2}"
-                         .format(resource_name, reservation_id, str(exc)))
+                         .format(resource_name, reservation_id, get_error_message_from_exception(exc)))
