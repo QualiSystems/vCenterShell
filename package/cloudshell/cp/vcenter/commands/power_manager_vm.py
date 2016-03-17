@@ -1,16 +1,18 @@
 from cloudshell.cp.vcenter.common.logger import getLogger
+from pyVmomi import vim
 
 _logger = getLogger("vCenterShell")
 
 
 class VirtualMachinePowerManagementCommand(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
-        self.pyvmomi_service = pyvmomi_service
+        self.pv_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
 
-    def power_off(self, si, session, vm_uuid, resource_fullname):
+    def power_off(self, si, session, vcenter_data_model, vm_uuid, resource_fullname):
         """
-        hard power of the specified on the vcenter
+        Power off of a vm
+        :param vcenter_data_model: vcenter model
         :param si: Service Instance
         :param vcenter_name: vcenter name
         :param vm_uuid: the uuid of the vm
@@ -19,17 +21,21 @@ class VirtualMachinePowerManagementCommand(object):
         """
 
         _logger.info('retrieving vm by uuid: {0}'.format(vm_uuid))
-        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
         if vm.summary.runtime.powerState == 'poweredOff':
             _logger.info('vm already powered off')
             task_result = 'already powered off'
         else:
             # hard power off
-            _logger.info('hard powering of vm')
-            task = vm.PowerOff()
-            task_result = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                     action_name='Power Off')
+            _logger.info('{0} powering of vm'.format(vcenter_data_model.shutdown_method))
+            if vcenter_data_model.shutdown_method.lower() == 'soft':
+                task = vm.PowerOff()
+                task_result = self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                         action_name='Power Off')
+            else:
+                vm.ShutdownGuest()
+                task_result = 'vm powered off'
 
         # Set live status - deployment done
         if resource_fullname:
@@ -46,7 +52,7 @@ class VirtualMachinePowerManagementCommand(object):
         :return:
         """
         _logger.info('retrieving vm by uuid: {0}'.format(vm_uuid))
-        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
         if vm.summary.runtime.powerState == 'poweredOn':
             _logger.info('vm already powered on')

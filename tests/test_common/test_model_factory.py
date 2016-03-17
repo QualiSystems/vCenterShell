@@ -39,35 +39,8 @@ class TestDataModel(TestCase):
 
         self.assertSequenceEqual(validation_errors, [])
 
-    def test_app_templates(self):
-        xml_files = self.get_app_templates_xml_files()
-        for xml_file in xml_files:
-            tree = ET.parse(xml_file)
-            root = tree.getroot()
-            deployment_nodes = root.findall('.//DeploymentService')
-            validation_errors = []
-            for deployment_node in deployment_nodes:
-                resource_model_name = self.get_class_name_from_model_node(deployment_node)
-                try:
-                    klass = ResourceModelParser().get_class('cloudshell.cp.vcenter.models.' + resource_model_name)
-                except ValueError as value_error:
-                    validation_errors.append(value_error.message)
-                    continue
-
-                attribute_names = self.get_template_attributes(deployment_node)
-
-                for attribute_name in attribute_names:
-                    if not hasattr(klass, attribute_name):
-                        validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name,
-                                                                                                resource_model_name))
-
-        for validation_error in validation_errors:
-            print validation_error
-
-        self.assertSequenceEqual(validation_errors, [])
-
     def get_app_templates_xml_files(self):
-        app_templates_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/App Templates/')
+        app_templates_path = os.path.join(os.path.dirname(__file__), '../../../../vCenterShellPackage/App Templates/')
         xml_files = [os.path.join(app_templates_path, f)
                      for f in listdir(app_templates_path)
                      if os.path.splitext(f)[1] == '.xml']
