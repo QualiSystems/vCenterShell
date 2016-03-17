@@ -453,7 +453,7 @@ class pyVmomiService:
         resource_pool = ''
         if clone_params.resource_pool:
             resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
-        if resource_pool:
+        if not resource_pool:
             cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
                                    clone_params.cluster_name)
             resource_pool = cluster.resourcePool
