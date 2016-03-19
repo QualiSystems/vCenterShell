@@ -3,7 +3,7 @@ python:
     - "2.7"
 
 install:
-    - pip install -r package/requirements.
+    - pip install -r package/requirements.txt
     - pip install -r vcentershell_driver/requirements.txt
     - pip install -r test_requirements.txt
     - pip install coveralls
