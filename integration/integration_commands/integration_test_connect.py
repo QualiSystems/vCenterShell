@@ -1,5 +1,6 @@
 from unittest import TestCase
 
+from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
@@ -14,8 +15,7 @@ from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from tests.utils.testing_credentials import TestCredentials
-from mock import Mock
+from cloudshell.tests.utils import TestCredentials
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

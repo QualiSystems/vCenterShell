@@ -7,7 +7,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from tests.utils.testing_credentials import TestCredentials
+from cloudshell.tests.utils import TestCredentials
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):

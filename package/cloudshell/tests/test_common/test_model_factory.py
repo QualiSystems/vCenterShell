@@ -13,7 +13,7 @@ class TestDataModel(TestCase):
 
     def test_resource_models(self):
         ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
-        datamodel_path = os.path.join(os.path.dirname(__file__), '../../vCenterShellPackage/DataModel/datamodel.xml')
+        datamodel_path = os.path.join(os.path.dirname(__file__), 'assets/datamodel.xml')
         tree = ET.parse(datamodel_path)
         root = tree.getroot()
         resource_models = root.findall('.//default:ResourceModel', ns)
