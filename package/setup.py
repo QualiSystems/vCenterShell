@@ -16,6 +16,8 @@ setup(
                  "CloudShell. It supports connectivity, deployment and management operations"
                  "used for Cloudshel sanboxes."),
     packages=find_packages(),
+    test_suite='nose.collector',
+    test_requires=['Nose'],
     package_data={'': ['*.txt']},
     install_requires=required,
     version=version_from_file,
