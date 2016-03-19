@@ -8,7 +8,7 @@ from pyVmomi import vim
 from PerfMethodWrapper import PerfMethodWrapper
 from cloudshell.cp.vcenter.common.logger import getLogger
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from tests.utils.testing_credentials import TestCredentials
+from cloudshell.tests.utils import TestCredentials
 
 # consts
 START = 'START'

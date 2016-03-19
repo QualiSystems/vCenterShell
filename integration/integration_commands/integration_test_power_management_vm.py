@@ -6,7 +6,7 @@ from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerM
 from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import task_waiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from tests.utils.testing_credentials import TestCredentials
+from cloudshell.tests.utils import TestCredentials
 
 
 class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):
