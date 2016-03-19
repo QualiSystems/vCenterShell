@@ -463,7 +463,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         sixth_folder = Mock(spec=[], name='sixth')
         sixth_folder.name = 'sixth'
 
-        si.content.rootFolder = Mock()
+        si.content.rootFolder = Mock(spec=['name','childEntity'])
         si.content.rootFolder.name = 'rootFolder'
         si.content.rootFolder.childEntity = [first_folder, second_folder]
         first_folder.vmFolder = [second_folder, sixth_folder]
