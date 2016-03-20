@@ -167,7 +167,7 @@ class VCenterAutoModelDiscovery(object):
         accepted_types = (vim.ClusterComputeResource, vim.HostSystem)
         cluster = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not cluster:
-            cluster = self._get_default(all_items_in_vc, accepted_types[0], key)
+            cluster = self._get_default(all_items_in_vc, accepted_types, key)
             c_name = self.get_full_name(dc_name, cluster)
             # removing the upper folder
             c_name = c_name.replace('host/', '')
@@ -265,6 +265,6 @@ class VCenterAutoModelDiscovery(object):
         if managed_object.name == dc_name:
             return name
         curr_path = managed_object.name
-        if name:
+        if name and name != managed_object.name:
             curr_path = '{0}/{1}'.format(managed_object.name, name)
         return VCenterAutoModelDiscovery.get_full_name(dc_name, managed_object.parent, curr_path)
