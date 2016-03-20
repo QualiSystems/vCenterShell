@@ -211,7 +211,14 @@ class pyVmomiService:
         paths = path.split("/")
 
         child = None
-        if hasattr(sub_folder, self.ChildEntity):
+        try:
+            new_root = search_index.FindChild(sub_folder, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
+        except:
+            child = None
+
+        if child is None and hasattr(sub_folder, self.ChildEntity):
             new_root = search_index.FindChild(sub_folder, paths[0])
             if new_root:
                 child = self.get_folder(si, '/'.join(paths[1:]), new_root)
