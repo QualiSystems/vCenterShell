@@ -5,10 +5,7 @@ from cloudshell.core.logger.qs_logger import get_qs_logger
 from cloudshell.api.cloudshell_api import CloudShellAPISession
 
 
-
 class DeployAppOrchestrationDriver(object):
-
-
     def initialize(self, context):
         """
         Deploys app from template
@@ -30,10 +27,12 @@ class DeployAppOrchestrationDriver(object):
 
         # Start api session
         session = CloudShellAPISession(host=context.connectivity.server_address,
-                                             token_id=context.connectivity.admin_auth_token,
-                                             domain=context.reservation.domain)
+                                       token_id=context.connectivity.admin_auth_token,
+                                       domain=context.reservation.domain)
         # execute deploy app
         deployment_result = self._deploy_app(session, app_name, deployment_service, reservation_id)
+
+        self._try_exeucte_autoload(session, reservation_id, deployment_result.LogicalResourceName)
 
         # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
         self._connect_routes_on_deployed_app(session, reservation_id, deployment_result.LogicalResourceName)
@@ -80,7 +79,8 @@ class DeployAppOrchestrationDriver(object):
             raise exc
 
     def _refresh_ip(self, api, deployment_result, reservation_id):
-        self.logger.info("Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
+        self.logger.info(
+            "Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
         try:
             api.ExecuteResourceConnectedCommand(reservation_id,
                                                 deployment_result.LogicalResourceName,
@@ -91,13 +91,13 @@ class DeployAppOrchestrationDriver(object):
             print "Error refreshing ip for deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                                 exc.rawxml)
             self.logger.error("Error refreshing ip for deployed app {0}. Error: {1}"
-                         .format(deployment_result.LogicalResourceName, exc.rawxml))
+                              .format(deployment_result.LogicalResourceName, exc.rawxml))
             raise exc
         except Exception as exc:
             print "Error refreshing ip for deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                                 str(exc))
             self.logger.error("Error refreshing ip for deployed app {0}. Error: {1}"
-                         .format(deployment_result.LogicalResourceName, str(exc)))
+                              .format(deployment_result.LogicalResourceName, str(exc)))
             raise exc
 
     def _execute_installation_if_exist(self, api, deployment_result, installation_service_data, reservation_id):
@@ -109,14 +109,14 @@ class DeployAppOrchestrationDriver(object):
         installation_script_inputs = installation_service_data["scriptInputs"]
 
         self.logger.info(
-            "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
+                "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
                 .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
         try:
 
             script_inputs = []
             for installation_script_input in installation_script_inputs:
                 script_inputs.append(
-                    InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+                        InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
             installation_result = api.InstallApp(reservation_id, deployment_result.LogicalResourceName,
                                                  installation_script_name, script_inputs)
@@ -125,20 +125,21 @@ class DeployAppOrchestrationDriver(object):
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                          exc.rawxml)
             self.logger.error("Error installing deployed app {0}. Error: {1}"
-                         .format(deployment_result.LogicalResourceName, exc.rawxml))
+                              .format(deployment_result.LogicalResourceName, exc.rawxml))
             raise exc
         except Exception as exc:
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                          str(exc))
             self.logger.error(
-                "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName, str(exc)))
+                    "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
+                                                                           str(exc)))
             raise exc
 
     def _power_on_deployed_app(self, api, app_name, deployment_result, reservation_id):
         try:
             self.logger.info("Powering on deployed app {0}".format(deployment_result.LogicalResourceName))
             self.logger.debug("Powering on deployed app {0}. VM UUID: {1}".format(deployment_result.LogicalResourceName,
-                                                                             deployment_result.VmUuid))
+                                                                                  deployment_result.VmUuid))
             api.ExecuteResourceConnectedCommand(reservation_id,
                                                 deployment_result.LogicalResourceName,
                                                 "PowerOn",
@@ -161,3 +162,20 @@ class DeployAppOrchestrationDriver(object):
             print "Error deploying app {0}. Error: {1}".format(app_name, str(exc))
             self.logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
             raise exc
+
+    def _try_exeucte_autoload(self, session, reservation_id, deployed_app_name):
+        """
+        :param str reservation_id:
+        :param CloudShellAPISession session:
+        :param str deployed_app_name:
+        :return:
+        """
+        try:
+            self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
+            session.AutoLoad(deployed_app_name)
+        except CloudShellAPIError as exc:
+            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml)
+            self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml))
+        except Exception as exc:
+            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
+            self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc)))
