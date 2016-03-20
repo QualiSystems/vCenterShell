@@ -326,9 +326,12 @@ class pyVmomiService:
                 return task.info.result
 
             if task.info.state == 'error':
-                logger.info("error type: %s" % task.info.error.__class__.__name__)
-                logger.info("found cause: %s" % task.info.error.faultCause)
-                raise Exception(task.info.error.faultCause)
+                multi_msg = ''
+                if task.info.error.faultMessage:
+                    multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
+                multi_msg = multi_msg if multi_msg else task.info.error.msg
+                logger.info(multi_msg)
+                raise Exception(multi_msg)
             time.sleep(1)
 
     class CloneVmParameters:
@@ -492,11 +495,14 @@ class pyVmomiService:
         host = None
         if isinstance(obj, self.vim.HostSystem):
             host = obj
+            resource_pool = obj.parent.resourcePool
+
         elif isinstance(obj, self.vim.ResourcePool):
             resource_pool = obj
 
         elif isinstance(obj, self.vim.ClusterComputeResource):
             resource_pool = obj.resourcePool
+
         return resource_pool, host
 
     def destroy_vm(self, vm):
