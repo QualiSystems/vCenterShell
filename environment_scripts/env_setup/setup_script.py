@@ -1,6 +1,7 @@
 from multiprocessing.pool import ThreadPool
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
+from cloudshell.api.common_cloudshell_api import CloudShellAPIError
 from cloudshell.core.logger import qs_logger
 
 from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
@@ -22,11 +23,40 @@ class EnvironmentSetup:
             return
 
         reservation_details = api.GetReservationDetails(self.reservation_id)
-        self._connect_all_routes_in_reservation(api, reservation_details)
+
+        self._try_exeucte_autoload(api=api, reservation_details=reservation_details, deploy_result=deploy_result)
+
+        self._connect_all_routes_in_reservation(api=api, reservation_details=reservation_details)
 
         self._run_async_power_on_refresh_ip_install(api=api, deploy_result=deploy_result)
 
         self.logger.info("Setup for reservation {0} completed".format(self.reservation_id))
+
+    def _try_exeucte_autoload(self, api, reservation_details, deploy_result):
+        """
+        :param GetReservationDescriptionResponseInfo reservation_details:
+        :param CloudShellAPISession api:
+        :param BulkAppDeploymentyInfo deploy_result:
+        :return:
+        """
+        for deployed_app in deploy_result.ResultItems:
+            deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
+            try:
+                commands_list = api.GetResourceCommands(deployed_app_name)
+                for command in commands_list.Commands:
+                    if command.Name == "Autoload":
+                        self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
+                        api.ExecuteCommand(reservation_details.ReservationDescription.Id,
+                                           deployed_app_name, 'Resource', 'Autoload')
+                        break
+            except CloudShellAPIError as exc:
+                print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml)
+                self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml))
+                raise exc
+            except Exception as exc:
+                print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
+                self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc)))
+                raise exc
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
