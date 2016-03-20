@@ -148,6 +148,20 @@ class pyVmomiService:
         """
         return self.find_obj_by_path(si, path, name, self.Datastore)
 
+    def find_portgroup(self, si, dv_switch_path, name):
+        """
+        Returns the portgroup on the dvSwitch
+        :param name: str
+        :param dv_switch_path: str
+        :param si: service instance
+        """
+        dv_switch = self.get_folder(si, dv_switch_path)
+        if dv_switch and dv_switch.portgroup:
+            for port in dv_switch.portgroup:
+                if port.name == name:
+                    return port
+        return name
+
     def find_network_by_name(self, si, path, name):
         """
         Finds network in the vCenter or returns "None"
@@ -390,6 +404,8 @@ class pyVmomiService:
             result.error = 'vm_folder param cannot be None'
             return result
 
+        datacenter = self.get_datacenter(clone_params)
+
         dest_folder = self._get_destination_folder(clone_params)
 
         vm_location = VMLocation.create_from_full_path(clone_params.template_name)
@@ -398,12 +414,18 @@ class pyVmomiService:
 
         datastore = self._get_datastore(clone_params)
 
-        resource_pool = self._get_resource_pool(clone_params)
+        resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
+
+        if not resource_pool and not host:
+            raise ValueError('The specifed host, cluster or resource pool could not be found')
 
         '# set relo_spec'
         placement = self.vim.vm.RelocateSpec()
         placement.datastore = datastore
-        placement.pool = resource_pool
+        if resource_pool:
+            placement.pool = resource_pool
+        if host:
+            placement.host = host
 
         clone_spec = self.vim.vm.CloneSpec()
         clone_spec.location = placement
@@ -415,6 +437,12 @@ class pyVmomiService:
         vm = self.wait_for_task(task)
         result.vm = vm
         return result
+
+    def get_datacenter(self, clone_params):
+        splited = clone_params.vm_folder.split('/')
+        root_path = splited[0]
+        datacenter = self.get_folder(clone_params.si, root_path)
+        return datacenter
 
     def _get_destination_folder(self, clone_params):
         managed_object = self.get_folder(clone_params.si, clone_params.vm_folder)
@@ -453,19 +481,23 @@ class pyVmomiService:
             raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
         return datastore
 
-    def _get_resource_pool(self, clone_params):
-        resource_pool = ''
-        if clone_params.resource_pool:
-            resource_pool = self.get_obj(clone_params.si.content, [self.vim.ResourcePool], clone_params.resource_pool)
-        if not resource_pool:
-            cluster = self.get_obj(clone_params.si.content, [self.vim.ClusterComputeResource],
-                                   clone_params.cluster_name)
-            resource_pool = cluster.resourcePool
-        if not resource_pool:
-            raise ValueError('Could not find Cluster or Resource Pool by the names: "{0}", "{1}"'.
-                             format(clone_params.cluster_name,
-                                    clone_params.resource_pool))
-        return resource_pool
+    def _get_resource_pool(self, datacenter_name, clone_params):
+
+        resource_full_path = '{0}/{1}/{2}'.format(datacenter_name,
+                                                  clone_params.cluster_name,
+                                                  clone_params.resource_pool)
+        obj = self.get_folder(clone_params.si, resource_full_path)
+
+        resource_pool = None
+        host = None
+        if isinstance(obj, self.vim.HostSystem):
+            host = obj
+        elif isinstance(obj, self.vim.ResourcePool):
+            resource_pool = obj
+
+        elif isinstance(obj, self.vim.ClusterComputeResource):
+            resource_pool = obj.resourcePool
+        return resource_pool, host
 
     def destroy_vm(self, vm):
         """ 
