@@ -65,7 +65,8 @@ class VirtualMachineDeployer(object):
                             auto_power_on=template_resource_model.auto_power_on,
                             auto_power_off=template_resource_model.auto_power_off,
                             wait_for_ip=template_resource_model.wait_for_ip,
-                            auto_delete=template_resource_model.auto_delete
+                            auto_delete=template_resource_model.auto_delete,
+                            autoload=template_resource_model.autoload
                             )
 
     def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context):
@@ -94,7 +95,8 @@ class VirtualMachineDeployer(object):
                                     auto_power_on=data_holder.image_params.auto_power_on,
                                     auto_power_off=data_holder.image_params.auto_power_off,
                                     wait_for_ip=data_holder.image_params.wait_for_ip,
-                                    auto_delete=data_holder.image_params.auto_delete)
+                                    auto_delete=data_holder.image_params.auto_delete,
+                                    autoload=data_holder.image_params.autoload)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 
