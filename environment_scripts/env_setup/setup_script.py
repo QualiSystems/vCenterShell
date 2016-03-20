@@ -42,21 +42,14 @@ class EnvironmentSetup:
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
             try:
-                commands_list = api.GetResourceCommands(deployed_app_name)
-                for command in commands_list.Commands:
-                    if command.Name == "Autoload":
-                        self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
-                        api.ExecuteCommand(reservation_details.ReservationDescription.Id,
-                                           deployed_app_name, 'Resource', 'Autoload')
-                        break
+                self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
+                api.AutoLoad(deployed_app_name)
             except CloudShellAPIError as exc:
                 print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml)
                 self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml))
-                raise exc
             except Exception as exc:
                 print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
                 self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc)))
-                raise exc
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
