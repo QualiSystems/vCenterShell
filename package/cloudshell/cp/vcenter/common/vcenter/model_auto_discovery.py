@@ -265,6 +265,6 @@ class VCenterAutoModelDiscovery(object):
         if managed_object.name == dc_name:
             return name
         curr_path = managed_object.name
-        if name and name != managed_object.name:
+        if name:
             curr_path = '{0}/{1}'.format(managed_object.name, name)
         return VCenterAutoModelDiscovery.get_full_name(dc_name, managed_object.parent, curr_path)
