@@ -29,23 +29,62 @@ class DeployAppOrchestrationDriver(object):
         session = CloudShellAPISession(host=context.connectivity.server_address,
                                        token_id=context.connectivity.admin_auth_token,
                                        domain=context.reservation.domain)
+
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'deployment started'))
         # execute deploy app
         deployment_result = self._deploy_app(session, app_name, deployment_service, reservation_id)
+        app_name = deployment_result.LogicalResourceName
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'deployment started'))
 
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'discovery started'))
         self._try_exeucte_autoload(session, reservation_id, deployment_result.LogicalResourceName)
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'discovery ended successfully'))
 
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'connecting routes started'))
         # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
         self._connect_routes_on_deployed_app(session, reservation_id, deployment_result.LogicalResourceName)
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'connecting routes ended successfully'))
 
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'is powering on'))
         # "Power On"
         self._power_on_deployed_app(session, app_name, deployment_result, reservation_id)
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'is powered on'))
 
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'is waiting for IP address, this may take a while'))
         # refresh ip
-        self._refresh_ip(session, deployment_result, reservation_id)
+        ip = self._refresh_ip(session, deployment_result, reservation_id)
+        session.WriteMessageToReservationOutput(
+            reservationId=reservation_id,
+            message='[{0}] {1}'.format(
+                app_name,
+                'IP address is [{0}]'.format(ip) if ip else 'IP address not found'))
 
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'installation started'))
         # if install service exists on app execute it
         self._execute_installation_if_exist(session, deployment_result, installation_service_data, reservation_id)
-
+        session.WriteMessageToReservationOutput(reservationId=reservation_id,
+                                                message='[{0}] {1}'.format(app_name,
+                                                                           'installation ended successfully'))
         # Set live status - deployment done
         session.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
@@ -82,10 +121,14 @@ class DeployAppOrchestrationDriver(object):
         self.logger.info(
             "Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
         try:
-            api.ExecuteResourceConnectedCommand(reservation_id,
-                                                deployment_result.LogicalResourceName,
-                                                "remote_refresh_ip",
-                                                "remote_connectivity")
+            res = api.ExecuteResourceConnectedCommand(reservation_id,
+                                                      deployment_result.LogicalResourceName,
+                                                      "remote_refresh_ip",
+                                                      "remote_connectivity")
+            ip = getattr(res, 'Output', None)
+            if not ip:
+                return ip
+            return ip.replace('command_json_result="', '').replace('"=command_json_result_end', '')
 
         except CloudShellAPIError as exc:
             print "Error refreshing ip for deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
@@ -109,14 +152,14 @@ class DeployAppOrchestrationDriver(object):
         installation_script_inputs = installation_service_data["scriptInputs"]
 
         self.logger.info(
-                "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
+            "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
                 .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
         try:
 
             script_inputs = []
             for installation_script_input in installation_script_inputs:
                 script_inputs.append(
-                        InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+                    InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
             installation_result = api.InstallApp(reservationId=reservation_id,
                                                  resourceName=deployment_result.LogicalResourceName,
@@ -134,8 +177,8 @@ class DeployAppOrchestrationDriver(object):
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                          str(exc))
             self.logger.error(
-                    "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
-                                                                           str(exc)))
+                "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
+                                                                       str(exc)))
             raise exc
 
     def _power_on_deployed_app(self, api, app_name, deployment_result, reservation_id):
@@ -177,8 +220,12 @@ class DeployAppOrchestrationDriver(object):
             self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
             session.AutoLoad(deployed_app_name)
         except CloudShellAPIError as exc:
-            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml)
-            self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, exc.rawxml))
+            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                            exc.rawxml)
+            self.logger.error(
+                "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                          exc.rawxml))
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
-            self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc)))
+            self.logger.error(
+                "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc)))
