@@ -106,7 +106,8 @@ class TestVirtualMachineDeployer(TestCase):
                     'auto_power_on': 'True',
                     'auto_power_off': 'True',
                     'wait_for_ip': 'True',
-                    'auto_delete': 'True'
+                    'auto_delete': 'True',
+                    'autoload': 'True'
                 }
         })
 

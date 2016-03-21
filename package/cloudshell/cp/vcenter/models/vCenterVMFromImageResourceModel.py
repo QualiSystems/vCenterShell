@@ -13,6 +13,7 @@ class vCenterVMFromImageResourceModel(object):
         self.auto_power_off = True
         self.wait_for_ip = True
         self.auto_delete = True
+        self.autoload = True
         self.ip_regex = ''
         self.default_datacenter = ''
         self.refresh_ip_timeout = 0
