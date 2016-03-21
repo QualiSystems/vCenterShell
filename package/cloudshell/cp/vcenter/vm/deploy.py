@@ -25,7 +25,6 @@ class VirtualMachineDeployer(object):
 
     def deploy_from_template(self, si, data_holder, resource_context):
         """
-
         :param si:
         :type data_holder: DeployFromTemplateDetails
         :type resource_context

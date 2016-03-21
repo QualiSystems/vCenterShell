@@ -49,9 +49,6 @@ class EnvironmentSetup:
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
-            api.WriteMessageToReservationOutput(reservation_id,
-                                                "Trying to execute Autoload for {0}".format(deployed_app_name))
-
             resource_details = api.GetResourceDetails(deployed_app_name)
             resource_details_cache[deployed_app_name] = resource_details
 
@@ -60,15 +57,9 @@ class EnvironmentSetup:
             if autoload_param:
                 autoload = autoload_param.Value
             if autoload.lower() != "true":
-                api.WriteMessageToReservationOutput(reservation_id, "Autoload Param Value: {0}".format(autoload))
                 continue
 
-            api.WriteMessageToReservationOutput(reservation_id, "--> Autoload Param Value: {0}".format(autoload))
-
             try:
-                api.WriteMessageToReservationOutput(reservation_id,
-                                                    "Executing Autoload command on deployed app {0}"
-                                                    .format(deployed_app_name))
                 self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
                 api.AutoLoad(deployed_app_name)
             except CloudShellAPIError as exc:
