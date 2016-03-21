@@ -49,6 +49,8 @@ class DvPortGroupCreator(object):
                                            vlan_id)
                 network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
 
+            if not network:
+                raise ValueError('Could not get or create vlan named: {0}'.format(dv_port_name))
         finally:
             self._lock.release()
             return network

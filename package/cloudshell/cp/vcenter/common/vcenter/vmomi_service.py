@@ -160,7 +160,7 @@ class pyVmomiService:
             for port in dv_switch.portgroup:
                 if port.name == name:
                     return port
-        return name
+        return None
 
     def find_network_by_name(self, si, path, name):
         """
@@ -222,7 +222,7 @@ class pyVmomiService:
         if not path:
             return sub_folder
 
-        paths = path.split("/")
+        paths = [p for p in path.split("/") if p]
 
         child = None
         try:
