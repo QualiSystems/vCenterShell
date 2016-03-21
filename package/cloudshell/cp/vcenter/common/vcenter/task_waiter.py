@@ -31,8 +31,11 @@ class SynchronousTaskWaiter(object):
                 out = '%s completed successfully.' % action_name
                 logger.info(out)
         else:
-            out = '%s did not complete successfully: %s' % (action_name, task.info.error)
-            logger.info(out)
-            raise task.info.error
+            multi_msg = ''
+            if task.info.error.faultMessage:
+                multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
+
+            logger.info(multi_msg)
+            raise Exception(multi_msg)
 
         return task.info.result
