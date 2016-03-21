@@ -11,4 +11,5 @@ class vCenterVMFromTemplateResourceModel(object):
         self.auto_power_off = True
         self.wait_for_ip = True
         self.auto_delete = True
+        self.autoload = True
         self.refresh_ip_timeout = 0
