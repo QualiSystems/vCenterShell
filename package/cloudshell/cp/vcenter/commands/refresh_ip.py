@@ -51,6 +51,8 @@ class RefreshIpCommand(object):
         if ip_result.reason == IpReason.Success:
             session.UpdateResourceAddress(resource_name, ip_result.ip_address)
 
+            return ip_result.ip_address
+
     @staticmethod
     def _get_ip_match_function(resource):
         ip_regex = RefreshIpCommand._get_custom_param(

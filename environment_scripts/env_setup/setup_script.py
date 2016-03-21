@@ -21,7 +21,8 @@ class EnvironmentSetup:
         deploy_result = self._deploy_apps_in_reservation(api, reservation_details)
         if deploy_result is None:
             return
-
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[beginning setup reservation]')
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
         resource_details_cache = {}
@@ -35,6 +36,8 @@ class EnvironmentSetup:
                                                     resource_details_cache=resource_details_cache)
 
         self.logger.info("Setup for reservation {0} completed".format(self.reservation_id))
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[reservation setup finished successfully]')
 
     def _try_exeucte_autoload(self, api, reservation_details, deploy_result, resource_details_cache):
         """
@@ -49,6 +52,9 @@ class EnvironmentSetup:
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message='[{0}] discovery started'.format(deployed_app_name))
+
             resource_details = api.GetResourceDetails(deployed_app_name)
             resource_details_cache[deployed_app_name] = resource_details
 
@@ -62,6 +68,10 @@ class EnvironmentSetup:
             try:
                 self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
                 api.AutoLoad(deployed_app_name)
+
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] discovery ended successfully'.format(
+                                                        deployed_app_name))
             except CloudShellAPIError as exc:
                 self.logger.error(
                     "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
@@ -80,10 +90,16 @@ class EnvironmentSetup:
         app_names = map(lambda x: x.Name, apps)
         app_inputs = map(lambda x: DeployAppInput(x.Name, "Name", x.Name), apps)
 
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[deploying apps] {0}'.format(app_names))
         self.logger.info(
-                "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
+            "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
 
-        return api.DeployAppToCloudProviderBulk(self.reservation_id, app_names, app_inputs)
+        res = api.DeployAppToCloudProviderBulk(self.reservation_id, app_names, app_inputs)
+
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[deployed all apps]')
+        return res
 
     def _connect_all_routes_in_reservation(self, api, reservation_details):
         connectors = reservation_details.ReservationDescription.Connectors
@@ -100,7 +116,13 @@ class EnvironmentSetup:
         self.logger.info("Executing connect routes for reservation {0}".format(self.reservation_id))
         self.logger.debug("Connecting: {0}".format(",".join(endpoints)))
 
-        return api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[start connecting all routes in reservation]')
+
+        res = api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
+        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                            message='[done connecting all routes in reservation]')
+        return res
 
     def _run_async_power_on_refresh_ip_install(self, api, deploy_result, resource_details_cache):
         """
@@ -163,7 +185,11 @@ class EnvironmentSetup:
             if power_on.lower() == "true":
                 self.logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
                                  .format(deployed_app_name, self.reservation_id))
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] is powering on'.format(deployed_app_name))
                 api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "PowerOn", "power")
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] powered on'.format(deployed_app_name))
                 api.SetResourceLiveStatus(deployed_app_name, "Online", "Active")
             else:
                 self.logger.info("Auto Power On is off for deployed app {0} in reservation {1}"
@@ -177,8 +203,20 @@ class EnvironmentSetup:
             if wait_for_ip.lower() == "true":
                 self.logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
                                  .format(deployed_app_name, self.reservation_id))
-                api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "remote_refresh_ip",
-                                                    "remote_connectivity")
+                api.WriteMessageToReservationOutput(
+                    reservationId=self.reservation_id,
+                    message='[{0}] is waiting for IP address, this may take a while'.format(deployed_app_name))
+
+                ip = api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name,
+                                                         "remote_refresh_ip",
+                                                         "remote_connectivity")
+                if ip and hasattr(ip, 'Output'):
+                    ip = ip.replace('command_json_result="', '').replace('"=command_json_result_end', '')
+                    api.WriteMessageToReservationOutput(
+                        reservationId=self.reservation_id,
+                        message='[{0}] {1}'.format(
+                            deployed_app_name,
+                            'IP address is [{0}]'.format(ip) if ip else 'IP address not found'))
             else:
                 self.logger.info("Wait For IP is off for deployed app {0} in reservation {1}"
                                  .format(deployed_app_name, self.reservation_id))
@@ -192,14 +230,20 @@ class EnvironmentSetup:
             if installation_info:
                 self.logger.info("Executing installation script {0} on deployed app {1} in reservation {2}"
                                  .format(installation_info.ScriptCommandName, deployed_app_name, self.reservation_id))
-
+                api.WriteMessageToReservationOutput(
+                    reservationId=self.reservation_id,
+                    message='[{0}] installation started'.format(deployed_app_name))
                 script_inputs = []
                 for installation_script_input in installation_info.ScriptInputs:
                     script_inputs.append(
-                            InputNameValue(installation_script_input.Name, installation_script_input.Value))
+                        InputNameValue(installation_script_input.Name, installation_script_input.Value))
 
                 installation_result = api.InstallApp(self.reservation_id, deployed_app_name,
                                                      installation_info.ScriptCommandName, script_inputs)
+                api.WriteMessageToReservationOutput(
+                    reservationId=self.reservation_id,
+                    message='[{0}] installation ended successfully'.format(deployed_app_name))
+
                 self.logger.debug("Installation_result: " + installation_result.Output)
         except Exception as exc:
             self.logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
