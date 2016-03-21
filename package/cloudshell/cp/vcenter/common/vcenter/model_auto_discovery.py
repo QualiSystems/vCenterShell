@@ -45,6 +45,9 @@ class VCenterAutoModelDiscovery(object):
         auto_attr = []
 
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
+        if not si:
+            raise ValueError('Could not connect to the vCenter: {0}, with given credentials'.
+                             format(context.resource.address))
         all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
 
         dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
@@ -95,9 +98,9 @@ class VCenterAutoModelDiscovery(object):
 
             obj = self.pv_service.get_folder(si, att_value)
             if not obj or isinstance(obj, str):
-                raise KeyError('Could not find the {0}: {1}'.format(name, attributes[name]))
+                raise ValueError('Could not find the {0}: {1}'.format(name, attributes[name]))
             if vim_type and not isinstance(obj, vim_type):
-                raise KeyError('The given {0}: {1} is not of the correct type'.format(name, attributes[name]))
+                raise ValueError('The given {0}: {1} is not of the correct type'.format(name, attributes[name]))
             return obj
         return False
 
@@ -120,7 +123,7 @@ class VCenterAutoModelDiscovery(object):
                                          connection_details.password,
                                          connection_details.port)
         except Exception:
-            raise KeyError('could not connect to the vcenter: {0}, with the given credentials ({1})'.format(
+            raise ValueError('could not connect to the vcenter: {0}, with the given credentials ({1})'.format(
                 connection_details.host,
                 connection_details.username))
         return si
