@@ -33,28 +33,29 @@ class DvPortGroupCreator(object):
             if network is None:
                 # try to get it from the vcenter
                 try:
-                    network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
+                    network = self.pyvmomi_service.find_portgroup(si,
+                                                                  '{0}/{1}'.format(dv_switch_path, dv_switch_name),
+                                                                  dv_port_name)
                 except KeyError:
                     network = None
 
             # if we still couldn't get the network ---> create it(can't find it, play god!)
             if network is None:
                 self._create_dv_port_group(dv_port_name,
-                                          dv_switch_name,
-                                          dv_switch_path,
-                                          si,
-                                          vlan_spec,
-                                          vlan_id)
+                                           dv_switch_name,
+                                           dv_switch_path,
+                                           si,
+                                           vlan_spec,
+                                           vlan_id)
                 network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
 
         finally:
             self._lock.release()
             return network
 
-
     def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id):
-        dv_switch = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_switch_name)
-        if dv_switch is None:
+        dv_switch = self.pyvmomi_service.get_folder(si, '{0}/{1}'.format(dv_switch_path, dv_switch_name))
+        if not dv_switch:
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
@@ -104,4 +105,3 @@ class DvPortGroupCreator(object):
         :return: <vim.Task> Task which really provides update
         """
         return port_group.Destroy()
-

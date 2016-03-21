@@ -118,8 +118,11 @@ class DeployAppOrchestrationDriver(object):
                 script_inputs.append(
                         InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
-            installation_result = api.InstallApp(reservation_id, deployment_result.LogicalResourceName,
-                                                 installation_script_name, script_inputs)
+            installation_result = api.InstallApp(reservationId=reservation_id,
+                                                 resourceName=deployment_result.LogicalResourceName,
+                                                 commandName=installation_script_name,
+                                                 commandInputs=script_inputs,
+                                                 printOutput=True)
             self.logger.debug("Installation_result: " + installation_result.Output)
         except CloudShellAPIError as exc:
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
