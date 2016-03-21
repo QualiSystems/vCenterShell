@@ -262,6 +262,11 @@ class pyVmomiService:
             if new_root:
                 child = self.get_folder(si, '/'.join(paths[1:]), new_root)
 
+        if child is None and hasattr(sub_folder, 'resourcePool'):
+            new_root = search_index.FindChild(sub_folder.resourcePool, paths[0])
+            if new_root:
+                child = self.get_folder(si, '/'.join(paths[1:]), new_root)
+
         return child
 
     def get_network_by_full_name(self, si, default_network_full_name):
@@ -467,14 +472,18 @@ class pyVmomiService:
 
     def _get_datastore(self, clone_params):
         datastore = ''
-        if clone_params.datastore_name:
+        parts = clone_params.datastore_name.split('/')
+        if not parts:
+            raise ValueError('Datastore could not be empty')
+        name = parts[len(parts) - 1]
+        if name:
             datastore = self.get_obj(clone_params.si.content,
                                      [self.vim.Datastore],
-                                     clone_params.datastore_name)
+                                     name)
         if not datastore:
             datastore = self.get_obj(clone_params.si.content,
                                      [self.vim.StoragePod],
-                                     clone_params.datastore_name)
+                                     name)
             if datastore:
                 datastore = sorted(datastore.childEntity,
                                    key=lambda data: data.summary.freeSpace,
