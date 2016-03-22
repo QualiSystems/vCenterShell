@@ -235,8 +235,13 @@ class ConnectionCommandOrchestrator(object):
             action_results = async_result.get()
             for action_result in action_results:
                 if action_result.success:
-                    ConnectionCommandOrchestrator._decombine_success_action_result(action_result,
-                                                                                   unified_actions, results)
+                    res = ConnectionCommandOrchestrator._decombine_success_action_result(action_result,
+                                                                                         unified_actions, results)
+                    for i in range(0, len(unified_actions[action_result.actionId])):
+                        action = unified_actions[action_result.actionId][i]
+                        if action.actionId == res.actionId:
+                            unified_actions[action_result.actionId].remove(action)
+                            break
                 else:
                     ConnectionCommandOrchestrator._decombine_failed_action_result(action_result,
                                                                                   unified_actions, results)
@@ -255,7 +260,7 @@ class ConnectionCommandOrchestrator(object):
             result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
             if result:
                 results.append(result)
-                break
+                return result
 
     @staticmethod
     def _decombine_setVlan(unified_action, action_result):
