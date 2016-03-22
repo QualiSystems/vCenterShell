@@ -50,7 +50,7 @@ class TestOvfImageService(unittest.TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
 
-        ovf._validate_image_exists = Mock(return_value=True)
+        ovf._validate_url_exists = Mock(return_value=True)
 
         res = ovf.deploy_image(vcenter_data_model, image_params)
 
@@ -77,7 +77,7 @@ class TestOvfImageService(unittest.TestCase):
 
         vcenter_data_model = Mock()
         vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
-        ovf._validate_image_exists = Mock(return_value=True)
+        ovf._validate_url_exists = Mock(return_value=True)
 
         self.assertRaises(Exception, ovf.deploy_image, vcenter_data_model, image_params)
         self.assertTrue(PROCESS.stdin.close.called)
@@ -99,7 +99,7 @@ class TestOvfImageService(unittest.TestCase):
 
         image_params.user_arguments = '--vlan="anetwork"'
 
-        ovf._validate_image_exists = Mock(return_value=True)
+        ovf._validate_url_exists = Mock(return_value=True)
 
         vcenter_data_model = Mock()
         vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'

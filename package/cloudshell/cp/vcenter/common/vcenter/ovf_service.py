@@ -32,9 +32,12 @@ class OvfImageDeployerService(object):
         """
         ovf_tool_exe_path = vcenter_data_model.ovf_tool_path
 
+        self._validate_url_exists(ovf_tool_exe_path, 'OVF Tool')
+
         args = self._get_args(ovf_tool_exe_path, image_params)
         self.logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
-        process = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
 
         self.logger.debug('communicating with ovf tool')
         result = process.communicate()
@@ -43,7 +46,9 @@ class OvfImageDeployerService(object):
         if result:
             res = '\n\r'.join(result)
         else:
-            raise Exception('no result has return from the ovftool')
+            if image_params.user_arguments.find('--quiet') == -1:
+                raise Exception('no result has return from the ovftool')
+            res = COMPLETED_SUCCESSFULLY
 
         self.logger.info('communication with ovf tool results: {0}'.format(res))
         if res.find(COMPLETED_SUCCESSFULLY) > -1:
@@ -54,10 +59,6 @@ class OvfImageDeployerService(object):
         self.logger.error('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
         raise Exception('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
 
-    # C:\Program Files\VMware\VMware OVF Tool>ovftool --X:logFile="c:\log.log"
-    # --noSSLVerify --acceptAllEulas --vmFolder="Raz" --name="raz_test_1" --datastore="aa"
-    # "C:\images\test\OVAfile121_QS\OVAfile121_QS.ovf"
-    # "vi://qualisystems%5Craz.a:%21QAZ2wsx@192.168.42.110/QualiSB/host/QualiSB Cluster"
     def _get_args(self, ovf_tool_exe_path, image_params):
         """
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
@@ -121,8 +122,11 @@ class OvfImageDeployerService(object):
             return '\"{0}\"'.format(param)
         return param
 
+    def _validate_image_exists(self, image_url):
+        self._validate_url_exists(image_url, 'Image')
+
     @staticmethod
-    def _validate_image_exists(image_url):
+    def _validate_url_exists(image_url, type_name):
         try:
             f = urlopen(image_url)
             if f:
@@ -132,4 +136,4 @@ class OvfImageDeployerService(object):
             if exists:
                 return True
 
-        raise ValueError('Image cannot be open at: "{0}"'.format(image_url))
+        raise ValueError('{0} cannot be open at: "{1}"'.format(type_name, image_url))
