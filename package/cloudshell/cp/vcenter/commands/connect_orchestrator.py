@@ -25,57 +25,139 @@ class ConnectionCommandOrchestrator(object):
         :param request:
         :return:
         """
-        reserved_networks = []
+        self.reserved_networks = []
+        self.vcenter_data_model = vcenter_data_model
         if vcenter_data_model.reserved_networks:
-            reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
+            self.reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
 
         dvswitch_location = VMLocation.create_from_full_path(vcenter_data_model.default_dvswitch)
 
-        dv_switch_path = VMLocation.combine([vcenter_data_model.default_datacenter, dvswitch_location.path])
-        dv_switch_name = dvswitch_location.name
-        port_group_path = vcenter_data_model.default_port_group_location
-        default_network = VMLocation.combine(
+        self.dv_switch_path = VMLocation.combine([vcenter_data_model.default_datacenter, dvswitch_location.path])
+        self.dv_switch_name = dvswitch_location.name
+        self.port_group_path = vcenter_data_model.default_port_group_location
+        self.default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
         holder = DeployDataHolder(jsonpickle.decode(request))
 
-        mappings = self._group_actions_by_uuid_and_mode(holder.driverRequest.actions)
-        unified_actions = self._create_new_action_by_mapping(mappings)
+        mappings = self._map_requsets(holder.driverRequest.actions)
 
         pool = ThreadPool()
-        async_results = self.run_async_connection_actions(default_network, dv_switch_name, dv_switch_path,
-                                                          port_group_path, si, unified_actions, pool,
-                                                          reserved_networks, vcenter_data_model)
+        async_results = self._run_async_connection_actions(si, mappings, pool)
 
         results = self._get_async_results(async_results, mappings, pool)
 
         return results
 
-    def run_async_connection_actions(self, default_network, dv_switch_name, dv_switch_path, port_group_path, si,
-                                     unified_actions, pool, reserved_networks, vcenter_data_model):
-        async_results = []
-        for key, actions in unified_actions.items():
-            first_action = actions[0]
-            vm_uuid = self._get_vm_uuid(first_action)
-            if first_action.type == 'setVlan':
-                async_results.append(pool.apply_async(self._set_vlan_bulk,
-                                                      (actions,
-                                                       default_network,
-                                                       dv_switch_name,
-                                                       dv_switch_path,
-                                                       port_group_path,
-                                                       vm_uuid,
-                                                       reserved_networks,
-                                                       si)))
+    class ActionsMapping(object):
+        def __init__(self):
+            self.action_tree = ''
+            self.remove_mapping = ''
+            self.set_mapping = ''
 
-            elif first_action.type == 'removeVlan':
+    def _map_requsets(self, actions):
+        grouped_by_vm = dict()
+        grouped_by_vm_by_requset = dict()
+        grouped_by_vm_by_requset_by_mode = dict()
+        vm_mapping = dict()
+
+        for action in actions:
+            vm_uuid = ConnectionCommandOrchestrator._get_vm_uuid(action)
+            self._add_safely_to_dict(value=action, dictionary=grouped_by_vm, key=vm_uuid)
+
+        for machine, actions in grouped_by_vm.items():
+            grouped_by_vm_by_requset[machine] = dict()
+            for action in actions:
+                self._add_safely_to_dict(key=action.type, dictionary=grouped_by_vm_by_requset[machine], value=action)
+
+        for machine, req_to_actions in grouped_by_vm_by_requset.items():
+            grouped_by_vm_by_requset_by_mode[machine] = dict()
+            for req_type, actions in req_to_actions.items():
+                grouped_by_vm_by_requset_by_mode[machine][req_type] = dict()
                 for action in actions:
-                    async_results.append(pool.apply_async(self._remove_vlan_bulk,
-                                                          (action,
-                                                           vm_uuid,
-                                                           si,
-                                                           vcenter_data_model)))
+                    self._add_safely_to_dict(value=action,
+                                             dictionary=grouped_by_vm_by_requset_by_mode[machine][req_type],
+                                             key=action.connectionParams.mode)
 
+        self._create_mapping_from_groupings(grouped_by_vm_by_requset_by_mode, vm_mapping)
+        return vm_mapping
+
+    def _create_mapping_from_groupings(self, grouped_by_vm_by_requset_by_mode, vm_mapping):
+        for vm, req_to_modes in grouped_by_vm_by_requset_by_mode.items():
+            actions_mapping = self.ActionsMapping()
+
+            remove_mappings = self._get_remove_mappings(req_to_modes, vm)
+            actions_mapping.remove_mapping = remove_mappings
+
+            set_mappings = self._get_set_mappings(req_to_modes)
+            actions_mapping.set_mapping = set_mappings
+
+            actions_mapping.action_tree = req_to_modes
+            vm_mapping[vm] = actions_mapping
+
+    def _get_remove_mappings(self, req_to_modes, vm):
+        remove_mappings = []
+        if 'removeVlan' in req_to_modes:
+            remove_requests = [actions for mode, actions in req_to_modes['removeVlan'].items()][0]
+            for action in remove_requests:
+                interface_attributes = \
+                    [attr.attributeValue for attr in action.connectorAttributes
+                     if attr.attributeName == 'Interface']
+                for interface_attribute in interface_attributes:
+                    vm_network_remove_mapping = VmNetworkRemoveMapping()
+                    vm_network_remove_mapping.mac_address = interface_attribute
+                    vm_network_remove_mapping.vm_uuid = vm
+                    remove_mappings.append(vm_network_remove_mapping)
+        return remove_mappings
+
+    def _get_set_mappings(self, req_to_modes):
+        set_mappings = []
+        if 'setVlan' in req_to_modes:
+            set_requests = req_to_modes['setVlan']
+            for mode, actions in set_requests.items():
+                for action in actions:
+                    vnic_name = ConnectionCommandOrchestrator._get_vnic_name(action)
+                    if vnic_name:
+                        vnic_to_network = self._create_map(action.connectionParams.vlanIds[0], mode, vnic_name)
+                        set_mappings.append(vnic_to_network)
+                    else:
+                        for vlan in action.connectionParams.vlanIds:
+                            vnic_to_network = self._create_map(vlan, mode)
+                            set_mappings.append(vnic_to_network)
+
+        # this line makes sure that the vNICS with names are first
+        return sorted(set_mappings, key=lambda x: x.vnic_name, reverse=True)
+
+    def _create_map(self, vlan_id, mode, vnic_name=None):
+        vnic_to_network = VmNetworkMapping()
+        vnic_to_network.vnic_name = vnic_name
+        vnic_to_network = VmNetworkMapping()
+        vnic_to_network.dv_switch_path = self.dv_switch_path
+        vnic_to_network.dv_switch_name = self.dv_switch_name
+        vnic_to_network.port_group_path = self.port_group_path
+        vnic_to_network.vlan_id = vlan_id
+        vnic_to_network.vlan_spec = mode
+        return vnic_to_network
+
+    def _run_async_connection_actions(self, si, mappings, pool):
+
+        async_results = []
+        for vm, action_mappings in mappings.items():
+            async_results.append(pool.apply_async(self._apply_connectivity_changes, (si, vm, action_mappings)))
         return async_results
+
+    def _apply_connectivity_changes(self, si, vm_uuid, action_mappings):
+        if action_mappings.remove_mapping:
+            connection_results = self.disconnector.disconnect_from_networks(si,
+                                                                            self.vcenter_data_model,
+                                                                            vm_uuid,
+                                                                            action_mappings.remove_mapping)
+        if action_mappings.set_mapping:
+            connection_results = self.connector.connect_to_networks(si,
+                                                                    vm_uuid,
+                                                                    action_mappings.set_mapping,
+                                                                    self.default_network,
+                                                                    self.reserved_networks)
+        return connection_results
 
     def _set_vlan_bulk(self, actions, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
                        reserved_networks, si):
@@ -157,9 +239,7 @@ class ConnectionCommandOrchestrator(object):
             key = (vm_uuid,
                    # vlan_mode,
                    action_type)
-            if key not in key_to_actions:
-                key_to_actions[key] = []
-            key_to_actions[key].append(action)
+            ConnectionCommandOrchestrator._add_safely_to_dict(action, key_to_actions, key)
 
         # generate new keys
         return {str(uuid.uuid4()): action
@@ -172,19 +252,43 @@ class ConnectionCommandOrchestrator(object):
         for key, actions_arr in mapping.items():
             actions_by_modes = dict()
             for action in actions_arr:
-                if action.connectionParams.mode not in actions_by_modes:
-                    actions_by_modes[action.connectionParams.mode] = []
-                actions_by_modes[action.connectionParams.mode].append(action)
+                ConnectionCommandOrchestrator._add_safely_to_dict(action, actions_by_modes,
+                                                                  action.connectionParams.mode)
 
             for mode, actions_by_mode_arr in actions_by_modes.items():
                 act = copy.deepcopy(actions_by_mode_arr[0])
                 act.actionId = key
-                for act_to_combine in actions_by_mode_arr[1:]:
-                    CombineAction.combine(act, act_to_combine)
-                if key not in actions:
-                    actions[key] = []
-                actions[key].append(act)
+
+                if not ConnectionCommandOrchestrator._have_vnic_request(act):
+                    for act_to_combine in actions_by_mode_arr[1:]:
+                        if not ConnectionCommandOrchestrator._have_vnic_request(act_to_combine):
+                            CombineAction.combine(act, act_to_combine)
+                        else:
+                            s_act = copy.deepcopy(act_to_combine)
+                            s_act.actionId = key
+                            ConnectionCommandOrchestrator._add_safely_to_dict(s_act, actions, key)
+                    ConnectionCommandOrchestrator._add_safely_to_dict(act, actions, key)
+                else:
+                    # if one of them have a requested vnic it wont combine
+                    ConnectionCommandOrchestrator._add_safely_to_dict(act, actions, key)
+                    for act_to_combine in actions_by_mode_arr[1:]:
+                        s_act = copy.deepcopy(act_to_combine)
+                        s_act.actionId = key
+                        ConnectionCommandOrchestrator._add_safely_to_dict(s_act, actions, key)
+
         return actions
+
+    @staticmethod
+    def _add_safely_to_dict(value, dictionary, key):
+        if key not in dictionary:
+            dictionary[key] = []
+        dictionary[key].append(value)
+
+    @staticmethod
+    def _have_vnic_request(action):
+        if not [att for att in action.customActionAttributes if att.attributeName == 'Vnic Name']:
+            return False
+        return True
 
     @staticmethod
     def _create_successful_result(action, connection_result):
