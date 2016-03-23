@@ -1,15 +1,17 @@
-import copy
-import traceback
-import uuid
 from multiprocessing.pool import ThreadPool
 
 import jsonpickle
-from cloudshell.cp.vcenter.commands.combine_action import CombineAction
-from cloudshell.cp.vcenter.models.ActionResult import CustomActionResult
+from cloudshell.cp.vcenter.models.ActionResult import ActionResult
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import get_error_message_from_exception
+
+SUCCESSFULLY_REMOVED = 'VLAN Successfully removed'
+ACTION_TYPE_SET_VLAN = 'setVlan'
+ACTION_SUCCESS_MSG = 'VLAN successfully set'
+INTERFACE = 'Interface'
+ACTION_TYPE_REMOVE_VLAN = 'removeVlan'
 
 
 class ConnectionCommandOrchestrator(object):
@@ -17,6 +19,12 @@ class ConnectionCommandOrchestrator(object):
         self.connector = connector
         self.disconnector = disconnector
         self.resource_model_parser = resource_model_parser
+        self.vcenter_data_model = None
+        self.reserved_networks = []
+        self.dv_switch_path = ''
+        self.dv_switch_name = ''
+        self.port_group_path = ''
+        self.default_network = ''
 
     def connect_bulk(self, si, vcenter_data_model, request):
         """
@@ -25,7 +33,6 @@ class ConnectionCommandOrchestrator(object):
         :param request:
         :return:
         """
-        self.reserved_networks = []
         self.vcenter_data_model = vcenter_data_model
         if vcenter_data_model.reserved_networks:
             self.reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
@@ -44,42 +51,50 @@ class ConnectionCommandOrchestrator(object):
         pool = ThreadPool()
         async_results = self._run_async_connection_actions(si, mappings, pool)
 
-        results = self._get_async_results(async_results, mappings, pool)
+        results = self._get_async_results(async_results, pool)
 
         return results
 
-    class ActionsMapping(object):
-        def __init__(self):
-            self.action_tree = ''
-            self.remove_mapping = ''
-            self.set_mapping = ''
-
     def _map_requsets(self, actions):
-        grouped_by_vm = dict()
-        grouped_by_vm_by_requset = dict()
-        grouped_by_vm_by_requset_by_mode = dict()
         vm_mapping = dict()
 
-        for action in actions:
-            vm_uuid = ConnectionCommandOrchestrator._get_vm_uuid(action)
-            self._add_safely_to_dict(value=action, dictionary=grouped_by_vm, key=vm_uuid)
+        grouped_by_vm_by_requset_by_mode = self._group_action(actions)
+        self._create_mapping_from_groupings(grouped_by_vm_by_requset_by_mode, vm_mapping)
 
-        for machine, actions in grouped_by_vm.items():
-            grouped_by_vm_by_requset[machine] = dict()
-            for action in actions:
-                self._add_safely_to_dict(key=action.type, dictionary=grouped_by_vm_by_requset[machine], value=action)
+        return vm_mapping
 
+    def _group_action(self, actions):
+        grouped_by_vm = self._group_action_by_vm(actions)
+        grouped_by_vm_by_requset = self._group_vm_actions_by_req_type(grouped_by_vm)
+        grouped_by_vm_by_requset_by_mode = self._group_vm_action_type_by_mode(grouped_by_vm_by_requset)
+        return grouped_by_vm_by_requset_by_mode
+
+    def _group_vm_action_type_by_mode(self, grouped_by_vm_by_requset):
+        grouped_by_vm_by_requset_by_mode = dict()
         for machine, req_to_actions in grouped_by_vm_by_requset.items():
             grouped_by_vm_by_requset_by_mode[machine] = dict()
             for req_type, actions in req_to_actions.items():
                 grouped_by_vm_by_requset_by_mode[machine][req_type] = dict()
                 for action in actions:
-                    self._add_safely_to_dict(value=action,
-                                             dictionary=grouped_by_vm_by_requset_by_mode[machine][req_type],
-                                             key=action.connectionParams.mode)
+                    self._add_safely_to_dict(dictionary=grouped_by_vm_by_requset_by_mode[machine][req_type],
+                                             key=action.connectionParams.mode,
+                                             value=action)
+        return grouped_by_vm_by_requset_by_mode
 
-        self._create_mapping_from_groupings(grouped_by_vm_by_requset_by_mode, vm_mapping)
-        return vm_mapping
+    def _group_vm_actions_by_req_type(self, grouped_by_vm):
+        grouped_by_vm_by_requset = dict()
+        for machine, actions in grouped_by_vm.items():
+            grouped_by_vm_by_requset[machine] = dict()
+            for action in actions:
+                self._add_safely_to_dict(dictionary=grouped_by_vm_by_requset[machine], key=action.type, value=action)
+        return grouped_by_vm_by_requset
+
+    def _group_action_by_vm(self, actions):
+        grouped_by_vm = dict()
+        for action in actions:
+            vm_uuid = ConnectionCommandOrchestrator._get_vm_uuid(action)
+            self._add_safely_to_dict(dictionary=grouped_by_vm, key=vm_uuid, value=action)
+        return grouped_by_vm
 
     def _create_mapping_from_groupings(self, grouped_by_vm_by_requset_by_mode, vm_mapping):
         for vm, req_to_modes in grouped_by_vm_by_requset_by_mode.items():
@@ -96,41 +111,35 @@ class ConnectionCommandOrchestrator(object):
 
     def _get_remove_mappings(self, req_to_modes, vm):
         remove_mappings = []
-        if 'removeVlan' in req_to_modes:
-            remove_requests = [actions for mode, actions in req_to_modes['removeVlan'].items()][0]
-            for action in remove_requests:
-                interface_attributes = \
-                    [attr.attributeValue for attr in action.connectorAttributes
-                     if attr.attributeName == 'Interface']
-                for interface_attribute in interface_attributes:
-                    vm_network_remove_mapping = VmNetworkRemoveMapping()
-                    vm_network_remove_mapping.mac_address = interface_attribute
-                    vm_network_remove_mapping.vm_uuid = vm
-                    remove_mappings.append(vm_network_remove_mapping)
+        if ACTION_TYPE_REMOVE_VLAN in req_to_modes:
+            for mode, actions in req_to_modes[ACTION_TYPE_REMOVE_VLAN].items():
+                for action in actions:
+                    interface_attributes = \
+                        [attr.attributeValue for attr in action.connectorAttributes
+                         if attr.attributeName == INTERFACE]
+                    for interface_attribute in interface_attributes:
+                        vm_network_remove_mapping = VmNetworkRemoveMapping()
+                        vm_network_remove_mapping.mac_address = interface_attribute
+                        vm_network_remove_mapping.vm_uuid = vm
+                        remove_mappings.append(vm_network_remove_mapping)
         return remove_mappings
 
     def _get_set_mappings(self, req_to_modes):
         set_mappings = []
-        if 'setVlan' in req_to_modes:
-            set_requests = req_to_modes['setVlan']
+        if ACTION_TYPE_SET_VLAN in req_to_modes:
+            set_requests = req_to_modes[ACTION_TYPE_SET_VLAN]
             for mode, actions in set_requests.items():
                 for action in actions:
-                    vnic_name = ConnectionCommandOrchestrator._get_vnic_name(action)
-                    if vnic_name:
-                        vnic_to_network = self._create_map(action.connectionParams.vlanIds[0], mode, vnic_name)
-                        set_mappings.append(vnic_to_network)
-                    else:
-                        for vlan in action.connectionParams.vlanIds:
-                            vnic_to_network = self._create_map(vlan, mode)
-                            set_mappings.append(vnic_to_network)
+                    vnic_name = self._get_vnic_name(action)
+                    vnic_to_network = self._create_map(action.connectionParams.vlanId, mode, vnic_name)
+                    set_mappings.append(vnic_to_network)
 
         # this line makes sure that the vNICS with names are first
         return sorted(set_mappings, key=lambda x: x.vnic_name, reverse=True)
 
-    def _create_map(self, vlan_id, mode, vnic_name=None):
+    def _create_map(self, vlan_id, mode, vnic_name):
         vnic_to_network = VmNetworkMapping()
         vnic_to_network.vnic_name = vnic_name
-        vnic_to_network = VmNetworkMapping()
         vnic_to_network.dv_switch_path = self.dv_switch_path
         vnic_to_network.dv_switch_name = self.dv_switch_name
         vnic_to_network.port_group_path = self.port_group_path
@@ -146,171 +155,101 @@ class ConnectionCommandOrchestrator(object):
         return async_results
 
     def _apply_connectivity_changes(self, si, vm_uuid, action_mappings):
+        results = []
         if action_mappings.remove_mapping:
-            connection_results = self.disconnector.disconnect_from_networks(si,
-                                                                            self.vcenter_data_model,
-                                                                            vm_uuid,
-                                                                            action_mappings.remove_mapping)
+            remove_results = self._remove_vlan(action_mappings, si, vm_uuid)
+            results += remove_results
+
         if action_mappings.set_mapping:
+            set_results = self._set_vlan(action_mappings, si, vm_uuid)
+            results += set_results
+        return results
+
+    def _set_vlan(self, action_mappings, si, vm_uuid):
+        results = []
+        set_vlan_actions = action_mappings.action_tree[ACTION_TYPE_SET_VLAN]
+        try:
             connection_results = self.connector.connect_to_networks(si,
                                                                     vm_uuid,
                                                                     action_mappings.set_mapping,
                                                                     self.default_network,
                                                                     self.reserved_networks)
-        return connection_results
+            connection_res_map = dict()
+            for connection_result in connection_results:
+                vlan_spec = connection_result.network_name.split('_')
+                mode = vlan_spec[len(vlan_spec) - 1]
+                id = vlan_spec[len(vlan_spec) - 2]
+                if mode not in connection_res_map:
+                    connection_res_map[mode] = dict()
+                connection_res_map[mode][id] = connection_result
+            for mode, actions in set_vlan_actions.items():
+                for action in actions:
+                    vlan_id = action.connectionParams.vlanId
+                    conn_res = connection_res_map[mode][vlan_id]
 
-    def _set_vlan_bulk(self, actions, default_network, dv_switch_name, dv_switch_path, port_group_path, vm_uuid,
-                       reserved_networks, si):
-        results = []
-        for action in actions:
-            mappings = self._create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path)
-
-            if mappings:
-                try:
-                    connection_results = self.connector.connect_to_networks(si, vm_uuid, mappings,
-                                                                            default_network, reserved_networks)
-                    for connection_result in connection_results:
-                        result = CustomActionResult()
-                        result.actionId = str(action.actionId)
-                        result.type = str(action.type)
-                        result.infoMessage = 'VLAN successfully set'
-                        result.errorMessage = ''
-                        result.success = True
-                        result.updatedInterface = connection_result.mac_address
-                        result.network_name = connection_result.network_name
-                        results.append(result)
-
-                except Exception as ex:
-                    # todo: write exception stacktrace to log
-                    error_result = self._create_failure_result(action, ex)
+                    result = ActionResult()
+                    result.actionId = action.actionId
+                    result.success = True
+                    result.errorMessage = None
+                    result.infoMessage = ACTION_SUCCESS_MSG
+                    result.type = ACTION_TYPE_SET_VLAN
+                    result.updatedInterface = conn_res.mac_address
+                    result.network_name = conn_res.network_name
+                    results.append(result)
+        except Exception as e:
+            for mode, actions in set_vlan_actions.items():
+                for action in actions:
+                    error_result = self._create_error_action_res(action, e)
                     results.append(error_result)
 
         return results
 
-    def _remove_vlan_bulk(self, action, vm_uuid, si, vcenter_data_model):
-        mappings = self._create_disconnection_mappings(action, vm_uuid)
-
+    def _remove_vlan(self, action_mappings, si, vm_uuid):
         results = []
-        if not mappings:
-            error_result = CustomActionResult()
-            error_result.actionId = str(action.actionId)
-            error_result.type = str(action.type)
-            error_result.infoMessage = str('')
-            error_result.errorMessage = 'Interface attribute is missing on connectorAttributes for removeVlan action'
-            error_result.success = False
-            error_result.updatedInterface = None
-            results = [error_result]
-        else:
-            try:
-                connection_results = self.disconnector.disconnect_from_networks(si, vcenter_data_model,
-                                                                                vm_uuid, mappings)
+        mode_to_actions = action_mappings.action_tree[ACTION_TYPE_REMOVE_VLAN]
+        try:
+            connection_results = self.disconnector.disconnect_from_networks(si,
+                                                                            self.vcenter_data_model,
+                                                                            vm_uuid,
+                                                                            action_mappings.remove_mapping)
 
-                for connection_result in connection_results:
-                    result = self._create_successful_result(action, connection_result)
-                    results.append(result)
+            interface_to_action = dict()
+            for mode, actions in mode_to_actions.items():
+                for action in actions:
+                    name = self._get_mac(action)
+                    interface_to_action[name] = action
 
-            except Exception as ex:
-                error_result = self._create_failure_result(action, ex)
-                results.append(error_result)
-
+            for res in connection_results:
+                action = interface_to_action[res.vnic_mac]
+                action_result = ActionResult()
+                action_result.actionId = action.actionId
+                action_result.success = True
+                action_result.infoMessage = SUCCESSFULLY_REMOVED
+                action_result.type = ACTION_TYPE_REMOVE_VLAN
+                action_result.errorMessage = None
+                results.append(action_result)
+        except Exception as e:
+            for mode, actions in mode_to_actions:
+                for action in actions:
+                    error_result = self._create_error_action_res(action, e)
+                    results.append(error_result)
         return results
 
     @staticmethod
-    def _create_disconnection_mappings(action, vm_uuid):
-        mappings = []
-        interface_attributes = [attr.attributeValue for attr in action.connectorAttributes
-                                if attr.attributeName == 'Interface']
-        for interface_attribute in interface_attributes:
-            vm_network_remove_mapping = VmNetworkRemoveMapping()
-            vm_network_remove_mapping.mac_address = interface_attribute
-            vm_network_remove_mapping.vm_uuid = vm_uuid
-            mappings.append(vm_network_remove_mapping)
-        return mappings
-
-    @staticmethod
-    def _group_actions_by_uuid_and_mode(actions):
-        key_to_actions = dict()
-
-        # group by machine and vlan mode and action type
-        for action in actions:
-            vm_uuid = ConnectionCommandOrchestrator._get_vm_uuid(action)
-            # vlan_mode = action.connectionParams.mode
-            action_type = action.type
-            key = (vm_uuid,
-                   # vlan_mode,
-                   action_type)
-            ConnectionCommandOrchestrator._add_safely_to_dict(action, key_to_actions, key)
-
-        # generate new keys
-        return {str(uuid.uuid4()): action
-                for key, action in key_to_actions.items()}
-
-    @staticmethod
-    def _create_new_action_by_mapping(mapping):
-        actions = dict()
-
-        for key, actions_arr in mapping.items():
-            actions_by_modes = dict()
-            for action in actions_arr:
-                ConnectionCommandOrchestrator._add_safely_to_dict(action, actions_by_modes,
-                                                                  action.connectionParams.mode)
-
-            for mode, actions_by_mode_arr in actions_by_modes.items():
-                act = copy.deepcopy(actions_by_mode_arr[0])
-                act.actionId = key
-
-                if not ConnectionCommandOrchestrator._have_vnic_request(act):
-                    for act_to_combine in actions_by_mode_arr[1:]:
-                        if not ConnectionCommandOrchestrator._have_vnic_request(act_to_combine):
-                            CombineAction.combine(act, act_to_combine)
-                        else:
-                            s_act = copy.deepcopy(act_to_combine)
-                            s_act.actionId = key
-                            ConnectionCommandOrchestrator._add_safely_to_dict(s_act, actions, key)
-                    ConnectionCommandOrchestrator._add_safely_to_dict(act, actions, key)
-                else:
-                    # if one of them have a requested vnic it wont combine
-                    ConnectionCommandOrchestrator._add_safely_to_dict(act, actions, key)
-                    for act_to_combine in actions_by_mode_arr[1:]:
-                        s_act = copy.deepcopy(act_to_combine)
-                        s_act.actionId = key
-                        ConnectionCommandOrchestrator._add_safely_to_dict(s_act, actions, key)
-
-        return actions
+    def _create_error_action_res(action, e):
+        error_result = ActionResult()
+        error_result.actionId = action.actionId
+        error_result.type = action.type
+        error_result.errorMessage = get_error_message_from_exception(e)
+        error_result.infoMessage = None
+        error_result.success = False
+        return error_result
 
     @staticmethod
     def _add_safely_to_dict(value, dictionary, key):
         if key not in dictionary:
             dictionary[key] = []
         dictionary[key].append(value)
-
-    @staticmethod
-    def _have_vnic_request(action):
-        if not [att for att in action.customActionAttributes if att.attributeName == 'Vnic Name']:
-            return False
-        return True
-
-    @staticmethod
-    def _create_successful_result(action, connection_result):
-        result = CustomActionResult()
-        result.actionId = str(action.actionId)
-        result.type = str(action.type)
-        result.infoMessage = 'VLAN successfully set'
-        result.errorMessage = ''
-        result.success = True
-        result.updatedInterface = connection_result.vnic_mac
-        return result
-
-    @staticmethod
-    def _create_failure_result(action, ex):
-        error_result = CustomActionResult()
-        error_result.actionId = str(action.actionId)
-        error_result.type = str(action.type)
-        error_result.infoMessage = str('')
-        error_result.errorMessage = get_error_message_from_exception(ex)
-        error_result.success = False
-        error_result.updatedInterface = None
-        return error_result
 
     @staticmethod
     def _get_vm_uuid(action):
@@ -331,92 +270,24 @@ class ConnectionCommandOrchestrator(object):
         return None
 
     @staticmethod
-    def _get_async_results(async_results, unified_actions, pool):
+    def _get_async_results(async_results, pool):
         pool.close()
         pool.join()
         results = []
         for async_result in async_results:
             action_results = async_result.get()
-            for action_result in action_results:
-                if action_result.success:
-                    res = ConnectionCommandOrchestrator._decombine_success_action_result(action_result,
-                                                                                         unified_actions, results)
-                    for i in range(0, len(unified_actions[action_result.actionId])):
-                        action = unified_actions[action_result.actionId][i]
-                        if action.actionId == res.actionId:
-                            unified_actions[action_result.actionId].remove(action)
-                            break
-                else:
-                    ConnectionCommandOrchestrator._decombine_failed_action_result(action_result,
-                                                                                  unified_actions, results)
+            results += action_results
         return results
 
     @staticmethod
-    def _decombine_failed_action_result(action_result, unified_actions, results):
-        for unified_action in unified_actions[action_result.actionId]:
-            result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
-            if result:
-                results.append(result)
-
-    @staticmethod
-    def _decombine_success_action_result(action_result, unified_actions, results):
-        for unified_action in unified_actions[action_result.actionId]:
-            result = ConnectionCommandOrchestrator._decombine(unified_action, action_result)
-            if result:
-                results.append(result)
-                return result
-
-    @staticmethod
-    def _decombine_setVlan(unified_action, action_result):
-        name = str(action_result.network_name)
-        for vlan_id in unified_action.connectionParams.vlanIds:
-            sub = '_{0}_'.format(str(vlan_id))
-            if name.find(sub) > -1 or not action_result.success:
-                copied_action = action_result.get_base_class()
-                copied_action.actionId = unified_action.actionId
-                return copied_action
+    def _get_mac(action):
+        for att in action.connectorAttributes:
+            if att.attributeName == INTERFACE:
+                return att.attributeValue
         return None
 
-    @staticmethod
-    def _decombine_removeVlan(unified_action, action_result):
-        """
-            :type action_result: CustomActionResult
-        """
-        mac = str(action_result.updatedInterface)
-        interfaces = [inter
-                      for inter in unified_action.connectorAttributes
-                      if inter.attributeName == "Interface"]
-        for interface in interfaces:
-            if not action_result.success or mac == str(interface.attributeValue):
-                copied_action = action_result.get_base_class()
-                copied_action.actionId = unified_action.actionId
-                return copied_action
-        return None
-
-    @staticmethod
-    def _create_connect_mappings(action, dv_switch_name, dv_switch_path, port_group_path):
-        mappings = []
-        for vlan in action.connectionParams.vlanIds:
-            vnic_to_network = VmNetworkMapping()
-            vnic_to_network.dv_switch_path = dv_switch_path
-            vnic_to_network.dv_switch_name = dv_switch_name
-            vnic_to_network.port_group_path = port_group_path
-            vnic_to_network.vlan_id = vlan
-            vnic_to_network.vlan_spec = action.connectionParams.mode
-
-            vnic_name = ConnectionCommandOrchestrator._get_vnic_name(action)
-            if vnic_name:
-                vnic_to_network.vnic_name = vnic_name
-
-            mappings.append(vnic_to_network)
-        return mappings
-
-    @classmethod
-    def _decombine(self, unified_action, action_result):
-        method_name = '_decombine_' + unified_action.type
-
-        if not hasattr(self, method_name):
-            raise ValueError('Action type {0} is not supported'.format(unified_action.type))
-
-        method = getattr(self, method_name)
-        return method(unified_action, action_result)
+    class ActionsMapping(object):
+        def __init__(self):
+            self.action_tree = ''
+            self.remove_mapping = ''
+            self.set_mapping = ''
