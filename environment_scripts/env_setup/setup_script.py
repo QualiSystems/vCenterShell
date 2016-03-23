@@ -64,9 +64,6 @@ class EnvironmentSetup:
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
-            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[{0}] Discovery started'.format(deployed_app_name))
-
             resource_details = api.GetResourceDetails(deployed_app_name)
             resource_details_cache[deployed_app_name] = resource_details
 
@@ -75,10 +72,15 @@ class EnvironmentSetup:
             if autoload_param:
                 autoload = autoload_param.Value
             if autoload.lower() != "true":
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] Discovery disabled'.format(deployed_app_name))
                 continue
 
             try:
                 self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] Discovery started'.format(deployed_app_name))
+
                 api.AutoLoad(deployed_app_name)
 
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
@@ -154,16 +156,17 @@ class EnvironmentSetup:
         resources = reservation_details.ReservationDescription.Resources
         pool = ThreadPool(len(resources))
 
-        results = [pool.apply_async(self._power_on_refresh_ip_install,
+        async_results = [pool.apply_async(self._power_on_refresh_ip_install,
                                     (api, resource, deploy_result, resource_details_cache))
                    for resource in resources]
 
         pool.close()
         pool.join()
 
-        for res in results:
-            if not res.successful():
-                raise Exception("Reservation is Active with Errors")
+        for async_result in async_results:
+            res = async_result.get()
+            if not res[0]:
+                raise Exception("Reservation is Active with Errors - " + res[1])
 
     def _power_on_refresh_ip_install(self, api, resource, deploy_result, resource_details_cache):
         """
@@ -192,7 +195,7 @@ class EnvironmentSetup:
             # check if deployed app
             if not resource_details.VmDetails:
                 self.logger.debug("Resource {0} is not a deployed app, nothing to do with it".format(deployed_app_name))
-                return True
+                return True, ""
 
             auto_power_on_param = get_vm_custom_param(resource_details.VmDetails.VmCustomParams, "auto_power_on")
             if auto_power_on_param:
@@ -208,7 +211,8 @@ class EnvironmentSetup:
                         deployed_app_data = data
         except Exception as exc:
             self.logger.error("Error getting resource details for deployed app {0} in reservation {1}. "
-                              "Will use default settings. Error: {2}".format(deployed_app_name, self.reservation_id,
+                              "Will use default settings. Error: {2}".format(deployed_app_name,
+                                                                             self.reservation_id,
                                                                              str(exc)))
 
         try:
@@ -216,23 +220,23 @@ class EnvironmentSetup:
         except Exception as exc:
             self.logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            raise
+            return False, "Error powering on deployed app {0}".format(deployed_app_name)
 
         try:
             self._wait_for_ip(api, deployed_app_name, wait_for_ip)
         except Exception as exc:
             self.logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            raise
+            return False, "Error refreshing IP deployed app {0}. Error: {1}".format(deployed_app_name, exc.message)
 
         try:
             self._install(api, deployed_app_data, deployed_app_name)
         except Exception as exc:
             self.logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            raise
+            return False, "Error installing deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
 
-        return True
+        return True, ""
 
     def _install(self, api, deployed_app_data, deployed_app_name):
         installation_info = None
@@ -241,12 +245,14 @@ class EnvironmentSetup:
         else:
             self.logger.info("Cant execute installation script for deployed app {0} - No deployment data"
                              .format(deployed_app_name))
-        if installation_info:
+            return
+
+        if installation_info and hasattr(installation_info, "ScriptCommandName"):
             self.logger.info("Executing installation script {0} on deployed app {1} in reservation {2}"
                              .format(installation_info.ScriptCommandName, deployed_app_name, self.reservation_id))
             api.WriteMessageToReservationOutput(
                     reservationId=self.reservation_id,
-                    message='[{0}] installation started'.format(deployed_app_name))
+                    message='[{0}] Installation started'.format(deployed_app_name))
             script_inputs = []
             for installation_script_input in installation_info.ScriptInputs:
                 script_inputs.append(
@@ -256,7 +262,7 @@ class EnvironmentSetup:
                                                  installation_info.ScriptCommandName, script_inputs)
             api.WriteMessageToReservationOutput(
                     reservationId=self.reservation_id,
-                    message='[{0}] installation ended successfully'.format(deployed_app_name))
+                    message='[{0}] Installation ended successfully'.format(deployed_app_name))
 
             self.logger.debug("Installation_result: " + installation_result.Output)
 
