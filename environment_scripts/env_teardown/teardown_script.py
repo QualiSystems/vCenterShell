@@ -15,13 +15,13 @@ class EnvironmentTeardown:
         api = helpers.get_api_session()
         reservation_details = api.GetReservationDetails(self.reservation_id)
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[beginning teardown reservation]')
+                                            message='[Beginning teardown reservation]')
         self._disconnect_all_routes_in_reservation(api, reservation_details)
         self._power_off_all_vm_resources(api, reservation_details)
 
         self.logger.info("Teardown for reservation {0} completed".format(self.reservation_id))
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[reservation teardown finished successfully]')
+                                            message='[Reservation teardown finished successfully]')
 
     def _disconnect_all_routes_in_reservation(self, api, reservation_details):
         connectors = reservation_details.ReservationDescription.Connectors
@@ -38,7 +38,7 @@ class EnvironmentTeardown:
 
         try:
             api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[disconnecting all routes in reservation]')
+                                                message='[Disconnecting all routes in reservation]')
             api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
         except Exception as exc:
             self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
@@ -75,7 +75,7 @@ class EnvironmentTeardown:
                                  .format(resource_name, self.reservation_id))
 
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] is being deleted'.format(resource_name))
+                                                    message='[{0}] Deleted resource'.format(resource_name))
 
                 api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "remote_destroy_vm",
                                                     "remote_app_management")
@@ -89,7 +89,7 @@ class EnvironmentTeardown:
                     self.logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
                                      .format(resource_name, self.reservation_id))
                     api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                        message='[{0}] is powering off'.format(resource_name))
+                                                        message='[{0}] Powering off'.format(resource_name))
                     api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
 
                 else:
