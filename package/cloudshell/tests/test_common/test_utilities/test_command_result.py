@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from cloudshell.cp.vcenter.models.ActionResult import Test
 from cloudshell.cp.vcenter.models.ActionResult import ActionResult
 from cloudshell.cp.vcenter.models.ConnectionResult import ConnectionResult
 from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
