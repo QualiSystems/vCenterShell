@@ -36,7 +36,7 @@ from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 
 
 class CommandOrchestrator(object):
-    def __init__(self, context):
+    def __init__(self):
         """
         Initialize the driver session, this function is called everytime a new instance of the driver is created
         in here the driver is going to be bootstrapped
@@ -48,8 +48,7 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                                  VMwarevCenterResourceModel)
+
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         ovf_service = OvfImageDeployerService(self.resource_model_parser, getLogger('OvfImageDeployerService'))
