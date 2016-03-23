@@ -57,15 +57,15 @@ class EnvironmentSetup:
         """
 
         if deploy_result is None:
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message='[No apps to discover]')
             return
-
-        reservation_id = reservation_details.ReservationDescription.Id
 
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
             api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[{0}] discovery started'.format(deployed_app_name))
+                                                message='[{0}] Discovery started'.format(deployed_app_name))
 
             resource_details = api.GetResourceDetails(deployed_app_name)
             resource_details_cache[deployed_app_name] = resource_details
@@ -82,20 +82,25 @@ class EnvironmentSetup:
                 api.AutoLoad(deployed_app_name)
 
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] discovery ended successfully'.format(
-                                                            deployed_app_name))
+                                                    message='[{0}] Discovery ended successfully'
+                                                            .format(deployed_app_name))
             except CloudShellAPIError as exc:
                 self.logger.error(
                         "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                                   exc.rawxml))
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] Discovery failed: {1}'
+                                                            .format(deployed_app_name, exc.message))
             except Exception as exc:
-                self.logger.error(
-                        "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                                  str(exc)))
+                self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}"
+                                  .format(deployed_app_name, str(exc)))
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message='[{0}] Discovery failed: {1}'
+                                                            .format(deployed_app_name, exc.message))
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
-        if not apps:
+        if not apps or (len(apps) == 1 and not apps[0].Name):
             self.logger.info("No apps found in reservation {0}".format(self.reservation_id))
             return None
 
@@ -149,11 +154,16 @@ class EnvironmentSetup:
         resources = reservation_details.ReservationDescription.Resources
         pool = ThreadPool(len(resources))
 
-        for resource in resources:
-            pool.apply_async(self._power_on_refresh_ip_install, (api, resource, deploy_result, resource_details_cache))
+        results = [pool.apply_async(self._power_on_refresh_ip_install,
+                                    (api, resource, deploy_result, resource_details_cache))
+                   for resource in resources]
 
         pool.close()
         pool.join()
+
+        for res in results:
+            if not res.successful():
+                raise Exception("Reservation is Active with Errors")
 
     def _power_on_refresh_ip_install(self, api, resource, deploy_result, resource_details_cache):
         """
@@ -206,21 +216,21 @@ class EnvironmentSetup:
         except Exception as exc:
             self.logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            return False
+            raise
 
         try:
             self._wait_for_ip(api, deployed_app_name, wait_for_ip)
         except Exception as exc:
             self.logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            return False
+            raise
 
         try:
             self._install(api, deployed_app_data, deployed_app_name)
         except Exception as exc:
             self.logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
-            return False
+            raise
 
         return True
 

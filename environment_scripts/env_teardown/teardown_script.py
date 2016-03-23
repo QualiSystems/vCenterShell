@@ -63,9 +63,8 @@ class EnvironmentTeardown:
         :param ResourceInfo resource_info:
         :return:
         """
+        resource_name = resource_info.Name
         try:
-            resource_name = resource_info.Name
-
             delete = "true"
             auto_delete_param = get_vm_custom_param(resource_info.VmDetails.VmCustomParams, "auto_delete")
             if auto_delete_param:
