@@ -7,30 +7,29 @@ class VirtualSwitchConnectCommand:
                  virtual_switch_to_machine_connector,
                  dv_port_group_name_generator,
                  vlan_spec_factory,
-                 vlan_id_range_parser,
-                 logger):
+                 vlan_id_range_parser):
         """
         :param py_service: vCenter API wrapper
         :param virtual_switch_to_machine_connector:
         :param dv_port_group_name_generator: DvPortGroupNameGenerator
         :param vlan_spec_factory: VlanSpecFactory
         :param vlan_id_range_parser: VLanIdRangeParser
-        :param logger Logger
         """
         self.pv_service = pv_service
         self.virtual_switch_to_machine_connector = virtual_switch_to_machine_connector
         self.dv_port_group_name_generator = dv_port_group_name_generator
         self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
-        self.logger = logger
 
-    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name, reserved_networks):
+    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name, reserved_networks, logger):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter
         :param vm_uuid: <str> UUID for VM
         :param vm_network_mappings: <collection of 'VmNetworkMapping'>
         :param default_network_name: <str> Full Network name - likes 'DataCenterName/NetworkName'
+        :param reserved_networks:
+        :param logger:
         :return: None
         """
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
@@ -46,7 +45,7 @@ class VirtualSwitchConnectCommand:
         mappings = self._prepare_mappings(vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
-            si, vm, mappings, default_network_instance, reserved_networks)
+            si, vm, mappings, default_network_instance, reserved_networks, logger)
 
         connection_results = []
         for updated_mapping in updated_mappings:

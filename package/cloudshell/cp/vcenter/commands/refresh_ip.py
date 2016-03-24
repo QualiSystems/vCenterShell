@@ -4,9 +4,6 @@ import time
 from cloudshell.cp.vcenter.commands.ip_result import IpResult, IpReason
 
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
-from cloudshell.cp.vcenter.common.logger import getLogger
-
-logger = getLogger(__name__)
 
 
 class RefreshIpCommand(object):
@@ -17,7 +14,7 @@ class RefreshIpCommand(object):
         self.pyvmomi_service = pyvmomi_service
         self.resource_model_parser = resource_model_parser
 
-    def refresh_ip(self, si, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
+    def refresh_ip(self, si, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context, logger):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 

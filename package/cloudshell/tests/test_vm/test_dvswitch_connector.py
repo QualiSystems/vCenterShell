@@ -43,7 +43,12 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         network_map.vlan_id = '100'
         network_map.vlan_spec = 'Access'
         # Act
-        virtual_switch_to_machine_connector.connect_by_mapping(si, vm, [network_map], Mock(spec=vim.Network), [])
+        virtual_switch_to_machine_connector.connect_by_mapping(si=si,
+                                                               vm=vm,
+                                                               mapping=[network_map],
+                                                               default_network=Mock(spec=vim.Network),
+                                                               reserved_networks=[],
+                                                               logger=Mock())
 
     def integrationtest(self):
         resource_connection_details_retriever = Mock()

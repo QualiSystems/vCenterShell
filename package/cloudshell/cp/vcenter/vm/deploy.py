@@ -2,7 +2,6 @@ from cloudshell.cp.vcenter.models.DeployResultModel import DeployResult
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from cloudshell.cp.vcenter.vm.ovf_image_params import OvfImageParams
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
-
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 
 
@@ -11,6 +10,7 @@ class VirtualMachineDeployer(object):
         """
 
         :param pv_service:
+        :type pv_service: cloudshell.cp.vcenter.common.vcenter.vmomi_service.pyVmomiService
         :param name_generator:
         :param ovf_service:
         :param cs_helper:
@@ -23,9 +23,10 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
-    def deploy_from_template(self, si, data_holder, resource_context):
+    def deploy_from_template(self, si, logger, data_holder, resource_context):
         """
         :param si:
+        :param logger:
         :type data_holder: DeployFromTemplateDetails
         :type resource_context
         :return:
@@ -52,7 +53,7 @@ class VirtualMachineDeployer(object):
                                                    resource_pool=template_resource_model.vm_resource_pool,
                                                    power_on=template_resource_model.auto_power_on)
 
-        clone_vm_result = self.pv_service.clone_vm(params)
+        clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger)
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
 
@@ -68,7 +69,7 @@ class VirtualMachineDeployer(object):
                             autoload=template_resource_model.autoload
                             )
 
-    def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context):
+    def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context, logger):
         vm_name = self.name_generator(data_holder.app_name)
 
         connection_details = self.cs_helper.get_connection_details(session=session,

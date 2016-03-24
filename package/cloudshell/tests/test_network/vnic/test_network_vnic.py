@@ -42,7 +42,7 @@ class TestNetwork(TestCase):
         nicspec = Mock()
 
         nicspec.device = device
-        res = VNicService.vnic_attach_to_network_standard(nicspec, network)
+        res = VNicService.vnic_attach_to_network_standard(nicspec=nicspec,network= network, logger=Mock())
         self.assertEquals(res.device.backing.network.name, "xnet")
 
     def test_device_attahed_to_network_distributed(self):
@@ -61,7 +61,7 @@ class TestNetwork(TestCase):
         nicspec = Mock()
 
         nicspec.device = device
-        res = VNicService.vnic_attach_to_network_distributed(nicspec, port_group)
+        res = VNicService.vnic_attach_to_network_distributed(nicspec=nicspec, port_group=port_group, logger=Mock())
         self.assertEquals(res.device.backing.port.portgroupKey, "group_net")
 
 
@@ -69,7 +69,7 @@ class TestNetwork(TestCase):
         vm = Mock()
         vm.ReconfigVM_Task = lambda x: isinstance(x,  vim.vm.ConfigSpec)
         nicspec = Mock()
-        res = VNicService.vnic_add_to_vm_task(nicspec, vm)
+        res = VNicService.vnic_add_to_vm_task(nicspec=nicspec, virtual_machine=vm, logger=Mock())
         self.assertIsNone(res)
 
         # nicspec = Mock(spec=vim.vm.device.VirtualDeviceSpec)
@@ -84,7 +84,7 @@ class TestNetwork(TestCase):
         pyVmomiService.vm_reconfig_task = Mock()
 
         #act
-        res = VNicService.vnic_add_to_vm_task(nicspec, vm)
+        res = VNicService.vnic_add_to_vm_task(nicspec=nicspec, virtual_machine=vm, logger=Mock())
 
         #assert
         self.assertTrue(VNicService.vnic_set_connectivity_status.called)
@@ -94,9 +94,8 @@ class TestNetwork(TestCase):
         nicspec = Mock()
         nicspec.device = Mock()
         connect_status = True
-        nicspec = VNicService.vnic_set_connectivity_status(nicspec, connect_status)
+        nicspec = VNicService.vnic_set_connectivity_status(nicspec=nicspec, is_connected=connect_status, logger=Mock())
         self.assertEquals(nicspec.device.connectable.connected, connect_status)
-
 
     def test_vnic_is_attachet_to_network(self):
         nicspec = Mock()
@@ -138,7 +137,7 @@ class TestNetwork(TestCase):
         #VNicService.vnic_add_to_vm_task = Mock()
 
         #act
-        VNicService.vnic_add_new_to_vm_task(vm)
+        VNicService.vnic_add_new_to_vm_task(vm=vm, network=None, logger=Mock())
 
         #assert
         self.assertTrue(VNicService.vnic_new_attached_to_network.called)

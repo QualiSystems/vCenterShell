@@ -1,5 +1,5 @@
+from cloudshell.core.logger.qs_logger import get_qs_logger
 from TimerWrapper import TimerWrapper
-from cloudshell.cp.vcenter.common.logger import getLogger
 
 
 class PerfMethodWrapper:
@@ -9,7 +9,7 @@ class PerfMethodWrapper:
         self._print_format = '{0} ran: {1} times - total: {2} (sec) avg: {3} (sec)'
 
         if logger is None:
-            logger = getLogger('performance')
+            logger = get_qs_logger('performance')
         self.logger = logger
 
     def run(self, i=1):

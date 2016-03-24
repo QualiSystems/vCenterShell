@@ -3,10 +3,6 @@
 from pyVmomi import vim
 from cloudshell.cp.vcenter.models.VirtualNicModel import VirtualNicModel
 
-from cloudshell.cp.vcenter.common.logger import getLogger
-
-_logger = getLogger("vCenterShell")
-
 
 # @todo very much trivial implementation. Should be moved & expanded
 class ConnectionException(Exception):
@@ -21,7 +17,7 @@ class NetworkAdaptersRetrieverCommand(object):
         """
         self.pv_service = pv_service
 
-    def retrieve(self, si, path, network_name):
+    def retrieve(self, si, path, network_name, logger):
         """
         Retrieve Network by Name
         :param si: <service instance>
@@ -29,7 +25,7 @@ class NetworkAdaptersRetrieverCommand(object):
         :param network_name: <str>
         :return: <list of 'VirtualNicModel'>
         """
-        _logger.debug("Retrieving Network... Path: '{0}' Name: '{1}'".format(path, network_name))
+        logger.debug("Retrieving Network... Path: '{0}' Name: '{1}'".format(path, network_name))
         vm_machine = self.pv_service.find_network_by_name(si, path, network_name)
 
         result = [VirtualNicModel(x.deviceInfo.summary,

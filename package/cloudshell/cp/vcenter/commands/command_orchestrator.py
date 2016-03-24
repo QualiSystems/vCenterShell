@@ -1,6 +1,4 @@
 import time
-from logging import getLogger
-
 import jsonpickle
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
@@ -49,7 +47,7 @@ class CommandOrchestrator(object):
 
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        ovf_service = OvfImageDeployerService(self.resource_model_parser, getLogger('OvfImageDeployerService'))
+        ovf_service = OvfImageDeployerService(self.resource_model_parser)
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -88,8 +86,7 @@ class CommandOrchestrator(object):
                 virtual_switch_to_machine_connector=virtual_switch_to_machine_connector,
                 dv_port_group_name_generator=DvPortGroupNameGenerator(),
                 vlan_spec_factory=VlanSpecFactory(),
-                vlan_id_range_parser=VLanIdRangeParser(),
-                logger=getLogger('VirtualSwitchConnectCommand'))
+                vlan_id_range_parser=VLanIdRangeParser())
         self.connection_orchestrator = ConnectionCommandOrchestrator(
             connector=virtual_switch_connect_command,
             disconnector=self.virtual_switch_disconnect_command,

@@ -4,7 +4,7 @@ import jsonpickle
 from mock import Mock, patch
 
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class MockResourceParser(object):

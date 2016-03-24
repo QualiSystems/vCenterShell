@@ -1,4 +1,4 @@
 @echo off
 pushd package
-python setup.py develop
+C:\work\QualiSystems\Trunk\Drop\TestShell\ExecutionServer\python\2.7.10\python setup.py develop
 popd

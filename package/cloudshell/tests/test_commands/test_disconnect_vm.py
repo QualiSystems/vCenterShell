@@ -35,7 +35,10 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vcenter_data_model = VMwarevCenterResourceModel()
 
         # act
-        res = connector.disconnect(si, vcenter_data_model, uuid)
+        res = connector.disconnect(si, vcenter_data_model, uuid,
+                                   logger=Mock(),
+                                   network_name=None,
+                                   vm=None)
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,
                                                        connection_detail.username,
@@ -71,7 +74,8 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vcenter_data_model = VMwarevCenterResourceModel()
 
         # act
-        res = connector.disconnect(si, vcenter_data_model, uuid, network_name)
+        res = connector.disconnect(si, vcenter_data_model, uuid, logger=Mock(),
+                                   network_name=network_name)
 
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,

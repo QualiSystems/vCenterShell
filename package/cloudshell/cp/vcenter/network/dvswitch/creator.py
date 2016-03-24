@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 from threading import Lock
-
 from pyVmomi import vim
-
-from cloudshell.cp.vcenter.common.logger import getLogger
-
-logger = getLogger("vCenterCommon")
-
 
 class DvPortGroupCreator(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
@@ -22,7 +16,8 @@ class DvPortGroupCreator(object):
                               dv_switch_path,
                               port_group_path,
                               vlan_id,
-                              vlan_spec):
+                              vlan_spec,
+                              logger):
         network = None
         self._lock.acquire()
         try:
@@ -46,7 +41,8 @@ class DvPortGroupCreator(object):
                                            dv_switch_path,
                                            si,
                                            vlan_spec,
-                                           vlan_id)
+                                           vlan_id,
+                                           logger)
                 network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
 
             if not network:
@@ -55,23 +51,25 @@ class DvPortGroupCreator(object):
             self._lock.release()
             return network
 
-    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id):
+    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id, logger):
         dv_switch = self.pyvmomi_service.get_folder(si, '{0}/{1}'.format(dv_switch_path, dv_switch_name))
         if not dv_switch:
             raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
-        task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id)
+        task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id,
+                                                            logger=logger)
         self.synchronous_task_waiter.wait_for_task(task=task,
                                                    action_name='Create dv port group')
 
     @staticmethod
-    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, num_ports=32):
+    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, num_ports=32):
         """
         Create ' Distributed Virtual Portgroup' Task
         :param dv_port_name: <str>  Distributed Virtual Portgroup Name
         :param dv_switch: <vim.dvs.VmwareDistributedVirtualSwitch> Switch this Portgroup will be belong to
         :param spec:
         :param vlan_id: <int>
+        :param logger:
         :param num_ports: <int> number of ports in this Group
         :return: <vim.Task> Task which really provides update
         """

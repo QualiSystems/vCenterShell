@@ -1,17 +1,10 @@
 ﻿import time
-
 import requests
 from pyVmomi import vim
-from cloudshell.cp.vcenter.common.logger import getLogger
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
-
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 
-logger = getLogger(__name__)
-
-
-# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class pyVmomiService:
     # region consts
@@ -388,11 +381,12 @@ class pyVmomiService:
             self.vm = vm
             self.error = error
 
-    def clone_vm(self, clone_params):
+    def clone_vm(self, clone_params, logger):
         """
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
         :param clone_params: CloneVmParameters =
+        :param logger:
         """
         result = self.CloneVmResult()
 
@@ -514,10 +508,11 @@ class pyVmomiService:
 
         return resource_pool, host
 
-    def destroy_vm(self, vm):
+    def destroy_vm(self, vm, logger):
         """ 
         destroy the given vm  
         :param vm: virutal machine pyvmomi object
+        :param logger:
         """
 
         if vm.runtime.powerState == 'poweredOn':
@@ -531,30 +526,32 @@ class pyVmomiService:
         task = vm.Destroy_Task()
         return self.wait_for_task(task)
 
-    def destroy_vm_by_name(self, si, vm_name, vm_path):
+    def destroy_vm_by_name(self, si, vm_name, vm_path, logger):
         """ 
         destroy the given vm  
         :param si:      pyvmomi 'ServiceInstance'
         :param vm_name: str name of the vm to destroyed
         :param vm_path: str path to the vm that will be destroyed
+        :param logger:
         """
         if vm_name is not None:
             vm = self.find_vm_by_name(si, vm_path, vm_name)
             if vm:
-                return self.destroy_vm(vm)
+                return self.destroy_vm(vm, logger)
         raise ValueError('vm not found')
 
-    def destroy_vm_by_uuid(self, si, vm_uuid, vm_path):
+    def destroy_vm_by_uuid(self, si, vm_uuid, vm_path, logger):
         """
         destroy the given vm
         :param si:      pyvmomi 'ServiceInstance'
         :param vm_uuid: str uuid of the vm to destroyed
         :param vm_path: str path to the vm that will be destroyed
+        :param logger:
         """
         if vm_uuid is not None:
             vm = self.find_by_uuid(si, vm_uuid, vm_path)
             if vm:
-                return self.destroy_vm(vm)
+                return self.destroy_vm(vm, logger)
         # return 'vm not found'
         # for apply the same Interface as for 'destroy_vm_by_name'
         raise ValueError('vm not found')

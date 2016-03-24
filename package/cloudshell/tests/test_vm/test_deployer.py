@@ -45,7 +45,8 @@ class TestVirtualMachineDeployer(TestCase):
         res = self.deployer.deploy_from_template(
             si=self.si,
             data_holder=deploy_from_template_details,
-            resource_context=resource_context)
+            resource_context=resource_context,
+            logger=Mock())
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -83,7 +84,7 @@ class TestVirtualMachineDeployer(TestCase):
         resource_context = self._create_vcenter_resource_context()
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, deploy_from_template_details,
-                          resource_context)
+                          resource_context, Mock())
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):

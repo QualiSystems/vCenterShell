@@ -32,7 +32,7 @@ class TestOvfImageService(unittest.TestCase):
              '--vlan="anetwork"',
              'http://192.168.65.88/ovf/Debian 64 - Yoav.ovf',
              'vi://vcenter%20user:password%20to%20vcenter@venter.host.com/QualiSB/host/QualiSB%20Cluster/Resources/LiverPool']
-        ovf = OvfImageDeployerService('dummypath/ovftool.exe', Mock())
+        ovf = OvfImageDeployerService('dummypath/ovftool.exe')
         image_params = Mock()
         image_params.connectivity = VCenterConnectionDetails('venter.host.com', 'vcenter user', 'password to vcenter')
 
@@ -52,7 +52,7 @@ class TestOvfImageService(unittest.TestCase):
 
         ovf._validate_url_exists = Mock(return_value=True)
 
-        res = ovf.deploy_image(vcenter_data_model, image_params)
+        res = ovf.deploy_image(vcenter_data_model, image_params, logger=Mock())
 
         self.assertTrue(res)
         self.assertEqual(PROCESS.args, expected_args)
@@ -62,7 +62,7 @@ class TestOvfImageService(unittest.TestCase):
     def test_deploy_image_no_communication(self):
 
         PROCESS.communicate = Mock(return_value=None)
-        ovf = OvfImageDeployerService('dummypath/ovftool.exe', Mock())
+        ovf = OvfImageDeployerService('dummypath/ovftool.exe')
         image_params = Mock()
         image_params.connectivity = VCenterConnectionDetails('venter.host.com', 'vcenter user', 'password to vcenter')
 
@@ -86,7 +86,7 @@ class TestOvfImageService(unittest.TestCase):
     def test_deploy_image_error(self):
 
         PROCESS.communicate = Mock(return_value=['error'])
-        ovf = OvfImageDeployerService('dummypath/ovftool.exe', Mock())
+        ovf = OvfImageDeployerService('dummypath/ovftool.exe')
         image_params = Mock()
         image_params.connectivity = VCenterConnectionDetails('venter.host.com', 'vcenter user', 'password to vcenter')
         image_params.datacenter = 'QualiSB'
@@ -105,7 +105,7 @@ class TestOvfImageService(unittest.TestCase):
         vcenter_data_model.ovf_tool_path = 'dummypath/ovftool.exe'
 
         try:
-            ovf.deploy_image(vcenter_data_model, image_params)
+            ovf.deploy_image(vcenter_data_model, image_params, logger=Mock())
             # should not reach here
             self.assertTrue(False)
         except Exception as inst:

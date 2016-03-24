@@ -13,7 +13,7 @@ from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNam
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.portgroup_configurer import *
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):

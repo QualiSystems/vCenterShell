@@ -1,30 +1,26 @@
 import time
-
 from pyVmomi import vim
 
-from cloudshell.cp.vcenter.common.logger import getLogger
-
-logger = getLogger(__name__)
-# configure_loglevel("INFO", "INFO", os.path.join(__file__, os.pardir, os.pardir, os.pardir, 'logs', 'vCenter.log'))
 
 class SynchronousTaskWaiter(object):
     def __init__(self):
         pass
 
     # noinspection PyMethodMayBeStatic
-    def wait_for_task(self, task, action_name='job', hideResult=False):
+    def wait_for_task(self, task, action_name, hide_result, logger):
         """
         Waits and provides updates on a vSphere task
-        :param hideResult:
-        :param action_name:
         :param task:
+        :param action_name:
+        :param hide_result:
+        :param logger:
         """
 
         while task.info.state == vim.TaskInfo.State.running:
             time.sleep(2)
 
         if task.info.state == vim.TaskInfo.State.success:
-            if task.info.result is not None and not hideResult:
+            if task.info.result is not None and not hide_result:
                 out = '%s completed successfully, result: %s' % (action_name, task.info.result)
                 logger.info(out)
             else:

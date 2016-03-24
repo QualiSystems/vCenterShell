@@ -4,7 +4,6 @@ from mock import Mock, patch, MagicMock, create_autospec
 from vcentershell_driver.driver import VCenterShellDriver
 
 
-
 class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.driver = VCenterShellDriver()
@@ -75,7 +74,7 @@ class TestCommandOrchestrator(TestCase):
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.deploy_from_template.called_with(self.context,
-                                                                                          deploy_data))
+                                                                                          deploy_data, Mock()))
 
     def test_deploy_from_image(self):
         self.setUp()

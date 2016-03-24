@@ -9,7 +9,7 @@ from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerSer
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class VirtualMachinePowerManagementCommandIntegrationTest(TestCase):

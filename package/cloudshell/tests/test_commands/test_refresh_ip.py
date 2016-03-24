@@ -59,7 +59,8 @@ class TestRefreshIpCommand(TestCase):
                                       vcenter_data_model= center_resource_model,
                                       vm_uuid='machine1',
                                       resource_name='default_network',
-                                      cancellation_context=cancellation_context)
+                                      cancellation_context=cancellation_context,
+                                      logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -120,7 +121,8 @@ class TestRefreshIpCommand(TestCase):
             vcenter_data_model=center_resource_model,
             vm_uuid='machine1',
             resource_name='default_network',
-            cancellation_context=cancellation_context)
+            cancellation_context=cancellation_context,
+            logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -173,7 +175,8 @@ class TestRefreshIpCommand(TestCase):
             vcenter_data_model=center_resource_model,
             vm_uuid='machine1',
             resource_name='default_network',
-            cancellation_context=cancellation_context)
+            cancellation_context=cancellation_context,
+            logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))

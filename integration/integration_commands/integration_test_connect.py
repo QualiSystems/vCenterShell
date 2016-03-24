@@ -15,7 +15,7 @@ from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VirtualSwitchToMachineConnector
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
