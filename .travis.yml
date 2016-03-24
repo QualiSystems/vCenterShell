@@ -10,7 +10,7 @@ install:
 
 script:
     - pushd package
-    - python setup.py test
+    - python setup.py develop
     - popd
     - python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration
 
