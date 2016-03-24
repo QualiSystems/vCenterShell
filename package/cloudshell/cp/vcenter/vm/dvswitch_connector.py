@@ -64,7 +64,7 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_id,
                                                                        network_map.vlan_spec)
 
-            request_mapping.append(ConnectRequest(self._get_vnic_name(network_map.vnic_name), network))
+            request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
         logger.debug(str(request_mapping))
         return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm,
@@ -72,8 +72,3 @@ class VirtualSwitchToMachineConnector(object):
                                                                                    default_network,
                                                                                    reserved_networks)
 
-    @staticmethod
-    def _get_vnic_name(vnic_name):
-        if str(vnic_name).isdigit():
-            vnic_name = 'Network adapter {0}'.format(vnic_name)
-        return vnic_name
