@@ -9,7 +9,9 @@ install:
     - pip install coveralls
 
 script:
-    python package/setup.py tests
+    pushd package
+    python setup.py tests
+    popd
     python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration
 
 after_success:
