@@ -74,7 +74,7 @@ class VirtualMachinePortGroupConfigurer(object):
     def disconnect_all_networks(self, vm, default_network, reserved_networks):
         vnics = self.vnic_service.map_vnics(vm)
         network_for_removal = self.get_networks_on_vnics(vm, vnics.values())
-        update_mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
+        update_mapping = [VNicDeviceMapper(vnic, vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
         res = self.update_vnic_by_mapping(vm, update_mapping)
         self.erase_network_by_mapping(network_for_removal, reserved_networks)
         return res
