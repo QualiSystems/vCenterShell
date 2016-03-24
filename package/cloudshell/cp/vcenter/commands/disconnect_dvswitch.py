@@ -52,6 +52,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
             vnics.append(vnic)
             mappings.append(VNicDeviceMapper(connect=False, network=default_network,
+                                             requested_vnic=vm_network_remove_mapping.mac_address,
                                              vnic=vnic, mac=vm_network_remove_mapping.mac_address))
 
         networks_to_remove = self.port_group_configurer.get_networks_on_vnics(vm, vnics)

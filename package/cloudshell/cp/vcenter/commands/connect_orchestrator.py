@@ -139,7 +139,7 @@ class ConnectionCommandOrchestrator(object):
 
     def _create_map(self, vlan_id, mode, vnic_name):
         vnic_to_network = VmNetworkMapping()
-        vnic_to_network.vnic_name = vnic_name
+        vnic_to_network.vnic_name = self._validate_vnic_name(vnic_name)
         vnic_to_network.dv_switch_path = self.dv_switch_path
         vnic_to_network.dv_switch_name = self.dv_switch_name
         vnic_to_network.port_group_path = self.port_group_path
@@ -174,28 +174,12 @@ class ConnectionCommandOrchestrator(object):
                                                                     action_mappings.set_mapping,
                                                                     self.default_network,
                                                                     self.reserved_networks)
-            connection_res_map = dict()
-            for connection_result in connection_results:
-                vlan_spec = connection_result.network_name.split('_')
-                mode = vlan_spec[len(vlan_spec) - 1]
-                id = vlan_spec[len(vlan_spec) - 2]
-                if mode not in connection_res_map:
-                    connection_res_map[mode] = dict()
-                connection_res_map[mode][id] = connection_result
-            for mode, actions in set_vlan_actions.items():
-                for action in actions:
-                    vlan_id = action.connectionParams.vlanId
-                    conn_res = connection_res_map[mode][vlan_id]
 
-                    result = ActionResult()
-                    result.actionId = action.actionId
-                    result.success = True
-                    result.errorMessage = None
-                    result.infoMessage = ACTION_SUCCESS_MSG
-                    result.type = ACTION_TYPE_SET_VLAN
-                    result.updatedInterface = conn_res.mac_address
-                    result.network_name = conn_res.network_name
-                    results.append(result)
+            connection_res_map = self._prepare_connection_results_for_extraction(connection_results)
+            act_by_mode_by_vlan = self._group_action_by_vlan_id(set_vlan_actions)
+            act_by_mode_by_vlan_by_nic = self._group_actions_by_vlan_by_vnic(act_by_mode_by_vlan)
+            results += self._get_set_vlan_result_suc(act_by_mode_by_vlan_by_nic, connection_res_map)
+
         except Exception as e:
             for mode, actions in set_vlan_actions.items():
                 for action in actions:
@@ -203,6 +187,65 @@ class ConnectionCommandOrchestrator(object):
                     results.append(error_result)
 
         return results
+
+    def _prepare_connection_results_for_extraction(self, connection_results):
+        connection_res_map = dict()
+        for connection_result in connection_results:
+            vlan_spec = connection_result.network_name.split('_')
+            mode = vlan_spec[len(vlan_spec) - 1]
+            id = vlan_spec[len(vlan_spec) - 2]
+            if mode not in connection_res_map:
+                connection_res_map[mode] = dict()
+            if id not in connection_res_map[mode]:
+                connection_res_map[mode][id] = dict()
+
+            self._add_safely_to_dict(dictionary=connection_res_map[mode][id],
+                                     key=connection_result.requested_vnic,
+                                     value=connection_result)
+        return connection_res_map
+
+    def _get_set_vlan_result_suc(self, act_by_mode_by_vlan_by_nic, connection_res_map):
+        results = []
+        for mode, vlans_to_nics in act_by_mode_by_vlan_by_nic.items():
+            for vlan_id, nics_to_actions in vlans_to_nics.items():
+                for nic_name, actions in nics_to_actions.items():
+                    nic_name = self._validate_vnic_name(nic_name)
+                    for action in actions:
+                        res = connection_res_map[mode][vlan_id][nic_name][0]
+                        connection_res_map[mode][vlan_id][nic_name].remove(res)
+                        result = ActionResult()
+                        result.actionId = action.actionId
+                        result.success = True
+                        result.errorMessage = None
+                        result.infoMessage = ACTION_SUCCESS_MSG
+                        result.type = ACTION_TYPE_SET_VLAN
+                        result.updatedInterface = res.mac_address
+                        result.network_name = res.network_name
+                        results.append(result)
+        return results
+
+    def _group_actions_by_vlan_by_vnic(self, set_actions_grouped_by_vlan_id):
+        set_act_group_by_mode_by_vlan_by_requsted_vnic = dict()
+        for mode, vlan_to_action in set_actions_grouped_by_vlan_id.items():
+            set_act_group_by_mode_by_vlan_by_requsted_vnic[mode] = dict()
+            for vlan_id, actions in vlan_to_action.items():
+                set_act_group_by_mode_by_vlan_by_requsted_vnic[mode][vlan_id] = dict()
+                for action in actions:
+                    name = self._get_vnic_name(action)
+                    self._add_safely_to_dict(
+                        dictionary=set_act_group_by_mode_by_vlan_by_requsted_vnic[mode][vlan_id],
+                        key=name,
+                        value=action)
+        return set_act_group_by_mode_by_vlan_by_requsted_vnic
+
+    def _group_action_by_vlan_id(self, set_vlan_actions):
+        set_actions_grouped_by_vlan_id = dict()
+        for mode, actions in set_vlan_actions.items():
+            set_actions_grouped_by_vlan_id[mode] = dict()
+            for action in actions:
+                vlan_id = action.connectionParams.vlanId
+                self._add_safely_to_dict(dictionary=set_actions_grouped_by_vlan_id[mode], key=vlan_id, value=action)
+        return set_actions_grouped_by_vlan_id
 
     def _remove_vlan(self, action_mappings, si, vm_uuid):
         results = []
@@ -291,3 +334,12 @@ class ConnectionCommandOrchestrator(object):
             self.action_tree = ''
             self.remove_mapping = ''
             self.set_mapping = ''
+
+    @staticmethod
+    def _validate_vnic_name(vnic_name):
+        if not vnic_name:
+            return None
+
+        if str(vnic_name).isdigit():
+            vnic_name = 'Network adapter {0}'.format(vnic_name)
+        return vnic_name

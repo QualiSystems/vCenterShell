@@ -27,9 +27,12 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vnic_device_mapper = create_autospec(spec=VNicDeviceMapper)
         vnic_device_mapper.vnic = create_autospec(spec=vim.vm.device.VirtualEthernetCard)
         vnic_device_mapper.vnic.macAddress = 'AA-BB'
+        vnic_device_mapper.vnic.deviceInfo = Mock()
+        vnic_device_mapper.vnic.deviceInfo.label = 'AA-BB'
         vnic_device_mapper.network = Mock()
         vnic_device_mapper.network.name = 'the network'
         vnic_device_mapper.network.key = 'keyyyyyey'
+        vnic_device_mapper.requested_vnic = 'requested'
 
         self.dv_connector = Mock()
         self.dv_connector.connect_by_mapping = Mock(return_value=[vnic_device_mapper])
