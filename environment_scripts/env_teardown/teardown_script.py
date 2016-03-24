@@ -1,4 +1,7 @@
+# coding=utf-8
 from multiprocessing.pool import ThreadPool
+from threading import Lock
+
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
 from environment_scripts.profiler.env_profiler import profileit
@@ -15,13 +18,13 @@ class EnvironmentTeardown:
         api = helpers.get_api_session()
         reservation_details = api.GetReservationDetails(self.reservation_id)
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Beginning teardown reservation]')
+                                            message="Disconnecting all apps…")
         self._disconnect_all_routes_in_reservation(api, reservation_details)
-        self._power_off_all_vm_resources(api, reservation_details)
+        self._power_off_and_delete_all_vm_resources(api, reservation_details)
 
         self.logger.info("Teardown for reservation {0} completed".format(self.reservation_id))
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Reservation teardown finished successfully]')
+                                            message='Reservation teardown finished successfully')
 
     def _disconnect_all_routes_in_reservation(self, api, reservation_details):
         connectors = reservation_details.ReservationDescription.Connectors
@@ -37,14 +40,14 @@ class EnvironmentTeardown:
         self.logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
 
         try:
-            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[Disconnecting all routes in reservation]')
             api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
         except Exception as exc:
             self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
                               .format(self.reservation_id, str(exc)))
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message="Error disconnecting apps. Error: {0}".format(exc.message))
 
-    def _power_off_all_vm_resources(self, api, reservation_details):
+    def _power_off_and_delete_all_vm_resources(self, api, reservation_details):
         resources = reservation_details.ReservationDescription.Resources
 
         pool = ThreadPool()
@@ -60,6 +63,7 @@ class EnvironmentTeardown:
     def _power_off_or_delete_deployed_app(self, api, resource_info):
         """
         :param api:
+        :param Lock lock:
         :param ResourceInfo resource_info:
         :return:
         """

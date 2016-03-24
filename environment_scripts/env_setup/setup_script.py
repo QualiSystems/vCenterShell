@@ -1,4 +1,6 @@
 from multiprocessing.pool import ThreadPool
+from threading import Lock
+
 import cloudshell.api.cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
 from cloudshell.api.common_cloudshell_api import CloudShellAPIError
@@ -19,7 +21,7 @@ class EnvironmentSetup:
         resource_details_cache = {}
 
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Beginning reservation setup]')
+                                            message='Beginning reservation setup]')
 
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
@@ -85,20 +87,20 @@ class EnvironmentSetup:
 
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
                                                     message='[{0}] Discovery ended successfully'
-                                                            .format(deployed_app_name))
+                                                    .format(deployed_app_name))
             except CloudShellAPIError as exc:
                 self.logger.error(
                         "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                                   exc.rawxml))
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
                                                     message='[{0}] Discovery failed: {1}'
-                                                            .format(deployed_app_name, exc.message))
+                                                    .format(deployed_app_name, exc.message))
             except Exception as exc:
                 self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}"
                                   .format(deployed_app_name, str(exc)))
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
                                                     message='[{0}] Discovery failed: {1}'
-                                                            .format(deployed_app_name, exc.message))
+                                                    .format(deployed_app_name, exc.message))
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
@@ -155,10 +157,11 @@ class EnvironmentSetup:
         """
         resources = reservation_details.ReservationDescription.Resources
         pool = ThreadPool(len(resources))
+        lock = Lock()
 
         async_results = [pool.apply_async(self._power_on_refresh_ip_install,
-                                    (api, resource, deploy_result, resource_details_cache))
-                   for resource in resources]
+                                          (api, lock, resource, deploy_result, resource_details_cache))
+                         for resource in resources]
 
         pool.close()
         pool.join()
@@ -168,9 +171,10 @@ class EnvironmentSetup:
             if not res[0]:
                 raise Exception("Reservation is Active with Errors - " + res[1])
 
-    def _power_on_refresh_ip_install(self, api, resource, deploy_result, resource_details_cache):
+    def _power_on_refresh_ip_install(self, api, lock, resource, deploy_result, resource_details_cache):
         """
         :param CloudShellAPISession api:
+        :param Lock lock:
         :param ReservedResourceInfo resource:
         :param BulkAppDeploymentyInfo deploy_result:
         :param (dict of str: ResourceInfo) resource_details_cache:
