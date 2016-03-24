@@ -31,7 +31,7 @@ class TestCommandOrchestrator(TestCase):
         self.ports = Mock()
 
     def test_init(self):
-        self.driver.initialize(self.context)
+        self.driver.initialize()
 
     def test_connect_bulk(self):
         self.setUp()
