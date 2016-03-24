@@ -9,15 +9,15 @@ logger = getLogger(__name__)
 
 
 class VNicDeviceMapper(object):
-    def __init__(self, vnic, network, connect, mac):
+    def __init__(self, vnic, requested_vnic, network, connect, mac):
         self.vnic = vnic
+        self.requested_vnic = requested_vnic
         self.network = network
         self.connect = connect
         self.vnic_mac = mac
 
 
 class VirtualMachinePortGroupConfigurer(object):
-
     def __init__(self,
                  pyvmomi_service,
                  synchronous_task_waiter,
@@ -37,7 +37,6 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_service = vnic_service
         self.network_name_gen = name_gen
 
-
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks):
         vnic_mapping = self.vnic_service.map_vnics(vm)
 
@@ -45,9 +44,11 @@ class VirtualMachinePortGroupConfigurer(object):
             mapping, vnic_mapping, vm.network, default_network, reserved_networks)
 
         update_mapping = []
-        for vnic_name, network in vnic_to_network_mapping.items():
+        for vnic_name, map in vnic_to_network_mapping.items():
             vnic = vnic_mapping[vnic_name]
-            update_mapping.append(VNicDeviceMapper(vnic, network, True, vnic.macAddress))
+            requseted_vnic = map[1]
+            network = map[0]
+            update_mapping.append(VNicDeviceMapper(vnic, requseted_vnic, network, True, vnic.macAddress))
 
         self.update_vnic_by_mapping(vm, update_mapping)
         return update_mapping
@@ -84,13 +85,13 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def create_mappings_for_all_networks(self, vm, default_network):
         vnics = self.vnic_service.map_vnics(vm)
-        return [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
+        return [VNicDeviceMapper(vnic, vnic, default_network, False, vnic.macAddress) for vnic in vnics.values()]
 
     def create_mapping_for_network(self, vm, network, default_network):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
 
-        mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
+        mapping = [VNicDeviceMapper(vnic, vnic_name, default_network, False, vnic.macAddress)
                    for vnic_name, vnic in vnics.items()
                    if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
         return mapping
@@ -99,7 +100,7 @@ class VirtualMachinePortGroupConfigurer(object):
         condition = lambda vnic: True if default_network else self.vnic_service.is_vnic_connected(vnic)
         vnics = self.vnic_service.map_vnics(vm)
         network_to_remove = self.get_networks_on_vnics(vm, vnics.values())
-        mapping = [VNicDeviceMapper(vnic, default_network, False, vnic.macAddress)
+        mapping = [VNicDeviceMapper(vnic, vnic_name, default_network, False, vnic.macAddress)
                    for vnic_name, vnic in vnics.items()
                    if self.vnic_service.is_vnic_attached_to_network(vnic, network) and condition(vnic)]
 
