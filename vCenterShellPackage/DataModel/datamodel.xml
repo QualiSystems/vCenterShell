@@ -554,7 +554,9 @@
           <ns0:ParentModels />
           <ns0:Drivers>
           </ns0:Drivers>
-          <ns0:Scripts />
+          <ns0:Scripts>
+            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
+          </ns0:Scripts>
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -583,7 +585,9 @@
           <ns0:ParentModels />
           <ns0:Drivers>
           </ns0:Drivers>
-          <ns0:Scripts />
+          <ns0:Scripts>
+            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
+          </ns0:Scripts>
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VLAN Default" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
@@ -620,7 +624,9 @@
           <ns0:ParentModels />
           <ns0:Drivers>
           </ns0:Drivers>
-          <ns0:Scripts />
+          <ns0:Scripts>
+            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
+          </ns0:Scripts>
         </ns0:ResourceModel>
       </ns0:Models>
       <ns0:Categories>
@@ -655,6 +661,9 @@
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
     <ns0:ScriptDescriptor Alias="Teardown script" CategoryName="Hidden Commands" Name="Default Sandbox Teardown" Version="1.0.0">
+      <ns0:ScriptInputs />
+    </ns0:ScriptDescriptor>
+    <ns0:ScriptDescriptor Alias="Connect All" Name="Vlan Service Connect All" Version="1.0.0">
       <ns0:ScriptInputs />
     </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>

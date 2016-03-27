@@ -98,7 +98,7 @@ class VCenterAutoModelDiscovery(object):
 
             obj = self.pv_service.get_folder(si, att_value)
             if not obj or isinstance(obj, str):
-                raise ValueError('Could not find the {0}: {1}'.format(name, attributes[name]))
+                raise ValueError('Could not find {0}'.format(name))
             if vim_type and not isinstance(obj, vim_type):
                 raise ValueError('The given {0}: {1} is not of the correct type'.format(name, attributes[name]))
             return obj
@@ -107,7 +107,11 @@ class VCenterAutoModelDiscovery(object):
     def _get_default(self, all_item_in_vc, vim_type, key):
         obj = self._get_default_from_vc_by_type_and_name(all_item_in_vc, vim_type)
         if isinstance(obj, str):
-            raise Exception('Could not select {0} because: {1}'.format(key, obj))
+            if obj == 'too many options':
+                raise ValueError('{0} must be selected'.format(key))
+
+            raise ValueError('Could not find {0}'.format(key))
+
         return obj
 
     def _check_if_vcenter_user_pass_valid(self, context, session, attributes):
@@ -156,7 +160,7 @@ class VCenterAutoModelDiscovery(object):
         accepted_types = None
         folder = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not folder:
-            raise ValueError('VM folder cannot be empty')
+            raise ValueError('VM Folder cannot be empty')
 
         f_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, f_name))
@@ -218,7 +222,7 @@ class VCenterAutoModelDiscovery(object):
     def _validate_holding_network(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         holding_network = self._validate_attribute(si, attributes, vim.Network, key, dc_name)
         if not holding_network:
-            raise ValueError('Holding network cannot be empty')
+            raise ValueError('Holding Network cannot be empty')
 
         n_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, n_name))
@@ -251,12 +255,12 @@ class VCenterAutoModelDiscovery(object):
             raise ValueError('{0} cannot be empty'.format(name))
 
     @staticmethod
-    def _validate_empty(ai, all_items_in_vc, attributes, auto_attr, dc_name, key):
+    def _validate_empty(si, all_items_in_vc, attributes, auto_attr, dc_name, key):
         return
 
     def _get_validation_method(self, name):
         if not name:
-            return self._validate_empty()
+            return self._validate_empty
         name = name.lower()
         name = name.split(' ')
         name = '_'.join(name)

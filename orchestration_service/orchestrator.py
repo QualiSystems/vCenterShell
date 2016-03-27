@@ -76,7 +76,8 @@ class DeployAppOrchestrationDriver(object):
         try:
             reservation = api.GetReservationDetails(reservation_id)
             connectors = [connector for connector in reservation.ReservationDescription.Connectors
-                          if connector.Source == resource_name or connector.Target == resource_name]
+                          if connector.State in ['Disconnected', 'PartiallyConnected', 'ConnectionFailed'] and
+                          connector.Source == resource_name or connector.Target == resource_name]
             endpoints = []
             for endpoint in connectors:
                 endpoints.append(endpoint.Target)
