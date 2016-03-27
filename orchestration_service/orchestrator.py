@@ -47,7 +47,8 @@ class DeployAppOrchestrationDriver(object):
         self._power_on_deployed_app(session, deployed_app_name, deployment_result, reservation_id)
         self._write_message(deployed_app_name, reservation_id, session, 'powered on successfully')
 
-        self._write_message(deployed_app_name, reservation_id, session, 'is waiting for IP address, this may take a while...')
+        self._write_message(deployed_app_name, reservation_id, session,
+                            'is waiting for IP address, this may take a while...')
         ip = self._refresh_ip(session, deployment_result, reservation_id)
         self._write_message(deployed_app_name, reservation_id, session,
                             'IP address is {0}'.format(ip) if ip else 'IP address not found')
@@ -135,7 +136,7 @@ class DeployAppOrchestrationDriver(object):
 
         self.logger.info(
                 "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
-                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
+                    .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
         self._write_message(deployment_result.LogicalResourceName, reservation_id, api, 'installation started')
         try:
 

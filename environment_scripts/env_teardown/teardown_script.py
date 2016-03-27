@@ -17,9 +17,12 @@ class EnvironmentTeardown:
     def execute(self):
         api = helpers.get_api_session()
         reservation_details = api.GetReservationDetails(self.reservation_id)
+
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message="Disconnecting all apps…")
+                                            message='Beginning reservation teardown')
+
         self._disconnect_all_routes_in_reservation(api, reservation_details)
+
         self._power_off_and_delete_all_vm_resources(api, reservation_details)
 
         self.logger.info("Teardown for reservation {0} completed".format(self.reservation_id))
@@ -30,16 +33,20 @@ class EnvironmentTeardown:
         connectors = reservation_details.ReservationDescription.Connectors
         endpoints = []
         for endpoint in connectors:
-            endpoints.append(endpoint.Target)
-            endpoints.append(endpoint.Source)
+            if endpoint.Target and endpoint.Source:
+                endpoints.append(endpoint.Target)
+                endpoints.append(endpoint.Source)
 
-        if len(endpoints) == 0:
+        if not endpoints:
             self.logger.info("No routes to disconnect for reservation {0}".format(self.reservation_id))
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message="Nothing to disconnecting")
             return
 
-        self.logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
-
         try:
+            self.logger.info("Executing disconnect routes for reservation {0}".format(self.reservation_id))
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message="Disconnecting all apps...")
             api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
         except Exception as exc:
             self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
@@ -51,19 +58,38 @@ class EnvironmentTeardown:
         resources = reservation_details.ReservationDescription.Resources
 
         pool = ThreadPool()
+        async_results = []
+        lock = Lock()
+        message_status = {
+            "power_off": False,
+            "delete": False
+        }
 
         for resource in resources:
             resource_details = api.GetResourceDetails(resource.Name)
             if resource_details.VmDetails:
-                pool.apply_async(self._power_off_or_delete_deployed_app, (api, resource_details))
+                result_obj = pool.apply_async(self._power_off_or_delete_deployed_app,
+                                              (api, resource_details, lock, message_status))
+                async_results.append(result_obj)
 
         pool.close()
         pool.join()
 
-    def _power_off_or_delete_deployed_app(self, api, resource_info):
+        resource_to_delete = []
+        for async_result in async_results:
+            result = async_result.get()
+            if result is not None:
+                resource_to_delete.append(result)
+
+        # delete resource - bulk
+        if resource_to_delete:
+            api.DeleteResources(resource_to_delete)
+
+    def _power_off_or_delete_deployed_app(self, api, resource_info, lock, message_status):
         """
-        :param api:
+        :param CloudShellAPISession api:
         :param Lock lock:
+        :param (dict of str: Boolean) message_status:
         :param ResourceInfo resource_info:
         :return:
         """
@@ -78,11 +104,23 @@ class EnvironmentTeardown:
                 self.logger.info("Executing 'Delete' on deployed app {0} in reservation {1}"
                                  .format(resource_name, self.reservation_id))
 
-                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Deleted resource'.format(resource_name))
+                if not message_status['delete']:
+                    with lock:
+                        if not message_status['delete']:
+                            message_status['delete'] = True
+                            if not message_status['power_off']:
+                                message_status['power_off'] = True
+                                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                                    message='Apps are being powered off and deleted...')
+                            else:
+                                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                                    message='Apps are being deleted...')
 
-                api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "remote_destroy_vm",
+                api.ExecuteResourceConnectedCommand(self.reservation_id,
+                                                    resource_name,
+                                                    "destroy_vm_only",
                                                     "remote_app_management")
+                return resource_name
             else:
                 power_off = "true"
                 auto_power_off_param = get_vm_custom_param(resource_info.VmDetails.VmCustomParams, "auto_power_off")
@@ -92,15 +130,20 @@ class EnvironmentTeardown:
                 if power_off.lower() == "true":
                     self.logger.info("Executing 'Power Off' on deployed app {0} in reservation {1}"
                                      .format(resource_name, self.reservation_id))
-                    api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                        message='[{0}] Powering off'.format(resource_name))
-                    api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
 
+                    if not message_status['power_off']:
+                        with lock:
+                            if not message_status['power_off']:
+                                message_status['power_off'] = True
+                                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                                    message='Apps are powering off...')
+
+                    api.ExecuteResourceConnectedCommand(self.reservation_id, resource_name, "PowerOff", "power")
                 else:
                     self.logger.info("Auto Power Off is disabled for deployed app {0} in reservation {1}"
                                      .format(resource_name, self.reservation_id))
-            return True
+            return None
         except Exception as exc:
-            self.logger.error("Error powering off deployed app {0} in reservation {1}. Error: {2}"
+            self.logger.error("Error deleting or powering off deployed app {0} in reservation {1}. Error: {2}"
                               .format(resource_name, self.reservation_id, str(exc)))
-            return False
+            return None

@@ -11,10 +11,11 @@
             <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
         </Category>
         <Category Name="App Management">
-            <Command Description="" DisplayName="Delete" Name="remote_destroy_vm" Tags="remote_app_management,allow_shared" />
+            <Command Description="" DisplayName="Delete" Name="destroy_vm" Tags="remote_app_management,allow_shared" />
         </Category>
         <Category Name="Hidden Commands">
             <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />
+            <Command Description="" DisplayName="Delete VM Only" Name="destroy_vm_only" Tags="remote_app_management" />
         </Category>
 
         <Category Name="Power">

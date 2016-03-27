@@ -1,3 +1,4 @@
+# coding=utf-8
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
@@ -21,7 +22,7 @@ class EnvironmentSetup:
         resource_details_cache = {}
 
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='Beginning reservation setup]')
+                                            message='Beginning reservation setup')
 
         reservation_details = api.GetReservationDetails(self.reservation_id)
 
@@ -47,7 +48,7 @@ class EnvironmentSetup:
 
         self.logger.info("Setup for reservation {0} completed".format(self.reservation_id))
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Reservation setup finished successfully]')
+                                            message='Reservation setup finished successfully')
 
     def _try_exeucte_autoload(self, api, reservation_details, deploy_result, resource_details_cache):
         """
@@ -59,9 +60,10 @@ class EnvironmentSetup:
         """
 
         if deploy_result is None:
-            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[No apps to discover]')
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id, message='No apps to discover')
             return
+
+        message_written = False
 
         for deployed_app in deploy_result.ResultItems:
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
@@ -74,52 +76,50 @@ class EnvironmentSetup:
             if autoload_param:
                 autoload = autoload_param.Value
             if autoload.lower() != "true":
-                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Discovery disabled'.format(deployed_app_name))
+                self.logger.info("Apps discovery is disabled on deployed app {0}".format(deployed_app_name))
                 continue
 
             try:
                 self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
-                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Discovery started'.format(deployed_app_name))
+                if not message_written:
+                    api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                        message='Apps are being discovered...')
+                    message_written = True
 
                 api.AutoLoad(deployed_app_name)
 
-                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Discovery ended successfully'
-                                                    .format(deployed_app_name))
             except CloudShellAPIError as exc:
                 self.logger.error(
                         "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                                   exc.rawxml))
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Discovery failed: {1}'
+                                                    message='Discovery failed on "{0}": {1}'
                                                     .format(deployed_app_name, exc.message))
             except Exception as exc:
                 self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}"
                                   .format(deployed_app_name, str(exc)))
                 api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='[{0}] Discovery failed: {1}'
+                                                    message='Discovery failed on "{0}": {1}'
                                                     .format(deployed_app_name, exc.message))
 
     def _deploy_apps_in_reservation(self, api, reservation_details):
         apps = reservation_details.ReservationDescription.Apps
         if not apps or (len(apps) == 1 and not apps[0].Name):
             self.logger.info("No apps found in reservation {0}".format(self.reservation_id))
+            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                message='No apps to deploy')
             return None
 
         app_names = map(lambda x: x.Name, apps)
         app_inputs = map(lambda x: DeployAppInput(x.Name, "Name", x.Name), apps)
 
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Deploying apps] {0}'.format(app_names))
+                                            message='Apps deployment started')
         self.logger.info(
                 "Deploying apps for reservation {0}. App names: {1}".format(reservation_details, ", ".join(app_names)))
 
         res = api.DeployAppToCloudProviderBulk(self.reservation_id, app_names, app_inputs)
 
-        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Deployed all apps]')
         return res
 
     def _connect_all_routes_in_reservation(self, api, reservation_details):
@@ -133,18 +133,14 @@ class EnvironmentSetup:
         if not endpoints:
             self.logger.info("No routes to connect for reservation {0}".format(self.reservation_id))
             api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[No routes to connect]')
+                                                message='Nothing to connect')
             return
 
         self.logger.info("Executing connect routes for reservation {0}".format(self.reservation_id))
         self.logger.debug("Connecting: {0}".format(",".join(endpoints)))
-
         api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Start connecting all routes in reservation]')
-
+                                            message='Connecting all apps')
         res = api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
-        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                            message='[Done connecting all routes in reservation]')
         return res
 
     def _run_async_power_on_refresh_ip_install(self, api, reservation_details, deploy_result, resource_details_cache):
@@ -156,11 +152,22 @@ class EnvironmentSetup:
         :return:
         """
         resources = reservation_details.ReservationDescription.Resources
+        if len(resources) == 0:
+            api.WriteMessageToReservationOutput(
+                reservationId=self.reservation_id,
+                message='No resources to power on or install')
+            return
+
         pool = ThreadPool(len(resources))
         lock = Lock()
+        message_status = {
+            "power_on": False,
+            "wait_for_ip": False,
+            "install": False
+        }
 
         async_results = [pool.apply_async(self._power_on_refresh_ip_install,
-                                          (api, lock, resource, deploy_result, resource_details_cache))
+                                          (api, lock, message_status, resource, deploy_result, resource_details_cache))
                          for resource in resources]
 
         pool.close()
@@ -171,10 +178,11 @@ class EnvironmentSetup:
             if not res[0]:
                 raise Exception("Reservation is Active with Errors - " + res[1])
 
-    def _power_on_refresh_ip_install(self, api, lock, resource, deploy_result, resource_details_cache):
+    def _power_on_refresh_ip_install(self, api, lock, message_status, resource, deploy_result, resource_details_cache):
         """
         :param CloudShellAPISession api:
         :param Lock lock:
+        :param (dict of str: Boolean) message_status:
         :param ReservedResourceInfo resource:
         :param BulkAppDeploymentyInfo deploy_result:
         :param (dict of str: ResourceInfo) resource_details_cache:
@@ -220,21 +228,21 @@ class EnvironmentSetup:
                                                                              str(exc)))
 
         try:
-            self._power_on(api, deployed_app_name, power_on)
+            self._power_on(api, deployed_app_name, power_on, lock, message_status)
         except Exception as exc:
             self.logger.error("Error powering on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
             return False, "Error powering on deployed app {0}".format(deployed_app_name)
 
         try:
-            self._wait_for_ip(api, deployed_app_name, wait_for_ip)
+            self._wait_for_ip(api, deployed_app_name, wait_for_ip, lock, message_status)
         except Exception as exc:
             self.logger.error("Error refreshing IP on deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
             return False, "Error refreshing IP deployed app {0}. Error: {1}".format(deployed_app_name, exc.message)
 
         try:
-            self._install(api, deployed_app_data, deployed_app_name)
+            self._install(api, deployed_app_data, deployed_app_name, lock, message_status)
         except Exception as exc:
             self.logger.error("Error installing deployed app {0} in reservation {1}. Error: {2}"
                               .format(deployed_app_name, self.reservation_id, str(exc)))
@@ -242,7 +250,7 @@ class EnvironmentSetup:
 
         return True, ""
 
-    def _install(self, api, deployed_app_data, deployed_app_name):
+    def _install(self, api, deployed_app_data, deployed_app_name, lock, message_status):
         installation_info = None
         if deployed_app_data:
             installation_info = deployed_app_data.AppInstallationInfo
@@ -254,9 +262,14 @@ class EnvironmentSetup:
         if installation_info and hasattr(installation_info, "ScriptCommandName"):
             self.logger.info("Executing installation script {0} on deployed app {1} in reservation {2}"
                              .format(installation_info.ScriptCommandName, deployed_app_name, self.reservation_id))
-            api.WriteMessageToReservationOutput(
-                    reservationId=self.reservation_id,
-                    message='[{0}] Installation started'.format(deployed_app_name))
+
+            if not message_status['install']:
+                with lock:
+                    if not message_status['install']:
+                        message_status['install'] = True
+                        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                            message='Apps are installing...')
+
             script_inputs = []
             for installation_script_input in installation_info.ScriptInputs:
                 script_inputs.append(
@@ -264,44 +277,43 @@ class EnvironmentSetup:
 
             installation_result = api.InstallApp(self.reservation_id, deployed_app_name,
                                                  installation_info.ScriptCommandName, script_inputs)
-            api.WriteMessageToReservationOutput(
-                    reservationId=self.reservation_id,
-                    message='[{0}] Installation ended successfully'.format(deployed_app_name))
 
             self.logger.debug("Installation_result: " + installation_result.Output)
 
-    def _wait_for_ip(self, api, deployed_app_name, wait_for_ip):
+    def _wait_for_ip(self, api, deployed_app_name, wait_for_ip, lock, message_status):
         if wait_for_ip.lower() == "true":
+
+            if not message_status['wait_for_ip']:
+                with lock:
+                    if not message_status['wait_for_ip']:
+                        message_status['wait_for_ip'] = True
+                        api.WriteMessageToReservationOutput(
+                                reservationId=self.reservation_id,
+                                message='Waiting for apps IP addresses, this may take a while...')
+
             self.logger.info("Executing 'Refresh IP' on deployed app {0} in reservation {1}"
                              .format(deployed_app_name, self.reservation_id))
-            api.WriteMessageToReservationOutput(
-                    reservationId=self.reservation_id,
-                    message='[{0}] is waiting for IP address, this may take a while'.format(deployed_app_name))
 
-            ip = api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name,
-                                                     "remote_refresh_ip",
-                                                     "remote_connectivity")
-            if ip and hasattr(ip, 'Output'):
-                ip = ip.Output.replace('command_json_result="', '').replace('"=command_json_result_end', '')
-                api.WriteMessageToReservationOutput(
-                        reservationId=self.reservation_id,
-                        message='[{0}] {1}'.format(
-                                deployed_app_name,
-                                'IP address is [{0}]'.format(ip) if ip else 'IP address not found'))
+            api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name,
+                                                "remote_refresh_ip",
+                                                "remote_connectivity")
         else:
             self.logger.info("Wait For IP is off for deployed app {0} in reservation {1}"
                              .format(deployed_app_name, self.reservation_id))
 
-    def _power_on(self, api, deployed_app_name, power_on):
+    def _power_on(self, api, deployed_app_name, power_on, lock, message_status):
         if power_on.lower() == "true":
             self.logger.info("Executing 'Power On' on deployed app {0} in reservation {1}"
                              .format(deployed_app_name, self.reservation_id))
-            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[{0}] is powering on'.format(deployed_app_name))
+
+            if not message_status['power_on']:
+                with lock:
+                    if not message_status['power_on']:
+                        message_status['power_on'] = True
+                        api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                            message='Apps are powering on...')
+
             api.ExecuteResourceConnectedCommand(self.reservation_id, deployed_app_name, "PowerOn", "power")
-            api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                message='[{0}] powered on'.format(deployed_app_name))
-            api.SetResourceLiveStatus(deployed_app_name, "Online", "Active")
         else:
             self.logger.info("Auto Power On is off for deployed app {0} in reservation {1}"
                              .format(deployed_app_name, self.reservation_id))
