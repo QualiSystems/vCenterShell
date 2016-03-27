@@ -220,7 +220,6 @@ class ConnectionCommandOrchestrator(object):
                         result.infoMessage = ACTION_SUCCESS_MSG
                         result.type = ACTION_TYPE_SET_VLAN
                         result.updatedInterface = res.mac_address
-                        result.network_name = res.network_name
                         results.append(result)
         return results
 
@@ -270,6 +269,7 @@ class ConnectionCommandOrchestrator(object):
                 action_result.infoMessage = SUCCESSFULLY_REMOVED
                 action_result.type = ACTION_TYPE_REMOVE_VLAN
                 action_result.errorMessage = None
+                action_result.updatedInterface = res.vnic_mac
                 results.append(action_result)
         except Exception as e:
             for mode, actions in mode_to_actions:
