@@ -246,6 +246,26 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
+    def destroy_vm_only(self, context, ports):
+        """
+        Destroy Vm Command, will only destroy the vm and will not remove the resource
+
+        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
+        """
+        resource_details = self._parse_remote_model(context)
+        reservation_id = context.remote_reservation.reservation_id
+        # execute command
+        res = self.command_wrapper.execute_command_with_connection(
+            context,
+            self.destroy_virtual_machine_command.destroy_vm_only,
+            resource_details.vm_uuid,
+            resource_details.fullname,
+            reservation_id)
+        return set_command_result(result=res, unpicklable=False)
+
+
+    # remote command
     def refresh_ip(self, context, cancellation_context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource

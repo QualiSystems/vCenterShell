@@ -30,27 +30,28 @@ class DeployAppOrchestrationDriver(object):
                                        token_id=context.connectivity.admin_auth_token,
                                        domain=context.reservation.domain)
 
-        self._write_message(app_name, reservation_id, session, 'Deployment started')
+        self._write_message(app_name, reservation_id, session, 'deployment started')
         deployment_result = self._deploy_app(session, app_name, deployment_service, reservation_id)
-        app_name = deployment_result.LogicalResourceName
-        self._write_message(app_name, reservation_id, session, 'Deployment ended successfully')
+        deployed_app_name = deployment_result.LogicalResourceName
+        #  self._write_message(deployed_app_name, reservation_id, session, 'Deployment ended successfully')
 
         # if autoload fails we still want to continue so 'success message' moved inside '_try_exeucte_autoload'
         self._try_exeucte_autoload(session, reservation_id, deployment_result.LogicalResourceName)
 
-        self._write_message(app_name, reservation_id, session, 'Connecting routes started')
+        self._write_message(deployed_app_name, reservation_id, session, 'connecting routes started')
         # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
         self._connect_routes_on_deployed_app(session, reservation_id, deployment_result.LogicalResourceName)
-        self._write_message(app_name, reservation_id, session, 'Connecting routes ended successfully')
+        self._write_message(deployed_app_name, reservation_id, session, 'connecting routes ended successfully')
 
-        self._write_message(app_name, reservation_id, session, 'Powering on')
-        self._power_on_deployed_app(session, app_name, deployment_result, reservation_id)
-        self._write_message(app_name, reservation_id, session, 'Powered on successfully')
+        self._write_message(deployed_app_name, reservation_id, session, 'is powering on...')
+        self._power_on_deployed_app(session, deployed_app_name, deployment_result, reservation_id)
+        self._write_message(deployed_app_name, reservation_id, session, 'powered on successfully')
 
-        self._write_message(app_name, reservation_id, session, 'Waiting for IP address, this may take a while')
+        self._write_message(deployed_app_name, reservation_id, session,
+                            'is waiting for IP address, this may take a while...')
         ip = self._refresh_ip(session, deployment_result, reservation_id)
-        self._write_message(app_name, reservation_id, session,
-                            'IP address is [{0}]'.format(ip) if ip else 'IP address not found')
+        self._write_message(deployed_app_name, reservation_id, session,
+                            'IP address is {0}'.format(ip) if ip else 'IP address not found')
 
         # if install service exists on app execute it
         self._execute_installation_if_exist(session, deployment_result, installation_service_data, reservation_id)
@@ -58,14 +59,18 @@ class DeployAppOrchestrationDriver(object):
         # Set live status - deployment done
         session.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
-        success_msg = "Deployed {0} Successfully".format(deployment_result.LogicalResourceName)
+        success_msg = self._format_message(deployed_app_name, 'deployed Successfully')
         self.logger.info(success_msg)
-        self._write_message(app_name, reservation_id, session, success_msg)
         return success_msg
 
     def _write_message(self, app_name, reservation_id, session, message):
         session.WriteMessageToReservationOutput(reservationId=reservation_id,
-                                                message='[{0}] {1}'.format(app_name, message))
+                                                message=self._format_message(app_name, message))
+
+    def _format_message(self, app_name, message):
+        if ' ' in app_name:
+            app_name = '"{0}"'.format(app_name)
+        return '{0} {1}'.format(app_name, message)
 
     def _connect_routes_on_deployed_app(self, api, reservation_id, resource_name):
         try:
@@ -122,7 +127,7 @@ class DeployAppOrchestrationDriver(object):
     def _execute_installation_if_exist(self, api, deployment_result, installation_service_data, reservation_id):
         if not installation_service_data:
             self._write_message(deployment_result.LogicalResourceName, reservation_id, api,
-                                'No installation to execute')
+                                'doen\'t have an installation to execute')
             return
 
         installation_service_name = installation_service_data["name"]
@@ -131,8 +136,8 @@ class DeployAppOrchestrationDriver(object):
 
         self.logger.info(
                 "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
-                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
-        self._write_message(deployment_result.LogicalResourceName, reservation_id, api, 'Installation started')
+                    .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
+        self._write_message(deployment_result.LogicalResourceName, reservation_id, api, 'installation started')
         try:
 
             script_inputs = []
@@ -148,7 +153,7 @@ class DeployAppOrchestrationDriver(object):
 
             self.logger.debug("Installation_result: " + installation_result.Output)
             self._write_message(deployment_result.LogicalResourceName, reservation_id, api,
-                                'Installation ended successfully')
+                                'installation ended successfully')
 
         except CloudShellAPIError as exc:
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
@@ -200,11 +205,11 @@ class DeployAppOrchestrationDriver(object):
         """
         try:
             self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
-            self._write_message(deployed_app_name, reservation_id, session, 'Discovery started')
+            self._write_message(deployed_app_name, reservation_id, session, 'discovery started')
 
             session.AutoLoad(deployed_app_name)
 
-            self._write_message(deployed_app_name, reservation_id, session, 'Discovery ended successfully')
+            self._write_message(deployed_app_name, reservation_id, session, 'discovery ended successfully')
         except CloudShellAPIError as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                             exc.rawxml)
@@ -212,11 +217,11 @@ class DeployAppOrchestrationDriver(object):
                     "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                               exc.rawxml))
             self._write_message(deployed_app_name, reservation_id, session,
-                                'Discovery failed: {1}'.format(deployed_app_name, exc.message))
+                                'discovery failed: {1}'.format(deployed_app_name, exc.message))
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
             self.logger.error(
                     "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
                                                                                               str(exc)))
             self._write_message(deployed_app_name, reservation_id, session,
-                                'Discovery failed: {1}'.format(deployed_app_name, exc.message))
+                                'discovery failed: {1}'.format(deployed_app_name, exc.message))
