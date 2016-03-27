@@ -100,7 +100,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4094 or a range." IsReadOnly="false" Name="VLAN Id" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4094 or a range." IsReadOnly="false" Name="VLAN ID" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -539,7 +539,7 @@
                 <ns0:AllowedValue>Trunk</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
@@ -571,7 +571,7 @@
                 <ns0:AllowedValue>Trunk</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
@@ -606,7 +606,7 @@
                 <ns0:AllowedValue>Trunk</ns0:AllowedValue>
               </ns0:AllowedValues>
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN Id" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">

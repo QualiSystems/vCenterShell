@@ -208,7 +208,7 @@ class TestCommandOrchestrator(TestCase):
                                     "type": "vlanServiceAttribute"
                                 },
                                 {
-                                    "attributeName": "VLAN Id",
+                                    "attributeName": "VLAN ID",
                                     "attributeValue": "654",
                                     "type": "vlanServiceAttribute"
                                 },
@@ -402,7 +402,7 @@ class TestCommandOrchestrator(TestCase):
                                     "type": "vlanServiceAttribute"
                                 },
                                 {
-                                    "attributeName": "VLAN Id",
+                                    "attributeName": "VLAN ID",
                                     "attributeValue": "654",
                                     "type": "vlanServiceAttribute"
                                 },
@@ -454,7 +454,7 @@ class TestCommandOrchestrator(TestCase):
                                     "type": "vlanServiceAttribute"
                                 },
                                 {
-                                    "attributeName": "VLAN Id",
+                                    "attributeName": "VLAN ID",
                                     "attributeValue": "654",
                                     "type": "vlanServiceAttribute"
                                 },
