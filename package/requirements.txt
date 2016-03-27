@@ -1,4 +1,4 @@
-cloudshell-automation-api==7.0.0.70
+cloudshell-automation-api==7.0.0.108
 cloudshell-core
 pyvmomi==6.0.0
 jsonpickle

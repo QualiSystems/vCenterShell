@@ -18,7 +18,7 @@ class ConnectAll:
 
         connectors = [connector
                       for connector in reservation.ReservationDescription.Connectors
-                      if connector.State == 'Connected' and
+                      if connector.State in ['Disconnected', 'PartiallyConnected', 'ConnectionFailed'] and
                       (connector.Source == resource_name or connector.Target == resource_name) and
                       connector.Source in all_resources and connector.Target in all_resources]
 
