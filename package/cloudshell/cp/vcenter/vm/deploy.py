@@ -69,7 +69,7 @@ class VirtualMachineDeployer(object):
                             autoload=template_resource_model.autoload
                             )
 
-    def deploy_from_image(self, si, session, vcenter_data_model, data_holder, resource_context, logger):
+    def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context):
         vm_name = self.name_generator(data_holder.app_name)
 
         connection_details = self.cs_helper.get_connection_details(session=session,

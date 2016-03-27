@@ -30,9 +30,9 @@ class TestTaskWaiter(unittest.TestCase):
 
         waiter = SynchronousTaskWaiter()
         res = waiter.wait_for_task(task=task,
+                                   logger=Mock(),
                                    action_name='job',
-                                   hide_result=False,
-                                   logger=Mock())
+                                   hide_result=False)
 
         self.assertEqual(res, result)
 
@@ -45,9 +45,9 @@ class TestTaskWaiter(unittest.TestCase):
 
         waiter = SynchronousTaskWaiter()
         res = waiter.wait_for_task(task=task,
+                                   logger=Mock(),
                                    action_name='job',
-                                   hide_result=False,
-                                   logger=Mock())
+                                   hide_result=False)
 
         self.assertIsNone(res, result)
 

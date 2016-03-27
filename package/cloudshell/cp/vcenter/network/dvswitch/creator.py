@@ -2,8 +2,16 @@
 from threading import Lock
 from pyVmomi import vim
 
+
 class DvPortGroupCreator(object):
     def __init__(self, pyvmomi_service, synchronous_task_waiter):
+        """
+
+        :param pyvmomi_service:
+        :param synchronous_task_waiter:
+        :type synchronous_task_waiter: cloudshell.cp.vcenter.common.vcenter.task_waiter.SynchronousTaskWaiter
+        :return:
+        """
         self.pyvmomi_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
         self._lock = Lock()
@@ -59,7 +67,9 @@ class DvPortGroupCreator(object):
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id,
                                                             logger=logger)
         self.synchronous_task_waiter.wait_for_task(task=task,
-                                                   action_name='Create dv port group')
+                                                   logger=logger,
+                                                   action_name='Create dv port group',
+                                                   hide_result=False)
 
     @staticmethod
     def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, num_ports=32):

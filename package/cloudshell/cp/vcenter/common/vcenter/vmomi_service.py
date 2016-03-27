@@ -315,8 +315,11 @@ class pyVmomiService:
         container = si.content.viewManager.CreateContainerView(container=root, recursive=True)
         return [item for item in container.view if not type_filter or isinstance(item, type_filter)]
 
-    def wait_for_task(self, task):
-        """ wait for a vCenter task to finish """
+    def wait_for_task(self, task, logger):
+        """ wait for a vCenter task to finish
+        :param task:
+        :param logger:
+        """
         task_done = False
         while not task_done:
             if task.info.state == 'success':
@@ -436,7 +439,7 @@ class pyVmomiService:
         logger.info("cloning VM...")
 
         task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-        vm = self.wait_for_task(task)
+        vm = self.wait_for_task(task, logger)
         result.vm = vm
         return result
 

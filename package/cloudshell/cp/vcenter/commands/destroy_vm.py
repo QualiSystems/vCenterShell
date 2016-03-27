@@ -15,15 +15,15 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
-    def destroy(self, si, session, vcenter_data_model, vm_uuid, vm_name, reservation_id, logger):
+    def destroy(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
         """
         :param si:
+        :param logger:
         :param CloudShellAPISession session:
         :param vcenter_data_model:
         :param vm_uuid:
         :param str vm_name: This is the resource name
         :param reservation_id:
-        :param logger:
         :return:
         """
         # disconnect

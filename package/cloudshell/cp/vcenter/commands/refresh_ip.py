@@ -14,11 +14,12 @@ class RefreshIpCommand(object):
         self.pyvmomi_service = pyvmomi_service
         self.resource_model_parser = resource_model_parser
 
-    def refresh_ip(self, si, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context, logger):
+    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 
         :param vim.ServiceInstance si: py_vmomi service instance
+        :param logger:
         :param vCenterShell.driver.SecureCloudShellApiSession session: cloudshell session
         :param str vm_uuid: UUID of Virtual Machine
         :param str resource_name: Logical resource name to update address property on

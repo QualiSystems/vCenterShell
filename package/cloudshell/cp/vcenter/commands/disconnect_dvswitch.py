@@ -27,7 +27,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.port_group_configurer = port_group_configurer
         self.resource_model_parser = resource_model_parser
 
-    def disconnect_from_networks(self, si, vcenter_data_model, vm_uuid, vm_network_remove_mappings, logger):
+    def disconnect_from_networks(self, si, logger, vcenter_data_model, vm_uuid, vm_network_remove_mappings):
 
         default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
@@ -56,16 +56,16 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         self.port_group_configurer.erase_network_by_mapping(networks_to_remove, vcenter_data_model.reserved_networks)
         return res
 
-    def disconnect_all(self, si, vcenter_data_model, vm_uuid, logger, vm=None):
+    def disconnect_all(self, si, logger, vcenter_data_model, vm_uuid, vm=None):
         return self.disconnect(si, vcenter_data_model, vm_uuid, logger,  None, None)
 
-    def disconnect(self, si, vcenter_data_model, vm_uuid, logger, network_name=None, vm=None):
+    def disconnect(self, si, logger, vcenter_data_model, vm_uuid, network_name=None, vm=None):
         """
         disconnect network adapter of the vm. If 'network_name' = None - disconnect ALL interfaces
         :param <str> si:
+        :param logger:
         :param VMwarevCenterResourceModel vcenter_data_model:
         :param <str> vm_uuid: the uuid of the vm
-        :param logger:
         :param <str | None> network_name: the name of the specific network to disconnect
         :param <pyvmomi vm object> vm: If the vm obj is None will use vm_uuid to fetch the object
         :return: Started Task

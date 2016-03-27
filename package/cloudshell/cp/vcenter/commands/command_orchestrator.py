@@ -12,6 +12,7 @@ from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import Cloudshell
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result
 from cloudshell.cp.vcenter.common.utilites.common_name import generate_unique_name
+from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
@@ -68,7 +69,8 @@ class CommandOrchestrator(object):
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
                                               cloud_shell_helper=self.cs_helper,
-                                              resource_model_parser=self.resource_model_parser)
+                                              resource_model_parser=self.resource_model_parser,
+                                              context_based_logger_factory=ContextBasedLoggerFactory())
         # Deploy Command
         self.deploy_command = DeployCommand(deployer=vm_deployer)
 

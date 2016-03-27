@@ -1,10 +1,8 @@
 import inspect
-
-from cloudshell.core.logger.qs_logger import get_qs_logger
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
+from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-from cloudshell.shell.core.driver_context import ResourceCommandContext, AutoLoadCommandContext
-
-UNSUPPORTED_CONTEXT_PROVIDED = 'Unsuppported command context provided {0}'
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
 COMMAND_ERROR = 'error has occurred while executing command: {0}'
@@ -24,17 +22,20 @@ LOG_FORMAT = 'action:{0} command_name:{1}'
 
 
 class CommandWrapper:
-    def __init__(self, pv_service, cloud_shell_helper, resource_model_parser):
+    def __init__(self, pv_service, cloud_shell_helper, resource_model_parser, context_based_logger_factory):
         """
 
         :param pv_service:
         :param cloud_shell_helper:
         :param resource_model_parser:
+        :param context_based_logger_factory:
+        :type context_based_logger_factory: cloudshell.cp.vcenter.common.utilites.context_based_logger_factory.ContextBasedLoggerFactory
         :return:
         """
         self.pv_service = pv_service  # type: pyVmomiService
         self.cs_helper = cloud_shell_helper  # type: CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type: ResourceModelParser
+        self.context_based_logger_factory = context_based_logger_factory  # type ContextBasedLoggerFactory
 
     def execute_command_with_connection(self, context, command, *args):
         """
@@ -45,7 +46,7 @@ class CommandWrapper:
         :param args:
         """
 
-        logger = self._create_logger_for_context(context)
+        logger = self.context_based_logger_factory.create_logger_for_context(context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)
@@ -115,22 +116,6 @@ class CommandWrapper:
                 logger.info(DISCONNCTING_VCENERT.format(connection_details.host))
                 self.pv_service.disconnect(si)
             logger.info(LOG_FORMAT.format(END, command_name))
-
-    @staticmethod
-    def _create_logger_for_context(context):
-        if isinstance(context, AutoLoadCommandContext):
-            reservation_id = 'Autoload'
-            handler_name = 'Default'
-        elif isinstance(context, ResourceCommandContext) or \
-                (hasattr(context, 'reservation') and hasattr(context.reservation, 'reservation_id')):
-            reservation_id = context.reservation.reservation_id
-            handler_name = context.resource.name
-        else:
-            raise Exception(UNSUPPORTED_CONTEXT_PROVIDED, type(context))
-        logger = get_qs_logger(name='vCenterShell',
-                               handler_name=handler_name,
-                               reservation_id=reservation_id)
-        return logger
 
     @staticmethod
     def _get_domain(context):

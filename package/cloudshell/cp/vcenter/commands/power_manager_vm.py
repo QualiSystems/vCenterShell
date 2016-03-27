@@ -12,16 +12,16 @@ class VirtualMachinePowerManagementCommand(object):
         self.pv_service = pyvmomi_service
         self.synchronous_task_waiter = synchronous_task_waiter
 
-    def power_off(self, si, session, vcenter_data_model, vm_uuid, resource_fullname, logger):
+    def power_off(self, si, logger, session, vcenter_data_model, vm_uuid, resource_fullname):
         """
         Power off of a vm
         :param vcenter_data_model: vcenter model
         :param si: Service Instance
+        :param logger:
         :param session:
         :param vcenter_data_model: vcenter_data_model
         :param vm_uuid: the uuid of the vm
         :param resource_fullname: the full name of the deployed app resource
-        :param logger:
         :return:
         """
 
@@ -37,8 +37,8 @@ class VirtualMachinePowerManagementCommand(object):
             if vcenter_data_model.shutdown_method.lower() == 'soft':
                 task = vm.PowerOff()
                 task_result = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                         action_name='Power Off',
-                                                                         logger=logger)
+                                                                         logger=logger,
+                                                                         action_name='Power Off')
             else:
                 vm.ShutdownGuest()
                 task_result = 'vm powered off'
@@ -49,13 +49,14 @@ class VirtualMachinePowerManagementCommand(object):
 
         return task_result
 
-    def power_on(self, si, session, vm_uuid, resource_fullname, logger):
+    def power_on(self, si, logger, session, vm_uuid, resource_fullname):
         """
         power on the specified vm
-        :param vcenter_name: vcenter name
+        :param si:
+        :param logger:
+        :param session:
         :param vm_uuid: the uuid of the vm
         :param resource_fullname: the full name of the deployed app resource
-        :param logger:
         :return:
         """
         logger.info('retrieving vm by uuid: {0}'.format(vm_uuid))
@@ -68,8 +69,8 @@ class VirtualMachinePowerManagementCommand(object):
             logger.info('powering on vm')
             task = vm.PowerOn()
             task_result = self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                     action_name='Power On',
-                                                                     logger=logger)
+                                                                     logger=logger,
+                                                                     action_name='Power On')
 
         # Set live status - deployment done
         if resource_fullname:

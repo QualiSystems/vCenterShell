@@ -21,7 +21,7 @@ class VirtualSwitchConnectCommand:
         self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
 
-    def connect_to_networks(self, si, vm_uuid, vm_network_mappings, default_network_name, reserved_networks, logger):
+    def connect_to_networks(self, si, logger, vm_uuid, vm_network_mappings, default_network_name, reserved_networks):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter

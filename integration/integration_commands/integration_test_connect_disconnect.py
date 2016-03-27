@@ -134,7 +134,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         vm = self.get_vm(self.py_vmomi_service, self.virtual_machine_name)
         print "Remove vNIC. Machine: '{}' UUID: [{}]".format(self.virtual_machine_name, self.vm_uuid)
         task = connector.remove_interfaces_from_vm_task(vm)
-        self.synchronous_task_waiter.wait_for_task(task)
+        self.synchronous_task_waiter.wait_for_task(task, Mock())
 
 
     def integrationtest_attach_vnic(self, network):
@@ -147,7 +147,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         print "VM found. \n{}".format(vm)
 
         task = VNicService.vnic_add_to_vm_task(nicspes, vm)
-        self.synchronous_task_waiter.wait_for_task(task)
+        self.synchronous_task_waiter.wait_for_task(task, Mock())
 
     def integrationtest_attach_vnic_standard(self):
         network = self.py_vmomi_service.find_network_by_name(self.si, self.network_path, self.standard_network_name)
@@ -169,7 +169,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         print task
         # print_attributes(task)
         try:
-            self.synchronous_task_waiter.wait_for_task(task)
+            self.synchronous_task_waiter.wait_for_task(task, Mock())
         except vim.fault.ResourceInUse, e:
             print "IT USED NOW"
         pass

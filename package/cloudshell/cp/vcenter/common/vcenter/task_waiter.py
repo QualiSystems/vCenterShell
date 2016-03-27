@@ -7,7 +7,7 @@ class SynchronousTaskWaiter(object):
         pass
 
     # noinspection PyMethodMayBeStatic
-    def wait_for_task(self, task, action_name, hide_result, logger):
+    def wait_for_task(self, task, logger, action_name='job', hide_result=False):
         """
         Waits and provides updates on a vSphere task
         :param task:
