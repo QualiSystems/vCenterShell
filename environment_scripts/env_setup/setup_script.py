@@ -126,7 +126,8 @@ class EnvironmentSetup:
         connectors = reservation_details.ReservationDescription.Connectors
         endpoints = []
         for endpoint in connectors:
-            if endpoint.Target and endpoint.Source:
+            if endpoint.State in ['Disconnected', 'PartiallyConnected', 'ConnectionFailed']\
+                    and endpoint.Target and endpoint.Source:
                 endpoints.append(endpoint.Target)
                 endpoints.append(endpoint.Source)
 
