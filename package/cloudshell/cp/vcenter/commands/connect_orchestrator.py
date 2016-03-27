@@ -272,7 +272,7 @@ class ConnectionCommandOrchestrator(object):
                 action_result.updatedInterface = res.vnic_mac
                 results.append(action_result)
         except Exception as e:
-            for mode, actions in mode_to_actions:
+            for mode, actions in mode_to_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
                     results.append(error_result)
@@ -286,6 +286,7 @@ class ConnectionCommandOrchestrator(object):
         error_result.errorMessage = get_error_message_from_exception(e)
         error_result.infoMessage = None
         error_result.success = False
+        error_result.updatedInterface = ConnectionCommandOrchestrator._get_mac(action)
         return error_result
 
     @staticmethod
@@ -327,7 +328,6 @@ class ConnectionCommandOrchestrator(object):
         for att in action.connectorAttributes:
             if att.attributeName == INTERFACE:
                 return att.attributeValue
-        return None
 
     class ActionsMapping(object):
         def __init__(self):

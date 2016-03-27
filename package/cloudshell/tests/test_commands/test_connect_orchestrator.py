@@ -54,6 +54,30 @@ class TestCommandOrchestrator(TestCase):
         results = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
         self._assert_as_expected(results, expected)
 
+    def test_connect_bulk4(self):
+        """
+        Simple disconnect
+        """
+        request, expected = self._get_test4_params()
+        self.assertRaises(ValueError,
+                          self.ConnectionCommandOrchestrator.connect_bulk, self.si, self.vc_data_model, request)
+
+    def test_connect_bulk5(self):
+        """
+        Disconnect returns error
+        """
+        request, expected = self._get_test5_params()
+        res = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        self._assert_as_expected(res, expected)
+
+    def test_connect_bulk6(self):
+        """
+        Connect returns error
+        """
+        request, expected = self._get_test6_params()
+        res = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        self._assert_as_expected(res, expected)
+
     def _assert_as_expected(self, res, exp):
         for r in res:
             for e in exp:
@@ -361,3 +385,158 @@ class TestCommandOrchestrator(TestCase):
         self._set_connect_to_networks_by_request(request)
         expected = self._get_connect_excepted_results(request)
         return jsonpickle.encode(request), expected
+
+    def _get_test4_params(self):
+        request = {
+            "driverRequest": {
+                "actions": [
+                    {
+                        "connectionId": "d5369772-66de-4003-85cc-e94a57c20f1e",
+                        "connectionParams": {
+                            "vlanId": "654",
+                            "mode": "Access",
+                            "vlanServiceAttributes": [
+                                {
+                                    "attributeName": "Access Mode",
+                                    "attributeValue": "Access",
+                                    "type": "vlanServiceAttribute"
+                                },
+                                {
+                                    "attributeName": "VLAN Id",
+                                    "attributeValue": "654",
+                                    "type": "vlanServiceAttribute"
+                                },
+                                {
+                                    "attributeName": "Virtual Network",
+                                    "attributeValue": "654",
+                                    "type": "vlanServiceAttribute"
+                                }
+                            ],
+                            "type": "setVlanParameter"
+                        },
+                        "connectorAttributes": [
+                            {
+                                "attributeName": "Interface",
+                                "attributeValue": "00:50:56:a2:5f:07",
+                                "type": "connectorAttribute"
+                            }
+                        ],
+                        "actionId": "d5369772-66de-4003-85cc-e94a57c20f1e_30fb5d10-1ce9-4e9f-b41e-ce0d271fd7ab",
+                        "actionTarget": {
+                            "fullName": "Temp4_a443da02",
+                            "fullAddress": "192.168.65.33",
+                            "type": "actionTarget"
+                        },
+                        "customActionAttributes": [
+                        ],
+                        "type": "removeVlan"
+                    }
+                ]
+            }
+        }
+        self._set_disconnect_from_networks(request)
+        expected = self._get_disconnect_excepted_results(request, 'VM_UUID is missing on action attributes')
+        return jsonpickle.encode(request), expected
+
+    def _get_test5_params(self):
+        request = {
+            "driverRequest": {
+                "actions": [
+                    {
+                        "connectionId": "d5369772-66de-4003-85cc-e94a57c20f1e",
+                        "connectionParams": {
+                            "vlanId": "654",
+                            "mode": "Access",
+                            "vlanServiceAttributes": [
+                                {
+                                    "attributeName": "Access Mode",
+                                    "attributeValue": "Access",
+                                    "type": "vlanServiceAttribute"
+                                },
+                                {
+                                    "attributeName": "VLAN Id",
+                                    "attributeValue": "654",
+                                    "type": "vlanServiceAttribute"
+                                },
+                                {
+                                    "attributeName": "Virtual Network",
+                                    "attributeValue": "654",
+                                    "type": "vlanServiceAttribute"
+                                }
+                            ],
+                            "type": "setVlanParameter"
+                        },
+                        "connectorAttributes": [
+                            {
+                                "attributeName": "Interface",
+                                "attributeValue": "00:50:56:a2:5f:07",
+                                "type": "connectorAttribute"
+                            }
+                        ],
+                        "actionId": "d5369772-66de-4003-85cc-e94a57c20f1e_30fb5d10-1ce9-4e9f-b41e-ce0d271fd7ab",
+                        "actionTarget": {
+                            "fullName": "Temp4_a443da02",
+                            "fullAddress": "192.168.65.33",
+                            "type": "actionTarget"
+                        },
+                        "customActionAttributes": [
+                            {
+                                "attributeName": "VM_UUID",
+                                "attributeValue": "42220ae6-2fa8-b4cd-14e4-16fbad2798f6",
+                                "type": "customAttribute"
+                            }
+                        ],
+                        "type": "removeVlan"
+                    }
+                ]
+            }
+        }
+        self.disconnector.disconnect_from_networks = Mock()
+        self.disconnector.disconnect_from_networks.side_effect = ValueError('vnic not found')
+        expected = self._get_disconnect_excepted_results(request, 'vnic not found')
+        return jsonpickle.encode(request), expected
+
+    def _get_test6_params(self):
+        request = {
+            'driverRequest': {
+                'actions': [
+                    {
+                        "connectorAttributes": [],
+                        "connectionParams": {
+                            "vlanId": "2",
+                            "mode": "Access",
+                            "vlanServiceAttributes": [
+                                {
+                                    "attributeName": "Access Mode",
+                                    "attributeValue": "Access",
+                                    "type": "vlanServiceAttribute"
+                                }
+                            ],
+                            "type": "setVlanParameter"
+                        },
+                        "actionId": "ee8a3dc8-eb4b-4141-92ad-58bbd8430cad_376046bb-1ef0-4ecc-bb52-c0c7a9c75b1c",
+                        "actionTarget": {
+                            "fullName": "VM Deployment1_9602ad34",
+                            "fullAddress": "N/A/NA",
+                            "type": "actionTarget"
+                        },
+                        "customActionAttributes": [
+                            {
+                                "attributeName": "VM_UUID",
+                                "attributeValue": "42220ae6-2fa8-b4cd-14e4-16fbad2798f6",
+                                "type": "customAttribute"
+                            }
+                        ],
+                        "type": "setVlan"
+                    }
+                ]
+            }
+        }
+        self.connector.connect_to_networks = Mock()
+        self.connector.connect_to_networks.side_effect = ValueError('vnic not found')
+        expected = self._get_connect_excepted_results(request, 'vnic not found')
+        # here we don't don't get vnic input input
+        for e in expected:
+            e.updatedInterface = None
+        return jsonpickle.encode(request), expected
+
