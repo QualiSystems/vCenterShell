@@ -15,7 +15,7 @@ class TestResourceModelParser(TestCase):
         resource_info = create_autospec(ResourceContextDetails)
 
         resource_info.model = 'VLAN Auto'
-        resource_info.attrib = {'Access Mode': 'Trunk', 'VLAN Id': '123', 'Allocation Ranges': '2-4094',
+        resource_info.attrib = {'Access Mode': 'Trunk', 'VLAN ID': '123', 'Allocation Ranges': '2-4094',
                                 'Virtual Network': '', 'Isolation Level': 'Exclusive'}
         resource_model = resource_model_parser.convert_to_resource_model(resource_info, None)
 
@@ -52,7 +52,7 @@ class TestResourceModelParser(TestCase):
         resource_info = create_autospec(ResourceInfo)
 
         resource_info.ResourceModelName = None
-        resource_info.ResourceAttributes = {'Access Mode': 'Trunk', 'VLAN Id': '123', 'Allocation Ranges': '2-4094',
+        resource_info.ResourceAttributes = {'Access Mode': 'Trunk', 'VLAN ID': '123', 'Allocation Ranges': '2-4094',
                                             'Virtual Network': '', 'Isolation Level': 'Exclusive'}
         resource_model = resource_model_parser.convert_to_resource_model(resource_info,
                                                                          VLANAutoResourceModel)
@@ -70,7 +70,7 @@ class TestResourceModelParser(TestCase):
         resource_info = create_autospec(ResourceInfo)
 
         resource_info.ResourceModelName = None
-        resource_info.ResourceAttributes = {'Access Mode': 'Trunk', 'VLAN Id': '123', 'Allocation Ranges': '2-4094',
+        resource_info.ResourceAttributes = {'Access Mode': 'Trunk', 'VLAN ID': '123', 'Allocation Ranges': '2-4094',
                                             'Virtual Network': '', 'Isolation Level': 'Exclusive'}
 
         self.assertRaises(ValueError, resource_model_parser.convert_to_resource_model, resource_info,
