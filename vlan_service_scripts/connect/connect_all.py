@@ -1,4 +1,4 @@
-import cloudshell.api.cloudshell_scripts_helpers as helpers
+from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
 
 

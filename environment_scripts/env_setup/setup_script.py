@@ -2,7 +2,7 @@
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
-import cloudshell.api.cloudshell_scripts_helpers as helpers
+from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
 from cloudshell.api.cloudshell_api import *
 from cloudshell.api.common_cloudshell_api import CloudShellAPIError
 from cloudshell.core.logger import qs_logger
@@ -11,7 +11,11 @@ from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
 from environment_scripts.profiler.env_profiler import profileit
 
 
+
 class EnvironmentSetup:
+
+    NO_DRIVER_ERR = "129"
+
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
         self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup", reservation_id=self.reservation_id)
@@ -91,12 +95,13 @@ class EnvironmentSetup:
                 api.AutoLoad(deployed_app_name)
 
             except CloudShellAPIError as exc:
-                self.logger.error(
-                        "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                                  exc.rawxml))
-                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
-                                                    message='Discovery failed on "{0}": {1}'
-                                                    .format(deployed_app_name, exc.message))
+                if exc.code != EnvironmentSetup.NO_DRIVER_ERR:
+                    self.logger.error(
+                            "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                                      exc.rawxml))
+                    api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                        message='Discovery failed on "{0}": {1}'
+                                                        .format(deployed_app_name, exc.message))
             except Exception as exc:
                 self.logger.error("Error executing Autoload command on deployed app {0}. Error: {1}"
                                   .format(deployed_app_name, str(exc)))
