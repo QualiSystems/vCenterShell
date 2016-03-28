@@ -4,13 +4,10 @@ from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
 from mock import Mock, create_autospec
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class TestRefreshIpCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_refresh_ip(self):
         nic1 = Mock()

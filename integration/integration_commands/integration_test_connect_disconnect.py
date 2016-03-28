@@ -5,7 +5,6 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
@@ -17,8 +16,6 @@ from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
-    # LoggingService("CRITICAL", "DEBUG", None)
-    LoggingService("DEBUG", "DEBUG", None)
 
     @property
     def si(self):

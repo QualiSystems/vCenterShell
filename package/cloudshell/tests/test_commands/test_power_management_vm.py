@@ -1,14 +1,10 @@
 from unittest import TestCase
-
 from mock import Mock
 from pyVmomi import vim
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
-
 
 class TestVirtualMachinePowerManagementCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_power_on(self):
         # arrange

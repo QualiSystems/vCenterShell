@@ -1,16 +1,12 @@
 from unittest import TestCase
-
 from mock import Mock
 from pyVmomi import vim
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_delete_all(self):
         # arrange
