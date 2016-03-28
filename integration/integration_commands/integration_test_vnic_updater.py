@@ -1,8 +1,7 @@
 import os
 from unittest import TestCase
-
-import cloudshell.api.cloudshell_dev_helpers as dev_helpers
-import cloudshell.api.cloudshell_scripts_helpers as helpers
+from cloudshell.helpers.scripts import cloudshell_dev_helpers as dev_helpers
+from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 
