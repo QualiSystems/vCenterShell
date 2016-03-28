@@ -13,6 +13,7 @@ class VirtualMachineDeployer(object):
         :type pv_service: cloudshell.cp.vcenter.common.vcenter.vmomi_service.pyVmomiService
         :param name_generator:
         :param ovf_service:
+        :type ovf_service: cloudshell.cp.vcenter.common.vcenter.ovf_service.OvfImageDeployerService
         :param cs_helper:
         :type resource_model_parser: ResourceModelParser
         :return:
@@ -81,7 +82,7 @@ class VirtualMachineDeployer(object):
 
         image_params = self._get_deploy_image_params(data_holder.image_params, connection_details, vm_name)
 
-        res = self.ovf_service.deploy_image(vcenter_data_model, image_params)
+        res = self.ovf_service.deploy_image(vcenter_data_model, image_params, logger)
         if res:
             vm_path = image_params.datacenter + '/' + \
                       image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
