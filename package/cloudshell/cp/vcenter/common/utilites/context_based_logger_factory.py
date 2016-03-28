@@ -14,7 +14,7 @@ class ContextBasedLoggerFactory(object):
         """
         if self._is_instance_of(context, 'AutoLoadCommandContext'):
             reservation_id = 'Autoload'
-            handler_name = 'Default'
+            handler_name = context.resource.name
         elif self._is_instance_of(context, 'ResourceCommandContext'):
             reservation_id = context.reservation.reservation_id
             handler_name = context.resource.name
