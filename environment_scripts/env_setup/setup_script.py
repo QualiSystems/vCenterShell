@@ -43,7 +43,7 @@ class EnvironmentSetup:
 
         self._run_async_power_on_refresh_ip_install(api=api,
                                                     reservation_details=reservation_details,
-                                                    deploy_result=deploy_result,
+                                                    deploy_results=deploy_result,
                                                     resource_details_cache=resource_details_cache)
 
         self.logger.info("Setup for reservation {0} completed".format(self.reservation_id))
@@ -66,6 +66,8 @@ class EnvironmentSetup:
         message_written = False
 
         for deployed_app in deploy_result.ResultItems:
+            if not deployed_app.Success:
+                continue
             deployed_app_name = deployed_app.AppDeploymentyInfo.LogicalResourceName
 
             resource_details = api.GetResourceDetails(deployed_app_name)
@@ -144,11 +146,11 @@ class EnvironmentSetup:
         res = api.ConnectRoutesInReservation(self.reservation_id, endpoints, 'bi')
         return res
 
-    def _run_async_power_on_refresh_ip_install(self, api, reservation_details, deploy_result, resource_details_cache):
+    def _run_async_power_on_refresh_ip_install(self, api, reservation_details, deploy_results, resource_details_cache):
         """
         :param CloudShellAPISession api:
         :param GetReservationDescriptionResponseInfo reservation_details:
-        :param BulkAppDeploymentyInfo deploy_result:
+        :param BulkAppDeploymentyInfo deploy_results:
         :param (dict of str: ResourceInfo) resource_details_cache:
         :return:
         """
@@ -168,7 +170,7 @@ class EnvironmentSetup:
         }
 
         async_results = [pool.apply_async(self._power_on_refresh_ip_install,
-                                          (api, lock, message_status, resource, deploy_result, resource_details_cache))
+                                          (api, lock, message_status, resource, deploy_results, resource_details_cache))
                          for resource in resources]
 
         pool.close()
@@ -178,6 +180,10 @@ class EnvironmentSetup:
             res = async_result.get()
             if not res[0]:
                 raise Exception("Reservation is Active with Errors - " + res[1])
+
+        for deploy_res in deploy_results.ResultItems:
+            if not deploy_res.Success:
+                raise Exception("Reservation is Active with Errors - " + deploy_res.Error)
 
     def _power_on_refresh_ip_install(self, api, lock, message_status, resource, deploy_result, resource_details_cache):
         """
