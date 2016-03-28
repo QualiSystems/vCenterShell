@@ -1,14 +1,12 @@
 import ConfigParser
 import os
 from unittest import TestCase
-
+from cloudshell.core.logger.qs_logger import get_qs_logger
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-
 from PerfMethodWrapper import PerfMethodWrapper
-from cloudshell.cp.vcenter.common.logger import getLogger
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 # consts
 START = 'START'
@@ -26,7 +24,7 @@ class SearchObjectsPerfTest(TestCase):
         cred = TestCredentials()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect)
         self.si = self.pv_service.connect(cred.host, cred.username, cred.password)
-        self.logger = getLogger('performance')
+        self.logger = get_qs_logger()
 
     # def test_get_object_get_flat_object(self):
     #     def action():

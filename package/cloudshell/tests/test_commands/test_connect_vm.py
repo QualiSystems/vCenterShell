@@ -1,16 +1,12 @@
 from unittest import TestCase
-
 from mock import Mock, create_autospec
 from pyVmomi import vim
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VNicDeviceMapper
 
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
-
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def setUp(self):
         self.vlan_id_gen = 'gen_id'
@@ -40,13 +36,13 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.vlan_spec_factory = Mock()
         self.vlan_id_range_parser = Mock()
         self.vlan_id_range_parser.parse_vlan_id = Mock(return_value=self.vlan_id_gen)
-        self.dv_port_name_gen.generate_port_group_name =Mock(return_value=self.name_gen)
+        self.dv_port_name_gen.generate_port_group_name = Mock(return_value=self.name_gen)
         self.vlan_spec_factory.get_vlan_spec = Mock(return_value=self.spec)
 
     def test_connect_vnic_to_network(self):
         # arrange
         connect_command = VirtualSwitchConnectCommand(self.pv_service, self.dv_connector, self.dv_port_name_gen,
-                                                      self.vlan_spec_factory, self.vlan_id_range_parser, Mock())
+                                                      self.vlan_spec_factory, self.vlan_id_range_parser)
         mapping = VmNetworkMapping()
         mapping.vnic_name = 'name'
         mapping.vlan_id = 'vlan_id'
@@ -55,11 +51,17 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.network = Mock()
 
         # act
-        connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network', [])
+        connect_results = connect_command.connect_to_networks(si=self.si,
+                                                              logger=Mock(),
+                                                              vm_uuid=self.vm_uuid,
+                                                              vm_network_mappings=[mapping],
+                                                              default_network_name='default_network',
+                                                              reserved_networks=[])
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
-        self.assertTrue(self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id, self.vlan_spec_factory))
+        self.assertTrue(
+            self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id, self.vlan_spec_factory))
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
         self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping]))
         self.assertEqual(connect_results[0].mac_address, 'AA-BB')

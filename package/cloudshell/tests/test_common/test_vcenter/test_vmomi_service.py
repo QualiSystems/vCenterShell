@@ -1,21 +1,17 @@
 ﻿import unittest
 from datetime import datetime
 
+from cloudshell.core.logger.qs_logger import get_qs_logger
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-
-from cloudshell.cp.vcenter.common.logger import getLogger
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.tests.utils.testing_credentials import TestCredentials
+logger = get_qs_logger()
 
-logger = getLogger(__name__)
 
-
-class ignore_test_common_pyvmomi(unittest.TestCase):
+class TestVmomiService(unittest.TestCase):
     def setUp(self):
-        LoggingService("CRITICAL", "DEBUG", None)
         pass
 
     def tearDown(self):
@@ -36,17 +32,20 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder='DC0')
         '#act'
         now = datetime.now()
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params,
+                                  logger=Mock())
         logger.debug('clone took: %s' % (str(datetime.now() - now)))
 
         '#assert'
         self.assertTrue(type(res.vm), vim.VirtualMachine)
 
-        '#tear down'
+        '#teardown'
         now = datetime.now()
         if res.error is None and res.vm is not None:
-            destroyed = pv_service.destroy_vm(res.vm)
-        logger.debug('destroy took: %s' % (str(datetime.now() - now)))
+            destroyed = pv_service.destroy_vm(vm=res.vm, logger=Mock())
+
+        print 'destroy took: {0}'.format(str(datetime.now() - now))
+
         self.assertIsNone(destroyed)
 
     def test_clone_vm_power_on_false(self):
@@ -82,7 +81,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               power_on=False)
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -125,7 +124,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               resource_pool='my_resource_pool')
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -168,7 +167,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               datastore_name='my_datastore')
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -210,7 +209,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder='my_folder')
 
         '#assert'
-        self.assertRaises(ValueError, pv_service.clone_vm, params)
+        self.assertRaises(ValueError, pv_service.clone_vm, params, Mock())
         self.assertTrue(pv_service.get_folder.called)
         self.assertFalse(vim_mock.vm.RelocateSpec.called)
         self.assertFalse(vim_mock.vm.CloneSpec.called)
@@ -249,7 +248,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder='my_folder')
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -290,7 +289,8 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder='my_folder')
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params,
+                                  logger=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -314,7 +314,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -333,7 +333,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -352,7 +352,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -369,7 +369,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(params)
+        res = pv_service.clone_vm(clone_params=params, logger=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -390,7 +390,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.destroy_vm = Mock(return_value=True)
 
         '#act'
-        result = pv_service.destroy_vm_by_name(si, 'vm_name:name', 'fake/path')
+        result = pv_service.destroy_vm_by_name(si=si, vm_name='vm_name:name',vm_path='fake/path', logger=Mock())
 
         '#assert'
         self.assertTrue(result)
@@ -413,7 +413,9 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         pv_service.destroy_vm = Mock(return_value=True)
 
         '#act'
-        result = pv_service.destroy_vm_by_uuid(si, 'thisuni-vers-ally-uniq-ueidentifier', 'fake/path')
+        result = pv_service.destroy_vm_by_uuid(si=si, vm_uuid='thisuni-vers-ally-uniq-ueidentifier',
+                                               vm_path='fake/path',
+                                               logger=Mock())
 
         '#assert'
         self.assertTrue(result)
@@ -1197,7 +1199,7 @@ class ignore_test_common_pyvmomi(unittest.TestCase):
         vm.Destroy_Task = Mock()
 
         #act
-        pv_service.destroy_vm(vm)
+        pv_service.destroy_vm(vm=vm, logger=Mock())
 
         #assert
         self.assertTrue(vm.PowerOffVM_Task.called)

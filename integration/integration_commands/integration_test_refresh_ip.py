@@ -6,7 +6,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
-from cloudshell.tests.utils import TestCredentials
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 from cloudshell.tests.utils import helpers
 
 

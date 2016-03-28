@@ -1,10 +1,8 @@
 import time
-from logging import getLogger
-
 import jsonpickle
-from pyVim.connect import SmartConnect, Disconnect
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
+from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
@@ -14,6 +12,7 @@ from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import Cloudshell
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result
 from cloudshell.cp.vcenter.common.utilites.common_name import generate_unique_name
+from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
@@ -21,7 +20,6 @@ from cloudshell.cp.vcenter.common.wrappers.command_wrapper import CommandWrapper
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
 from cloudshell.cp.vcenter.models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
-from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
 from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from cloudshell.cp.vcenter.network.vlan.factory import VlanSpecFactory
@@ -31,12 +29,11 @@ from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
-
-from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
+from pyVim.connect import SmartConnect, Disconnect
 
 
 class CommandOrchestrator(object):
-    def __init__(self, context):
+    def __init__(self):
         """
         Initialize the driver session, this function is called everytime a new instance of the driver is created
         in here the driver is going to be bootstrapped
@@ -48,11 +45,10 @@ class CommandOrchestrator(object):
         synchronous_task_waiter = SynchronousTaskWaiter()
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
-        self.vc_data_model = self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                                  VMwarevCenterResourceModel)
+
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
-        ovf_service = OvfImageDeployerService(self.resource_model_parser, getLogger('OvfImageDeployerService'))
+        ovf_service = OvfImageDeployerService(self.resource_model_parser)
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -71,10 +67,10 @@ class CommandOrchestrator(object):
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
         # Command Wrapper
-        self.command_wrapper = CommandWrapper(logger=getLogger,
-                                              pv_service=pv_service,
+        self.command_wrapper = CommandWrapper(pv_service=pv_service,
                                               cloud_shell_helper=self.cs_helper,
-                                              resource_model_parser=self.resource_model_parser)
+                                              resource_model_parser=self.resource_model_parser,
+                                              context_based_logger_factory=ContextBasedLoggerFactory())
         # Deploy Command
         self.deploy_command = DeployCommand(deployer=vm_deployer)
 
@@ -92,8 +88,7 @@ class CommandOrchestrator(object):
                 virtual_switch_to_machine_connector=virtual_switch_to_machine_connector,
                 dv_port_group_name_generator=DvPortGroupNameGenerator(),
                 vlan_spec_factory=VlanSpecFactory(),
-                vlan_id_range_parser=VLanIdRangeParser(),
-                logger=getLogger('VirtualSwitchConnectCommand'))
+                vlan_id_range_parser=VLanIdRangeParser())
         self.connection_orchestrator = ConnectionCommandOrchestrator(
             connector=virtual_switch_connect_command,
             disconnector=self.virtual_switch_disconnect_command,

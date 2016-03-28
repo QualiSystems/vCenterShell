@@ -2,6 +2,8 @@ import collections
 
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
+
+from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 from cloudshell.cp.vcenter.models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 
@@ -32,22 +34,30 @@ class VCenterAutoModelDiscovery(object):
         self.parser = ResourceModelParser()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect)
         self.cs_helper = CloudshellDriverHelper()
+        self.context_based_logger_factory = ContextBasedLoggerFactory()
 
     def validate_and_discover(self, context):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
+        logger = self.context_based_logger_factory.create_logger_for_context(
+            logger_name='vCenterShell',
+            context=context)
+
+        logger.info('Autodiscovery started')
+
         session = self.cs_helper.get_session(context.connectivity.server_address,
                                              context.connectivity.admin_auth_token,
                                              DOMAIN)
         self._check_if_attribute_not_empty(context.resource, ADDRESS)
         resource = context.resource
         auto_attr = []
-
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
         if not si:
-            raise ValueError('Could not connect to the vCenter: {0}, with given credentials'.
-                             format(context.resource.address))
+            error_message = 'Could not connect to the vCenter: {0}, with given credentials'\
+                .format(context.resource.address)
+            logger.error(error_message)
+            raise ValueError(error_message)
         all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
 
         dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
@@ -61,6 +71,8 @@ class VCenterAutoModelDiscovery(object):
                 continue
             validation_method = self._get_validation_method(key)
             validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
+
+        logger.info('Autodiscovery completed')
 
         return AutoLoadDetails([], auto_attr)
 

@@ -1,5 +1,7 @@
 import inspect
-
+from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
+from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
@@ -20,29 +22,40 @@ LOG_FORMAT = 'action:{0} command_name:{1}'
 
 
 class CommandWrapper:
-    def __init__(self, logger, pv_service, cloud_shell_helper, resource_model_parser):
+    def __init__(self, pv_service, cloud_shell_helper, resource_model_parser, context_based_logger_factory):
+        """
+
+        :param pv_service:
+        :param cloud_shell_helper:
+        :param resource_model_parser:
+        :param context_based_logger_factory:
+        :type context_based_logger_factory: cloudshell.cp.vcenter.common.utilites.context_based_logger_factory.ContextBasedLoggerFactory
+        :return:
+        """
         self.pv_service = pv_service  # type: pyVmomiService
-        self.logger = logger
         self.cs_helper = cloud_shell_helper  # type: CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type: ResourceModelParser
-
-    def execute_command(self, command, *args):
-        return self.execute_command_with_connection(None, command, *args)
+        self.context_based_logger_factory = context_based_logger_factory  # type ContextBasedLoggerFactory
 
     def execute_command_with_connection(self, context, command, *args):
         """
         Note: session & vcenter_data_model objects will be injected dynamically to the command
+        :param command:
+        :param context: instance of ResourceCommandContext or AutoLoadCommandContext
+        :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
+        :param args:
         """
-        if not self.logger:
-            print LOGGER_CANNOT_BE_NONE
-            raise Exception(LOGGER_CANNOT_BE_NONE)
+
+        logger = self.context_based_logger_factory.create_logger_for_context(
+            logger_name='vCenterShell',
+            context=context)
+
         if not command:
-            self.logger.error(COMMAND_CANNOT_BE_NONE)
+            logger.error(COMMAND_CANNOT_BE_NONE)
             raise Exception(COMMAND_CANNOT_BE_NONE)
 
         try:
             command_name = command.__name__
-            logger = self.logger(command_name)
             logger.info(LOG_FORMAT.format(START, command_name))
             command_args = []
             si = None
@@ -56,7 +69,7 @@ class CommandWrapper:
                                                      token=context.connectivity.admin_auth_token,
                                                      reservation_domain=self._get_domain(context))
                 vcenter_data_model = self.resource_model_parser.convert_to_resource_model(
-                        resource_instance=context.resource, resource_model_type=VMwarevCenterResourceModel)
+                    resource_instance=context.resource, resource_model_type=VMwarevCenterResourceModel)
                 connection_details = self.cs_helper.get_connection_details(session=session,
                                                                            vcenter_resource_model=vcenter_data_model,
                                                                            resource_context=context.resource)
@@ -64,9 +77,9 @@ class CommandWrapper:
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                        DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                     connection_details.username,
-                                                     connection_details.port))
+                    DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                 connection_details.username,
+                                                 connection_details.port))
 
                 si = self.pv_service.connect(connection_details.host,
                                              connection_details.username,
@@ -79,6 +92,8 @@ class CommandWrapper:
             self._try_inject_arg(command=command, command_args=command_args, arg_object=session, arg_name='session')
             self._try_inject_arg(command=command, command_args=command_args, arg_object=vcenter_data_model,
                                  arg_name='vcenter_data_model')
+            self._try_inject_arg(command=command, command_args=command_args, arg_object=logger,
+                                 arg_name='logger')
 
             command_args.extend(args)
 
