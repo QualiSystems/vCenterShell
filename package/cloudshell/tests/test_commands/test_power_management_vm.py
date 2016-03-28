@@ -29,7 +29,11 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
 
         # act
-        res = power_manager.power_on(session, si, vm_uuid, None, logger=Mock())
+        res = power_manager.power_on(si=si,
+                                     logger=Mock(),
+                                     session=session,
+                                     vm_uuid=vm_uuid,
+                                     resource_fullname=None)
 
         # assert
         self.assertTrue(res)
@@ -59,7 +63,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         vcenter = Mock()
         vcenter.shutdown_method = 'soft'
         # act
-        res = power_manager.power_off(session, si, vcenter, vm_uuid, None, logger=Mock())
+        res = power_manager.power_off(si=si,
+                                      logger=Mock(),
+                                      session=session,
+                                      vcenter_data_model=vcenter,
+                                      vm_uuid=vm_uuid,
+                                      resource_fullname=None)
 
         # assert
         self.assertTrue(res)
@@ -91,7 +100,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         vcenter = Mock()
         vcenter.shutdown_method = 'hard'
         # act
-        res = power_manager.power_off(session, si, vcenter,vm_uuid, None, logger=Mock())
+        res = power_manager.power_off(si=si,
+                                      logger=Mock(),
+                                      session=session,
+                                      vcenter_data_model=vcenter,
+                                      vm_uuid=vm_uuid,
+                                      resource_fullname=None)
 
         # assert
         self.assertTrue(res)

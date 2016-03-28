@@ -522,12 +522,12 @@ class pyVmomiService:
             logger.info(("The current powerState is: {0}. Attempting to power off {1}"
                          .format(vm.runtime.powerState, vm.name)))
             task = vm.PowerOffVM_Task()
-            self.wait_for_task(task)
+            self.wait_for_task(task, logger)
 
         logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
-        return self.wait_for_task(task)
+        return self.wait_for_task(task, logger)
 
     def destroy_vm_by_name(self, si, vm_name, vm_path, logger):
         """ 

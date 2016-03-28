@@ -30,7 +30,13 @@ class TestDestroyVirtualMachineCommand(unittest.TestCase):
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy(si, session, vcenter_data_model, uuid, resource_name, "reservation_id", logger=Mock())
+        res = destroyer.destroy(si=si,
+                                logger=Mock(),
+                                session=session,
+                                vcenter_data_model=vcenter_data_model,
+                                vm_uuid=uuid,
+                                vm_name=resource_name,
+                                reservation_id="reservation_id")
 
         # assert
         self.assertTrue(res)

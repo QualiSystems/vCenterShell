@@ -52,8 +52,12 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.network = Mock()
 
         # act
-        connect_results = connect_command.connect_to_networks(self.si, self.vm_uuid, [mapping], 'default_network', [],
-                                                              Mock())
+        connect_results = connect_command.connect_to_networks(si=self.si,
+                                                              logger=Mock(),
+                                                              vm_uuid=self.vm_uuid,
+                                                              vm_network_mappings=[mapping],
+                                                              default_network_name='default_network',
+                                                              reserved_networks=[])
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))

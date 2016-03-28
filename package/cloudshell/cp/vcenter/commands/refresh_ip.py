@@ -40,7 +40,7 @@ class RefreshIpCommand(object):
             logger.warning('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(resource_name))
             return None
 
-        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout)
+        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout, logger)
 
         if ip_result.reason == IpReason.Timeout:
             raise ValueError('IP address of VM \'{0}\' could not be obtained during {1} seconds'
@@ -87,7 +87,7 @@ class RefreshIpCommand(object):
             return custom_param_values[0]
         return None
 
-    def _obtain_ip(self, vm, default_network, match_function, cancellation_context, timeout):
+    def _obtain_ip(self, vm, default_network, match_function, cancellation_context, timeout, logger):
         time_elapsed = 0
         ip = None
         interval = self.INTERVAL

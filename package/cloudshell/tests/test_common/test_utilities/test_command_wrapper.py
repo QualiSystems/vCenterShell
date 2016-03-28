@@ -22,7 +22,10 @@ class TestCommandWrapper(TestCase):
         def fake_command_with_connection_return_true_2(si, session, vcenter_data_model, fake1, fake2):
             return True
 
-        wrapper = CommandWrapper(self.pv_service, self.cloud_shell_helper, self.resource_model_parser)
+        wrapper = CommandWrapper(pv_service=self.pv_service,
+                                 cloud_shell_helper=self.cloud_shell_helper,
+                                 resource_model_parser= self.resource_model_parser,
+                                 context_based_logger_factory=Mock())
         context = self._create_resource_command_context()
 
         # act
@@ -43,7 +46,10 @@ class TestCommandWrapper(TestCase):
         def fake_command_with_connection_return_true(si, vcenter_data_model, fake1, fake2):
             return True
 
-        wrapper = CommandWrapper(self.pv_service, self.cloud_shell_helper, self.resource_model_parser)
+        wrapper = CommandWrapper(pv_service=self.pv_service,
+                                 cloud_shell_helper=self.cloud_shell_helper,
+                                 resource_model_parser= self.resource_model_parser,
+                                 context_based_logger_factory=Mock())
         context = self._create_resource_command_context()
 
         # act
@@ -59,7 +65,10 @@ class TestCommandWrapper(TestCase):
         def fake_command_with_connection_return_true(si, session, fake1, fake2):
             return True
 
-        wrapper = CommandWrapper(self.pv_service, self.cloud_shell_helper, self.resource_model_parser)
+        wrapper = CommandWrapper(pv_service=self.pv_service,
+                                 cloud_shell_helper=self.cloud_shell_helper,
+                                 resource_model_parser= self.resource_model_parser,
+                                 context_based_logger_factory=Mock())
         context = self._create_resource_command_context()
 
         # act
@@ -75,7 +84,10 @@ class TestCommandWrapper(TestCase):
         def fake_command_with_connection_return_true(si, fake1, fake2):
             return True
 
-        wrapper = CommandWrapper(self.pv_service, self.cloud_shell_helper, self.resource_model_parser)
+        wrapper = CommandWrapper(pv_service=self.pv_service,
+                                 cloud_shell_helper=self.cloud_shell_helper,
+                                 resource_model_parser= self.resource_model_parser,
+                                 context_based_logger_factory=Mock())
         context = self._create_resource_command_context()
 
         # act
