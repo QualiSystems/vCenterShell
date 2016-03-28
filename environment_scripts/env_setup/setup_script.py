@@ -186,9 +186,10 @@ class EnvironmentSetup:
             if not res[0]:
                 raise Exception("Reservation is Active with Errors - " + res[1])
 
-        for deploy_res in deploy_results.ResultItems:
-            if not deploy_res.Success:
-                raise Exception("Reservation is Active with Errors - " + deploy_res.Error)
+        if deploy_results and hasattr(deploy_results, "ResultItems"):
+            for deploy_res in deploy_results.ResultItems:
+                if not deploy_res.Success:
+                    raise Exception("Reservation is Active with Errors - " + deploy_res.Error)
 
     def _power_on_refresh_ip_install(self, api, lock, message_status, resource, deploy_result, resource_details_cache):
         """
@@ -217,7 +218,7 @@ class EnvironmentSetup:
                 resource_details = api.GetResourceDetails(deployed_app_name)
 
             # check if deployed app
-            if not resource_details.VmDetails:
+            if hasattr(resource_details, "VmDetails"):
                 self.logger.debug("Resource {0} is not a deployed app, nothing to do with it".format(deployed_app_name))
                 return True, ""
 
