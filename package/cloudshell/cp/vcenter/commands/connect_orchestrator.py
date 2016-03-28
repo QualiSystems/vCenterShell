@@ -1,6 +1,7 @@
 from multiprocessing.pool import ThreadPool
 
 import jsonpickle
+
 from cloudshell.cp.vcenter.models.ActionResult import ActionResult
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
@@ -21,6 +22,7 @@ class ConnectionCommandOrchestrator(object):
         :param connector:
         :type connector: cloudshell.cp.vcenter.commands.connect_dvswitch.VirtualSwitchConnectCommand
         :param disconnector:
+        :type disconnector: cloudshell.cp.vcenter.commands.disconnect_dvswitch.VirtualSwitchToMachineDisconnectCommand
         :param resource_model_parser:
         :return:
         """
@@ -166,7 +168,7 @@ class ConnectionCommandOrchestrator(object):
     def _apply_connectivity_changes(self, si, vm_uuid, action_mappings, logger):
         results = []
         if action_mappings.remove_mapping:
-            remove_results = self._remove_vlan(action_mappings, si, vm_uuid)
+            remove_results = self._remove_vlan(action_mappings, si, vm_uuid, logger)
             results += remove_results
 
         if action_mappings.set_mapping:
@@ -256,11 +258,12 @@ class ConnectionCommandOrchestrator(object):
                 self._add_safely_to_dict(dictionary=set_actions_grouped_by_vlan_id[mode], key=vlan_id, value=action)
         return set_actions_grouped_by_vlan_id
 
-    def _remove_vlan(self, action_mappings, si, vm_uuid):
+    def _remove_vlan(self, action_mappings, si, vm_uuid, logger):
         results = []
         mode_to_actions = action_mappings.action_tree[ACTION_TYPE_REMOVE_VLAN]
         try:
             connection_results = self.disconnector.disconnect_from_networks(si,
+                                                                            logger,
                                                                             self.vcenter_data_model,
                                                                             vm_uuid,
                                                                             action_mappings.remove_mapping)

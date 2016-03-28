@@ -55,7 +55,7 @@ class TestDvPortGroupConfigurer(TestCase):
                                                             Mock())
 
     def test_get_networks_on_vnics(self):
-        res = self.configurer.get_networks_on_vnics(self.vm, [self.vnic])
+        res = self.configurer.get_networks_on_vnics(self.vm, [self.vnic], logger=Mock())
         self.assertIsNotNone(res)
 
     def test_erase_network_by_mapping(self):

@@ -8,7 +8,6 @@
 from pyVmomi import vim
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VNicDeviceMapper
-from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 
 
 class VirtualSwitchToMachineDisconnectCommand(object):
@@ -20,6 +19,7 @@ class VirtualSwitchToMachineDisconnectCommand(object):
         Disconnect Distributed Virtual Switch from VM Command
         :param pyvmomi_service: vCenter API wrapper
         :param port_group_configurer: Port Group Configurer Service
+        :type port_group_configurer: cloudshell.cp.vcenter.vm.portgroup_configurer.VirtualMachinePortGroupConfigurer
         :param <ResourceModelParser> resource_model_parser: Network which disconnected interface will be attached to
         :return:
         """
@@ -51,10 +51,11 @@ class VirtualSwitchToMachineDisconnectCommand(object):
                                              requested_vnic=vm_network_remove_mapping.mac_address,
                                              vnic=vnic, mac=vm_network_remove_mapping.mac_address))
 
-        networks_to_remove = self.port_group_configurer.get_networks_on_vnics(vm, vnics)
+        networks_to_remove = self.port_group_configurer.get_networks_on_vnics(vm, vnics, logger)
 
-        res = self.port_group_configurer.update_vnic_by_mapping(vm, mappings)
-        self.port_group_configurer.erase_network_by_mapping(networks_to_remove, vcenter_data_model.reserved_networks)
+        res = self.port_group_configurer.update_vnic_by_mapping(vm, mappings, logger)
+        self.port_group_configurer.erase_network_by_mapping(networks_to_remove, vcenter_data_model.reserved_networks,
+                                                            logger)
         return res
 
     def disconnect_all(self, si, logger, vcenter_data_model, vm_uuid, vm=None):
@@ -89,9 +90,13 @@ class VirtualSwitchToMachineDisconnectCommand(object):
 
         default_network = self.pyvmomi_service.get_network_by_full_name(si, network_full_name)
         if network:
-            return self.port_group_configurer.disconnect_network(vm, network, default_network, vcenter_data_model.reserved_networks)
+            return self.port_group_configurer.disconnect_network(vm, network, default_network,
+                                                                 vcenter_data_model.reserved_networks,
+                                                                 logger=logger)
         else:
-            return self.port_group_configurer.disconnect_all_networks(vm, default_network, vcenter_data_model.reserved_networks)
+            return self.port_group_configurer.disconnect_all_networks(vm, default_network,
+                                                                      vcenter_data_model.reserved_networks,
+                                                                      logger=logger)
 
     def remove_interfaces_from_vm_task(self, virtual_machine, filter_function=None):
         """
