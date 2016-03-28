@@ -2,7 +2,7 @@
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
-import cloudshell.api.cloudshell_scripts_helpers as helpers
+from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
 from cloudshell.core.logger import qs_logger
 from environment_scripts.profiler.env_profiler import profileit
 from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
