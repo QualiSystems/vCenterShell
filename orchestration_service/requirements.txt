@@ -1,2 +1,2 @@
-cloudshell-automation-api==7.0.0.108
+cloudshell-automation-api>=7.0.0.0, 7.1.0.0
 cloudshell-shell-core
