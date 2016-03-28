@@ -1,4 +1,4 @@
 jsonpickle
-cloudshell-automation-api==7.0.0.108
+cloudshell-automation-api==7.0.0.107
 cloudshell-cp-vcenter
 cloudshell-shell-core
