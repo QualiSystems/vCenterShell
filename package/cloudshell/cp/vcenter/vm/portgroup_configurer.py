@@ -2,6 +2,8 @@
 
 from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
 from cloudshell.cp.vcenter.network.network_specifications import network_is_portgroup
+from threading import Lock
+from pyVmomi import vim
 
 
 class VNicDeviceMapper(object):
@@ -34,6 +36,7 @@ class VirtualMachinePortGroupConfigurer(object):
         self.vnic_to_network_mapper = vnic_to_network_mapper
         self.vnic_service = vnic_service
         self.network_name_gen = name_gen
+        self._lock = Lock()
 
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks, logger):
         vnic_mapping = self.vnic_service.map_vnics(vm)
@@ -53,22 +56,29 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def erase_network_by_mapping(self, networks, reserved_networks, logger):
         nets = dict()
-        for net in networks:
-            nets[net.name] = net
+        self._lock.acquire()
+        try:
+            for net in networks:
+                try:
+                    nets[net.name] = net
+                except vim.fault.ManagedObjectNotFound as e:
+                    continue
 
-        for network in nets.values():
-            if self.network_name_gen.is_generated_name(network.name) \
-                    and (not reserved_networks or network.name not in reserved_networks) \
-                    and not network.vm:
+                try:
+                    for network in nets.values():
+                        if self.network_name_gen.is_generated_name(network.name) \
+                                and (not reserved_networks or network.name not in reserved_networks) \
+                                and not network.vm:
 
-                task = self.destroy_port_group_task(network)
-                if task:
-                    try:
-                        self.synchronous_task_waiter.wait_for_task(task=task,
-                                                                   logger=logger,
-                                                                   action_name='Erase dv Port Group')
-                    except Exception as e:
-                        logger.warning("Cannot delete portgroup: {0} because: {1}".format(network, e))
+                            task = self.destroy_port_group_task(network)
+                            if task:
+                                    self.synchronous_task_waiter.wait_for_task(task=task,
+                                                                               logger=logger,
+                                                                               action_name='Erase dv Port Group')
+                except vim.fault.ManagedObjectNotFound as e:
+                            continue
+        finally:
+            self._lock.release()
 
     def disconnect_all_networks(self, vm, default_network, reserved_networks, logger):
         vnics = self.vnic_service.map_vnics(vm)

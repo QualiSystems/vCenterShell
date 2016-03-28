@@ -6,6 +6,8 @@ from context_based_logger_factory import ContextBasedLoggerFactory
 
 
 class DeployAppOrchestrationDriver(object):
+    NO_DRIVER_ERR = "129"
+
     def __init__(self):
         self.context_based_logger_factory = ContextBasedLoggerFactory()
 
@@ -102,7 +104,7 @@ class DeployAppOrchestrationDriver(object):
 
     def _refresh_ip(self, api, deployment_result, reservation_id, logger):
         logger.info(
-            "Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
+                "Waiting to get IP for deployed app resource {0}...".format(deployment_result.LogicalResourceName))
         try:
             res = api.ExecuteResourceConnectedCommand(reservation_id,
                                                       deployment_result.LogicalResourceName,
@@ -137,15 +139,15 @@ class DeployAppOrchestrationDriver(object):
         installation_script_inputs = installation_service_data["scriptInputs"]
 
         logger.info(
-            "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
-                .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
+                "Executing installation script '{0}' on installation service '{1}' under deployed app resource '{2}'..."
+                    .format(installation_script_name, installation_service_name, deployment_result.LogicalResourceName))
         self._write_message(deployment_result.LogicalResourceName, reservation_id, api, 'installation started')
         try:
 
             script_inputs = []
             for installation_script_input in installation_script_inputs:
                 script_inputs.append(
-                    InputNameValue(installation_script_input["name"], installation_script_input["value"]))
+                        InputNameValue(installation_script_input["name"], installation_script_input["value"]))
 
             installation_result = api.InstallApp(reservationId=reservation_id,
                                                  resourceName=deployment_result.LogicalResourceName,
@@ -153,7 +155,7 @@ class DeployAppOrchestrationDriver(object):
                                                  commandInputs=script_inputs,
                                                  printOutput=True)
 
-            self.logger.debug("Installation_result: " + installation_result.Output)
+            logger.debug("Installation_result: " + installation_result.Output)
             self._write_message(deployment_result.LogicalResourceName, reservation_id, api,
                                 'installation ended successfully')
 
@@ -167,8 +169,8 @@ class DeployAppOrchestrationDriver(object):
             print "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
                                                                          str(exc))
             logger.error(
-                "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
-                                                                       str(exc)))
+                    "Error installing deployed app {0}. Error: {1}".format(deployment_result.LogicalResourceName,
+                                                                           str(exc)))
             raise
 
     def _power_on_deployed_app(self, api, app_name, deployment_result, reservation_id, logger):
@@ -206,20 +208,23 @@ class DeployAppOrchestrationDriver(object):
         :return:
         """
         try:
-            self.logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
+            logger.info("Executing Autoload command on deployed app {0}".format(deployed_app_name))
             self._write_message(deployed_app_name, reservation_id, session, 'discovery started')
 
             session.AutoLoad(deployed_app_name)
 
             self._write_message(deployed_app_name, reservation_id, session, 'discovery ended successfully')
         except CloudShellAPIError as exc:
-            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                            exc.rawxml)
-            logger.error(
-                "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                          exc.rawxml))
-            self._write_message(deployed_app_name, reservation_id, session,
-                                'discovery failed: {1}'.format(deployed_app_name, exc.message))
+            if exc.code != DeployAppOrchestrationDriver.NO_DRIVER_ERR:
+                print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                                exc.rawxml)
+                logger.error(
+                        "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                                  exc.rawxml))
+                self._write_message(deployed_app_name, reservation_id, session,
+                                    'discovery failed: {1}'.format(deployed_app_name, exc.message))
+            raise
+
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
             logger.error(
