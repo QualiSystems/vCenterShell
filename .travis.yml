@@ -4,7 +4,7 @@ python:
 
 install:
     - pip install -r package/requirements.txt
-    - pip install -r vcentershell_driver/requirements.txt
+    - pip install cloudshell-shell-core
     - pip install -r test_requirements.txt
     - pip install coveralls
 
