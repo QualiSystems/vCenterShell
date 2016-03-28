@@ -1,6 +1,7 @@
 from multiprocessing.pool import ThreadPool
 
 import jsonpickle
+
 from cloudshell.cp.vcenter.models.ActionResult import ActionResult
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VmNetworkMapping, VmNetworkRemoveMapping
@@ -16,6 +17,15 @@ ACTION_TYPE_REMOVE_VLAN = 'removeVlan'
 
 class ConnectionCommandOrchestrator(object):
     def __init__(self, connector, disconnector, resource_model_parser):
+        """
+
+        :param connector:
+        :type connector: cloudshell.cp.vcenter.commands.connect_dvswitch.VirtualSwitchConnectCommand
+        :param disconnector:
+        :type disconnector: cloudshell.cp.vcenter.commands.disconnect_dvswitch.VirtualSwitchToMachineDisconnectCommand
+        :param resource_model_parser:
+        :return:
+        """
         self.connector = connector
         self.disconnector = disconnector
         self.resource_model_parser = resource_model_parser
@@ -26,9 +36,10 @@ class ConnectionCommandOrchestrator(object):
         self.port_group_path = ''
         self.default_network = ''
 
-    def connect_bulk(self, si, vcenter_data_model, request):
+    def connect_bulk(self, si, logger, vcenter_data_model, request):
         """
         :param si:
+        :param logger:
         :param VMwarevCenterResourceModel vcenter_data_model:
         :param request:
         :return:
@@ -49,7 +60,7 @@ class ConnectionCommandOrchestrator(object):
         mappings = self._map_requsets(holder.driverRequest.actions)
 
         pool = ThreadPool()
-        async_results = self._run_async_connection_actions(si, mappings, pool)
+        async_results = self._run_async_connection_actions(si, mappings, pool, logger)
 
         results = self._get_async_results(async_results, pool)
 
@@ -147,29 +158,30 @@ class ConnectionCommandOrchestrator(object):
         vnic_to_network.vlan_spec = mode
         return vnic_to_network
 
-    def _run_async_connection_actions(self, si, mappings, pool):
+    def _run_async_connection_actions(self, si, mappings, pool, logger):
 
         async_results = []
         for vm, action_mappings in mappings.items():
-            async_results.append(pool.apply_async(self._apply_connectivity_changes, (si, vm, action_mappings)))
+            async_results.append(pool.apply_async(self._apply_connectivity_changes, (si, vm, action_mappings, logger)))
         return async_results
 
-    def _apply_connectivity_changes(self, si, vm_uuid, action_mappings):
+    def _apply_connectivity_changes(self, si, vm_uuid, action_mappings, logger):
         results = []
         if action_mappings.remove_mapping:
-            remove_results = self._remove_vlan(action_mappings, si, vm_uuid)
+            remove_results = self._remove_vlan(action_mappings, si, vm_uuid, logger)
             results += remove_results
 
         if action_mappings.set_mapping:
-            set_results = self._set_vlan(action_mappings, si, vm_uuid)
+            set_results = self._set_vlan(action_mappings, si, vm_uuid, logger)
             results += set_results
         return results
 
-    def _set_vlan(self, action_mappings, si, vm_uuid):
+    def _set_vlan(self, action_mappings, si, vm_uuid, logger):
         results = []
         set_vlan_actions = action_mappings.action_tree[ACTION_TYPE_SET_VLAN]
         try:
             connection_results = self.connector.connect_to_networks(si,
+                                                                    logger,
                                                                     vm_uuid,
                                                                     action_mappings.set_mapping,
                                                                     self.default_network,
@@ -246,11 +258,12 @@ class ConnectionCommandOrchestrator(object):
                 self._add_safely_to_dict(dictionary=set_actions_grouped_by_vlan_id[mode], key=vlan_id, value=action)
         return set_actions_grouped_by_vlan_id
 
-    def _remove_vlan(self, action_mappings, si, vm_uuid):
+    def _remove_vlan(self, action_mappings, si, vm_uuid, logger):
         results = []
         mode_to_actions = action_mappings.action_tree[ACTION_TYPE_REMOVE_VLAN]
         try:
             connection_results = self.disconnector.disconnect_from_networks(si,
+                                                                            logger,
                                                                             self.vcenter_data_model,
                                                                             vm_uuid,
                                                                             action_mappings.remove_mapping)

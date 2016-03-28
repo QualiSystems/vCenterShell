@@ -3,6 +3,7 @@ from multiprocessing.pool import ThreadPool
 from threading import Lock
 
 from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
+from cloudshell.api.common_cloudshell_api import CloudShellAPIError
 from cloudshell.core.logger import qs_logger
 from environment_scripts.profiler.env_profiler import profileit
 from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
@@ -48,6 +49,14 @@ class EnvironmentTeardown:
             api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
                                                 message="Disconnecting all apps...")
             api.DisconnectRoutesInReservation(self.reservation_id, endpoints)
+
+        except CloudShellAPIError as cerr:
+            if cerr.code != "123":  # ConnectionNotFound error code
+                self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
+                                  .format(self.reservation_id, str(cerr)))
+                api.WriteMessageToReservationOutput(reservationId=self.reservation_id,
+                                                    message="Error disconnecting apps. Error: {0}".format(cerr.message))
+
         except Exception as exc:
             self.logger.error("Error disconnecting all routes in reservation {0}. Error: {1}"
                               .format(self.reservation_id, str(exc)))

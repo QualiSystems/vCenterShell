@@ -7,7 +7,6 @@ from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
 
 
 class TestDvPortGroupCreator(TestCase):
-
     def test_create_dv_port_group_exception(self):
         # Arrange
         pyvmomy_service = Mock()
@@ -19,10 +18,9 @@ class TestDvPortGroupCreator(TestCase):
 
         # Assert
         self.assertRaises(Exception,
-                          dv_port_group_creator._create_dv_port_group, 'port_name', 'switch_name', 'switch_path', Mock(),
-                          None, None)
-
-
+                          dv_port_group_creator._create_dv_port_group, 'port_name', 'switch_name', 'switch_path',
+                          Mock(),
+                          None, None, Mock())
 
     def test_create_dv_port_group(self):
         # Arrange
@@ -37,14 +35,17 @@ class TestDvPortGroupCreator(TestCase):
 
         # Act
         dv_port_group_creator._create_dv_port_group('port_name', 'switch_name', 'switch_path',
-                                                   create_autospec(spec=vim.ServiceInstance), None, 1001)
+                                                    create_autospec(spec=vim.ServiceInstance),
+                                                    spec=None,
+                                                    vlan_id=1001,
+                                                    logger=Mock())
 
         # Assert
         self.assertTrue(dv_port_group_creator.dv_port_group_create_task.called)
-        setattr(DvPortGroupCreator, 'dv_port_group_create_task',dv_port_group_create_task_prev)
+        setattr(DvPortGroupCreator, 'dv_port_group_create_task', dv_port_group_create_task_prev)
 
     def test_dv_port_group_create_task(self):
-        #arrange
+        # arrange
         pyvmomy_service = Mock()
         synchronous_task_waiter = Mock()
         dv_port_group_creator = DvPortGroupCreator(pyvmomy_service, synchronous_task_waiter)
@@ -52,8 +53,13 @@ class TestDvPortGroupCreator(TestCase):
         dv_switch.AddDVPortgroup_Task = Mock()
         spec = create_autospec(spec=vim.dvs.VmwareDistributedVirtualSwitch.VlanSpec)
 
-        #act
-        dv_port_group_creator.dv_port_group_create_task('dv_port_name', dv_switch, spec, 1001)
+        # act
+        dv_port_group_creator.dv_port_group_create_task(dv_port_name='dv_port_name',
+                                                        dv_switch=dv_switch,
+                                                        spec=spec,
+                                                        vlan_id=1001,
+                                                        logger=Mock(),
+                                                        num_ports=32)
 
-        #assert
+        # assert
         self.assertTrue(dv_switch.AddDVPortgroup_Task.called)

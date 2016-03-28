@@ -55,22 +55,22 @@ class TestDvPortGroupConfigurer(TestCase):
                                                             Mock())
 
     def test_get_networks_on_vnics(self):
-        res = self.configurer.get_networks_on_vnics(self.vm, [self.vnic])
+        res = self.configurer.get_networks_on_vnics(self.vm, [self.vnic], logger=Mock())
         self.assertIsNotNone(res)
 
     def test_erase_network_by_mapping(self):
-        res = self.configurer.erase_network_by_mapping([self.network], [])
+        res = self.configurer.erase_network_by_mapping([self.network], [], logger=Mock())
         self.assertIsNone(res)
 
     def test_disconnect_all_networks(self):
-        mapping = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network), [])
+        mapping = self.configurer.disconnect_all_networks(self.vm, Mock(spec=vim.Network), [], logger=Mock())
         self.assertFalse(mapping[0].connect)
 
     def test_disconnect_network(self):
-        mapping = self.configurer.disconnect_network(self.vm, self.network, Mock(spec=vim.Network), '')
+        mapping = self.configurer.disconnect_network(self.vm, self.network, Mock(spec=vim.Network), '', logger=Mock())
         self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):
         mapping = [ConnectRequest('vnic 1', (Mock(spec=vim.Network), None))]
-        res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network), [])
+        res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network), [], logger=Mock())
         self.assertIsNotNone(res[0].vnic)

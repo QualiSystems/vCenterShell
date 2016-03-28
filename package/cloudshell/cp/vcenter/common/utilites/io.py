@@ -6,9 +6,6 @@ Very much common Input/Output Utils
 
 import os.path
 
-from cloudshell.cp.vcenter.common.logger import getLogger
-_logger = getLogger("vCenterCommon")
-
 
 def extract_folder_name(whole_path):
     if whole_path:

@@ -1,7 +1,5 @@
 import os
 import subprocess
-
-from cloudshell.cp.vcenter.common.utilites.common_utils import fixurl
 from urllib2 import urlopen
 from cloudshell.cp.vcenter.common.utilites.common_utils import fixurl
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -20,26 +18,26 @@ RESOURCE_POOL_PARAM_TO_URL = '/Resources/{0}'
 
 
 class OvfImageDeployerService(object):
-    def __init__(self, resource_model_parser, logger):
+    def __init__(self, resource_model_parser):
         self.resource_model_parser = resource_model_parser
-        self.logger = logger
 
-    def deploy_image(self, vcenter_data_model, image_params):
+    def deploy_image(self, vcenter_data_model, image_params, logger):
         """
         Receives ovf image parameters and deploy it on the designated vcenter
         :param VMwarevCenterResourceModel vcenter_data_model:
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
+        :param logger:
         """
         ovf_tool_exe_path = vcenter_data_model.ovf_tool_path
 
         self._validate_url_exists(ovf_tool_exe_path, 'OVF Tool')
 
         args = self._get_args(ovf_tool_exe_path, image_params)
-        self.logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
+        logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
         process = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
 
-        self.logger.debug('communicating with ovf tool')
+        logger.debug('communicating with ovf tool')
         result = process.communicate()
         process.stdin.close()
 
@@ -50,13 +48,13 @@ class OvfImageDeployerService(object):
                 raise Exception('no result has return from the ovftool')
             res = COMPLETED_SUCCESSFULLY
 
-        self.logger.info('communication with ovf tool results: {0}'.format(res))
+        logger.info('communication with ovf tool results: {0}'.format(res))
         if res.find(COMPLETED_SUCCESSFULLY) > -1:
             return True
 
         image_params.connectivity.password = '******'
         args_for_error = ' '.join(self._get_args(ovf_tool_exe_path, image_params))
-        self.logger.error('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
+        logger.error('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
         raise Exception('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
 
     def _get_args(self, ovf_tool_exe_path, image_params):

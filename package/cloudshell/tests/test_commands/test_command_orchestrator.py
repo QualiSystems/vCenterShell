@@ -33,16 +33,11 @@ class TestCommandOrchestrator(TestCase):
         self.connection_details = Mock()
         self.context.resource = self.resource
         self.context.remote_endpoints = [self.resource]
-        self.command_orchestrator = CommandOrchestrator(self.context)
+        self.command_orchestrator = CommandOrchestrator()
         self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=True)
         self.command_orchestrator.cs_helper = Mock()
         self.command_orchestrator.cs_helper.get_session = Mock(return_value=session)
         self.command_orchestrator.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
-        self.command_orchestrator.vc_data_model.default_dvswitch_path = 'path'
-        self.command_orchestrator.vc_data_model.default_dvswitch_name = 'dv_name'
-        self.command_orchestrator.vc_data_model.default_port_group_location = 'port path'
-        self.command_orchestrator.vc_data_model.default_network = 'default network'
-        self.command_orchestrator.vc_data_model.reserved_networks = 'reserved'
         self.ports = [Mock()]
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 

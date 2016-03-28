@@ -2,13 +2,7 @@
 
 from pyVmomi import vim
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-
-from cloudshell.cp.vcenter.network import *
-# from cloudshell.cp.vcenter.vm import vm_reconfig_task
-from cloudshell.cp.vcenter.common.logger import getLogger
 from cloudshell.cp.vcenter.network.network_specifications import network_is_standard, network_is_portgroup
-
-logger = getLogger("vCenterCommon")
 
 
 class VNicService(object):
@@ -16,7 +10,7 @@ class VNicService(object):
         super(VNicService, self).__init__()
 
     @staticmethod
-    def vnic_set_connectivity_status(nicspec, is_connected):
+    def vnic_set_connectivity_status(nicspec, is_connected, logger):
         if not nicspec.device.connectable:
             nicspec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
             nicspec.device.connectable.startConnected = is_connected
@@ -26,11 +20,12 @@ class VNicService(object):
         return nicspec
 
     @staticmethod
-    def vnic_add_to_vm_task(nicspec, virtual_machine):
+    def vnic_add_to_vm_task(nicspec, virtual_machine, logger):
         """
         Add new vNIC to VM
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
         :param virtual_machine:
+        :param logger:
         :return:
         """
         if issubclass(type(nicspec), vim.vm.device.VirtualDeviceSpec):
@@ -70,12 +65,15 @@ class VNicService(object):
         return network
 
     @staticmethod
-    def vnic_get_network_attached(vm, device, pyvmomi_service):
+    def vnic_get_network_attached(vm, device, pyvmomi_service, logger):
         """
         Get a Network connected to a particular Device (vNIC)
         @see https://github.com/vmware/pyvmomi/blob/master/docs/vim/dvs/PortConnection.rst
 
+        :param vm:
         :param device: <vim.vm.device.VirtualVmxnet3> instance of adapter
+        :param pyvmomi_service:
+        :param logger:
         :return: <vim Network Obj or None>
         """
 
@@ -146,11 +144,12 @@ class VNicService(object):
         return nicspec
 
     @staticmethod
-    def vnic_attach_to_network_standard(nicspec, network):
+    def vnic_attach_to_network_standard(nicspec, network, logger):
         """
         Attach vNIC to a 'usual' network
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
         :param network: <vim.Network>
+        :param logger:
         :return: updated 'nicspec'
         """
         if nicspec and network_is_standard(network):
@@ -174,11 +173,12 @@ class VNicService(object):
         return nicspec
 
     @staticmethod
-    def vnic_attach_to_network_distributed(nicspec, port_group):
+    def vnic_attach_to_network_distributed(nicspec, port_group, logger):
         """
         Attach vNIC to a Distributed Port Group network
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
-        :param network: <vim.dvs.DistributedVirtualPortgroup>
+        :param port_group: <vim.dvs.DistributedVirtualPortgroup>
+        :param logger:
         :return: updated 'nicspec'
         """
         if nicspec and network_is_portgroup(port_group):
@@ -197,7 +197,7 @@ class VNicService(object):
         return nicspec
 
     @staticmethod
-    def vnic_attached_to_network(nicspec, network):
+    def vnic_attached_to_network(nicspec, network, logger):
         """
         Attach vNIC to Network.
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
@@ -207,9 +207,11 @@ class VNicService(object):
 
         if nicspec:
             if network_is_portgroup(network):
-                return VNicService.vnic_attach_to_network_distributed(nicspec, network)
+                return VNicService.vnic_attach_to_network_distributed(nicspec, network,
+                                                                      logger=logger)
             elif network_is_standard(network):
-                return VNicService.vnic_attach_to_network_standard(nicspec, network)
+                return VNicService.vnic_attach_to_network_standard(nicspec, network,
+                                                                   logger=logger)
         return None
 
     @staticmethod
@@ -220,10 +222,10 @@ class VNicService(object):
         :param network: <vim network obj>
         :return: <vim.vm.device.VirtualDeviceSpec> ready for inserting to VM
         """
-        return VNicService.vnic_attached_to_network(VNicService.vnic_compose_empty(), network)
+        return VNicService.vnic_attached_to_network(VNicService.vnic_compose_empty(), network, logger)
 
     @staticmethod
-    def vnic_add_new_to_vm_task(vm, network=None):
+    def vnic_add_new_to_vm_task(vm, network, logger):
         """
         Compose new vNIC and attach it to VM & connect to Network
         :param nicspec: <vim.vm.VM>
@@ -232,7 +234,7 @@ class VNicService(object):
         """
 
         nicspes = VNicService.vnic_new_attached_to_network(network)
-        task = VNicService.vnic_add_to_vm_task(nicspes, vm)
+        task = VNicService.vnic_add_to_vm_task(nicspes, vm, logger)
         return task
 
     @staticmethod

@@ -1,16 +1,12 @@
 from unittest import TestCase
-
 from mock import Mock
 from pyVmomi import vim
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 
 
 class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_delete_all(self):
         # arrange
@@ -35,7 +31,12 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vcenter_data_model = VMwarevCenterResourceModel()
 
         # act
-        res = connector.disconnect(si, vcenter_data_model, uuid)
+        res = connector.disconnect(si=si,
+                                   logger=Mock(),
+                                   vcenter_data_model=vcenter_data_model,
+                                   vm_uuid=uuid,
+                                   network_name=None,
+                                   vm=None)
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,
                                                        connection_detail.username,
@@ -71,7 +72,11 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         vcenter_data_model = VMwarevCenterResourceModel()
 
         # act
-        res = connector.disconnect(si, vcenter_data_model, uuid, network_name)
+        res = connector.disconnect(si=si,
+                                   logger=Mock(),
+                                   vcenter_data_model=vcenter_data_model,
+                                   vm_uuid= uuid,
+                                   network_name=network_name)
 
         # assert
         self.assertTrue(pv_service.connect.called_with(connection_detail.host,
