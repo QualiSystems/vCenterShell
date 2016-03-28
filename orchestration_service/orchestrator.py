@@ -129,7 +129,7 @@ class DeployAppOrchestrationDriver(object):
     def _execute_installation_if_exist(self, api, deployment_result, installation_service_data, reservation_id, logger):
         if not installation_service_data:
             self._write_message(deployment_result.LogicalResourceName, reservation_id, api,
-                                'doen\'t have an installation to execute')
+                                "doesn't have an installation to execute")
             return
 
         installation_service_name = installation_service_data["name"]
