@@ -46,7 +46,9 @@ class CommandWrapper:
         :param args:
         """
 
-        logger = self.context_based_logger_factory.create_logger_for_context(context)
+        logger = self.context_based_logger_factory.create_logger_for_context(
+            logger_name='vCenterShell',
+            context=context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)

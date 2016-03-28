@@ -14,7 +14,10 @@ class DeployAppOrchestrationDriver(object):
         Deploys app from template
         :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
         """
-        logger = self.context_based_logger_factory.create_logger_for_context(context)
+        logger = self.context_based_logger_factory.create_logger_for_context(
+            logger_name='DeployAppOrchestrationDriver',
+            context=context)
+
         reservation_id = context.reservation.reservation_id
         resource_details = context.resource
         app_name = resource_details.name
