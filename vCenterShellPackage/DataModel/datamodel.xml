@@ -131,7 +131,7 @@
         <ns0:Rule Name="Link Configurations" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200', '10,20,40-100'." IsReadOnly="false" Name="Allocation Ranges" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200'." IsReadOnly="false" Name="Allocation Ranges" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
