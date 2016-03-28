@@ -24,11 +24,11 @@ class VnicToNetworkMapper(object):
                 if self.quali_name_generator.is_generated_name(net_at_requsted_vnic):
                     raise ValueError('The vNIC: "{0}" is already set with: "{1}"'.format(request.vnic_name,
                                                                                          net_at_requsted_vnic))
-                mapping[request.vnic_name] = request.network
+                mapping[request.vnic_name] = (request.network, request.vnic_name)
                 vnics_to_network_mapping.pop(request.vnic_name)
             else:
                 vnic_name = self._find_available_vnic(vnics_to_network_mapping, default_network)
-                mapping[vnic_name] = request.network
+                mapping[vnic_name] = (request.network, request.vnic_name)
                 vnics_to_network_mapping.pop(vnic_name)
 
         return mapping

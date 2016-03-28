@@ -41,7 +41,7 @@ class TestDvPortGroupConfigurer(TestCase):
         self.synchronous_task_waiter.wait_for_task = Mock(return_value="TASK OK")
         self.si = Mock()
 
-        mapping = {'vnic 1': Mock(spec=vim.Network)}
+        mapping = {'vnic 1': (Mock(spec=vim.Network), None)}
         self.vnic_service = Mock()
         self.vnic_to_network_mapper = Mock()
         self.vnic_to_network_mapper.map_request_to_vnics = Mock(return_value=mapping)
@@ -71,7 +71,6 @@ class TestDvPortGroupConfigurer(TestCase):
         self.assertFalse(mapping[0].connect)
 
     def test_connect_vnic_to_networks(self):
-        req = ConnectRequest('vnic 1', Mock(spec=vim.Network))
-        mapping = [ConnectRequest('vnic 1', Mock(spec=vim.Network))]
+        mapping = [ConnectRequest('vnic 1', (Mock(spec=vim.Network), None))]
         res = self.configurer.connect_vnic_to_networks(self.vm, mapping, Mock(spec=vim.Network), [], logger=Mock())
         self.assertIsNotNone(res[0].vnic)

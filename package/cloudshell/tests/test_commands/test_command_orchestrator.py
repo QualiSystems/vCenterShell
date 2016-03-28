@@ -61,7 +61,7 @@ class TestCommandOrchestrator(TestCase):
 
     def test_deploy_from_template(self):
         # act
-        self.command_orchestrator.deploy_from_template(self.context, '{"name": "name"}')
+        self.command_orchestrator.deploy_from_template(self.context, '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 

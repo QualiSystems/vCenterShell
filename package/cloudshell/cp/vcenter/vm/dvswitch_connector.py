@@ -1,5 +1,4 @@
 
-
 class VmNetworkMapping(object):
     def __init__(self):
         self.vnic_name = ''
@@ -35,6 +34,7 @@ class VirtualSwitchToMachineConnector(object):
         """
         :param dv_port_group_creator: <DvPortGroupCreator> instance/interface
         :param virtual_machine_port_group_configurer: <VirtualMachinePortGroupConfigurer> instance/interface
+        :type virtual_machine_port_group_configurer: cloudshell.cp.vcenter.vm.portgroup_configurer.VirtualMachinePortGroupConfigurer
         :return:
         """
         self.dv_port_group_creator = dv_port_group_creator
@@ -66,16 +66,12 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.vlan_spec,
                                                                        logger=logger)
 
-            request_mapping.append(ConnectRequest(self._get_vnic_name(network_map.vnic_name), network))
+            request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
         logger.debug(str(request_mapping))
         return self.virtual_machine_port_group_configurer.connect_vnic_to_networks(vm,
                                                                                    request_mapping,
                                                                                    default_network,
-                                                                                   reserved_networks)
+                                                                                   reserved_networks,
+                                                                                   logger)
 
-    @staticmethod
-    def _get_vnic_name(vnic_name):
-        if str(vnic_name).isdigit():
-            vnic_name = 'Network adapter {0}'.format(vnic_name)
-        return vnic_name

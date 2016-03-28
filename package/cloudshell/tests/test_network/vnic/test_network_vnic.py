@@ -150,7 +150,7 @@ class TestNetwork(TestCase):
         VNicService.vnic_attach_to_network_distributed = Mock()
 
         #act
-        VNicService.vnic_attached_to_network(nicspec, network)
+        VNicService.vnic_attached_to_network(nicspec, network, logger=Mock())
 
         #assert
         self.assertTrue(VNicService.vnic_attach_to_network_distributed.called)
@@ -162,7 +162,7 @@ class TestNetwork(TestCase):
         VNicService.vnic_attach_to_network_standard = Mock()
 
         #act
-        VNicService.vnic_attached_to_network(nicspec, network)
+        VNicService.vnic_attached_to_network(nicspec, network, logger=Mock())
 
         #assert
         self.assertTrue(VNicService.vnic_attach_to_network_standard.called)

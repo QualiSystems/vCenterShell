@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from cloudshell.cp.vcenter.models.ActionResult import Test
 from cloudshell.cp.vcenter.models.ActionResult import ActionResult
 from cloudshell.cp.vcenter.models.ConnectionResult import ConnectionResult
 from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
@@ -18,7 +17,8 @@ class TestCommandResult(TestCase):
         self.assertEqual(result, None)
 
     def test_get_result_from_command_output_with_result_unpickable_true(self):
-        connection_result = ConnectionResult(mac_address='AA', vm_uuid='BB', network_name='CC', network_key='DD')
+        connection_result = ConnectionResult(mac_address='AA', vm_uuid='BB', network_name='CC', network_key='DD',
+                                             requested_vnic='EE', vnic_name='FF')
         output_result = set_command_result(result=connection_result, unpicklable=True)
         result = get_result_from_command_output(output_result)
 
@@ -26,9 +26,12 @@ class TestCommandResult(TestCase):
         self.assertEqual(result.vm_uuid, 'BB')
         self.assertEqual(result.network_name, 'CC')
         self.assertEqual(result.network_key, 'DD')
+        self.assertEqual(result.requested_vnic, 'EE')
+        self.assertEqual(result.vnic_name, 'FF')
 
     def test_get_result_from_command_output_with_result_unpickable_false(self):
-        connection_result = ConnectionResult(mac_address='AA', vm_uuid='BB', network_name='CC', network_key='DD')
+        connection_result = ConnectionResult(mac_address='AA', vm_uuid='BB', network_name='CC', network_key='DD',
+                                             requested_vnic='EE', vnic_name='FF')
         output_result = set_command_result(result=[connection_result], unpicklable=False)
         results = get_result_from_command_output(output_result)
 
@@ -36,6 +39,8 @@ class TestCommandResult(TestCase):
         self.assertEqual(results[0]['vm_uuid'], 'BB')
         self.assertEqual(results[0]['network_name'], 'CC')
         self.assertEqual(results[0]['network_key'], 'DD')
+        self.assertEqual(results[0]['requested_vnic'], 'EE')
+        self.assertEqual(results[0]['vnic_name'], 'FF')
 
     def test_get_result_from_command_output_with_result(self):
         output_result = 'command_json_result=[{"py/object": "cloudshell.cp.vcenter.models.ConnectionResult.ConnectionResult", "vm_uuid": "422258ab-47e9-d57c-3741-6832a432bc3a", "network_name": "QualiSB/anetwork", "mac_address": "00:50:56:a2:23:76"}]=command_json_result_end'

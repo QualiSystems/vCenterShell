@@ -154,8 +154,6 @@ class VNicService(object):
         """
         if nicspec and network_is_standard(network):
             network_name = network.name
-            nicspec.device.deviceInfo.label = network_name
-            nicspec.device.deviceInfo.summary = network_name
             nicspec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
             nicspec.device.backing.network = network
 
@@ -180,13 +178,11 @@ class VNicService(object):
         Attach vNIC to a Distributed Port Group network
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
         :param port_group: <vim.dvs.DistributedVirtualPortgroup>
+        :param logger:
         :return: updated 'nicspec'
         """
         if nicspec and network_is_portgroup(port_group):
             network_name = port_group.name
-            # port.portgroupKey
-            nicspec.device.deviceInfo.label = network_name
-            nicspec.device.deviceInfo.summary = network_name
 
             dvs_port_connection = vim.dvs.PortConnection()
             dvs_port_connection.portgroupKey = port_group.key
@@ -200,26 +196,8 @@ class VNicService(object):
             logger.warn(u"Cannot assigning portgroup for vNIC")
         return nicspec
 
-    ### NOT USED:
-    # def add_or_update_vnic_network(device, network):
-    #     """
-    #     attach network to vnic
-    #     :param network: vim.network port group
-    #     :param vnic: vnic
-    #     """
-    #
-    #     dvs_port_connection = vim.dvs.PortConnection()
-    #     dvs_port_connection.portgroupKey = network.key
-    #     dvs_port_connection.switchUuid = network.config.distributedVirtualSwitch.uuid
-    #
-    #     # checking if the vnic is not assigned or assign to a different network
-    #     if not hasattr(device, 'backing') or not hasattr(device.backing, 'networking'):
-    #         device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-    #
-    #     device.backing.port = dvs_port_connection
-
     @staticmethod
-    def vnic_attached_to_network(nicspec, network):
+    def vnic_attached_to_network(nicspec, network, logger):
         """
         Attach vNIC to Network.
         :param nicspec: <vim.vm.device.VirtualDeviceSpec>
@@ -229,9 +207,11 @@ class VNicService(object):
 
         if nicspec:
             if network_is_portgroup(network):
-                return VNicService.vnic_attach_to_network_distributed(nicspec, network)
+                return VNicService.vnic_attach_to_network_distributed(nicspec, network,
+                                                                      logger=logger)
             elif network_is_standard(network):
-                return VNicService.vnic_attach_to_network_standard(nicspec, network)
+                return VNicService.vnic_attach_to_network_standard(nicspec, network,
+                                                                   logger=logger)
         return None
 
     @staticmethod
@@ -242,7 +222,7 @@ class VNicService(object):
         :param network: <vim network obj>
         :return: <vim.vm.device.VirtualDeviceSpec> ready for inserting to VM
         """
-        return VNicService.vnic_attached_to_network(VNicService.vnic_compose_empty(), network)
+        return VNicService.vnic_attached_to_network(VNicService.vnic_compose_empty(), network, logger)
 
     @staticmethod
     def vnic_add_new_to_vm_task(vm, network, logger):
@@ -265,7 +245,6 @@ class VNicService(object):
             if hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name'):
                 return device.backing.network.name == network.name
         return False
-
 
     @staticmethod
     def is_vnic_connected(vnic):
