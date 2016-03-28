@@ -6,6 +6,8 @@ from cloudshell.api.cloudshell_api import CloudShellAPISession
 
 
 class DeployAppOrchestrationDriver(object):
+    NO_DRIVER_ERR = "129"
+
     def initialize(self, context):
         """
         Deploys app from template
@@ -36,7 +38,7 @@ class DeployAppOrchestrationDriver(object):
         #  self._write_message(deployed_app_name, reservation_id, session, 'Deployment ended successfully')
 
         # if autoload fails we still want to continue so 'success message' moved inside '_try_exeucte_autoload'
-        self._try_exeucte_autoload(session, reservation_id, deployment_result.LogicalResourceName)
+        self._try_execute_autoload(session, reservation_id, deployment_result.LogicalResourceName)
 
         self._write_message(deployed_app_name, reservation_id, session, 'connecting routes started')
         # if visual connector endpoints contains service with attribute "Virtual Network" execute connect command
@@ -197,7 +199,7 @@ class DeployAppOrchestrationDriver(object):
             self.logger.error("Error deploying app {0}. Error: {1}".format(app_name, str(exc)))
             raise
 
-    def _try_exeucte_autoload(self, session, reservation_id, deployed_app_name):
+    def _try_execute_autoload(self, session, reservation_id, deployed_app_name):
         """
         :param str reservation_id:
         :param CloudShellAPISession session:
@@ -212,13 +214,17 @@ class DeployAppOrchestrationDriver(object):
 
             self._write_message(deployed_app_name, reservation_id, session, 'discovery ended successfully')
         except CloudShellAPIError as exc:
-            print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                            exc.rawxml)
-            self.logger.error(
-                    "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
-                                                                                              exc.rawxml))
-            self._write_message(deployed_app_name, reservation_id, session,
-                                'discovery failed: {1}'.format(deployed_app_name, exc.message))
+            if exc.code != DeployAppOrchestrationDriver.NO_DRIVER_ERR:
+
+                print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                                exc.rawxml)
+                self.logger.error(
+                        "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name,
+                                                                                                  exc.rawxml))
+                self._write_message(deployed_app_name, reservation_id, session,
+                                    'discovery failed: {1}'.format(deployed_app_name, exc.message))
+                raise
+
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
             self.logger.error(
