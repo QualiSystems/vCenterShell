@@ -62,6 +62,8 @@ class pyVmomiService:
                 '#si = SmartConnect(host=address, user=user, pwd=password, port=port)'
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
+        except vim.fault.InvalidLogin as e:
+            raise ValueError(e.msg)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
             import traceback
