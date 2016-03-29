@@ -52,7 +52,8 @@ class DestroyVirtualMachineCommand(object):
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         # destroy vm
-        result = self.pv_service.destroy_vm(vm)
+        result = self.pv_service.destroy_vm(vm=vm,
+                                            logger=logger)
         return result
 
     @staticmethod

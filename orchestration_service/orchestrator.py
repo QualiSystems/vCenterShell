@@ -223,7 +223,7 @@ class DeployAppOrchestrationDriver(object):
                                                                                                   exc.rawxml))
                 self._write_message(deployed_app_name, reservation_id, session,
                                     'discovery failed: {1}'.format(deployed_app_name, exc.message))
-            raise
+                raise
 
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))
