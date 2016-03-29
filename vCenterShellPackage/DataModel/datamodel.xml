@@ -511,7 +511,7 @@
       <ns0:Categories>
       </ns0:Categories>
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ServiceType="Regular">
+    <ns0:ResourceFamily Description="" IsService="true" Name="Virtual Network" ImagePath="service_vnetwork.png" ServiceType="Regular">
       <ns0:AttachedAttributes>
         <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="QnQ" UserInput="false">
           <ns0:AllowedValues />
