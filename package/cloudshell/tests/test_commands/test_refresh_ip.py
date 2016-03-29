@@ -4,13 +4,10 @@ from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
 from mock import Mock, create_autospec
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class TestRefreshIpCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_refresh_ip(self):
         nic1 = Mock()
@@ -59,7 +56,8 @@ class TestRefreshIpCommand(TestCase):
                                       vcenter_data_model= center_resource_model,
                                       vm_uuid='machine1',
                                       resource_name='default_network',
-                                      cancellation_context=cancellation_context)
+                                      cancellation_context=cancellation_context,
+                                      logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -120,7 +118,8 @@ class TestRefreshIpCommand(TestCase):
             vcenter_data_model=center_resource_model,
             vm_uuid='machine1',
             resource_name='default_network',
-            cancellation_context=cancellation_context)
+            cancellation_context=cancellation_context,
+            logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -173,7 +172,8 @@ class TestRefreshIpCommand(TestCase):
             vcenter_data_model=center_resource_model,
             vm_uuid='machine1',
             resource_name='default_network',
-            cancellation_context=cancellation_context)
+            cancellation_context=cancellation_context,
+            logger=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))

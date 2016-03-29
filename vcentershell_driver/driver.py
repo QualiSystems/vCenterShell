@@ -12,10 +12,10 @@ class VCenterShellDriver (ResourceDriverInterface):
         """
         ctor must be without arguments, it is created with reflection at run time
         """
-        self.command_orchestrator = None  # type: CommandOrchestrator
+        self.command_orchestrator = CommandOrchestrator()  # type: CommandOrchestrator
 
-    def initialize(self, context):
-        self.command_orchestrator = CommandOrchestrator(context)
+    def initialize(self):
+        pass
 
     def ApplyConnectivityChanges(self, context, request):
         return self.command_orchestrator.connect_bulk(context, request)

@@ -35,7 +35,10 @@ class TestCommandOrchestrator(TestCase):
         Simple connect vm to vlan 'Access' mode
         """
         request, expected = self._get_test1_params()
-        results = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
         self._assert_as_expected(results, expected)
 
     def test_connect_bulk2(self):
@@ -43,7 +46,10 @@ class TestCommandOrchestrator(TestCase):
         Simple disconnect
         """
         request, expected = self._get_test2_params()
-        results = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
         self._assert_as_expected(results, expected)
 
     def test_connect_bulk3(self):
@@ -51,7 +57,10 @@ class TestCommandOrchestrator(TestCase):
         Complex connect multiple vms and multiple vlan types
         """
         request, expected = self._get_test3_params()
-        results = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
         self._assert_as_expected(results, expected)
 
     def test_connect_bulk4(self):
@@ -60,14 +69,17 @@ class TestCommandOrchestrator(TestCase):
         """
         request, expected = self._get_test4_params()
         self.assertRaises(ValueError,
-                          self.ConnectionCommandOrchestrator.connect_bulk, self.si, self.vc_data_model, request)
+                          self.ConnectionCommandOrchestrator.connect_bulk, self.si, Mock(), self.vc_data_model, request)
 
     def test_connect_bulk5(self):
         """
         Disconnect returns error
         """
         request, expected = self._get_test5_params()
-        res = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        res = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                              logger=Mock(),
+                                                              vcenter_data_model=self.vc_data_model,
+                                                              request=request)
         self._assert_as_expected(res, expected)
 
     def test_connect_bulk6(self):
@@ -75,7 +87,10 @@ class TestCommandOrchestrator(TestCase):
         Connect returns error
         """
         request, expected = self._get_test6_params()
-        res = self.ConnectionCommandOrchestrator.connect_bulk(self.si, self.vc_data_model, request)
+        res = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                              logger=Mock(),
+                                                              vcenter_data_model=self.vc_data_model,
+                                                              request=request)
         self._assert_as_expected(res, expected)
 
     def _assert_as_expected(self, res, exp):

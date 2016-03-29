@@ -1,15 +1,11 @@
 import os
-import sys
 import xml.etree.ElementTree as ET
 from os import listdir
 from unittest import TestCase
-
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class TestDataModel(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_resource_models(self):
         ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}

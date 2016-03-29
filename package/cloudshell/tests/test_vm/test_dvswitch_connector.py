@@ -3,8 +3,6 @@ from unittest import TestCase
 from mock import Mock, MagicMock
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
-
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
@@ -17,7 +15,6 @@ from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_connect(self):
         # Arrange
@@ -25,7 +22,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         py_vmomi_service = Mock()
         py_vmomi_service.connect = Mock(return_value=si)
-
 
         dv_port_group_creator = MagicMock()
         virtual_machine_port_group_configurer = MagicMock()
@@ -43,7 +39,12 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         network_map.vlan_id = '100'
         network_map.vlan_spec = 'Access'
         # Act
-        virtual_switch_to_machine_connector.connect_by_mapping(si, vm, [network_map], Mock(spec=vim.Network), [])
+        virtual_switch_to_machine_connector.connect_by_mapping(si=si,
+                                                               vm=vm,
+                                                               mapping=[network_map],
+                                                               default_network=Mock(spec=vim.Network),
+                                                               reserved_networks=[],
+                                                               logger=Mock())
 
     def integrationtest(self):
         resource_connection_details_retriever = Mock()

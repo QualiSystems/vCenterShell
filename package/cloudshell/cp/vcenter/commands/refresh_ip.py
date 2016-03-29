@@ -4,9 +4,6 @@ import time
 from cloudshell.cp.vcenter.commands.ip_result import IpResult, IpReason
 
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
-from cloudshell.cp.vcenter.common.logger import getLogger
-
-logger = getLogger(__name__)
 
 
 class RefreshIpCommand(object):
@@ -17,11 +14,12 @@ class RefreshIpCommand(object):
         self.pyvmomi_service = pyvmomi_service
         self.resource_model_parser = resource_model_parser
 
-    def refresh_ip(self, si, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
+    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 
         :param vim.ServiceInstance si: py_vmomi service instance
+        :param logger:
         :param vCenterShell.driver.SecureCloudShellApiSession session: cloudshell session
         :param str vm_uuid: UUID of Virtual Machine
         :param str resource_name: Logical resource name to update address property on
@@ -42,7 +40,7 @@ class RefreshIpCommand(object):
             logger.warning('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(resource_name))
             return None
 
-        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout)
+        ip_result = self._obtain_ip(vm, default_network, match_function, cancellation_context, timeout, logger)
 
         if ip_result.reason == IpReason.Timeout:
             raise ValueError('IP address of VM \'{0}\' could not be obtained during {1} seconds'
@@ -89,7 +87,7 @@ class RefreshIpCommand(object):
             return custom_param_values[0]
         return None
 
-    def _obtain_ip(self, vm, default_network, match_function, cancellation_context, timeout):
+    def _obtain_ip(self, vm, default_network, match_function, cancellation_context, timeout, logger):
         time_elapsed = 0
         ip = None
         interval = self.INTERVAL

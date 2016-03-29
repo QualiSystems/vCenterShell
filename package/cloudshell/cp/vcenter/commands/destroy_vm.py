@@ -1,10 +1,5 @@
 ﻿from cloudshell.api.cloudshell_api import CloudShellAPISession
-from cloudshell.api.common_cloudshell_api import CloudShellAPIError
-
-from cloudshell.cp.vcenter.common.logger import getLogger
 from cloudshell.cp.vcenter.common.utilites.common_utils import get_error_message_from_exception
-
-logger = getLogger(__name__)
 
 
 class DestroyVirtualMachineCommand(object):
@@ -13,44 +8,56 @@ class DestroyVirtualMachineCommand(object):
     def __init__(self, pv_service, resource_remover, disconnector):
         """
         :param pv_service:   pv_service Instance
+        :type pv_service:  cloudshell.cp.vcenter.common.vcenter.vmomi_service.pyVmomiService
         :param resource_remover: CloudshellResourceRemover
         """
         self.pv_service = pv_service
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
-    def destroy(self, si, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
+    def destroy(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
         """
+        :param si:
+        :param logger:
         :param CloudShellAPISession session:
+        :param vcenter_data_model:
+        :param vm_uuid:
         :param str vm_name: This is the resource name
+        :param reservation_id:
         :return:
         """
         # disconnect
-        self._disconnect_all_my_connectors(session=session, resource_name=vm_name, reservation_id=reservation_id)
+        self._disconnect_all_my_connectors(session=session, resource_name=vm_name, reservation_id=reservation_id,
+                                           logger=logger)
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         # destroy vm
-        result = self.pv_service.destroy_vm(vm)
+        result = self.pv_service.destroy_vm(vm=vm, logger=logger)
         # delete resources
         self.resource_remover.remove_resource(session=session, resource_full_name=vm_name)
         return result
 
-    def destroy_vm_only(self, si, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
+    def destroy_vm_only(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
         """
+        :param logger:
         :param CloudShellAPISession session:
         :param str vm_name: This is the resource name
         :return:
         """
         # disconnect
-        self._disconnect_all_my_connectors(session=session, resource_name=vm_name, reservation_id=reservation_id)
+        self._disconnect_all_my_connectors(session=session,
+                                           resource_name=vm_name,
+                                           reservation_id=reservation_id,
+                                           logger=logger)
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         # destroy vm
-        result = self.pv_service.destroy_vm(vm)
+        result = self.pv_service.destroy_vm(vm=vm,
+                                            logger=logger)
         return result
 
     @staticmethod
-    def _disconnect_all_my_connectors(session, resource_name, reservation_id):
+    def _disconnect_all_my_connectors(session, resource_name, reservation_id, logger):
         """
         :param CloudShellAPISession session:
         :param str resource_name:

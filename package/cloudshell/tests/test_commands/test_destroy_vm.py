@@ -1,15 +1,10 @@
 from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
-
-__author__ = 'shms'
-
-import os.path
-import sys
 import unittest
 from mock import Mock, create_autospec
 from pyVmomi import vim
 
 
-class test_destroyVirtualMachineCommand(unittest.TestCase):
+class TestDestroyVirtualMachineCommand(unittest.TestCase):
     def test_destroyVirtualMachineCommand(self):
         # arrange
         pv_service = Mock()
@@ -35,7 +30,13 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy(si, session, vcenter_data_model, uuid, resource_name, "reservation_id")
+        res = destroyer.destroy(si=si,
+                                logger=Mock(),
+                                session=session,
+                                vcenter_data_model=vcenter_data_model,
+                                vm_uuid=uuid,
+                                vm_name=resource_name,
+                                reservation_id="reservation_id")
 
         # assert
         self.assertTrue(res)
@@ -69,7 +70,13 @@ class test_destroyVirtualMachineCommand(unittest.TestCase):
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy_vm_only(si, session, vcenter_data_model, uuid, resource_name, "reservation_id")
+        res = destroyer.destroy_vm_only(si=si,
+                                        logger=Mock(),
+                                        session=session,
+                                        vcenter_data_model=vcenter_data_model,
+                                        vm_uuid=uuid,
+                                        vm_name=resource_name,
+                                        reservation_id="reservation_id")
 
         # assert
         self.assertTrue(res)

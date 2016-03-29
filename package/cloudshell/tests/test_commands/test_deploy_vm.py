@@ -36,6 +36,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         # act
         result = deploy_command.execute_deploy_from_template(
             si=si,
+            logger=Mock(),
             deployment_params= deploy_params,
             resource_context=resource_context)
 
@@ -56,8 +57,12 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_command = DeployCommand(deployer)
 
         # act
-        result = deploy_command.execute_deploy_from_image(si, session, vcenter_data_model,
-                                                          deployment_params, connectivity)
+        result = deploy_command.execute_deploy_from_image(si=si,
+                                                          logger=Mock(),
+                                                          session=session,
+                                                          vcenter_data_model=vcenter_data_model,
+                                                          deployment_params=deployment_params,
+                                                          resource_context=connectivity)
 
         # assert
         self.assertTrue(result)

@@ -1,14 +1,10 @@
 from unittest import TestCase
-
 from mock import Mock
 from pyVmomi import vim
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 
-from cloudshell.cp.vcenter.common.logger.service import LoggingService
-
 
 class TestVirtualMachinePowerManagementCommand(TestCase):
-    LoggingService("CRITICAL", "DEBUG", None)
 
     def test_power_on(self):
         # arrange
@@ -29,7 +25,11 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         power_manager = VirtualMachinePowerManagementCommand(pv_service, synchronous_task_waiter)
 
         # act
-        res = power_manager.power_on(session, si, vm_uuid, None)
+        res = power_manager.power_on(si=si,
+                                     logger=Mock(),
+                                     session=session,
+                                     vm_uuid=vm_uuid,
+                                     resource_fullname=None)
 
         # assert
         self.assertTrue(res)
@@ -59,7 +59,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         vcenter = Mock()
         vcenter.shutdown_method = 'soft'
         # act
-        res = power_manager.power_off(session, si, vcenter, vm_uuid, None)
+        res = power_manager.power_off(si=si,
+                                      logger=Mock(),
+                                      session=session,
+                                      vcenter_data_model=vcenter,
+                                      vm_uuid=vm_uuid,
+                                      resource_fullname=None)
 
         # assert
         self.assertTrue(res)
@@ -91,7 +96,12 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
         vcenter = Mock()
         vcenter.shutdown_method = 'hard'
         # act
-        res = power_manager.power_off(session, si, vcenter,vm_uuid, None)
+        res = power_manager.power_off(si=si,
+                                      logger=Mock(),
+                                      session=session,
+                                      vcenter_data_model=vcenter,
+                                      vm_uuid=vm_uuid,
+                                      resource_fullname=None)
 
         # assert
         self.assertTrue(res)
