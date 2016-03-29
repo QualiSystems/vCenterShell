@@ -61,12 +61,22 @@ docs/_build/
 # PyBuilder
 target/
 .idea/
-tests/config.ini
+package/cloudshell/tests/config.ini
 *.cache
 *.whl
 *.tar.gz
 *.orig
 vCenterShell.zip
+vCenterShellPackage/Resource Drivers - Python/*
 vCenterShellPackage/Resource Scripts/*
 vCenterShellPackage/Topology Scripts/*.*
 debug.txt
+package/cloudshell/tests/utils/config.ini
+vCenterShellPackage/Resource Drivers - Python/VCenter Shell Driver.zip
+
+#IDE Helpers
+deployment.xml
+deployment
+
+#Misc
+.imdone

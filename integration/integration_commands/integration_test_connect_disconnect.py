@@ -1,24 +1,21 @@
-import uuid
 from unittest import TestCase
-from mock import Mock, MagicMock
-from pyVmomi import vim
-from pyVim.connect import SmartConnect, Disconnect
-from common.logger.service import LoggingService
-from common.utilites.debug import print_attributes
-from models.VCenterConnectionDetails import VCenterConnectionDetails
-from tests.utils.testing_credentials import TestCredentials
-from common.vcenter.task_waiter import SynchronousTaskWaiter
-from vCenterShell.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
-from vCenterShell.vm.vnic_to_network_mapper import VnicToNetworkMapper
-from vCenterShell.network.dvswitch.name_generator import DvPortGroupNameGenerator
-from vCenterShell.network.vnic.vnic_service import VNicService
-from vCenterShell.vm.portgroup_configurer import *
 
+from mock import Mock
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
+
+from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
+from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
+from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
+from cloudshell.cp.vcenter.vm.portgroup_configurer import *
+from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
+from cloudshell.tests.utils.testing_credentials import TestCredentials
 
 
 class TestVirtualSwitchToMachineConnector(TestCase):
-    # LoggingService("CRITICAL", "DEBUG", None)
-    LoggingService("DEBUG", "DEBUG", None)
 
     @property
     def si(self):
@@ -36,7 +33,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.vm = None
 
         self.virtual_machine_path = 'SergiiT'
-        self.virtual_machine_name = 'TestVM'
+        self.virtual_machine_name = 'test_4f383119'
         self.vm_uuid = None
 
         self.vcenter_name = "QualiSB"
@@ -96,10 +93,9 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
         print result
 
-    def integrationtest_disconnect(self):
+    def test_integrationtest_disconnect(self):
         default_network = None
         connector = VirtualSwitchToMachineDisconnectCommand(self.py_vmomi_service,
-                                                            self.resource_connection_details_retriever,
                                                             self.configurer,
                                                             default_network)
 
@@ -135,7 +131,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         vm = self.get_vm(self.py_vmomi_service, self.virtual_machine_name)
         print "Remove vNIC. Machine: '{}' UUID: [{}]".format(self.virtual_machine_name, self.vm_uuid)
         task = connector.remove_interfaces_from_vm_task(vm)
-        self.synchronous_task_waiter.wait_for_task(task)
+        self.synchronous_task_waiter.wait_for_task(task, Mock())
 
 
     def integrationtest_attach_vnic(self, network):
@@ -148,7 +144,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         print "VM found. \n{}".format(vm)
 
         task = VNicService.vnic_add_to_vm_task(nicspes, vm)
-        self.synchronous_task_waiter.wait_for_task(task)
+        self.synchronous_task_waiter.wait_for_task(task, Mock())
 
     def integrationtest_attach_vnic_standard(self):
         network = self.py_vmomi_service.find_network_by_name(self.si, self.network_path, self.standard_network_name)
@@ -170,7 +166,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         print task
         # print_attributes(task)
         try:
-            self.synchronous_task_waiter.wait_for_task(task)
+            self.synchronous_task_waiter.wait_for_task(task, Mock())
         except vim.fault.ResourceInUse, e:
             print "IT USED NOW"
         pass

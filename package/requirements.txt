@@ -1,0 +1,5 @@
+cloudshell-automation-api>=7.0.0.0,<7.1.0.0
+cloudshell-core>=2.0.0,<2.1.0
+pyvmomi==6.0.0
+jsonpickle==0.9.3
+enum==0.4.6

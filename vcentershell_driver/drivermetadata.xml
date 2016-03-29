@@ -1,0 +1,26 @@
+<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.0.0">
+    <Layout>
+        <Category Name="Deployment">
+            <Command Description="" DisplayName="Deploy From Template" Name="deploy_from_template" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Deploy From Image" Name="deploy_from_image" Tags="allow_unreserved" />
+        </Category>
+        <Category Name="Connectivity">
+            <Command Description="" DisplayName="Refresh IP" EnableCancellation="true" Name="remote_refresh_ip" Tags="remote_connectivity,allow_shared" />
+            <Command Description="" DisplayName="Apply Connectivity Changes" Name="ApplyConnectivityChanges" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Disconnect All" Name="disconnect_all" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
+        </Category>
+        <Category Name="App Management">
+            <Command Description="" DisplayName="Delete" Name="destroy_vm" Tags="remote_app_management,allow_shared" />
+        </Category>
+        <Category Name="Hidden Commands">
+            <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />
+            <Command Description="" DisplayName="Delete VM Only" Name="destroy_vm_only" Tags="remote_app_management" />
+        </Category>
+
+        <Category Name="Power">
+            <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />
+            <Command Description="" DisplayName="Power Off" Name="PowerOff" Tags="power" />
+        </Category>
+    </Layout>
+</Driver>

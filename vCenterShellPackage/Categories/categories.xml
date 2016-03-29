@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CategoryList xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/CategorySchema.xsd">
-  <Category Name="Virtualization" Catalog="Service">
+  <Category Name="Networking" Catalog="Service">
+    <ChildCategories />
+  </Category>
+  <Category Name="Applications" Catalog="Service">
     <ChildCategories />
   </Category>
 </CategoryList>

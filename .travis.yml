@@ -3,13 +3,16 @@ python:
     - "2.7"
 
 install:
-    - pip install -r requirements.txt
+    - pip install -r package/requirements.txt
+    - pip install cloudshell-shell-core
     - pip install -r test_requirements.txt
-    - pip install 3rdParty/qualipy-1.0.790.zip
     - pip install coveralls
 
 script:
-    nosetests --with-coverage  --cover-package=vCenterShell,common,models --exclude-dir=integration
+    - pushd package
+    - python setup.py develop
+    - popd
+    - python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration
 
 after_success:
     coveralls
