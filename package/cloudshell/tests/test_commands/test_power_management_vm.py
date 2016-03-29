@@ -5,6 +5,54 @@ from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerM
 
 
 class TestVirtualMachinePowerManagementCommand(TestCase):
+    def test_power_off_already(self):
+        vm_uuid = 'uuid'
+        si = Mock(spec=vim.ServiceInstance)
+        vm = Mock(spec=vim.VirtualMachine)
+        vm.summary = Mock()
+        vm.summary.runtime = Mock()
+        vm.summary.runtime.powerState = 'poweredOff'
+        session = Mock()
+        pv_service = Mock()
+        pv_service.find_by_uuid = Mock(return_value=vm)
+
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock())
+
+        # act
+        res = power_manager.power_off(si=si,
+                                      logger=Mock(),
+                                      session=session,
+                                      vcenter_data_model=Mock(),
+                                      vm_uuid=vm_uuid,
+                                      resource_fullname=None)
+
+        # assert
+        self.assertTrue(res, 'already powered off')
+        self.assertFalse(vm.PowerOn.called)
+
+    def test_power_on_already(self):
+        vm_uuid = 'uuid'
+        si = Mock(spec=vim.ServiceInstance)
+        vm = Mock(spec=vim.VirtualMachine)
+        vm.summary = Mock()
+        vm.summary.runtime = Mock()
+        vm.summary.runtime.powerState = 'poweredOn'
+        session = Mock()
+        pv_service = Mock()
+        pv_service.find_by_uuid = Mock(return_value=vm)
+
+        power_manager = VirtualMachinePowerManagementCommand(pv_service, Mock())
+
+        # act
+        res = power_manager.power_on(si=si,
+                                     logger=Mock(),
+                                     session=session,
+                                     vm_uuid=vm_uuid,
+                                     resource_fullname=None)
+
+        # assert
+        self.assertTrue(res, 'already powered on')
+        self.assertFalse(vm.PowerOn.called)
 
     def test_power_on(self):
         # arrange
@@ -68,7 +116,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
 
         # assert
         self.assertTrue(res)
-        self.assertTrue(vm.PowerOff.called)
+        self.assertTrue(vm.ShutdownGuest.called)
         self.assertTrue(power_manager._connect_to_vcenter.called_with(vcenter_name))
         self.assertTrue(power_manager._get_vm.called_with(si, vm_uuid))
         self.assertTrue(synchronous_task_waiter.wait_for_task.called_with(task))
@@ -105,7 +153,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
 
         # assert
         self.assertTrue(res)
-        self.assertTrue(vm.ShutdownGuest.called)
+        self.assertTrue(vm.PowerOff.called)
         self.assertTrue(power_manager._connect_to_vcenter.called_with(vcenter_name))
         self.assertTrue(power_manager._get_vm.called_with(si, vm_uuid))
         self.assertTrue(synchronous_task_waiter.wait_for_task.called_with(task))

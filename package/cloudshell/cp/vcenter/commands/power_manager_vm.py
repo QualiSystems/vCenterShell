@@ -29,12 +29,12 @@ class VirtualMachinePowerManagementCommand(object):
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
 
         if vm.summary.runtime.powerState == 'poweredOff':
-            _logger.info('vm already powered off')
+            logger.info('vm already powered off')
             task_result = 'already powered off'
         else:
             # hard power off
             logger.info('{0} powering of vm'.format(vcenter_data_model.shutdown_method))
-            if vcenter_data_model.shutdown_method.lower() == 'soft':
+            if vcenter_data_model.shutdown_method.lower() != 'soft':
                 task = vm.PowerOff()
                 task_result = self.synchronous_task_waiter.wait_for_task(task=task,
                                                                          logger=logger,
