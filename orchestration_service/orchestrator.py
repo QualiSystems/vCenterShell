@@ -14,7 +14,7 @@ class DeployAppOrchestrationDriver(object):
     def deploy(self, context):
         """
         Deploys app from template
-        :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
+        :type context: cloudshell.shell.core.context.ResourceCommandContext
         """
         logger = self.context_based_logger_factory.create_logger_for_context(
             logger_name='DeployAppOrchestrationDriver',

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from cloudshell.shell.core.driver_context import ResourceCommandContext, \
+from cloudshell.shell.core.context import ResourceCommandContext, \
     ReservationContextDetails, ResourceContextDetails, ConnectivityContext
 from mock import Mock, create_autospec
 

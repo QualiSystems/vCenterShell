@@ -15,7 +15,9 @@ class EnvironmentSetup(object):
 
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup", reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(log_file_prefix="CloudShell Sandbox Setup",
+                                              log_group=self.reservation_id,
+                                              log_category='Setup')
 
     @profileit(scriptName='Setup')
     def execute(self):
