@@ -7,7 +7,6 @@ from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.tests.utils.testing_credentials import TestCredentials
-logger = get_qs_logger()
 
 
 class TestVmomiService(unittest.TestCase):
@@ -34,7 +33,6 @@ class TestVmomiService(unittest.TestCase):
         now = datetime.now()
         res = pv_service.clone_vm(clone_params=params,
                                   logger=Mock())
-        logger.debug('clone took: %s' % (str(datetime.now() - now)))
 
         '#assert'
         self.assertTrue(type(res.vm), vim.VirtualMachine)

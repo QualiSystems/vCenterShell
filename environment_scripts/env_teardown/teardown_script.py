@@ -12,7 +12,9 @@ from environment_scripts.helpers.vm_details_helper import get_vm_custom_param
 class EnvironmentTeardown:
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Teardown", reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(log_file_prefix="CloudShell Sandbox Teardown",
+                                              log_group=self.reservation_id,
+                                              log_category='Teardown')
 
     @profileit(scriptName="Teardown")
     def execute(self):
