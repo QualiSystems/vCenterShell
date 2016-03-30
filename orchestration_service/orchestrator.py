@@ -14,7 +14,7 @@ class DeployAppOrchestrationDriver(object):
     def deploy(self, context):
         """
         Deploys app from template
-        :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
+        :type context: cloudshell.shell.core.context.ResourceCommandContext
         """
         logger = self.context_based_logger_factory.create_logger_for_context(
             logger_name='DeployAppOrchestrationDriver',
@@ -223,7 +223,7 @@ class DeployAppOrchestrationDriver(object):
                                                                                                   exc.rawxml))
                 self._write_message(deployed_app_name, reservation_id, session,
                                     'discovery failed: {1}'.format(deployed_app_name, exc.message))
-            raise
+                raise
 
         except Exception as exc:
             print "Error executing Autoload command on deployed app {0}. Error: {1}".format(deployed_app_name, str(exc))

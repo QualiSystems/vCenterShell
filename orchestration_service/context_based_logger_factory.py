@@ -10,7 +10,7 @@ class ContextBasedLoggerFactory(object):
         :param logger_name:
         :type logger_name: str
         :param context:
-        :return:
+        :return: logging.Logger
         """
         if self._is_instance_of(context, 'AutoLoadCommandContext'):
             reservation_id = 'Autoload'
@@ -23,9 +23,9 @@ class ContextBasedLoggerFactory(object):
             handler_name = context.remote_endpoints[0].name
         else:
             raise Exception(ContextBasedLoggerFactory.UNSUPPORTED_CONTEXT_PROVIDED, context)
-        logger = get_qs_logger(name=logger_name,
-                               handler_name=handler_name,
-                               reservation_id=reservation_id)
+        logger = get_qs_logger(log_file_prefix=handler_name,
+                               log_group=reservation_id,
+                               log_category=logger_name)
         return logger
 
     @staticmethod

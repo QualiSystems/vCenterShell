@@ -1,4 +1,3 @@
-# coding=utf-8
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
@@ -16,7 +15,9 @@ class EnvironmentSetup(object):
 
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="CloudShell Sandbox Setup", reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(log_file_prefix="CloudShell Sandbox Setup",
+                                              log_group=self.reservation_id,
+                                              log_category='Setup')
 
     @profileit(scriptName='Setup')
     def execute(self):
@@ -62,6 +63,7 @@ class EnvironmentSetup(object):
         """
 
         if deploy_result is None:
+            self.logger.info("No apps to discover")
             api.WriteMessageToReservationOutput(reservationId=self.reservation_id, message='No apps to discover')
             return
 
@@ -162,6 +164,7 @@ class EnvironmentSetup(object):
             api.WriteMessageToReservationOutput(
                 reservationId=self.reservation_id,
                 message='No resources to power on or install')
+            self._validate_all_apps_deployed(deploy_results)
             return
 
         pool = ThreadPool(len(resources))
@@ -184,7 +187,10 @@ class EnvironmentSetup(object):
             if not res[0]:
                 raise Exception("Reservation is Active with Errors - " + res[1])
 
-        if deploy_results and hasattr(deploy_results, "ResultItems"):
+        self._validate_all_apps_deployed(deploy_results)
+
+    def _validate_all_apps_deployed(self, deploy_results):
+        if deploy_results is not None:
             for deploy_res in deploy_results.ResultItems:
                 if not deploy_res.Success:
                     raise Exception("Reservation is Active with Errors - " + deploy_res.Error)
@@ -216,7 +222,7 @@ class EnvironmentSetup(object):
                 resource_details = api.GetResourceDetails(deployed_app_name)
 
             # check if deployed app
-            if hasattr(resource_details, "VmDetails"):
+            if not hasattr(resource_details.VmDetails, "UID"):
                 self.logger.debug("Resource {0} is not a deployed app, nothing to do with it".format(deployed_app_name))
                 return True, ""
 

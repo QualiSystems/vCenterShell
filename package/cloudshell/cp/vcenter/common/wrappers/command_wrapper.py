@@ -42,7 +42,7 @@ class CommandWrapper:
         Note: session & vcenter_data_model objects will be injected dynamically to the command
         :param command:
         :param context: instance of ResourceCommandContext or AutoLoadCommandContext
-        :type context: cloudshell.shell.core.driver_context.ResourceCommandContext
+        :type context: cloudshell.shell.core.context.ResourceCommandContext
         :param args:
         """
 

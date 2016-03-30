@@ -5,7 +5,9 @@ from cloudshell.core.logger import qs_logger
 class ConnectAll:
     def __init__(self):
         self.reservation_id = helpers.get_reservation_context_details().id
-        self.logger = qs_logger.get_qs_logger(name="Connect All", reservation_id=self.reservation_id)
+        self.logger = qs_logger.get_qs_logger(log_file_prefix='Connect_All',
+                                              log_group=self.reservation_id,
+                                              log_category="Connect All")
 
     def execute(self):
         api = helpers.get_api_session()
