@@ -35,6 +35,7 @@ class ConnectionCommandOrchestrator(object):
         self.dv_switch_name = ''
         self.port_group_path = ''
         self.default_network = ''
+        self.logger = None
 
     def connect_bulk(self, si, logger, vcenter_data_model, request):
         """
@@ -44,6 +45,11 @@ class ConnectionCommandOrchestrator(object):
         :param request:
         :return:
         """
+        self.logger = logger
+
+        self.logger.info('Apply connectivity changes has started')
+        self.logger.debug('Apply connectivity changes has started with the requet: {0}'.format(request))
+
         self.vcenter_data_model = vcenter_data_model
         if vcenter_data_model.reserved_networks:
             self.reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
@@ -58,20 +64,20 @@ class ConnectionCommandOrchestrator(object):
         holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._map_requsets(holder.driverRequest.actions)
+        self.logger.debug('Connectivity actions mappings: {0}'.format(jsonpickle.encode(mappings, unpicklable=False)))
 
         pool = ThreadPool()
         async_results = self._run_async_connection_actions(si, mappings, pool, logger)
 
         results = self._get_async_results(async_results, pool)
-
+        self.logger.info('Apply connectivity changes done')
+        self.logger.debug('Apply connectivity has finished with the results: {0}'.format(jsonpickle.encode(results,
+                                                                                                           unpicklable=False)))
         return results
 
     def _map_requsets(self, actions):
-        vm_mapping = dict()
-
         grouped_by_vm_by_requset_by_mode = self._group_action(actions)
-        self._create_mapping_from_groupings(grouped_by_vm_by_requset_by_mode, vm_mapping)
-
+        vm_mapping = self._create_mapping_from_groupings(grouped_by_vm_by_requset_by_mode)
         return vm_mapping
 
     def _group_action(self, actions):
@@ -107,7 +113,8 @@ class ConnectionCommandOrchestrator(object):
             self._add_safely_to_dict(dictionary=grouped_by_vm, key=vm_uuid, value=action)
         return grouped_by_vm
 
-    def _create_mapping_from_groupings(self, grouped_by_vm_by_requset_by_mode, vm_mapping):
+    def _create_mapping_from_groupings(self, grouped_by_vm_by_requset_by_mode):
+        vm_mapping = dict()
         for vm, req_to_modes in grouped_by_vm_by_requset_by_mode.items():
             actions_mapping = self.ActionsMapping()
 
@@ -119,6 +126,8 @@ class ConnectionCommandOrchestrator(object):
 
             actions_mapping.action_tree = req_to_modes
             vm_mapping[vm] = actions_mapping
+
+        return vm_mapping
 
     def _get_remove_mappings(self, req_to_modes, vm):
         remove_mappings = []
@@ -180,6 +189,10 @@ class ConnectionCommandOrchestrator(object):
         results = []
         set_vlan_actions = action_mappings.action_tree[ACTION_TYPE_SET_VLAN]
         try:
+            self.logger.info('connecting vm({0})'.format(vm_uuid))
+            self.logger.debug('connecting vm({0}) with the mappings'.format(vm_uuid,
+                                                                            jsonpickle.encode(action_mappings,
+                                                                                              unpicklable=False)))
             connection_results = self.connector.connect_to_networks(si,
                                                                     logger,
                                                                     vm_uuid,
@@ -193,6 +206,7 @@ class ConnectionCommandOrchestrator(object):
             results += self._get_set_vlan_result_suc(act_by_mode_by_vlan_by_nic, connection_res_map)
 
         except Exception as e:
+            self.logger.error('Exception raised while connecting vm({0}) with exception: {1}'.format(vm_uuid, e))
             for mode, actions in set_vlan_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
@@ -259,9 +273,14 @@ class ConnectionCommandOrchestrator(object):
         return set_actions_grouped_by_vlan_id
 
     def _remove_vlan(self, action_mappings, si, vm_uuid, logger):
+
         results = []
         mode_to_actions = action_mappings.action_tree[ACTION_TYPE_REMOVE_VLAN]
         try:
+            self.logger.info('disconnecting vm({0})'.format(vm_uuid))
+            self.logger.debug('disconnecting vm({0}) with the mappings'.format(vm_uuid,
+                                                                               jsonpickle.encode(action_mappings,
+                                                                                                 unpicklable=False)))
             connection_results = self.disconnector.disconnect_from_networks(si,
                                                                             logger,
                                                                             self.vcenter_data_model,
@@ -285,6 +304,7 @@ class ConnectionCommandOrchestrator(object):
                 action_result.updatedInterface = res.vnic_mac
                 results.append(action_result)
         except Exception as e:
+            self.logger.error('Exception raised while disconnecting vm({0}) with exception: {1}'.format(vm_uuid, e))
             for mode, actions in mode_to_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
