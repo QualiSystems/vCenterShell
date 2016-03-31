@@ -61,10 +61,6 @@ class VirtualMachinePortGroupConfigurer(object):
             for net in networks:
                 try:
                     nets[net.name] = net
-                except vim.fault.ManagedObjectNotFound as e:
-                    continue
-
-                try:
                     for network in nets.values():
                         if self.network_name_gen.is_generated_name(network.name) \
                                 and (not reserved_networks or network.name not in reserved_networks) \
@@ -75,8 +71,9 @@ class VirtualMachinePortGroupConfigurer(object):
                                     self.synchronous_task_waiter.wait_for_task(task=task,
                                                                                logger=logger,
                                                                                action_name='Erase dv Port Group')
-                except vim.fault.ManagedObjectNotFound as e:
-                            continue
+                except Exception as e:
+                    a = e.msg
+                    continue
         finally:
             self._lock.release()
 
