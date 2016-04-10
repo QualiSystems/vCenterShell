@@ -3,9 +3,7 @@ import jsonpickle
 
 COMMAND_RESULT_PREFIX = ""
 COMMAND_RESULT_POSTFIX = ""
-
-# COMMAND_RESULT_PREFIX = "command_json_result="
-# COMMAND_RESULT_POSTFIX = "=command_json_result_end"
+EMPTY_STRING = ""
 
 
 def get_result_from_command_output(output):
@@ -14,11 +12,9 @@ def get_result_from_command_output(output):
     :param output: Console output as returned from command execution
     :return: Deserialized object or deserialized JSON into dictionary
     """
-    match = _extract_result_from_output(output)
-    if not match:
+    if output == EMPTY_STRING or output is None:
         return None
-    json = match.group('result')
-    return jsonpickle.decode(json)
+    return jsonpickle.decode(output)
 
 
 def set_command_result(result, unpicklable=False):
@@ -35,11 +31,4 @@ def set_command_result(result, unpicklable=False):
 
 
 def transfer_command_result(output):
-    match = _extract_result_from_output(output)
-    if match:
-        print COMMAND_RESULT_PREFIX + match.group('result') + COMMAND_RESULT_POSTFIX
-
-
-def _extract_result_from_output(output):
-    match = search(COMMAND_RESULT_PREFIX + '(?P<result>.*)' + COMMAND_RESULT_POSTFIX, output)
-    return match
+    print COMMAND_RESULT_PREFIX + output + COMMAND_RESULT_POSTFIX
