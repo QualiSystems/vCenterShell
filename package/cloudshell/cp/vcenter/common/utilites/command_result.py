@@ -1,8 +1,11 @@
 from re import search
 import jsonpickle
 
-COMMAND_RESULT_PREFIX = "command_json_result="
-COMMAND_RESULT_POSTFIX = "=command_json_result_end"
+COMMAND_RESULT_PREFIX = ""
+COMMAND_RESULT_POSTFIX = ""
+
+# COMMAND_RESULT_PREFIX = "command_json_result="
+# COMMAND_RESULT_POSTFIX = "=command_json_result_end"
 
 
 def get_result_from_command_output(output):
