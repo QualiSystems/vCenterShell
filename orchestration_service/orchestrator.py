@@ -62,7 +62,7 @@ class DeployAppOrchestrationDriver(object):
         # Set live status - deployment done
         session.SetResourceLiveStatus(deployment_result.LogicalResourceName, "Online", "Active")
 
-        success_msg = self._format_message(deployed_app_name, 'deployed Successfully')
+        success_msg = self._format_message(deployed_app_name, 'Deployed Successfully')
         logger.info(success_msg)
         return success_msg
 
