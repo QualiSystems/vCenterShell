@@ -45,3 +45,5 @@ A repository for projects providing out of the box capabilities within CloudShel
 
 ## License
 [Apache License 2.0](https://github.com/QualiSystems/vCenterShell/blob/master/LICENSE)
+
+
