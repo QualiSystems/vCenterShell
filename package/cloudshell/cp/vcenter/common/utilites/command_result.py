@@ -1,8 +1,6 @@
 from re import search
 import jsonpickle
 
-COMMAND_RESULT_PREFIX = ""
-COMMAND_RESULT_POSTFIX = ""
 EMPTY_STRING = ""
 
 
@@ -25,10 +23,7 @@ def set_command_result(result, unpicklable=False):
                         When False will be deserialized as dictionary
     """
     json = jsonpickle.encode(result, unpicklable=unpicklable)
-    result_for_output = COMMAND_RESULT_PREFIX + str(json) + COMMAND_RESULT_POSTFIX
+    result_for_output = str(json)
     print result_for_output
     return result_for_output
 
-
-def transfer_command_result(output):
-    print COMMAND_RESULT_PREFIX + output + COMMAND_RESULT_POSTFIX
