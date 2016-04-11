@@ -42,7 +42,7 @@ class VirtualSwitchConnectCommand:
         if not default_network_instance:
             raise ValueError('Default Network {0} not found'.format(default_network_name))
 
-        mappings = self._prepare_mappings(vm_network_mappings)
+        mappings = self._prepare_mappings(default_network_name, vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
             si, vm, mappings, default_network_instance, reserved_networks, logger)
@@ -60,12 +60,13 @@ class VirtualSwitchConnectCommand:
 
         return connection_results
 
-    def _prepare_mappings(self, vm_network_mappings):
+    def _prepare_mappings(self, dv_switch_name, vm_network_mappings):
         mappings = []
         # create mapping
         for vm_network_mapping in vm_network_mappings:
             vm_network_mapping.dv_port_name = \
-                self.dv_port_group_name_generator.generate_port_group_name(vm_network_mapping.vlan_id,
+                self.dv_port_group_name_generator.generate_port_group_name(dv_switch_name,
+                                                                           vm_network_mapping.vlan_id,
                                                                            vm_network_mapping.vlan_spec)
 
             vm_network_mapping.vlan_id = \

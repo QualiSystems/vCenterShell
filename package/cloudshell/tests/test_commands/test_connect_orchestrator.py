@@ -116,7 +116,7 @@ class TestCommandOrchestrator(TestCase):
                                  vnic_name=vnic_name,
                                  requested_vnic=vnic_name,
                                  vm_uuid=vm_uuid,
-                                 network_name=self.portgroup_name.generate_port_group_name(vlan_id, mode),
+                                 network_name=self.portgroup_name.generate_port_group_name('dvSwitch', vlan_id, mode),
                                  network_key='aa')
             res.append(r)
         self.connector.connect_to_networks = Mock(return_value=res)
