@@ -193,12 +193,13 @@ class ConnectionCommandOrchestrator(object):
             self.logger.debug('connecting vm({0}) with the mappings'.format(vm_uuid,
                                                                             jsonpickle.encode(action_mappings,
                                                                                               unpicklable=False)))
-            connection_results = self.connector.connect_to_networks(si,
-                                                                    logger,
-                                                                    vm_uuid,
-                                                                    action_mappings.set_mapping,
-                                                                    self.default_network,
-                                                                    self.reserved_networks)
+            connection_results = self.connector.connect_to_networks(si=si,
+                                                                    logger=logger,
+                                                                    vm_uuid=vm_uuid,
+                                                                    vm_network_mappings=action_mappings.set_mapping,
+                                                                    default_network_name=self.default_network,
+                                                                    reserved_networks=self.reserved_networks,
+                                                                    dv_switch_name=self.dv_switch_name)
 
             connection_res_map = self._prepare_connection_results_for_extraction(connection_results)
             act_by_mode_by_vlan = self._group_action_by_vlan_id(set_vlan_actions)

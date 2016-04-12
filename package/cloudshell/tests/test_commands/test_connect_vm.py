@@ -56,7 +56,8 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
                                                               vm_uuid=self.vm_uuid,
                                                               vm_network_mappings=[mapping],
                                                               default_network_name='default_network',
-                                                              reserved_networks=[])
+                                                              reserved_networks=[],
+                                                              dv_switch_name='')
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
