@@ -21,15 +21,17 @@ class VirtualSwitchConnectCommand:
         self.vlan_spec_factory = vlan_spec_factory
         self.vlan_id_range_parser = vlan_id_range_parser
 
-    def connect_to_networks(self, si, logger, vm_uuid, vm_network_mappings, default_network_name, reserved_networks):
+    def connect_to_networks(self, si, logger, vm_uuid, vm_network_mappings, default_network_name,
+                            reserved_networks, dv_switch_name):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter
+        :param logger:
         :param vm_uuid: <str> UUID for VM
         :param vm_network_mappings: <collection of 'VmNetworkMapping'>
         :param default_network_name: <str> Full Network name - likes 'DataCenterName/NetworkName'
         :param reserved_networks:
-        :param logger:
+        :param dv_switch_name: <str> Default dvSwitch name
         :return: None
         """
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
@@ -42,7 +44,7 @@ class VirtualSwitchConnectCommand:
         if not default_network_instance:
             raise ValueError('Default Network {0} not found'.format(default_network_name))
 
-        mappings = self._prepare_mappings(default_network_name, vm_network_mappings)
+        mappings = self._prepare_mappings(dv_switch_name=dv_switch_name, vm_network_mappings=vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
             si, vm, mappings, default_network_instance, reserved_networks, logger)
