@@ -94,68 +94,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The interface VLAN mode that will be configured. Possible values are Access or Trunk." IsReadOnly="false" Name="Access Mode" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enter a number between 2-4094 or a range." IsReadOnly="false" Name="VLAN ID" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Target Interface" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Selected Network" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="true" Name="Source Interface" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Source vNIC Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Requested Target vNIC Name" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Link Configurations" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The range of IDs that the VLAN can be allocated to. Examples - '100-200'." IsReadOnly="false" Name="Allocation Ranges" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-        <ns0:Rule Name="Admin Only" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The allocated network." IsReadOnly="true" Name="Virtual Network" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Determines if a VLAN service is a default VLAN service used for P2P connectivity." IsReadOnly="true" Name="Default VLAN" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Defines if the allocated VLAN can be shared by others or exclusively used. Possible values are Shared or Exclusive." IsReadOnly="false" Name="Isolation Level" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="Filters the IP that can be selected as an App's address." IsReadOnly="false" Name="IP Regex" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -163,18 +101,6 @@
       </ns0:Rules>
     </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="600" Description="Timeout for waiting when obaining IP address (in seconds)" IsReadOnly="false" Name="Refresh IP Timeout" Type="Numeric">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="False" IsReadOnly="false" Name="QnQ" Type="Boolean">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enter an ID or range to configure VLAN as Selective Q-in-Q. Examples - '100-200','10,20,40-100'" IsReadOnly="false" Name="CTag" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -511,160 +437,11 @@
       <ns0:Categories>
       </ns0:Categories>
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" ImagePath="service_vnetwork.png" IsService="true" Name="Virtual Network" ServiceType="Regular">
-      <ns0:AttachedAttributes>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="QnQ" UserInput="false">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-        <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="CTag" UserInput="false">
-          <ns0:AllowedValues />
-        </ns0:AttachedAttribute>
-      </ns0:AttachedAttributes>
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="VLAN Auto" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges" UserInput="false">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Shared</ns0:AllowedValue>
-                <ns0:AllowedValue>Exclusive</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Access</ns0:AllowedValue>
-                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Allocation Ranges" Value="2-4094" />
-            <ns0:AttributeValue Name="Isolation Level" Value="Exclusive" />
-            <ns0:AttributeValue Name="Access Mode" Value="Access" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="VLAN Manual" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="false">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Shared</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Access</ns0:AllowedValue>
-                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Isolation Level" Value="Shared" />
-            <ns0:AttributeValue Name="Access Mode" Value="Access" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="VLAN Default" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Allocation Ranges" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Isolation Level" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Shared</ns0:AllowedValue>
-                <ns0:AllowedValue>Exclusive</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Access Mode" UserInput="true">
-              <ns0:AllowedValues>
-                <ns0:AllowedValue>Access</ns0:AllowedValue>
-                <ns0:AllowedValue>Trunk</ns0:AllowedValue>
-              </ns0:AllowedValues>
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VLAN ID" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Virtual Network" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default VLAN" UserInput="false">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Allocation Ranges" Value="2-4094" />
-            <ns0:AttributeValue Name="Isolation Level" Value="Exclusive" />
-            <ns0:AttributeValue Name="Access Mode" Value="Access" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-          </ns0:Drivers>
-          <ns0:Scripts>
-            <ns0:ScriptName>Vlan Service Connect All</ns0:ScriptName>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-        <ns0:Category>Networking</ns0:Category>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Apps Orchestration" ServiceType="Orchestration">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Simple" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes />
-          <ns0:AttributeValues />
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Deployment Orchestrator</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts>
-          </ns0:Scripts>
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
   </ns0:ResourceFamilies>
   <ns0:DriverDescriptors>
     <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
     <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
-    <ns0:ScriptDescriptor Alias="Setup script" CategoryName="Hidden Commands" Name="Default Sandbox Setup" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Alias="Teardown script" CategoryName="Hidden Commands" Name="Default Sandbox Teardown" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
-    <ns0:ScriptDescriptor Alias="Connect All" Name="Vlan Service Connect All" Version="1.0.0">
-      <ns0:ScriptInputs />
-    </ns0:ScriptDescriptor>
   </ns0:ScriptDescriptors>
 </ns0:DataModelInfo>
