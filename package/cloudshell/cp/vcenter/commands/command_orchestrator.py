@@ -155,8 +155,8 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
-        data_holder.template_resource_model.vcenter_template = \
-            data_holder.template_resource_model.vcenter_template.replace('\\', '/')
+        data_holder.template_resource_model.vcenter_vm = \
+            data_holder.template_resource_model.vcenter_vm.replace('\\', '/')
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(

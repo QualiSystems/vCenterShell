@@ -20,7 +20,7 @@ class DeployCommand(object):
         :param resource_context:
         :return:
         """
-        deploy_result = self.deployer.deploy_from_template(si, logger, deployment_params, resource_context)
+        deploy_result = self.deployer.deploy_clone_from_vm(si, logger, deployment_params, resource_context)
         return deploy_result
 
     def execute_deploy_from_template(self, si, logger, deployment_params, resource_context):
