@@ -54,6 +54,9 @@ class VCenterShellDriver (ResourceDriverInterface):
     def deploy_from_template(self, context, deploy_data):
         return self.command_orchestrator.deploy_from_template(context, deploy_data)
 
+    def deploy_clone_from_vm(self, context, deploy_data):
+        return self.command_orchestrator.deploy_clone_from_vm(context, deploy_data)
+
     def deploy_from_image(self, context, deploy_data):
         return self.command_orchestrator.deploy_from_image(context, deploy_data)
 
