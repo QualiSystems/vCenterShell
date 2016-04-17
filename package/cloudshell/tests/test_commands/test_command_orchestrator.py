@@ -73,7 +73,7 @@ class TestCommandOrchestrator(TestCase):
 
     def test_deploy_from_snapshot(self):
         # act
-        self.command_orchestrator.deploy_from_linked_clone(self.context, '{"name": "name", "template_resource_model": {"vcenter_vm_snapshot": "name/snap"}}')
+        self.command_orchestrator.deploy_from_linked_clone(self.context, '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vm_snapshot": "snap"}}')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
