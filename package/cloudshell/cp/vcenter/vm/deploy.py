@@ -27,19 +27,13 @@ class VirtualMachineDeployer(object):
     def deploy_from_linked_clone(self, si, logger, data_holder, resource_context):
         template_resource_model = data_holder.template_resource_model
 
-        parts_vm_name = template_resource_model.vcenter_vm_snapshot.split('/')
-        last_part_index = len(parts_vm_name) - 1
-
-        vm_name = '/'.join(parts_vm_name[:last_part_index])
-        snapshot_name = parts_vm_name[last_part_index]
-
         return self._deploy_a_clone(si,
                                     logger,
                                     data_holder.app_name,
-                                    vm_name,
+                                    template_resource_model.vcenter_vm,
                                     template_resource_model,
                                     resource_context,
-                                    snapshot=snapshot_name)
+                                    snapshot=template_resource_model.vm_snapshot)
 
     def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
         """

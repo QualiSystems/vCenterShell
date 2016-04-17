@@ -82,7 +82,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="vCenter VM Snapshot to use in the VM creation. Should include the full path and the snapshot name under the vm its belongs, for example QualiFolder/vm1/snap12" IsReadOnly="false" Name="vCenter VM Snapshot" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="VM Snapshot to use in the VM creation. Should include the full path and the snapshot name under the vm its belongs, for example snap1/snap2" IsReadOnly="false" Name="VM Snapshot" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -442,7 +442,10 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM Snapshot" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Snapshot" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
