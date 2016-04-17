@@ -641,8 +641,31 @@ class pyVmomiService:
         if not hasattr(template, 'snapshot') and hasattr(template.snapshot, 'rootSnapshotList'):
             raise ValueError('The given vm does not have any snapshots')
 
-        for snapshotRoot in template.snapshot.rootSnapshotList:
-            if snapshotRoot.name == snapshot_name:
-                return snapshotRoot.snapshot
+        paths = snapshot_name.split('/')
+        temp_snap = template.snapshot
+        for path in paths:
+            if path:
+                root = getattr(temp_snap, 'rootSnapshotList', getattr(temp_snap, 'childSnapshotList', None))
+                if not root:
+                    temp_snap = None
+                    break
+
+                temp = pyVmomiService._get_snapshot_from_root_snapshot(path, root)
+
+                if not temp:
+                    temp_snap = None
+                    break
+                else:
+                    temp_snap = temp
+
+        if temp_snap:
+            return temp_snap.snapshot
 
         raise ValueError('Could not find snapshot in vm')
+
+    @staticmethod
+    def _get_snapshot_from_root_snapshot(name, root_snapshot):
+        for snapshot_header in root_snapshot:
+            if snapshot_header.name == name:
+                return snapshot_header
+        return None
