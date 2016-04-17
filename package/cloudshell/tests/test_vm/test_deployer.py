@@ -4,6 +4,8 @@ from cloudshell.api.cloudshell_api import ResourceInfo
 from mock import Mock, create_autospec
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneVMFromVMResourceModel
+from cloudshell.cp.vcenter.models.vCenterDeployFromLinkedClone import VCenterDeployFromLinkedCloneModel
 from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 
@@ -43,6 +45,40 @@ class TestVirtualMachineDeployer(TestCase):
         resource_context = self._create_vcenter_resource_context()
 
         res = self.deployer.deploy_from_template(
+            si=self.si,
+            data_holder=deploy_from_template_details,
+            resource_context=resource_context,
+            logger=Mock())
+
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
+        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
+
+    def test_clone_deployer(self):
+        deploy_from_template_details = DeployFromTemplateDetails(vCenterCloneVMFromVMResourceModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
+        deploy_from_template_details.vcenter_vm = 'name'
+        resource_context = self._create_vcenter_resource_context()
+
+        res = self.deployer.deploy_clone_from_vm(
+            si=self.si,
+            data_holder=deploy_from_template_details,
+            resource_context=resource_context,
+            logger=Mock())
+
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
+        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
+
+    def test_snapshot_deployer(self):
+        deploy_from_template_details = DeployFromTemplateDetails(VCenterDeployFromLinkedCloneModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
+        deploy_from_template_details.vcenter_vm_snapshot = 'name/shanpshot'
+        resource_context = self._create_vcenter_resource_context()
+
+        res = self.deployer.deploy_from_linked_clone(
             si=self.si,
             data_holder=deploy_from_template_details,
             resource_context=resource_context,

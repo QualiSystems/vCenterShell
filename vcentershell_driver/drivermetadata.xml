@@ -3,6 +3,7 @@
         <Category Name="Deployment">
             <Command Description="" DisplayName="Deploy From Template" Name="deploy_from_template" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Deploy Clone From VM" Name="deploy_clone_from_vm" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Deploy from Linked Clone" Name="deploy_from_linked_clone" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Deploy From Image" Name="deploy_from_image" Tags="allow_unreserved" />
         </Category>
         <Category Name="Connectivity">
