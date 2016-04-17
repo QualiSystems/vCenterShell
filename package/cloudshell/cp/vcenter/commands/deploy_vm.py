@@ -11,6 +11,17 @@ class DeployCommand(object):
         """
         self.deployer = deployer
 
+    def execute_deploy_from_linked_clone(self, si, logger, deployment_params, resource_context):
+        """
+        :param si:
+        :param logger:
+        :type deployment_params: DeployFromLinkedClone
+        :param resource_context:
+        :return:
+        """
+        deploy_result = self.deployer.deploy_from_linked_clone(si, logger, deployment_params, resource_context)
+        return deploy_result
+
     def execute_deploy_clone_from_vm(self, si, logger, deployment_params, resource_context):
         """
 

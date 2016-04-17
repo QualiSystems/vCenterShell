@@ -167,6 +167,33 @@ class CommandOrchestrator(object):
 
         return set_command_result(result=result, unpicklable=False)
 
+    def deploy_from_linked_clone(self, context, deploy_data):
+        """
+        Deploy Cloned VM From VM Command, will deploy vm from template
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :return str deploy results
+        """
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+        data_holder.template_resource_model.vcenter_vm = \
+            data_holder.template_resource_model.vcenter_vm.replace('\\', '/')
+
+        data_holder.template_resource_model.vm_snapshot = \
+            data_holder.template_resource_model.vm_snapshot.replace('\\', '/')
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            context,
+            self.deploy_command.execute_deploy_from_linked_clone,
+            data_holder,
+            context.resource)
+
+        return set_command_result(result=result, unpicklable=False)
+
     def deploy_from_image(self, context, deploy_data):
         """
         Deploy From Image Command, will deploy vm from ovf image
