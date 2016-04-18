@@ -24,6 +24,22 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
+    def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
+        """
+        :param si:
+        :param logger:
+        :type data_holder:
+        :type resource_context:
+        :return:
+        """
+        template_resource_model = data_holder.template_resource_model
+        return self._deploy_a_clone(si,
+                                    logger,
+                                    data_holder.app_name,
+                                    template_resource_model.vcenter_vm,
+                                    template_resource_model,
+                                    resource_context)
+
     def deploy_from_template(self, si, logger, data_holder, resource_context):
         """
         :param si:
@@ -32,27 +48,33 @@ class VirtualMachineDeployer(object):
         :type resource_context
         :return:
         """
-        # generate unique name
-        vm_name = self.name_generator(data_holder.app_name)
-
-        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(resource_context,
-                                                                                      VMwarevCenterResourceModel)
-
         template_resource_model = data_holder.template_resource_model
-        VCenterDetailsFactory.set_deplyment_vcenter_params(
-            vcenter_resource_model=vcenter_resource_model, deploy_params=template_resource_model)
+        return self._deploy_a_clone(si,
+                                    logger,
+                                    data_holder.app_name,
+                                    template_resource_model.vcenter_template,
+                                    template_resource_model,
+                                    resource_context)
 
-        template_name = VMLocation.combine([template_resource_model.default_datacenter,
-                                            template_resource_model.vcenter_template])
+    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, context):
+        # generate unique name
+        vm_name = self.name_generator(app_name)
+
+        vc_rm = self.resource_model_parser.convert_to_resource_model(context, VMwarevCenterResourceModel)
+        VCenterDetailsFactory.set_deplyment_vcenter_params(
+            vcenter_resource_model=vc_rm, deploy_params=other_params)
+
+        template_name = VMLocation.combine([other_params.default_datacenter,
+                                            template_name])
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=template_name,
                                                    vm_name=vm_name,
-                                                   vm_folder=template_resource_model.vm_location,
-                                                   datastore_name=template_resource_model.vm_storage,
-                                                   cluster_name=template_resource_model.vm_cluster,
-                                                   resource_pool=template_resource_model.vm_resource_pool,
-                                                   power_on=template_resource_model.auto_power_on)
+                                                   vm_folder=other_params.vm_location,
+                                                   datastore_name=other_params.vm_storage,
+                                                   cluster_name=other_params.vm_cluster,
+                                                   resource_pool=other_params.vm_resource_pool,
+                                                   power_on=other_params.auto_power_on)
 
         clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger)
         if clone_vm_result.error:
@@ -60,14 +82,14 @@ class VirtualMachineDeployer(object):
 
         return DeployResult(vm_name=vm_name,
                             vm_uuid=clone_vm_result.vm.summary.config.uuid,
-                            cloud_provider_resource_name=template_resource_model.vcenter_name,
-                            ip_regex=template_resource_model.ip_regex,
-                            refresh_ip_timeout=template_resource_model.refresh_ip_timeout,
-                            auto_power_on=template_resource_model.auto_power_on,
-                            auto_power_off=template_resource_model.auto_power_off,
-                            wait_for_ip=template_resource_model.wait_for_ip,
-                            auto_delete=template_resource_model.auto_delete,
-                            autoload=template_resource_model.autoload
+                            cloud_provider_resource_name=other_params.vcenter_name,
+                            ip_regex=other_params.ip_regex,
+                            refresh_ip_timeout=other_params.refresh_ip_timeout,
+                            auto_power_on=other_params.auto_power_on,
+                            auto_power_off=other_params.auto_power_off,
+                            wait_for_ip=other_params.wait_for_ip,
+                            auto_delete=other_params.auto_delete,
+                            autoload=other_params.autoload
                             )
 
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context):
