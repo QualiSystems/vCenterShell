@@ -1319,21 +1319,34 @@ class TestVmomiService(unittest.TestCase):
         template.snapshot = Mock()
 
         aa = Mock(spec=[])
-        bb = Mock(spec=[])
+        bb1 = Mock(spec=[])
+        bb2 = Mock(spec=[])
         cc = Mock(spec=[])
         dd = Mock(spec=[])
         ee = Mock(spec=[])
         aa.name = 'aa'
-        bb.name = 'bb'
+        aa.createTime = 1
+
+        bb1.name = 'bb'
+        bb1.createTime = 1
+
+        bb2.name = 'bb'
+        bb2.createTime = 2
+
         cc.name = 'cc'
+        cc.createTime = 1
+
         dd.name = 'dd'
+        dd.createTime = 1
+
         ee.name = 'ee'
+        ee.createTime = 1
 
         ee.snapshot = Mock()
 
-        aa.childSnapshotList = [dd, bb]
+        aa.childSnapshotList = [dd, bb1, bb2]
         dd.childSnapshotList = [cc]
-        bb.childSnapshotList = [dd, cc, ee]
+        bb2.childSnapshotList = [dd, cc, ee]
 
         template.snapshot.rootSnapshotList = [aa]
 

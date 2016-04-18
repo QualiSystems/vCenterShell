@@ -665,7 +665,8 @@ class pyVmomiService:
 
     @staticmethod
     def _get_snapshot_from_root_snapshot(name, root_snapshot):
-        for snapshot_header in root_snapshot:
+        sorted_by_creation = sorted(root_snapshot, key=lambda x: x.createTime, reverse=True)
+        for snapshot_header in sorted_by_creation:
             if snapshot_header.name == name:
                 return snapshot_header
         return None
