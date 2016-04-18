@@ -1,5 +1,11 @@
 import time
 import jsonpickle
+
+from cloudshell.cp.vcenter.commands.cloudshell_session_factory import CloudShellSessionFactory
+from cloudshell.cp.vcenter.commands.vcenter_session_factory import VCenterSessionFactory
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from cloudshell.shell.core.context_based_logger import get_logger_for_driver
+
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
@@ -108,16 +114,22 @@ class CommandOrchestrator(object):
                                                    resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
-        results = self.command_wrapper.execute_command_with_connection(
-            context,
-            self.connection_orchestrator.connect_bulk,
-            request)
+        logger = get_logger_for_driver(context)
+        vcenter_data_model = self._create_vcenter_resource_model(context)
+        with CloudShellSessionFactory().create_session(context) as session:
+            with VCenterSessionFactory.create_vcenter_session(context, session, vcenter_data_model) as si:
+                results = self.connection_orchestrator.connect_bulk(si, logger, vcenter_data_model, request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
+
+    def _create_vcenter_resource_model(self, context):
+        return self.resource_model_parser.convert_to_resource_model(
+            resource_instance=context.resource,
+            resource_model_type=VMwarevCenterResourceModel)
 
     def deploy_from_template(self, context, deploy_data):
         """
