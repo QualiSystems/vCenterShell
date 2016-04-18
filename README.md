@@ -11,7 +11,6 @@ A repository for projects providing out of the box capabilities within CloudShel
     * **deploy_from_template**
     App deployment type driver for cloning from vCenter templates
 
-
 * **package**
 
     The vCenter Python package hosted in [PyPi](https://pypi.python.org/). The package contains most of the logic relate
