@@ -110,13 +110,16 @@ class CommandOrchestrator(object):
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=ResourceModelParser())
-
+        self.logger_factory = ContextBasedLoggerFactory()
+        self.session_factory = CloudShellSessionFactory()
         self.vcenter_session_factory = VCenterSessionFactory(ResourceModelParser())
 
     def connect_bulk(self, context, request):
-        logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
-        with CloudShellSessionFactory.create_session(context) as session:
-            with self.vcenter_session_factory.create_vcenter_session(context, session) as si, vcenter_data_model:
+        logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
+        vcenter_data_model = self._create_vcenter_resource_model(context)
+
+        with self.session_factory.create_session(context) as session:
+            with self.vcenter_session_factory.create_vcenter_session(context, session) as si:
                 results = self.connection_orchestrator.connect_bulk(si, logger, vcenter_data_model, request)
 
         driver_response = DriverResponse()
@@ -149,6 +152,7 @@ class CommandOrchestrator(object):
         # execute command
         logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
         vcenter_data_model = self._create_vcenter_resource_model(context)
+
         with CloudShellSessionFactory.create_session(context) as session:
             with VCenterSessionFactory.create_vcenter_session(context, session, vcenter_data_model) as si:
                 # noinspection PyTypeChecker

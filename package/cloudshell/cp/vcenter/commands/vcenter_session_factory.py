@@ -29,7 +29,7 @@ class VCenterSessionFactory(object):
 
     def create_vcenter_session(self, session, context):
         vcenter_data_model = self._create_vcenter_resource_model(context)
-        return VCenterSession(session, vcenter_data_model, context), vcenter_data_model
+        return VCenterSession(session, vcenter_data_model, context)
 
     def _create_vcenter_resource_model(self, context):
         return self.resource_model_parser.convert_to_resource_model(

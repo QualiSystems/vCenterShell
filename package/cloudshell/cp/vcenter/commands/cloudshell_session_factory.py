@@ -3,10 +3,10 @@ from cloudshell.api.cloudshell_api import CloudShellAPISession
 
 class CloudShellSessionFactory(object):
 
-    @staticmethod
-    def create_session(context):
+    def create_session(self, context):
         """
         Creates session with interaction with CloudShell
+        :return:
         :param context: instance of ResourceCommandContext or AutoLoadCommandContext
         :type context: cloudshell.shell.core.context.ResourceCommandContext
         """
