@@ -70,11 +70,13 @@ class CommandOrchestrator(object):
                                               name_gen=port_group_name_generator)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
+        self.logger_factory = ContextBasedLoggerFactory()
+
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
                                               cloud_shell_helper=self.cs_helper,
                                               resource_model_parser=self.resource_model_parser,
-                                              context_based_logger_factory=ContextBasedLoggerFactory())
+                                              context_based_logger_factory=self.logger_factory)
         # Deploy Command
         self.deploy_command = DeployCommand(deployer=vm_deployer)
 
@@ -110,7 +112,6 @@ class CommandOrchestrator(object):
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=ResourceModelParser())
-        self.logger_factory = ContextBasedLoggerFactory()
         self.session_factory = CloudShellSessionFactory()
         self.vcenter_session_factory = VCenterSessionFactory(ResourceModelParser())
 
@@ -150,7 +151,7 @@ class CommandOrchestrator(object):
             data_holder.template_resource_model.vcenter_template.replace('\\', '/')
 
         # execute command
-        logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
+        logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
 
         with self.session_factory.create_session(context) as session:
             with self.vcenter_session_factory.create_vcenter_session(session, context) as si:

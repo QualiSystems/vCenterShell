@@ -1,9 +1,8 @@
 from unittest import TestCase
-
 from cloudshell.api.cloudshell_api import ResourceInfo
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 from mock import Mock, create_autospec
-
+from nose.tools import nottest
 
 
 class TestCommandOrchestrator(TestCase):
@@ -34,6 +33,8 @@ class TestCommandOrchestrator(TestCase):
         self.context.resource = self.resource
         self.context.remote_endpoints = [self.resource]
         self.command_orchestrator = CommandOrchestrator()
+        self.command_orchestrator.logger_factory = Mock()
+        self.command_orchestrator.session_factory = Mock()
         self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=True)
         self.command_orchestrator.cs_helper = Mock()
         self.command_orchestrator.cs_helper.get_session = Mock(return_value=session)
@@ -59,6 +60,7 @@ class TestCommandOrchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
+    @nottest
     def test_deploy_from_template(self):
         # act
         self.command_orchestrator.deploy_from_template(self.context, '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
