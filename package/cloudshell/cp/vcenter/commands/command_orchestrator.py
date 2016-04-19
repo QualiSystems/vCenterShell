@@ -179,11 +179,18 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
+
+        if not data_holder.template_resource_model.vcenter_vm:
+            raise ValueError('Please insert vm to deploy from')
+
         data_holder.template_resource_model.vcenter_vm = \
             data_holder.template_resource_model.vcenter_vm.replace('\\', '/')
 
-        data_holder.template_resource_model.vm_snapshot = \
-            data_holder.template_resource_model.vm_snapshot.replace('\\', '/')
+        if not data_holder.template_resource_model.vcenter_vm_snapshot:
+            raise ValueError('Please insert snapshot to deploy from')
+
+        data_holder.template_resource_model.vcenter_vm_snapshot = \
+            data_holder.template_resource_model.vcenter_vm_snapshot.replace('\\', '/')
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(

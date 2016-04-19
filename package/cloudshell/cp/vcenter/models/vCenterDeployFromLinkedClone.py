@@ -2,7 +2,7 @@ class VCenterDeployFromLinkedCloneModel(object):
     def __init__(self):
         self.vcenter_name = ''
         self.vcenter_vm = ''
-        self.vm_snapshot = ''
+        self.vcenter_vm_snapshot = ''
         self.vm_cluster = ''
         self.vm_storage = ''
         self.ip_regex = ''

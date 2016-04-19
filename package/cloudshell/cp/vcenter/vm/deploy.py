@@ -33,7 +33,7 @@ class VirtualMachineDeployer(object):
                                     template_resource_model.vcenter_vm,
                                     template_resource_model,
                                     resource_context,
-                                    snapshot=template_resource_model.vm_snapshot)
+                                    snapshot=template_resource_model.vcenter_vm_snapshot)
 
     def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
         """
