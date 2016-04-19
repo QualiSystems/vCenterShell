@@ -36,9 +36,9 @@ class DeployCloneFromVMDriver(ResourceDriverInterface):
                                                                  VCenterDeployFromLinkedCloneModel)
 
         if not Name:
-            Name=jsonpickle.decode(context.resource.app_context.app_request_json)['name']
+            name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']
 
-        deploy_from_template_details = DeployFromTemplateDetails(vcenter_template_resource_model, Name)
+        deploy_from_template_details = DeployFromTemplateDetails(vcenter_template_resource_model, name)
 
         params = [InputNameValue('deploy_data', jsonpickle.encode(deploy_from_template_details, unpicklable=False))]
 

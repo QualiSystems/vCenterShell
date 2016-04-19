@@ -25,6 +25,16 @@ class VirtualMachineDeployer(object):
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
     def deploy_from_linked_clone(self, si, logger, data_holder, resource_context):
+        """
+        deploy Cloned VM From VM Command, will deploy vm from a snapshot
+
+        :param si:
+        :param logger:
+        :type data_holder:
+        :type resource_context:
+        :return:
+        """
+
         template_resource_model = data_holder.template_resource_model
 
         return self._deploy_a_clone(si,
@@ -37,6 +47,8 @@ class VirtualMachineDeployer(object):
 
     def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
         """
+        deploy Cloned VM From VM Command, will deploy vm from another vm
+
         :param si:
         :param logger:
         :type data_holder:

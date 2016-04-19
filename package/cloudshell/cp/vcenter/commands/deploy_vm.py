@@ -13,6 +13,7 @@ class DeployCommand(object):
 
     def execute_deploy_from_linked_clone(self, si, logger, deployment_params, resource_context):
         """
+        Calls the deployer to deploy vm from snapshot
         :param si:
         :param logger:
         :type deployment_params: DeployFromLinkedClone
@@ -24,7 +25,7 @@ class DeployCommand(object):
 
     def execute_deploy_clone_from_vm(self, si, logger, deployment_params, resource_context):
         """
-
+        Calls the deployer to deploy vm from another vm
         :param si:
         :param logger:
         :type deployment_params: DeployFromTemplateDetails
