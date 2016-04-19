@@ -151,10 +151,9 @@ class CommandOrchestrator(object):
 
         # execute command
         logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
-        vcenter_data_model = self._create_vcenter_resource_model(context)
 
-        with CloudShellSessionFactory.create_session(context) as session:
-            with VCenterSessionFactory.create_vcenter_session(context, session, vcenter_data_model) as si:
+        with self.session_factory.create_session(context) as session:
+            with self.vcenter_session_factory.create_vcenter_session(session, context) as si:
                 # noinspection PyTypeChecker
                 result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)
 
