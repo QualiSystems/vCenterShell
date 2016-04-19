@@ -1,6 +1,6 @@
 import functools
 import inspect
-from cloudshell.shell.core.context_based_logger import get_logger_for_driver
+from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 
 CONTEXT = "context"
 
@@ -20,7 +20,7 @@ class LoggingDecorator(object):
                 command_args = LoggingDecorator._get_command_args(func)
                 context = command_args[CONTEXT]
 
-            context.logger = get_logger_for_driver(context)
+            context.logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
             f_result = func(*args, **kwargs)
 
             return f_result

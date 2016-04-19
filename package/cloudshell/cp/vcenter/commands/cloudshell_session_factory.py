@@ -2,7 +2,9 @@ from cloudshell.api.cloudshell_api import CloudShellAPISession
 
 
 class CloudShellSessionFactory(object):
-    def create_session(self, context):
+
+    @staticmethod
+    def create_session(context):
         """
         Creates session with interaction with CloudShell
         :param context: instance of ResourceCommandContext or AutoLoadCommandContext
@@ -13,7 +15,7 @@ class CloudShellSessionFactory(object):
                                        token_id=context.connectivity.admin_auth_token,
                                        username=None,
                                        password=None,
-                                       domain=self._get_domain(context))
+                                       domain=CloudShellSessionFactory._get_domain(context))
         return session
 
     @staticmethod

@@ -4,8 +4,6 @@ import jsonpickle
 from cloudshell.cp.vcenter.commands.cloudshell_session_factory import CloudShellSessionFactory
 from cloudshell.cp.vcenter.commands.vcenter_session_factory import VCenterSessionFactory
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-from cloudshell.shell.core.context_based_logger import get_logger_for_driver
-
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
@@ -113,11 +111,12 @@ class CommandOrchestrator(object):
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=ResourceModelParser())
 
+        self.vcenter_session_factory = VCenterSessionFactory(ResourceModelParser())
+
     def connect_bulk(self, context, request):
-        logger = get_logger_for_driver(context)
-        vcenter_data_model = self._create_vcenter_resource_model(context)
-        with CloudShellSessionFactory().create_session(context) as session:
-            with VCenterSessionFactory.create_vcenter_session(context, session, vcenter_data_model) as si:
+        logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
+        with CloudShellSessionFactory.create_session(context) as session:
+            with self.vcenter_session_factory.create_vcenter_session(context, session) as si, vcenter_data_model:
                 results = self.connection_orchestrator.connect_bulk(si, logger, vcenter_data_model, request)
 
         driver_response = DriverResponse()
@@ -143,15 +142,17 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
+        # noinspection PyUnresolvedReferences
         data_holder.template_resource_model.vcenter_template = \
             data_holder.template_resource_model.vcenter_template.replace('\\', '/')
 
         # execute command
-        result = self.command_wrapper.execute_command_with_connection(
-            context,
-            self.deploy_command.execute_deploy_from_template,
-            data_holder,
-            context.resource)
+        logger = ContextBasedLoggerFactory().create_logger_for_context('vCenterShell', context)
+        vcenter_data_model = self._create_vcenter_resource_model(context)
+        with CloudShellSessionFactory.create_session(context) as session:
+            with VCenterSessionFactory.create_vcenter_session(context, session, vcenter_data_model) as si:
+                # noinspection PyTypeChecker
+                result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)
 
         return set_command_result(result=result, unpicklable=False)
 

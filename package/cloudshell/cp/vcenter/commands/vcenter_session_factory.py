@@ -1,3 +1,4 @@
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from pyVim.connect import SmartConnect, Disconnect
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
@@ -23,6 +24,16 @@ class VCenterSession(object):
 
 
 class VCenterSessionFactory(object):
-    @staticmethod
-    def create_vcenter_session(session, vcenter_resource_model, resource_context):
-        return VCenterSession(session, vcenter_resource_model, resource_context)
+    def __init__(self, resource_model_parser):
+        self.resource_model_parser = resource_model_parser
+
+    def create_vcenter_session(self, session, context):
+        vcenter_data_model = self._create_vcenter_resource_model(context)
+        return VCenterSession(session, vcenter_data_model, context), vcenter_data_model
+
+    def _create_vcenter_resource_model(self, context):
+        return self.resource_model_parser.convert_to_resource_model(
+            resource_instance=context.resource,
+            resource_model_type=VMwarevCenterResourceModel)
+
+
