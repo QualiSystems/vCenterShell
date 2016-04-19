@@ -350,7 +350,8 @@ class pyVmomiService:
                      datastore_name=None,
                      cluster_name=None,
                      resource_pool=None,
-                     power_on=True):
+                     power_on=True,
+                     snapshot=''):
             """
             Constructor of CloneVmParameters
             :param si:              pyvmomi 'ServiceInstance'
@@ -361,6 +362,7 @@ class pyVmomiService:
             :param cluster_name:    str: the name of the dcluster
             :param resource_pool:   str: the name of the resource pool
             :param power_on:        bool: turn on the cloned vm
+            :param snapshot:        str: the name of the snapshot to clone from
             """
             self.si = si
             self.template_name = template_name
@@ -370,6 +372,7 @@ class pyVmomiService:
             self.cluster_name = cluster_name
             self.resource_pool = resource_pool
             self.power_on = str2bool(power_on)
+            self.snapshot = snapshot
 
     class CloneVmResult:
         """
@@ -419,6 +422,8 @@ class pyVmomiService:
 
         template = self._get_template(clone_params, vm_location)
 
+        snapshot = self._get_snapshot(clone_params, template)
+
         datastore = self._get_datastore(clone_params)
 
         resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
@@ -437,6 +442,9 @@ class pyVmomiService:
         clone_spec = self.vim.vm.CloneSpec()
         clone_spec.location = placement
         clone_spec.powerOn = clone_params.power_on
+
+        if snapshot:
+            clone_spec.snapshot = snapshot
 
         logger.info("cloning VM...")
 
@@ -622,4 +630,43 @@ class pyVmomiService:
         for network in vm.network:
             if hasattr(network, "name") and network_name == network.name:
                 return network
+        return None
+
+    @staticmethod
+    def _get_snapshot(clone_params, template):
+        snapshot_name = getattr(clone_params, 'snapshot', None)
+        if not snapshot_name:
+            return None
+
+        if not hasattr(template, 'snapshot') and hasattr(template.snapshot, 'rootSnapshotList'):
+            raise ValueError('The given vm does not have any snapshots')
+
+        paths = snapshot_name.split('/')
+        temp_snap = template.snapshot
+        for path in paths:
+            if path:
+                root = getattr(temp_snap, 'rootSnapshotList', getattr(temp_snap, 'childSnapshotList', None))
+                if not root:
+                    temp_snap = None
+                    break
+
+                temp = pyVmomiService._get_snapshot_from_root_snapshot(path, root)
+
+                if not temp:
+                    temp_snap = None
+                    break
+                else:
+                    temp_snap = temp
+
+        if temp_snap:
+            return temp_snap.snapshot
+
+        raise ValueError('Could not find snapshot in vm')
+
+    @staticmethod
+    def _get_snapshot_from_root_snapshot(name, root_snapshot):
+        sorted_by_creation = sorted(root_snapshot, key=lambda x: x.createTime, reverse=True)
+        for snapshot_header in sorted_by_creation:
+            if snapshot_header.name == name:
+                return snapshot_header
         return None

@@ -24,8 +24,31 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
+    def deploy_from_linked_clone(self, si, logger, data_holder, resource_context):
+        """
+        deploy Cloned VM From VM Command, will deploy vm from a snapshot
+
+        :param si:
+        :param logger:
+        :type data_holder:
+        :type resource_context:
+        :return:
+        """
+
+        template_resource_model = data_holder.template_resource_model
+
+        return self._deploy_a_clone(si,
+                                    logger,
+                                    data_holder.app_name,
+                                    template_resource_model.vcenter_vm,
+                                    template_resource_model,
+                                    resource_context,
+                                    snapshot=template_resource_model.vcenter_vm_snapshot)
+
     def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
         """
+        deploy Cloned VM From VM Command, will deploy vm from another vm
+
         :param si:
         :param logger:
         :type data_holder:
@@ -56,7 +79,7 @@ class VirtualMachineDeployer(object):
                                     template_resource_model,
                                     resource_context)
 
-    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, context):
+    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, context, snapshot=''):
         # generate unique name
         vm_name = self.name_generator(app_name)
 
@@ -74,7 +97,8 @@ class VirtualMachineDeployer(object):
                                                    datastore_name=other_params.vm_storage,
                                                    cluster_name=other_params.vm_cluster,
                                                    resource_pool=other_params.vm_resource_pool,
-                                                   power_on=other_params.auto_power_on)
+                                                   power_on=other_params.auto_power_on,
+                                                   snapshot=snapshot)
 
         clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger)
         if clone_vm_result.error:
