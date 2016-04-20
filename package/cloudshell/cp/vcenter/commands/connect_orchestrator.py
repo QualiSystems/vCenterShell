@@ -50,9 +50,14 @@ class ConnectionCommandOrchestrator(object):
         self.logger.info('Apply connectivity changes has started')
         self.logger.debug('Apply connectivity changes has started with the requet: {0}'.format(request))
 
+        holder = DeployDataHolder(jsonpickle.decode(request))
+
         self.vcenter_data_model = vcenter_data_model
         if vcenter_data_model.reserved_networks:
             self.reserved_networks = [name.strip() for name in vcenter_data_model.reserved_networks.split(',')]
+
+        if not vcenter_data_model.default_dvswitch:
+            return self._handle_no_dvswitch_error(holder)
 
         dvswitch_location = VMLocation.create_from_full_path(vcenter_data_model.default_dvswitch)
 
@@ -61,7 +66,6 @@ class ConnectionCommandOrchestrator(object):
         self.port_group_path = vcenter_data_model.default_port_group_location
         self.default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
-        holder = DeployDataHolder(jsonpickle.decode(request))
 
         mappings = self._map_requsets(holder.driverRequest.actions)
         self.logger.debug('Connectivity actions mappings: {0}'.format(jsonpickle.encode(mappings, unpicklable=False)))
@@ -74,6 +78,13 @@ class ConnectionCommandOrchestrator(object):
         self.logger.debug('Apply connectivity has finished with the results: {0}'.format(jsonpickle.encode(results,
                                                                                                            unpicklable=False)))
         return results
+
+    def _handle_no_dvswitch_error(self, holder):
+        error = ValueError('Please set the attribute "Default DvSwitch" in order to execute any connectivity changes')
+        err_res = []
+        for action in holder.driverRequest.actions:
+            err_res.append(self._create_error_action_res(action, error))
+        return err_res
 
     def _map_requsets(self, actions):
         grouped_by_vm_by_requset_by_mode = self._group_action(actions)
