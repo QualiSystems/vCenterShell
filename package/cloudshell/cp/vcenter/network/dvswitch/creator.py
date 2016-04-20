@@ -27,6 +27,7 @@ class DvPortGroupCreator(object):
                               vlan_spec,
                               logger):
         network = None
+        error = None
         self._lock.acquire()
         try:
             # check if the network is attached to the vm and gets it, the function doesn't goes to the vcenter
@@ -55,14 +56,18 @@ class DvPortGroupCreator(object):
 
             if not network:
                 raise ValueError('Could not get or create vlan named: {0}'.format(dv_port_name))
+        except ValueError as e:
+            error = e
         finally:
             self._lock.release()
+            if error:
+                raise error
             return network
 
     def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id, logger):
         dv_switch = self.pyvmomi_service.get_folder(si, '{0}/{1}'.format(dv_switch_path, dv_switch_name))
         if not dv_switch:
-            raise Exception('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
+            raise ValueError('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id,
                                                             logger=logger)
