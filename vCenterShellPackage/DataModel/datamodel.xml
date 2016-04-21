@@ -257,7 +257,7 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application" IsLockedByDefault="true">
       <ns0:AttachedAttributes>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
