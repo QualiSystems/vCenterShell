@@ -24,14 +24,14 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
-    def deploy_from_linked_clone(self, si, logger, data_holder, resource_context):
+    def deploy_from_linked_clone(self, si, logger, data_holder, vcenter_data_model):
         """
         deploy Cloned VM From VM Command, will deploy vm from a snapshot
 
         :param si:
         :param logger:
         :type data_holder:
-        :type resource_context:
+        :type vcenter_data_model:
         :return:
         """
 
@@ -42,17 +42,17 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_vm,
                                     template_resource_model,
-                                    resource_context,
+                                    vcenter_data_model,
                                     snapshot=template_resource_model.vcenter_vm_snapshot)
 
-    def deploy_clone_from_vm(self, si, logger, data_holder, resource_context):
+    def deploy_clone_from_vm(self, si, logger, data_holder, vcenter_data_model):
         """
         deploy Cloned VM From VM Command, will deploy vm from another vm
 
         :param si:
         :param logger:
         :type data_holder:
-        :type resource_context:
+        :type vcenter_data_model:
         :return:
         """
         template_resource_model = data_holder.template_resource_model
@@ -61,14 +61,14 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_vm,
                                     template_resource_model,
-                                    resource_context)
+                                    vcenter_data_model)
 
-    def deploy_from_template(self, si, logger, data_holder, resource_context):
+    def deploy_from_template(self, si, logger, data_holder, vcenter_data_model):
         """
         :param si:
         :param logger:
         :type data_holder: DeployFromTemplateDetails
-        :type resource_context
+        :type vcenter_data_model
         :return:
         """
         template_resource_model = data_holder.template_resource_model
@@ -77,15 +77,14 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_template,
                                     template_resource_model,
-                                    resource_context)
+                                    vcenter_data_model)
 
-    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, context, snapshot=''):
+    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model, snapshot=''):
         # generate unique name
         vm_name = self.name_generator(app_name)
 
-        vc_rm = self.resource_model_parser.convert_to_resource_model(context, VMwarevCenterResourceModel)
         VCenterDetailsFactory.set_deplyment_vcenter_params(
-            vcenter_resource_model=vc_rm, deploy_params=other_params)
+            vcenter_resource_model=vcenter_data_model, deploy_params=other_params)
 
         template_name = VMLocation.combine([other_params.default_datacenter,
                                             template_name])

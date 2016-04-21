@@ -18,6 +18,5 @@ class VCenterDataModelRetriever(object):
         if not vcenter_name:
             raise ValueError('VMWare vCenter name is empty')
         vcenter_instance = api.GetResourceDetails(vcenter_name)
-        vcenter_resource_model = self.resource_model_parser.convert_to_resource_model(vcenter_instance,
-                                                                                      VMwarevCenterResourceModel)
+        vcenter_resource_model = self.resource_model_parser.convert_to_vcenter_model(vcenter_instance)
         return vcenter_resource_model
