@@ -1,10 +1,7 @@
 from unittest import TestCase
 
-from cloudshell.api.cloudshell_api import ResourceInfo
-
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
-from cloudshell.cp.vcenter.network.vlan import factory
-from mock import Mock, create_autospec
+from mock import Mock
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneVMFromVMResourceModel
@@ -85,7 +82,7 @@ class TestVirtualMachineDeployer(TestCase):
         res = self.deployer.deploy_from_linked_clone(
             si=self.si,
             data_holder=deploy_from_template_details,
-            vcenter_data_model=Mock(),
+            vcenter_data_model=resource_context,
             logger=Mock())
 
         self.assertEqual(res.vm_name, self.name)
@@ -100,7 +97,7 @@ class TestVirtualMachineDeployer(TestCase):
         vc.default_dvswitch = 'switch1'
         vc.holding_network = 'anetwork'
         vc.default_port_group_location = 'Quali'
-        vc.vm_cluster =  'Quali'
+        vc.vm_cluster = 'Quali'
         vc.vm_location = 'Quali'
         vc.vm_resource_pool = 'Quali'
         vc.vm_storage = 'Quali'
