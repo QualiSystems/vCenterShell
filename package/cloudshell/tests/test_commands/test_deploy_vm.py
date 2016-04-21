@@ -38,7 +38,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
             si=si,
             logger=Mock(),
             deployment_params=deploy_params,
-            resource_context=resource_context)
+            vcenter_data_model=Mock())
 
         # assert
         self.assertTrue(result)
@@ -95,8 +95,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         result = deploy_command.execute_deploy_clone_from_vm(
             si=si,
             logger=Mock(),
-            deployment_params=deploy_params,
-            resource_context=resource_context)
+            vcenter_data_model=Mock(),
+            deployment_params=deploy_params)
 
         # assert
         self.assertTrue(result)
@@ -130,7 +130,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
             si=si,
             logger=Mock(),
             deployment_params=deploy_params,
-            resource_context=resource_context)
+            vcenter_data_model=Mock())
 
         # assert
         self.assertTrue(result)

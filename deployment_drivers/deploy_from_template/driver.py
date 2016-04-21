@@ -36,7 +36,7 @@ class DeployFromTemplateDriver(ResourceDriverInterface):
                                                                  vCenterVMFromTemplateResourceModel)
 
         if not Name:
-            Name=jsonpickle.decode(context.resource.app_context.app_request_json)['name']
+            Name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']
 
         deploy_from_template_details = DeployFromTemplateDetails(vcenter_template_resource_model, Name)
 
