@@ -40,9 +40,11 @@ class VirtualMachinePortGroupConfigurer(object):
 
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks, logger):
         vnic_mapping = self.vnic_service.map_vnics(vm)
-
-        vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
-            mapping, vnic_mapping, vm.network, default_network, reserved_networks)
+        try:
+            vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
+                mapping, vnic_mapping, vm.network, default_network, reserved_networks)
+        except ValueError as e:
+            raise ValueError('VM: {0} failed with: "{1}"'.format(vm.name, e.message))
 
         update_mapping = []
         for vnic_name, map in vnic_to_network_mapping.items():

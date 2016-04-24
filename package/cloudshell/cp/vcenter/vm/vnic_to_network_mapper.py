@@ -37,7 +37,7 @@ class VnicToNetworkMapper(object):
         for vnic_name, network_name in vnics_to_network_mapping.items():
             if network_name == default_network.name:
                 return vnic_name
-        raise Exception('no vnic available')
+        raise ValueError('No vNIC available')
 
     def _map_vnic_to_network(self, vnics, existing_network, default_network, reserved_networks):
         mapping = dict()
@@ -58,7 +58,7 @@ class VnicToNetworkMapper(object):
 
         if mapping:
             return mapping
-        raise Exception('there is no vnics')
+        raise ValueError('The cannot map vNICs to networks')
 
     @staticmethod
     def _get_network_name_from_key(key, existing_network, default_network):
