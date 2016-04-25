@@ -257,13 +257,13 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Deployed App" ResourceType="Application">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Generic App Family" ResourceType="Application" IsLockedByDefault="true">
       <ns0:AttachedAttributes>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
       </ns0:AttributeValues>
       <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Generic Deployed App" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="Generic App Model" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes />
           <ns0:AttributeValues>
           </ns0:AttributeValues>
