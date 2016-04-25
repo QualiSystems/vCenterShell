@@ -59,8 +59,7 @@ class pyVmomiService:
             raise ValueError(e.msg)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
-            import traceback
-            logger.warn("Connection Error: ({}):\n{}".format(e, traceback.format_exc()))
+            raise ValueError('Cannot connect to vCenter, please check that the address is valid')
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
