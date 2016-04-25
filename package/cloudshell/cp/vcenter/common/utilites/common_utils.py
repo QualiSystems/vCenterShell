@@ -8,6 +8,18 @@ def first_or_default(collection, predicate):
 
 
 # numeric utils
+def back_slash_to_front_converter(string):
+    """
+    Replacing all \ in the str to /
+    :param string: single string to modify
+    :type string: str
+    """
+    try:
+        if not string or not isinstance(string, str):
+            return string
+        return string.replace('\\', '/')
+    except Exception:
+        return string
 
 
 def represents_int(s):

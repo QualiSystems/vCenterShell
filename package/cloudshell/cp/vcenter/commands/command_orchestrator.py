@@ -30,6 +30,7 @@ from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineCo
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from pyVim.connect import SmartConnect, Disconnect
+from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 
 
 class CommandOrchestrator(object):
@@ -132,14 +133,13 @@ class CommandOrchestrator(object):
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
         data_holder.template_resource_model.vcenter_template = \
-            data_holder.template_resource_model.vcenter_template.replace('\\', '/')
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_template)
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder,
-            context.resource)
+            data_holder)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -156,14 +156,13 @@ class CommandOrchestrator(object):
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
         data_holder.template_resource_model.vcenter_vm = \
-            data_holder.template_resource_model.vcenter_vm.replace('\\', '/')
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
-            data_holder,
-            context.resource)
+            data_holder)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -184,20 +183,19 @@ class CommandOrchestrator(object):
             raise ValueError('Please insert vm to deploy from')
 
         data_holder.template_resource_model.vcenter_vm = \
-            data_holder.template_resource_model.vcenter_vm.replace('\\', '/')
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
 
         if not data_holder.template_resource_model.vcenter_vm_snapshot:
             raise ValueError('Please insert snapshot to deploy from')
 
         data_holder.template_resource_model.vcenter_vm_snapshot = \
-            data_holder.template_resource_model.vcenter_vm_snapshot.replace('\\', '/')
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm_snapshot)
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
-            data_holder,
-            context.resource)
+            data_holder)
 
         return set_command_result(result=result, unpicklable=False)
 
