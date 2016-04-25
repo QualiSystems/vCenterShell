@@ -1,7 +1,7 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneVMFromVMResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneFromVMResourceModel
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
@@ -33,7 +33,7 @@ class DeployCloneFromVMDriver(ResourceDriverInterface):
 
         vcenter_template_resource_model = \
             self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                 vCenterCloneVMFromVMResourceModel)
+                                                                 vCenterCloneFromVMResourceModel)
 
         if not Name:
             Name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']

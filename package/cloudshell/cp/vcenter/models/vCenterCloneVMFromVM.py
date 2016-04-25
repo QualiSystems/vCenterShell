@@ -1,4 +1,4 @@
-class vCenterCloneVMFromVMResourceModel(object):
+class vCenterCloneFromVMResourceModel(object):
     def __init__(self):
         self.vcenter_name = ''
         self.vcenter_vm = ''

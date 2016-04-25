@@ -33,7 +33,6 @@ class ConnectionCommandOrchestrator(object):
         self.reserved_networks = []
         self.dv_switch_path = ''
         self.dv_switch_name = ''
-        self.port_group_path = ''
         self.default_network = ''
         self.logger = None
 
@@ -63,7 +62,6 @@ class ConnectionCommandOrchestrator(object):
 
         self.dv_switch_path = VMLocation.combine([vcenter_data_model.default_datacenter, dvswitch_location.path])
         self.dv_switch_name = dvswitch_location.name
-        self.port_group_path = vcenter_data_model.default_port_group_location
         self.default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
@@ -173,7 +171,6 @@ class ConnectionCommandOrchestrator(object):
         vnic_to_network.vnic_name = self._validate_vnic_name(vnic_name)
         vnic_to_network.dv_switch_path = self.dv_switch_path
         vnic_to_network.dv_switch_name = self.dv_switch_name
-        vnic_to_network.port_group_path = self.port_group_path
         vnic_to_network.vlan_id = vlan_id
         vnic_to_network.vlan_spec = mode
         return vnic_to_network
