@@ -35,7 +35,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         network_map.dv_port_name = 'dv_port_name'
         network_map.dv_switch_name = 'dvSwitch'
         network_map.dv_switch_path = 'QualiSB'
-        network_map.port_group_path = 'QualiSB'
         network_map.vlan_id = '100'
         network_map.vlan_spec = 'Access'
         # Act
@@ -76,7 +75,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         vm = py_vmomi_service.get_obj(si.content, [vim.VirtualMachine], virtual_machine_name)
         vm_uuid = vm.config.uuid
         #vm_uuid = self.get_vm_uuid(py_vmomi_service, si, virtual_machine_name)
-        port_group_path = 'QualiSB'
         dv_switch_path = 'QualiSB'
         dv_switch_name = 'dvSwitch'
         dv_port_name = 'boris_group59'

@@ -4,8 +4,8 @@ from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCente
 from mock import Mock
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneVMFromVMResourceModel
-from cloudshell.cp.vcenter.models.vCenterDeployFromLinkedClone import VCenterDeployFromLinkedCloneModel
+from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import VCenterDeployVMFromLinkedCloneResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 
@@ -74,7 +74,7 @@ class TestVirtualMachineDeployer(TestCase):
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_snapshot_deployer(self):
-        deploy_from_template_details = DeployFromTemplateDetails(VCenterDeployFromLinkedCloneModel(), 'VM Deployment')
+        deploy_from_template_details = DeployFromTemplateDetails(VCenterDeployVMFromLinkedCloneResourceModel(), 'VM Deployment')
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
         deploy_from_template_details.vcenter_vm_snapshot = 'name/shanpshot'
         resource_context = self._create_vcenter_resource_context()
@@ -96,7 +96,6 @@ class TestVirtualMachineDeployer(TestCase):
         vc.password = '123'
         vc.default_dvswitch = 'switch1'
         vc.holding_network = 'anetwork'
-        vc.default_port_group_location = 'Quali'
         vc.vm_cluster = 'Quali'
         vc.vm_location = 'Quali'
         vc.vm_resource_pool = 'Quali'
