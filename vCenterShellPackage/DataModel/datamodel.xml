@@ -300,7 +300,7 @@
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
-        <ns0:ResourceModel Description="" Name="vCenter Clone From VM" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />
@@ -424,7 +424,7 @@
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="vCenter from Linked Clone" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />

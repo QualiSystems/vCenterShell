@@ -1,8 +1,7 @@
-class VCenterDeployFromLinkedCloneModel(object):
+class vCenterCloneVMFromVMResourceModel(object):
     def __init__(self):
         self.vcenter_name = ''
         self.vcenter_vm = ''
-        self.vcenter_vm_snapshot = ''
         self.vm_cluster = ''
         self.vm_storage = ''
         self.ip_regex = ''

@@ -1,7 +1,7 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneFromVMResourceModel
+from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import vCenterCloneFromVMResourceModel
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
