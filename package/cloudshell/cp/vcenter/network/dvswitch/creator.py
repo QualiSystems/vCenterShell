@@ -22,7 +22,6 @@ class DvPortGroupCreator(object):
                               dv_port_name,
                               dv_switch_name,
                               dv_switch_path,
-                              port_group_path,
                               vlan_id,
                               vlan_spec,
                               logger):

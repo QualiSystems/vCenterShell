@@ -15,7 +15,6 @@ class TestDvPortGroupConfigurer(TestCase):
         self.vm_uuid = "422254d5-5226-946e-26fb-60c21898b731"
 
         self.vcenter_name = "QualiSB"
-        self.port_group_path = 'QualiSB'
         self.dv_switch_path = 'QualiSB'
         self.network_path = 'QualiSB'
 
