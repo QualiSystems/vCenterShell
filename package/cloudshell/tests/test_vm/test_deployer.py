@@ -4,7 +4,7 @@ from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCente
 from mock import Mock
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneFromVMResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVM import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.models.vCenterDeployFromLinkedClone import VCenterDeployFromLinkedCloneModel
 from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
@@ -57,7 +57,7 @@ class TestVirtualMachineDeployer(TestCase):
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_clone_deployer(self):
-        deploy_from_template_details = DeployFromTemplateDetails(vCenterCloneFromVMResourceModel(), 'VM Deployment')
+        deploy_from_template_details = DeployFromTemplateDetails(vCenterCloneVMFromVMResourceModel(), 'VM Deployment')
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
         deploy_from_template_details.vcenter_vm = 'name'
         resource_context = self._create_vcenter_resource_context()
