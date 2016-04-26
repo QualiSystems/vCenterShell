@@ -4,7 +4,6 @@ class VMwarevCenterResourceModel(object):
         self.password = ''
         self.default_dvswitch = ''
         self.holding_network = ''
-        self.default_port_group_location = ''
         self.vm_cluster = ''
         self.vm_resource_pool = ''
         self.vm_storage = ''

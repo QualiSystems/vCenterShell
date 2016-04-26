@@ -38,7 +38,6 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         mapping.dv_port_name = DvPortGroupNameGenerator().generate_port_group_name(65, 'Trunk')
         mapping.dv_switch_name = 'dvSwitch'
         mapping.dv_switch_path = 'QualiSB'
-        mapping.port_group_path = 'QualiSB'
         mapping.vlan_spec = vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec()
         connector = VirtualSwitchToMachineConnector(
             dv_port_group_creator,
@@ -62,7 +61,6 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         # mapping.dv_port_name = 65
         mapping.dv_switch_name = 'dvSwitch'
         mapping.dv_switch_path = 'QualiSB'
-        mapping.port_group_path = 'QualiSB'
         mapping.vlan_spec = 'Trunk'
 
         vlan_spec = VlanSpecFactory()

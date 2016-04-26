@@ -5,7 +5,6 @@ class VmNetworkMapping(object):
         self.dv_port_name = ''
         self.dv_switch_name = ''
         self.dv_switch_path = ''
-        self.port_group_path = ''
         self.vlan_id = ''
         self.vlan_spec = ''
 

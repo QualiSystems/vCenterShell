@@ -20,8 +20,6 @@ class ResourceModelParser:
         vcenter_data_model.vm_storage = back_slash_to_front_converter(vcenter_data_model.vm_storage)
         vcenter_data_model.vm_resource_pool = back_slash_to_front_converter(vcenter_data_model.vm_resource_pool)
         vcenter_data_model.vm_cluster = back_slash_to_front_converter(vcenter_data_model.vm_cluster)
-        vcenter_data_model.default_port_group_location = \
-            back_slash_to_front_converter(vcenter_data_model.default_port_group_location)
 
         return vcenter_data_model
 
