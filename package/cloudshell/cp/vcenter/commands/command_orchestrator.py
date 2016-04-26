@@ -115,17 +115,18 @@ class CommandOrchestrator(object):
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=model_parser)
 
-        self.context_factory = CompositeContextFactory(CloudShellContextFactory(),
-                                                       VCenterShellContextFactory(model_parser))
+        self.cloudshell_context_factory = CloudShellContextFactory()
+        self.vcenter_context_factory = VCenterShellContextFactory(model_parser)
 
     def connect_bulk(self, context, request):
         logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
         vcenter_data_model = self._create_vcenter_resource_model(context)
 
-        with self.context_factory.create_context(context) as context:
-            cloudshell_context, vcenter_context = context.get_objects()
-            si = cloudshell_context.get_objects()
-            results = self.connection_orchestrator.connect_bulk(si, logger, vcenter_data_model, request)
+        with self.cloudshell_context_factory.create_context(context) as cloudshell_context:
+            with self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) \
+                    as vcenter_context:
+                results = self.connection_orchestrator.connect_bulk(vcenter_context.get_objects(), logger,
+                                                                    vcenter_data_model, request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
@@ -157,11 +158,12 @@ class CommandOrchestrator(object):
         # execute command
         logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
 
-        with self.context_factory.create_context(context) as context:
-            cloudshell_context, vcenter_context = context.get_objects()
-            si = vcenter_context.get_objects()
-            # noinspection PyTypeChecker
-            result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)
+        with self.cloudshell_context_factory.create_context(context) as cloudshell_context:
+            with self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) \
+                    as vcenter_context:
+                si = vcenter_context.get_objects()
+                # noinspection PyTypeChecker
+                result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)
 
         return set_command_result(result=result, unpicklable=False)
 
