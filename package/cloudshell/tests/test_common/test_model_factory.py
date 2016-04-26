@@ -10,7 +10,7 @@ class TestDataModel(TestCase):
     def test_resource_models(self):
         ns = {'default': 'http://schemas.qualisystems.com/ResourceManagement/DataModelSchema.xsd'}
         #It didn't work with //..//..//.. so ?I used os.path.dirname X times
-        datamodel_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'vCenterShellPackage\DataModel\datamodel.xml')
+        datamodel_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'vCenterShellPackage/DataModel/datamodel.xml')
         tree = ET.parse(datamodel_path)
         root = tree.getroot()
         resource_models = root.findall('.//default:ResourceModel', ns)
