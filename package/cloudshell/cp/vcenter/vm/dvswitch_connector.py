@@ -60,7 +60,6 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.dv_port_name,
                                                                        network_map.dv_switch_name,
                                                                        network_map.dv_switch_path,
-                                                                       network_map.port_group_path,
                                                                        network_map.vlan_id,
                                                                        network_map.vlan_spec,
                                                                        logger=logger)
