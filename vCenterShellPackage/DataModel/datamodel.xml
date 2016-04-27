@@ -42,12 +42,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The default location within the vCenter (under the Default Datacenter) in which new port groups will be created in order to connect a VM to the network." IsReadOnly="false" Name="Default Port Group Location" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity. Should be under the Default Datacenter." IsReadOnly="false" Name="Default dvSwitch" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -233,7 +227,6 @@
             <ns0:AttributeValue Name="Reserved Networks" Value="" />
             <ns0:AttributeValue Name="User" Value="" />
             <ns0:AttributeValue Name="Password" Value="" />
-            <ns0:AttributeValue Name="Default Port Group Location" Value="" />
             <ns0:AttributeValue Name="Default dvSwitch" Value="" />
             <ns0:AttributeValue Name="Holding Network" Value="holding" />
             <ns0:AttributeValue Name="VM Cluster" Value="" />
