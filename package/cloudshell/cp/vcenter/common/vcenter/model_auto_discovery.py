@@ -17,7 +17,6 @@ USER = 'User'
 PASSWORD = 'Password'
 DEFAULT_DVSWITCH = 'Default dvSwitch'
 DEFAULT_DATACENTER = 'Default Datacenter'
-DEFAULT_PORT_GROUP_LOCATION = 'Default Port Group Location'
 EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
 HOLDING_NETWORK = 'Holding Network'
 OVF_TOOL_PATH = 'OVF Tool Path'
@@ -164,11 +163,6 @@ class VCenterAutoModelDiscovery(object):
 
         f_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, f_name))
-
-    def _validate_default_port_group_location(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        if not attributes[key]:
-            return
-        self._validate_attribute(si, attributes, None, key, dc_name)
 
     def _validate_vm_cluster(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         accepted_types = (vim.ClusterComputeResource, vim.HostSystem)
