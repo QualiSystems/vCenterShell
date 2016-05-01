@@ -68,7 +68,11 @@ class OvfImageDeployerService(object):
         datastore_param = DATA_STORE_PARAM.format(image_params.datastore)
 
         # power state
-        power_state = POWER_ON_PARAM if image_params.power_on else POWER_OFF_PARAM
+        # power_state = POWER_ON_PARAM if image_params.power_on else POWER_OFF_PARAM
+        # due to hotfix 1 for release 1.0,
+        # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
+
+        power_state = POWER_OFF_PARAM
 
         # build basic args
         args = [ovf_tool_exe_path,

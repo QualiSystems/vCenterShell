@@ -25,7 +25,7 @@ class TestOvfImageService(unittest.TestCase):
             ['dummypath/ovftool.exe',
              '--noSSLVerify',
              '--acceptAllEulas',
-             '--powerOn',
+             '--powerOffTarget',
              '--name=raz_deploy_image_integration_test',
              '--datastore=aa',
              '--vmFolder=Raz',
@@ -41,7 +41,7 @@ class TestOvfImageService(unittest.TestCase):
         image_params.resource_pool = 'LiverPool'
         image_params.vm_name = 'raz_deploy_image_integration_test'
         image_params.datastore = 'aa'
-        image_params.power_on = 'true'
+        image_params.power_on = 'false'
         image_params.vm_folder = 'Raz'
         # image_params.image_url = "C:\\images\\test\\OVAfile121_QS\\OVAfile121_QS.ovf"
         image_params.image_url = "http://192.168.65.88/ovf/Debian 64 - Yoav.ovf"
