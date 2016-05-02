@@ -436,7 +436,10 @@ class pyVmomiService:
 
         clone_spec = self.vim.vm.CloneSpec()
         clone_spec.location = placement
-        clone_spec.powerOn = clone_params.power_on
+        # clone_params.power_on
+        # due to hotfix 1 for release 1.0,
+        # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
+        clone_spec.powerOn = False
 
         logger.info("cloning VM...")
 
