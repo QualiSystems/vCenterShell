@@ -42,6 +42,6 @@ A repository for projects providing out of the box capabilities within CloudShel
 
 ## Links
 [VmWare vCenter] (https://github.com/vmware/pyvmomi/tree/master/docs)
-
+[Nitzans presentation] (http://gitlab.com)
 ## License
 [Apache License 2.0](https://github.com/QualiSystems/vCenterShell/blob/master/LICENSE)
