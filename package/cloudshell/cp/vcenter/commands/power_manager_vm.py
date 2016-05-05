@@ -40,6 +40,14 @@ class VirtualMachinePowerManagementCommand(object):
                                                                          logger=logger,
                                                                          action_name='Power Off')
             else:
+                if vm.guest.toolsStatus == 'toolsNotInstalled':
+                    logger.warning('VMWare Tools status on virtual machine \'{0}\' are not installed'.format(vm.name))
+                    raise ValueError('Cannot power off the vm softly because VMWare Tools are not installed')
+
+                if vm.guest.toolsStatus == 'toolsNotRunning':
+                    logger.warning('VMWare Tools status on virtual machine \'{0}\' are not running'.format(vm.name))
+                    raise ValueError('Cannot power off the vm softly because VMWare Tools are not running')
+
                 vm.ShutdownGuest()
                 task_result = 'vm powered off'
 

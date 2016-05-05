@@ -19,7 +19,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.vm_uuid = "422254d5-5226-946e-26fb-60c21898b731"
 
         self.vcenter_name = "QualiSB"
-        self.port_group_path = 'QualiSB'
         self.dv_switch_path = 'QualiSB'
         self.network_path = 'QualiSB'
 
@@ -78,7 +77,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         network_spec.dv_port_name = ""
         network_spec.dv_switch_name = ""
         network_spec.dv_switch_path = ""
-        network_spec.port_group_path = ""
         network_spec.vlan_id = ""
         network_spec.vlan_spec = ""
         mapp = [network_spec]

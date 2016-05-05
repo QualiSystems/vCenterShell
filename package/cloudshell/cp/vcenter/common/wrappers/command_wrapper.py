@@ -68,8 +68,7 @@ class CommandWrapper:
                 session = self.cs_helper.get_session(server_address=context.connectivity.server_address,
                                                      token=context.connectivity.admin_auth_token,
                                                      reservation_domain=self._get_domain(context))
-                vcenter_data_model = self.resource_model_parser.convert_to_resource_model(
-                    resource_instance=context.resource, resource_model_type=VMwarevCenterResourceModel)
+                vcenter_data_model = self.resource_model_parser.convert_to_vcenter_model(context.resource)
                 connection_details = self.cs_helper.get_connection_details(session=session,
                                                                            vcenter_resource_model=vcenter_data_model,
                                                                            resource_context=context.resource)

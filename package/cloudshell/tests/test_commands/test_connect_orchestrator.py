@@ -22,13 +22,30 @@ class TestCommandOrchestrator(TestCase):
         self.vc_data_model.default_network = 'Anetwork'
         self.vc_data_model.default_datacenter = 'datacenter'
         self.vc_data_model.holding_network = 'Holding Network'
-        self.vc_data_model.default_port_group_location = '/'
 
         self.si = Mock()
 
         self.ConnectionCommandOrchestrator = ConnectionCommandOrchestrator(self.connector,
                                                                            self.disconnector,
                                                                            self.model_parser)
+
+    def test_connect_bulk_dvswitch_is_None(self):
+        """
+        tests the error by missing dvswitch
+        """
+        vc_data_model = Mock()
+        vc_data_model.reserved_networks = 'restricted_network1,restricted_network2'
+        vc_data_model.default_dvswitch = None
+        vc_data_model.default_network = 'Anetwork'
+        vc_data_model.default_datacenter = 'datacenter'
+        vc_data_model.holding_network = 'Holding Network'
+
+        request, expected = self._get_missing_dv_switch_params()
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=vc_data_model,
+                                                                  request=request)
+        self._assert_as_expected(results, expected)
 
     def test_connect_bulk1(self):
         """
@@ -139,7 +156,7 @@ class TestCommandOrchestrator(TestCase):
         interface = 'aa' if not interface_attributes else interface_attributes[0]
         return interface
 
-    def _get_connect_excepted_results(self, request, error_msg=None):
+    def _get_connect_excepted_results(self, request, error_msg=None, ignore_interface=False):
         a = DeployDataHolder(request['driverRequest'])
         res = []
         for action in a.actions:
@@ -149,7 +166,7 @@ class TestCommandOrchestrator(TestCase):
             r.errorMessage = error_msg
             r.infoMessage = 'VLAN successfully set' if not error_msg else None
             r.success = True if not error_msg else False
-            r.updatedInterface = self._get_interface_name(action)
+            r.updatedInterface = None if ignore_interface else self._get_interface_name(action)
             res.append(r)
         return res
 
@@ -166,6 +183,48 @@ class TestCommandOrchestrator(TestCase):
             r.updatedInterface = self._get_interface_name(action)
             res.append(r)
         return res
+
+    def _get_missing_dv_switch_params(self):
+        request = {
+            'driverRequest': {
+                'actions': [
+                    {
+                        "connectorAttributes": [],
+                        "connectionParams": {
+                            "vlanId": "2",
+                            "mode": "Access",
+                            "vlanServiceAttributes": [
+                                {
+                                    "attributeName": "Access Mode",
+                                    "attributeValue": "Access",
+                                    "type": "vlanServiceAttribute"
+                                }
+                            ],
+                            "type": "setVlanParameter"
+                        },
+                        "actionId": "ee8a3dc8-eb4b-4141-92ad-58bbd8430cad_376046bb-1ef0-4ecc-bb52-c0c7a9c75b1c",
+                        "actionTarget": {
+                            "fullName": "VM Deployment1_9602ad34",
+                            "fullAddress": "N/A/NA",
+                            "type": "actionTarget"
+                        },
+                        "customActionAttributes": [
+                            {
+                                "attributeName": "VM_UUID",
+                                "attributeValue": "42220ae6-2fa8-b4cd-14e4-16fbad2798f6",
+                                "type": "customAttribute"
+                            }
+                        ],
+                        "type": "setVlan"
+                    }
+                ]
+            }
+        }
+        self._set_connect_to_networks_by_request(request)
+        expected = self._get_connect_excepted_results(request,
+                                                      error_msg='Please set the attribute "Default DvSwitch" in order to execute any connectivity changes',
+                                                      ignore_interface=True)
+        return jsonpickle.encode(request), expected
 
     def _get_test1_params(self):
         request = {

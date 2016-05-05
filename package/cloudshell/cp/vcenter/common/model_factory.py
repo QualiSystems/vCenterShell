@@ -1,8 +1,27 @@
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
+
+
 class ResourceModelParser:
     ATTRIBUTE_NAME_POSTFIX = "_attribute"
 
     def __init__(self):
         pass
+
+    def convert_to_vcenter_model(self, resource):
+        vcenter_data_model = self.convert_to_resource_model(
+            resource_instance=resource,
+            resource_model_type=VMwarevCenterResourceModel)
+
+        vcenter_data_model.default_dvswitch = back_slash_to_front_converter(vcenter_data_model.default_dvswitch)
+        vcenter_data_model.default_datacenter = back_slash_to_front_converter(vcenter_data_model.default_datacenter)
+        vcenter_data_model.reserved_networks = back_slash_to_front_converter(vcenter_data_model.reserved_networks)
+        vcenter_data_model.vm_location = back_slash_to_front_converter(vcenter_data_model.vm_location)
+        vcenter_data_model.vm_storage = back_slash_to_front_converter(vcenter_data_model.vm_storage)
+        vcenter_data_model.vm_resource_pool = back_slash_to_front_converter(vcenter_data_model.vm_resource_pool)
+        vcenter_data_model.vm_cluster = back_slash_to_front_converter(vcenter_data_model.vm_cluster)
+
+        return vcenter_data_model
 
     def convert_to_resource_model(self, resource_instance, resource_model_type):
         """
@@ -75,7 +94,7 @@ class ResourceModelParser:
         """
         resource_model = ResourceModelParser.get_resource_model(resource_instance)
         resource_class_name = ResourceModelParser.get_resource_model_class_name(
-                resource_model)
+            resource_model)
         # print 'Family name is ' + resource_class_name
         instance = ResourceModelParser.get_class('cloudshell.cp.vcenter.models.' + resource_class_name)
         return instance

@@ -15,7 +15,6 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
 			<Attribute Name="Default Datacenter" Value="" />
 			<Attribute Name="Default dvSwitch" Value="" />
 			<Attribute Name="Holding Network" Value="" />
-			<Attribute Name="Default Port Group Location" Value="" />
 			<Attribute Name="VM Cluster" Value="" />
 			<Attribute Name="VM Resource Pool" Value="" />
 			<Attribute Name="VM Storage" Value="" />

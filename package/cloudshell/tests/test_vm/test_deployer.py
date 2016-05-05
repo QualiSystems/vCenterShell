@@ -1,9 +1,11 @@
 from unittest import TestCase
 
-from cloudshell.api.cloudshell_api import ResourceInfo
-from mock import Mock, create_autospec
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from mock import Mock
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import VCenterDeployVMFromLinkedCloneResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 
@@ -33,8 +35,9 @@ class TestVirtualMachineDeployer(TestCase):
         self.vm.config.uuid = self.uuid
         self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
         self.cs_helper = Mock()
+        self.model_parser = ResourceModelParser()
         self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer, self.cs_helper,
-                                               ResourceModelParser())
+                                               self.model_parser)
 
     def test_vm_deployer(self):
         deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')
@@ -45,7 +48,41 @@ class TestVirtualMachineDeployer(TestCase):
         res = self.deployer.deploy_from_template(
             si=self.si,
             data_holder=deploy_from_template_details,
-            resource_context=resource_context,
+            vcenter_data_model=resource_context,
+            logger=Mock())
+
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
+        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
+
+    def test_clone_deployer(self):
+        deploy_from_template_details = DeployFromTemplateDetails(vCenterCloneVMFromVMResourceModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
+        deploy_from_template_details.vcenter_vm = 'name'
+        resource_context = self._create_vcenter_resource_context()
+
+        res = self.deployer.deploy_clone_from_vm(
+            si=self.si,
+            data_holder=deploy_from_template_details,
+            vcenter_data_model=resource_context,
+            logger=Mock())
+
+        self.assertEqual(res.vm_name, self.name)
+        self.assertEqual(res.vm_uuid, self.uuid)
+        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
+        self.assertTrue(self.pv_service.CloneVmParameters.called)
+
+    def test_snapshot_deployer(self):
+        deploy_from_template_details = DeployFromTemplateDetails(VCenterDeployVMFromLinkedCloneResourceModel(), 'VM Deployment')
+        deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
+        deploy_from_template_details.vcenter_vm_snapshot = 'name/shanpshot'
+        resource_context = self._create_vcenter_resource_context()
+
+        res = self.deployer.deploy_from_linked_clone(
+            si=self.si,
+            data_holder=deploy_from_template_details,
+            vcenter_data_model=resource_context,
             logger=Mock())
 
         self.assertEqual(res.vm_name, self.name)
@@ -54,24 +91,22 @@ class TestVirtualMachineDeployer(TestCase):
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def _create_vcenter_resource_context(self):
-        resource_context = create_autospec(ResourceInfo)
-        resource_context.ResourceModelName = 'VMwarev Center'
-        resource_context.ResourceAttributes = {'User': 'user',
-                                               'Password': '123',
-                                               'Default dvSwitch': 'switch1',
-                                               'Holding Network': 'anetwork',
-                                               'Default Port Group Location': 'Quali',
-                                               'VM Cluster': 'Quali',
-                                               'VM Location': 'Quali',
-                                               'VM Resource Pool': 'Quali',
-                                               'VM Storage': 'Quali',
-                                               'Shutdown Method': 'hard',
-                                               'OVF Tool Path': 'C\\program files\ovf',
-                                               'Execution Server Selector': '',
-                                               'Reserved Networks': 'vlan65',
-                                               'Default Datacenter': 'QualiSB'
-                                               }
-        return resource_context
+        vc = VMwarevCenterResourceModel()
+        vc.user = 'user'
+        vc.password = '123'
+        vc.default_dvswitch = 'switch1'
+        vc.holding_network = 'anetwork'
+        vc.vm_cluster = 'Quali'
+        vc.vm_location = 'Quali'
+        vc.vm_resource_pool = 'Quali'
+        vc.vm_storage = 'Quali'
+        vc.shutdown_method = 'hard'
+        vc.ovf_tool_path = 'C\\program files\ovf'
+        vc.execution_server_selector = ''
+        vc.reserved_networks = 'vlan65'
+        vc.default_datacenter = 'QualiSB'
+
+        return vc
 
     def test_vm_deployer_error(self):
         self.clone_res.error = Mock()
@@ -81,10 +116,10 @@ class TestVirtualMachineDeployer(TestCase):
         deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
 
-        resource_context = self._create_vcenter_resource_context()
+        vcenter_data_model = self._create_vcenter_resource_context()
 
-        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si, Mock(), deploy_from_template_details,
-                          resource_context)
+        self.assertRaises(Exception, self.deployer.deploy_from_template, self.si,
+                          Mock(), deploy_from_template_details, vcenter_data_model)
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):
