@@ -123,7 +123,7 @@ class CommandOrchestrator(object):
         logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
         vcenter_data_model = self._create_vcenter_resource_model(context)
 
-        with self.cloudshell_context_factory.create_context(context) as cloudshell_context:
+        with self.cloudshell_context_factory.create(context) as cloudshell_context:
             with self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) \
                     as vcenter_context:
                 results = self.connection_orchestrator.connect_bulk(vcenter_context.get_objects(), logger,
@@ -159,9 +159,8 @@ class CommandOrchestrator(object):
         # execute command
         logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
 
-        with self.cloudshell_context_factory.create(context) as cs_ctx, \
-                self.vcenter_context_factory.create(cloudshell_context.get_objects(),
-                                                    context) as vcenter_context:
+        with self.cloudshell_context_factory.create(context) as cloudshell_context, \
+                self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) as vcenter_context:
             si = vcenter_context.get_objects()
             # noinspection PyTypeChecker
             result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)

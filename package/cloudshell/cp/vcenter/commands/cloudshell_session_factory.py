@@ -15,14 +15,14 @@ class ContextBasedService(object):
         pass
 
     @abstractmethod
-    def context_ended(self):
+    def context_ended(self, exc_type, exc_val, exc_tb):
         pass
 
     def __enter__(self):
         self.context_started()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.context_ended()
+        self.context_ended(exc_type, exc_val, exc_tb)
 
 
 class CloudShellSessionContext(ContextBasedService):
@@ -49,12 +49,12 @@ class CloudShellSessionContext(ContextBasedService):
 
         return self.context_object
 
-    def context_ended(self):
+    def context_ended(self, exc_type, exc_val, exc_tb):
         pass
 
 
 class CloudShellContextFactory(object):
-    def create_context(self, context):
+    def create(self, context):
         return CloudShellSessionContext(context)
 
 

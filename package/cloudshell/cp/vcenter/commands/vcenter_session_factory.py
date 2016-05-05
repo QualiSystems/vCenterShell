@@ -20,7 +20,7 @@ class VCenterOperationContext(ContextBasedService):
         self.si = self.pv_service.connect(vcenter_url, user, password, 443)
         return self.si
 
-    def context_ended(self):
+    def context_ended(self, exc_type, exc_val, exc_tb):
         self.pv_service.disconnect(self.si)
 
     def get_objects(self):
