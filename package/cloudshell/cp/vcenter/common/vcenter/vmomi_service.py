@@ -449,9 +449,17 @@ class pyVmomiService:
             clone_spec.snapshot = snapshot
 
         logger.info("cloning VM...")
+        try:
+            task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
+            vm = self.wait_for_task(task, logger)
 
-        task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-        vm = self.wait_for_task(task, logger)
+        except vim.fault.NoPermission as error:
+            logger.error("vcenter returned - no permission: {0}".format(error))
+            raise Exception('Permissions is not set correctly, please check the log for more info.')
+        except Exception as e:
+            logger.error("error deploying: {0}".format(e))
+            raise Exception('Error has occurred while deploying, please look at the log for more info.')
+
         result.vm = vm
         return result
 
