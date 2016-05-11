@@ -30,6 +30,7 @@ from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineCo
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from pyVim.connect import SmartConnect, Disconnect
+from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 
 
 class CommandOrchestrator(object):
@@ -132,14 +133,69 @@ class CommandOrchestrator(object):
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
         data_holder.template_resource_model.vcenter_template = \
-            data_holder.template_resource_model.vcenter_template.replace('\\', '/')
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_template)
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder,
-            context.resource)
+            data_holder)
+
+        return set_command_result(result=result, unpicklable=False)
+
+    def deploy_clone_from_vm(self, context, deploy_data):
+        """
+        Deploy Cloned VM From VM Command, will deploy vm from template
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :return str deploy results
+        """
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+        data_holder.template_resource_model.vcenter_vm = \
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            context,
+            self.deploy_command.execute_deploy_clone_from_vm,
+            data_holder)
+
+        return set_command_result(result=result, unpicklable=False)
+
+    def deploy_from_linked_clone(self, context, deploy_data):
+        """
+        Deploy Cloned VM From VM Command, will deploy vm from template
+
+        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
+        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :return str deploy results
+        """
+
+        # get command parameters from the environment
+        data = jsonpickle.decode(deploy_data)
+        data_holder = DeployDataHolder(data)
+
+        if not data_holder.template_resource_model.vcenter_vm:
+            raise ValueError('Please insert vm to deploy from')
+
+        data_holder.template_resource_model.vcenter_vm = \
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
+
+        if not data_holder.template_resource_model.vcenter_vm_snapshot:
+            raise ValueError('Please insert snapshot to deploy from')
+
+        data_holder.template_resource_model.vcenter_vm_snapshot = \
+            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm_snapshot)
+
+        # execute command
+        result = self.command_wrapper.execute_command_with_connection(
+            context,
+            self.deploy_command.execute_deploy_from_linked_clone,
+            data_holder)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -248,7 +304,6 @@ class CommandOrchestrator(object):
             resource_details.fullname,
             reservation_id)
         return set_command_result(result=res, unpicklable=False)
-
 
     # remote command
     def refresh_ip(self, context, cancellation_context, ports):

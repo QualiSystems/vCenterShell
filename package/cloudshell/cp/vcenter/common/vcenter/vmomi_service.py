@@ -59,8 +59,7 @@ class pyVmomiService:
             raise ValueError(e.msg)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
-            import traceback
-            logger.warn("Connection Error: ({}):\n{}".format(e, traceback.format_exc()))
+            raise ValueError('Cannot connect to vCenter, please check that the address is valid')
 
     def disconnect(self, si):
         """ Disconnect from vCenter """
@@ -350,7 +349,8 @@ class pyVmomiService:
                      datastore_name=None,
                      cluster_name=None,
                      resource_pool=None,
-                     power_on=True):
+                     power_on=True,
+                     snapshot=''):
             """
             Constructor of CloneVmParameters
             :param si:              pyvmomi 'ServiceInstance'
@@ -361,6 +361,7 @@ class pyVmomiService:
             :param cluster_name:    str: the name of the dcluster
             :param resource_pool:   str: the name of the resource pool
             :param power_on:        bool: turn on the cloned vm
+            :param snapshot:        str: the name of the snapshot to clone from
             """
             self.si = si
             self.template_name = template_name
@@ -370,6 +371,7 @@ class pyVmomiService:
             self.cluster_name = cluster_name
             self.resource_pool = resource_pool
             self.power_on = str2bool(power_on)
+            self.snapshot = snapshot
 
     class CloneVmResult:
         """
@@ -419,6 +421,8 @@ class pyVmomiService:
 
         template = self._get_template(clone_params, vm_location)
 
+        snapshot = self._get_snapshot(clone_params, template)
+
         datastore = self._get_datastore(clone_params)
 
         resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
@@ -441,10 +445,21 @@ class pyVmomiService:
         # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
         clone_spec.powerOn = False
 
-        logger.info("cloning VM...")
+        if snapshot:
+            clone_spec.snapshot = snapshot
 
-        task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-        vm = self.wait_for_task(task, logger)
+        logger.info("cloning VM...")
+        try:
+            task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
+            vm = self.wait_for_task(task, logger)
+
+        except vim.fault.NoPermission as error:
+            logger.error("vcenter returned - no permission: {0}".format(error))
+            raise Exception('Permissions is not set correctly, please check the log for more info.')
+        except Exception as e:
+            logger.error("error deploying: {0}".format(e))
+            raise Exception('Error has occurred while deploying, please look at the log for more info.')
+
         result.vm = vm
         return result
 
@@ -625,4 +640,43 @@ class pyVmomiService:
         for network in vm.network:
             if hasattr(network, "name") and network_name == network.name:
                 return network
+        return None
+
+    @staticmethod
+    def _get_snapshot(clone_params, template):
+        snapshot_name = getattr(clone_params, 'snapshot', None)
+        if not snapshot_name:
+            return None
+
+        if not hasattr(template, 'snapshot') and hasattr(template.snapshot, 'rootSnapshotList'):
+            raise ValueError('The given vm does not have any snapshots')
+
+        paths = snapshot_name.split('/')
+        temp_snap = template.snapshot
+        for path in paths:
+            if path:
+                root = getattr(temp_snap, 'rootSnapshotList', getattr(temp_snap, 'childSnapshotList', None))
+                if not root:
+                    temp_snap = None
+                    break
+
+                temp = pyVmomiService._get_snapshot_from_root_snapshot(path, root)
+
+                if not temp:
+                    temp_snap = None
+                    break
+                else:
+                    temp_snap = temp
+
+        if temp_snap:
+            return temp_snap.snapshot
+
+        raise ValueError('Could not find snapshot in vm')
+
+    @staticmethod
+    def _get_snapshot_from_root_snapshot(name, root_snapshot):
+        sorted_by_creation = sorted(root_snapshot, key=lambda x: x.createTime, reverse=True)
+        for snapshot_header in sorted_by_creation:
+            if snapshot_header.name == name:
+                return snapshot_header
         return None

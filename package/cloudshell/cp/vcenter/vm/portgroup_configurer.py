@@ -39,20 +39,23 @@ class VirtualMachinePortGroupConfigurer(object):
         self._lock = Lock()
 
     def connect_vnic_to_networks(self, vm, mapping, default_network, reserved_networks, logger):
-        vnic_mapping = self.vnic_service.map_vnics(vm)
+        try:
 
-        vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
-            mapping, vnic_mapping, vm.network, default_network, reserved_networks)
+            vnic_mapping = self.vnic_service.map_vnics(vm)
+            vnic_to_network_mapping = self.vnic_to_network_mapper.map_request_to_vnics(
+                mapping, vnic_mapping, vm.network, default_network, reserved_networks)
 
-        update_mapping = []
-        for vnic_name, map in vnic_to_network_mapping.items():
-            vnic = vnic_mapping[vnic_name]
-            requseted_vnic = map[1]
-            network = map[0]
-            update_mapping.append(VNicDeviceMapper(vnic, requseted_vnic, network, True, vnic.macAddress))
+            update_mapping = []
+            for vnic_name, map in vnic_to_network_mapping.items():
+                vnic = vnic_mapping[vnic_name]
+                requseted_vnic = map[1]
+                network = map[0]
+                update_mapping.append(VNicDeviceMapper(vnic, requseted_vnic, network, True, vnic.macAddress))
 
-        self.update_vnic_by_mapping(vm, update_mapping, logger)
-        return update_mapping
+            self.update_vnic_by_mapping(vm, update_mapping, logger)
+            return update_mapping
+        except Exception as e:
+            raise ValueError('VM: {0} failed with: "{1}"'.format(vm.name, e.message))
 
     def erase_network_by_mapping(self, networks, reserved_networks, logger):
         nets = dict()
@@ -72,6 +75,7 @@ class VirtualMachinePortGroupConfigurer(object):
                                                                                logger=logger,
                                                                                action_name='Erase dv Port Group')
                 except Exception as e:
+                    a = e.msg
                     continue
         finally:
             self._lock.release()

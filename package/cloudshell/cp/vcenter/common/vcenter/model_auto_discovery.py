@@ -17,7 +17,6 @@ USER = 'User'
 PASSWORD = 'Password'
 DEFAULT_DVSWITCH = 'Default dvSwitch'
 DEFAULT_DATACENTER = 'Default Datacenter'
-DEFAULT_PORT_GROUP_LOCATION = 'Default Port Group Location'
 EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
 HOLDING_NETWORK = 'Holding Network'
 OVF_TOOL_PATH = 'OVF Tool Path'
@@ -144,18 +143,6 @@ class VCenterAutoModelDiscovery(object):
                 connection_details.username))
         return si
 
-    def _validate_default_dvswitch(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        accepted_types = (vim.DistributedVirtualSwitch, vim.VmwareDistributedVirtualSwitch)
-        d_switch = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
-        if not d_switch:
-            d_switch = self._get_default(all_items_in_vc, accepted_types, key)
-            d_name = self.get_full_name(dc_name, d_switch)
-            # removing the upper folder
-            d_name = d_name.replace('network/', '')
-        else:
-            d_name = attributes[key]
-        auto_att.append(AutoLoadAttribute('', key, d_name))
-
     def _validate_vm_storage(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         accepted_types = (vim.Datastore, vim.StoragePod)
         datastore = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
@@ -176,11 +163,6 @@ class VCenterAutoModelDiscovery(object):
 
         f_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, f_name))
-
-    def _validate_default_port_group_location(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        if not attributes[key]:
-            return
-        self._validate_attribute(si, attributes, None, key, dc_name)
 
     def _validate_vm_cluster(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         accepted_types = (vim.ClusterComputeResource, vim.HostSystem)

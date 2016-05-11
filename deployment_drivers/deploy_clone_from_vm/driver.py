@@ -1,14 +1,14 @@
 import jsonpickle
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 
 
-class DeployFromTemplateDriver(ResourceDriverInterface):
+class DeployCloneFromVMDriver(ResourceDriverInterface):
     def __init__(self):
         self.resource_model_parser = ResourceModelParser()
         self.cs_helper = CloudshellDriverHelper()
@@ -33,7 +33,7 @@ class DeployFromTemplateDriver(ResourceDriverInterface):
 
         vcenter_template_resource_model = \
             self.resource_model_parser.convert_to_resource_model(context.resource,
-                                                                 vCenterVMFromTemplateResourceModel)
+                                                                 vCenterCloneVMFromVMResourceModel)
 
         if not Name:
             Name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']
@@ -46,7 +46,7 @@ class DeployFromTemplateDriver(ResourceDriverInterface):
         result = session.ExecuteCommand(reservation_id,
                                         vcenter_template_resource_model.vcenter_name,
                                         "Resource",
-                                        "deploy_from_template",
+                                        "deploy_clone_from_vm",
                                         params,
                                         False)
 
