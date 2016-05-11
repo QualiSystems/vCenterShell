@@ -10,6 +10,10 @@ A repository for projects providing out of the box capabilities within CloudShel
     App deployment type driver for deploying from vCenter OVF images
     * **deploy_from_template**
     App deployment type driver for cloning from vCenter templates
+    * **deploy_clone_vm_from_vm**
+    App deployment type driver for creating clones from existing VMs
+    * **deploy_vm_from_linked_clone**
+    App deployment type driver for deploying a linked clone (deploy from snapshot)
 
 
 * **package**
