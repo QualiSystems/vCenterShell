@@ -188,7 +188,7 @@ class pyVmomiService:
 
         folder = self.get_folder(si, path)
         if folder is None:
-            raise KeyError('vmomi managed object not found at: {0}'.format(path))
+            raise ValueError('vmomi managed object not found at: {0}'.format(path))
 
         look_in = None
         if hasattr(folder, type_name):
@@ -196,7 +196,7 @@ class pyVmomiService:
         if hasattr(folder, self.ChildEntity):
             look_in = folder
         if look_in is None:
-            raise KeyError('vmomi managed object not found at: {0}'.format(path))
+            raise ValueError('vmomi managed object not found at: {0}'.format(path))
 
         search_index = si.content.searchIndex
         '#searches for the specific vm in the folder'

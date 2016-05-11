@@ -5,6 +5,7 @@ from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionComman
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
+from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
@@ -50,6 +51,9 @@ class CommandOrchestrator(object):
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         ovf_service = OvfImageDeployerService(self.resource_model_parser)
+
+
+        self.vm_loader = VMLoader(pv_service)
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -386,4 +390,10 @@ class CommandOrchestrator(object):
                                                                    self.vm_power_management_command.power_on,
                                                                    vm_uuid,
                                                                    resource_fullname)
+        return set_command_result(result=res, unpicklable=False)
+
+    def get_vm_uuid_by_name(self, context, vm_name):
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.vm_loader.load_vm_uuid_by_name,
+                                                                   vm_name)
         return set_command_result(result=res, unpicklable=False)
