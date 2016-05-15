@@ -1,5 +1,5 @@
-from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
+from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 
 
@@ -14,7 +14,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         """
         self.command_orchestrator = CommandOrchestrator()  # type: CommandOrchestrator
 
-    def initialize(self):
+    def initialize(self, context):
         pass
 
     def ApplyConnectivityChanges(self, context, request):
@@ -39,6 +39,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         return self.command_orchestrator.power_off(context, ports)
 
     # the name is by the Qualisystems conventions
+
     def PowerOn(self, context, ports):
         """
         Powers off the remote vm

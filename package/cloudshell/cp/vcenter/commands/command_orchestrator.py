@@ -1,5 +1,10 @@
 import time
 import jsonpickle
+
+from cloudshell.cp.vcenter.commands.cloudshell_session_factory import CloudShellSessionFactory, CompositeContextFactory, \
+    CloudShellContextFactory, VCenterShellContextFactory
+from cloudshell.cp.vcenter.commands.vcenter_session_factory import VCenterOperationContextFactory
+from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
@@ -44,7 +49,8 @@ class CommandOrchestrator(object):
         self.cs_helper = CloudshellDriverHelper()
         pv_service = pyVmomiService(SmartConnect, Disconnect)
         synchronous_task_waiter = SynchronousTaskWaiter()
-        self.resource_model_parser = ResourceModelParser()
+        model_parser = ResourceModelParser()
+        self.resource_model_parser = model_parser
         port_group_name_generator = DvPortGroupNameGenerator()
 
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
@@ -55,7 +61,7 @@ class CommandOrchestrator(object):
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
                                              cs_helper=self.cs_helper,
-                                             resource_model_parser=ResourceModelParser())
+                                             resource_model_parser=model_parser)
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
@@ -67,11 +73,13 @@ class CommandOrchestrator(object):
                                               name_gen=port_group_name_generator)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
+        self.logger_factory = ContextBasedLoggerFactory()
+
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
                                               cloud_shell_helper=self.cs_helper,
                                               resource_model_parser=self.resource_model_parser,
-                                              context_based_logger_factory=ContextBasedLoggerFactory())
+                                              context_based_logger_factory=self.logger_factory)
         # Deploy Command
         self.deploy_command = DeployCommand(deployer=vm_deployer)
 
@@ -106,19 +114,31 @@ class CommandOrchestrator(object):
                                                  synchronous_task_waiter=synchronous_task_waiter)
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
-                                                   resource_model_parser=ResourceModelParser())
+                                                   resource_model_parser=model_parser)
+
+        self.cloudshell_context_factory = CloudShellContextFactory()
+        self.vcenter_context_factory = VCenterShellContextFactory(model_parser)
 
     def connect_bulk(self, context, request):
-        results = self.command_wrapper.execute_command_with_connection(
-            context,
-            self.connection_orchestrator.connect_bulk,
-            request)
+        logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
+        vcenter_data_model = self._create_vcenter_resource_model(context)
+
+        with self.cloudshell_context_factory.create(context) as cloudshell_context:
+            with self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) \
+                    as vcenter_context:
+                results = self.connection_orchestrator.connect_bulk(vcenter_context.get_objects(), logger,
+                                                                    vcenter_data_model, request)
 
         driver_response = DriverResponse()
         driver_response.actionResults = results
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
+
+    def _create_vcenter_resource_model(self, context):
+        return self.resource_model_parser.convert_to_resource_model(
+            resource_instance=context.resource,
+            resource_model_type=VMwarevCenterResourceModel)
 
     def deploy_from_template(self, context, deploy_data):
         """
@@ -132,14 +152,18 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
         data_holder = DeployDataHolder(data)
+        # noinspection PyUnresolvedReferences
         data_holder.template_resource_model.vcenter_template = \
             back_slash_to_front_converter(data_holder.template_resource_model.vcenter_template)
 
         # execute command
-        result = self.command_wrapper.execute_command_with_connection(
-            context,
-            self.deploy_command.execute_deploy_from_template,
-            data_holder)
+        logger = self.logger_factory.create_logger_for_context('vCenterShell', context)
+
+        with self.cloudshell_context_factory.create(context) as cloudshell_context, \
+                self.vcenter_context_factory.create_context(cloudshell_context.get_objects(), context) as vcenter_context:
+            si = vcenter_context.get_objects()
+            # noinspection PyTypeChecker
+            result = self.deploy_command.execute_deploy_from_template(si, logger, data_holder, context.resource)
 
         return set_command_result(result=result, unpicklable=False)
 
