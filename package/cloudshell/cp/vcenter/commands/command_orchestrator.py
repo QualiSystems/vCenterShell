@@ -28,6 +28,7 @@ from cloudshell.cp.vcenter.network.vlan.range_parser import VLanIdRangeParser
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineConnector
+from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from pyVim.connect import SmartConnect, Disconnect
@@ -108,9 +109,13 @@ class CommandOrchestrator(object):
         self.vm_power_management_command = \
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
+
+        ip_manager = VMIPManager()
+
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
-                                                   resource_model_parser=ResourceModelParser())
+                                                   resource_model_parser=ResourceModelParser(),
+                                                   ip_manager=ip_manager)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
