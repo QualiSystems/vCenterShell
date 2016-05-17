@@ -9,8 +9,8 @@ from cloudshell.cp.vcenter.common.utilites.command_result import get_result_from
 
 class TestCommandResult(TestCase):
     def test_get_result_from_command_output_with_result(self):
-        result = get_result_from_command_output('{"result":"MY RESULT"}')
-        self.assertEqual(result["result"], 'MY RESULT')
+        result = get_result_from_command_output('{"result":"MY RESULT1"}')
+        self.assertEqual(result["result"], 'MY RESULT1')
 
     def test_command_result_empty(self):
         result = get_result_from_command_output('')

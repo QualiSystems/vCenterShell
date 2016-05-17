@@ -432,21 +432,25 @@ class pyVmomiService:
 
         '# set relo_spec'
         placement = self.vim.vm.RelocateSpec()
-        placement.datastore = datastore
         if resource_pool:
             placement.pool = resource_pool
         if host:
             placement.host = host
 
         clone_spec = self.vim.vm.CloneSpec()
-        clone_spec.location = placement
-        # clone_params.power_on
-        # due to hotfix 1 for release 1.0,
-        # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
-        clone_spec.powerOn = False
 
         if snapshot:
             clone_spec.snapshot = snapshot
+            clone_spec.template = False
+            placement.diskMoveType = 'createNewChildDiskBacking'
+        else:
+            placement.datastore = datastore
+
+        # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
+        clone_spec.location = placement
+        # clone_params.power_on
+        # due to hotfix 1 for release 1.0,
+        clone_spec.powerOn = False
 
         logger.info("cloning VM...")
         try:

@@ -5,7 +5,6 @@ from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestra
 from mock import Mock, create_autospec
 
 
-
 class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.resource = create_autospec(ResourceInfo)
@@ -49,31 +48,34 @@ class TestCommandOrchestrator(TestCase):
 
     def test_disconnect(self):
         # act
-        self.command_orchestrator.disconnect(self.context,  self.ports, 'network')
+        self.command_orchestrator.disconnect(self.context, self.ports, 'network')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_destroy_vm(self):
         # act
-        self.command_orchestrator.destroy_vm(self.context,  self.ports)
+        self.command_orchestrator.destroy_vm(self.context, self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_template(self):
         # act
-        self.command_orchestrator.deploy_from_template(self.context, '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
+        self.command_orchestrator.deploy_from_template(self.context,
+                                                       '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_vm_from_vm(self):
         # act
-        self.command_orchestrator.deploy_clone_from_vm(self.context, '{"name": "name", "template_resource_model": {"vcenter_vm": ""}}')
+        self.command_orchestrator.deploy_clone_from_vm(self.context,
+                                                       '{"name": "name", "template_resource_model": {"vcenter_vm": ""}}')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_snapshot(self):
         # act
-        self.command_orchestrator.deploy_from_linked_clone(self.context, '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vcenter_vm_snapshot": "snap"}}')
+        self.command_orchestrator.deploy_from_linked_clone(self.context,
+                                                           '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vcenter_vm_snapshot": "snap"}}')
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
@@ -91,7 +93,7 @@ class TestCommandOrchestrator(TestCase):
 
     def test_power_on(self):
         # act
-        self.command_orchestrator.power_on(self.context,  self.ports)
+        self.command_orchestrator.power_on(self.context, self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
