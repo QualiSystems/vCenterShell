@@ -71,5 +71,5 @@ class VCenterShellDriver (ResourceDriverInterface):
         validator = VCenterAutoModelDiscovery()
         return validator.validate_and_discover(context)
 
-
-
+    def get_vm_uuid(self, context, vm_name):
+        return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
