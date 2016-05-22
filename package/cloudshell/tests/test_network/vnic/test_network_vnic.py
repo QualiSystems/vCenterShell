@@ -16,7 +16,7 @@ class TestNetwork(TestCase):
         vm = Mock()
         vm.ReconfigVM_Task = lambda x: isinstance(x,  vim.vm.ConfigSpec)
 
-        api_wrapper = pyVmomiService(Mock, Mock())
+        api_wrapper = pyVmomiService(Mock, Mock(), Mock())
         res = api_wrapper.vm_reconfig_task(vm, [])
         self.assertTrue(res)
 

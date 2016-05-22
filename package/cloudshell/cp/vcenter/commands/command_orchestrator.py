@@ -44,8 +44,8 @@ class CommandOrchestrator(object):
         :param context: models.QualiDriverModels.InitCommandContext
         """
         self.cs_helper = CloudshellDriverHelper()
-        pv_service = pyVmomiService(SmartConnect, Disconnect)
         synchronous_task_waiter = SynchronousTaskWaiter()
+        pv_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=synchronous_task_waiter)
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
 
