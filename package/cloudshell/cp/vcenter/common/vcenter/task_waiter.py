@@ -16,7 +16,7 @@ class SynchronousTaskWaiter(object):
         :param logger:
         """
 
-        while task.info.state == vim.TaskInfo.State.running or task.info.state == vim.TaskInfo.State.queued:
+        while task.info.state in [vim.TaskInfo.State.running, vim.TaskInfo.State.queued]:
             time.sleep(2)
 
         if task.info.state == vim.TaskInfo.State.success:
