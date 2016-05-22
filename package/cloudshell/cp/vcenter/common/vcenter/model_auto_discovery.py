@@ -11,6 +11,8 @@ from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDri
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+
 DOMAIN = 'Global'
 ADDRESS = 'address'
 USER = 'User'
@@ -31,7 +33,7 @@ SHUTDOWN_METHODS = ['soft', 'hard']
 class VCenterAutoModelDiscovery(object):
     def __init__(self):
         self.parser = ResourceModelParser()
-        self.pv_service = pyVmomiService(SmartConnect, Disconnect)
+        self.pv_service = pyVmomiService(SmartConnect, Disconnect, SynchronousTaskWaiter())
         self.cs_helper = CloudshellDriverHelper()
         self.context_based_logger_factory = ContextBasedLoggerFactory()
 
