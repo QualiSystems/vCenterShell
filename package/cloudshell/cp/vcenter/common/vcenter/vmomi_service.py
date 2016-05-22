@@ -4,7 +4,7 @@ from pyVmomi import vim
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
-
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
 class pyVmomiService:
     # region consts
@@ -18,9 +18,14 @@ class pyVmomiService:
 
     # endregion
 
-    def __init__(self, connect, disconnect, vim_import=None):
+    def __init__(self, connect, disconnect, task_waiter, vim_import=None):
+        """
+        :param SynchronousTaskWaiter task_waiter:
+        :return:
+        """
         self.pyvmomi_connect = connect
         self.pyvmomi_disconnect = disconnect
+        self.task_waiter = task_waiter
         if vim_import is None:
             from pyVmomi import vim
             self.vim = vim
@@ -316,26 +321,6 @@ class pyVmomiService:
         container = si.content.viewManager.CreateContainerView(container=root, recursive=True)
         return [item for item in container.view if not type_filter or isinstance(item, type_filter)]
 
-    def wait_for_task(self, task, logger):
-        """ wait for a vCenter task to finish
-        :param task:
-        :param logger:
-        """
-        task_done = False
-        while not task_done:
-            if task.info.state == 'success':
-                logger.info("Task succeeded: " + task.info.state)
-                return task.info.result
-
-            if task.info.state == 'error':
-                multi_msg = ''
-                if task.info.error.faultMessage:
-                    multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
-                multi_msg = multi_msg if multi_msg else task.info.error.msg
-                logger.info(multi_msg)
-                raise Exception(multi_msg)
-            time.sleep(1)
-
     class CloneVmParameters:
         """
         This is clone_vm method params object
@@ -455,7 +440,7 @@ class pyVmomiService:
         logger.info("cloning VM...")
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.wait_for_task(task, logger)
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
 
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
@@ -546,12 +531,12 @@ class pyVmomiService:
             logger.info(("The current powerState is: {0}. Attempting to power off {1}"
                          .format(vm.runtime.powerState, vm.name)))
             task = vm.PowerOffVM_Task()
-            self.wait_for_task(task, logger)
+            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Power Off Before Destroy")
 
         logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
-        return self.wait_for_task(task, logger)
+        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy VM")
 
     def destroy_vm_by_name(self, si, vm_name, vm_path, logger):
         """ 
