@@ -16,7 +16,7 @@ class SynchronousTaskWaiter(object):
         :param logger:
         """
 
-        while task.info.state == vim.TaskInfo.State.running:
+        while task.info.state in [vim.TaskInfo.State.running, vim.TaskInfo.State.queued]:
             time.sleep(2)
 
         if task.info.state == vim.TaskInfo.State.success:
@@ -26,7 +26,7 @@ class SynchronousTaskWaiter(object):
             else:
                 out = '%s completed successfully.' % action_name
                 logger.info(out)
-        else:
+        else:  # error state
             multi_msg = ''
             if task.info.error.faultMessage:
                 multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
