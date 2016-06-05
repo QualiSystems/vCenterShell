@@ -110,6 +110,39 @@ class TestCommandOrchestrator(TestCase):
                                                               request=request)
         self._assert_as_expected(res, expected)
 
+    def test_connect_bulk7(self):
+        """
+        Simple connect vm to vlan 'Access' mode
+        """
+        request, expected = self._get_test7_params()
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
+        self._assert_as_expected(results, expected)
+
+    def test_connect_bulk8(self):
+        """
+        Simple connect vm to vlan 'Access' mode
+        """
+        request, expected = self._get_test8_params()
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
+        self._assert_as_expected(results, expected)
+
+    def test_connect_bulk9(self):
+        """
+        Simple disconnect
+        """
+        request, expected = self._get_test9_params()
+        results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
+                                                                  logger=Mock(),
+                                                                  vcenter_data_model=self.vc_data_model,
+                                                                  request=request)
+        self._assert_as_expected(results, expected)
+
     def _assert_as_expected(self, res, exp):
         for r in res:
             for e in exp:
@@ -126,16 +159,25 @@ class TestCommandOrchestrator(TestCase):
             vm_uuid = self.ConnectionCommandOrchestrator._get_vm_uuid(action)
             vnic_name = self.ConnectionCommandOrchestrator._validate_vnic_name(
                 self.ConnectionCommandOrchestrator._get_vnic_name(action))
-            vlan_id = action.connectionParams.vlanId
-            mode = action.connectionParams.mode
-            interface = self._get_interface_name(action)
-            r = ConnectionResult(mac_address=interface,
-                                 vnic_name=vnic_name,
-                                 requested_vnic=vnic_name,
-                                 vm_uuid=vm_uuid,
-                                 network_name=self.portgroup_name.generate_port_group_name('dvSwitch', vlan_id, mode),
-                                 network_key='aa')
-            res.append(r)
+            if vnic_name:
+                vnic_name = vnic_name.strip().split(',')
+            else:
+                vnic_name = [None]
+
+            for vnic in vnic_name:
+                vlan_id = action.connectionParams.vlanId
+                mode = action.connectionParams.mode
+
+                interface = self._get_interface_name(action)
+                name = 'Network adapter {0}'.format(vnic) if vnic and vnic.isdigit() else vnic
+                r = ConnectionResult(mac_address=interface,
+                                     vnic_name=name,
+                                     requested_vnic=name,
+                                     vm_uuid=vm_uuid,
+                                     network_name=self.portgroup_name.generate_port_group_name('dvSwitch', vlan_id,
+                                                                                               mode),
+                                     network_key='aa')
+                res.append(r)
         self.connector.connect_to_networks = Mock(return_value=res)
 
     def _set_disconnect_from_networks(self, request):
@@ -148,6 +190,22 @@ class TestCommandOrchestrator(TestCase):
             r = VNicDeviceMapper(vnic=Mock(), requested_vnic=vnic_name, network=Mock(), connect=False, mac=interface)
             res.append(r)
         self.disconnector.disconnect_from_networks = Mock(return_value=res)
+
+    def _get_interface_name_for_result(self, action):
+        interface_attributes = [attr.attributeValue
+                                for attr in action.connectorAttributes
+                                if attr.attributeName == 'Interface']
+        vnics = [attr.attributeValue
+                 for attr in action.connectorAttributes
+                 if attr.attributeName == 'Requested Source vNIC Name']
+        if vnics:
+            vnics = vnics[0].strip().split(',')
+
+        interface = 'aa'
+        for vnic in vnics[1:]:
+            interface = '{0},{1}'.format(interface, 'aa' if not interface_attributes else interface_attributes[0])
+
+        return interface
 
     def _get_interface_name(self, action):
         interface_attributes = [attr.attributeValue
@@ -166,7 +224,7 @@ class TestCommandOrchestrator(TestCase):
             r.errorMessage = error_msg
             r.infoMessage = 'VLAN successfully set' if not error_msg else None
             r.success = True if not error_msg else False
-            r.updatedInterface = None if ignore_interface else self._get_interface_name(action)
+            r.updatedInterface = None if ignore_interface else self._get_interface_name_for_result(action)
             res.append(r)
         return res
 
@@ -614,3 +672,116 @@ class TestCommandOrchestrator(TestCase):
             e.updatedInterface = None
         return jsonpickle.encode(request), expected
 
+    def _get_test7_params(self):
+        request = {"driverRequest": {"actions": [{"connectionId": "6bd00213-6cfa-435a-abf5-6c839dae0f44",
+                                                  "connectionParams": {"vlanId": "2", "mode": "Access",
+                                                                       "vlanServiceAttributes": [
+                                                                           {"attributeName": "QnQ",
+                                                                            "attributeValue": "False",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "CTag",
+                                                                            "attributeValue": "",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "Allocation Ranges",
+                                                                            "attributeValue": "2-4094",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "Isolation Level",
+                                                                            "attributeValue": "Exclusive",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "Access Mode",
+                                                                            "attributeValue": "Access",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "VLAN ID",
+                                                                            "attributeValue": "",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "Pool Name",
+                                                                            "attributeValue": "",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "Virtual Network",
+                                                                            "attributeValue": "2",
+                                                                            "type": "vlanServiceAttribute"}],
+                                                                       "type": "setVlanParameter"},
+                                                  "connectorAttributes": [
+                                                      {"attributeName": "Requested Source vNIC Name",
+                                                       "attributeValue": "1,2", "type": "connectorAttribute"}],
+                                                  "actionId": "6bd00213-6cfa-435a-abf5-6c839dae0f44_c6b69177-d251-4dba-ba88-d7c5bb259505",
+                                                  "actionTarget": {"fullName": "temp_b648f80f", "fullAddress": "NA",
+                                                                   "type": "actionTarget"}, "customActionAttributes": [
+                {"attributeName": "auto_power_off", "attributeValue": "auto_power_off", "type": "customAttribute"},
+                {"attributeName": "ip_regex", "attributeValue": "ip_regex", "type": "customAttribute"},
+                {"attributeName": "wait_for_ip", "attributeValue": "wait_for_ip", "type": "customAttribute"},
+                {"attributeName": "autoload", "attributeValue": "autoload", "type": "customAttribute"},
+                {"attributeName": "auto_delete", "attributeValue": "auto_delete", "type": "customAttribute"},
+                {"attributeName": "auto_power_on", "attributeValue": "auto_power_on", "type": "customAttribute"},
+                {"attributeName": "refresh_ip_timeout", "attributeValue": "refresh_ip_timeout",
+                 "type": "customAttribute"},
+                {"attributeName": "VM_UUID", "attributeValue": "422203f6-eadd-9f88-5dc8-00c17f49fa21",
+                 "type": "customAttribute"},
+                {"attributeName": "Vnic Name", "attributeValue": "1,2", "type": "customAttribute"}],
+                                                  "type": "setVlan"}]}}
+        self._set_connect_to_networks_by_request(request)
+        expected = self._get_connect_excepted_results(request)
+        return jsonpickle.encode(request), expected
+
+    def _get_test8_params(self):
+        request = {"driverRequest": {"actions": [{"connectionId": "6bd00213-6cfa-435a-abf5-6c839dae0f44",
+                                                  "connectionParams": {"vlanId": "2", "mode": "Access",
+                                                                       "vlanServiceAttributes": [
+                                                                           {"attributeName": "QnQ",
+                                                                            "attributeValue": "False",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {"attributeName": "CTag",
+                                                                            "attributeValue": "",
+                                                                            "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "Allocation Ranges",
+                                                                               "attributeValue": "2-4094",
+                                                                               "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "Isolation Level",
+                                                                               "attributeValue": "Exclusive",
+                                                                               "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "Access Mode",
+                                                                               "attributeValue": "Access",
+                                                                               "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "VLAN ID",
+                                                                               "attributeValue": "",
+                                                                               "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "Pool Name",
+                                                                               "attributeValue": "",
+                                                                               "type": "vlanServiceAttribute"},
+                                                                           {
+                                                                               "attributeName": "Virtual Network",
+                                                                               "attributeValue": "2",
+                                                                               "type": "vlanServiceAttribute"}],
+                                                                       "type": "setVlanParameter"},
+                                                  "connectorAttributes": [
+                                                      {"attributeName": "Requested Source vNIC Name",
+                                                       "attributeValue": "1,2", "type": "connectorAttribute"}],
+                                                  "actionId": "6bd00213-6cfa-435a-abf5-6c839dae0f44_c6b69177-d251-4dba-ba88-d7c5bb259505",
+                                                  "actionTarget": {"fullName": "temp_b648f80f", "fullAddress": "NA",
+                                                                   "type": "actionTarget"}, "customActionAttributes": [
+                {"attributeName": "auto_power_off", "attributeValue": "auto_power_off", "type": "customAttribute"},
+                {"attributeName": "ip_regex", "attributeValue": "ip_regex", "type": "customAttribute"},
+                {"attributeName": "wait_for_ip", "attributeValue": "wait_for_ip", "type": "customAttribute"},
+                {"attributeName": "autoload", "attributeValue": "autoload", "type": "customAttribute"},
+                {"attributeName": "auto_delete", "attributeValue": "auto_delete", "type": "customAttribute"},
+                {"attributeName": "auto_power_on", "attributeValue": "auto_power_on", "type": "customAttribute"},
+                {"attributeName": "refresh_ip_timeout", "attributeValue": "refresh_ip_timeout",
+                 "type": "customAttribute"},
+                {"attributeName": "VM_UUID", "attributeValue": "422203f6-eadd-9f88-5dc8-00c17f49fa21",
+                 "type": "customAttribute"},
+                {"attributeName": "Vnic Name", "attributeValue": "Network Adapter 1,Network Adapter 2",
+                 "type": "customAttribute"}], "type": "setVlan"}]}}
+        self._set_connect_to_networks_by_request(request)
+        expected = self._get_connect_excepted_results(request)
+        return jsonpickle.encode(request), expected
+
+    def _get_test9_params(self):
+        request = {"driverRequest":{"actions":[{"connectionId":"4dd285fa-d271-4023-b7d1-881553a8f59f","connectionParams":{"vlanId":"2","mode":"Access","vlanServiceAttributes":[{"attributeName":"QnQ","attributeValue":"False","type":"vlanServiceAttribute"},{"attributeName":"CTag","attributeValue":"","type":"vlanServiceAttribute"},{"attributeName":"Allocation Ranges","attributeValue":"2-4094","type":"vlanServiceAttribute"},{"attributeName":"Isolation Level","attributeValue":"Exclusive","type":"vlanServiceAttribute"},{"attributeName":"Access Mode","attributeValue":"Access","type":"vlanServiceAttribute"},{"attributeName":"VLAN ID","attributeValue":"","type":"vlanServiceAttribute"},{"attributeName":"Pool Name","attributeValue":"","type":"vlanServiceAttribute"},{"attributeName":"Virtual Network","attributeValue":"2","type":"vlanServiceAttribute"}],"type":"setVlanParameter"},"connectorAttributes":[{"attributeName":"Interface","attributeValue":"00:50:56:a2:37:3b","type":"connectorAttribute"}],"actionId":"4dd285fa-d271-4023-b7d1-881553a8f59f_c6b69177-d251-4dba-ba88-d7c5bb259505","actionTarget":{"fullName":"temp_b648f80f","fullAddress":"NA","type":"actionTarget"},"customActionAttributes":[{"attributeName":"auto_power_off","attributeValue":"auto_power_off","type":"customAttribute"},{"attributeName":"ip_regex","attributeValue":"ip_regex","type":"customAttribute"},{"attributeName":"wait_for_ip","attributeValue":"wait_for_ip","type":"customAttribute"},{"attributeName":"autoload","attributeValue":"autoload","type":"customAttribute"},{"attributeName":"auto_delete","attributeValue":"auto_delete","type":"customAttribute"},{"attributeName":"auto_power_on","attributeValue":"auto_power_on","type":"customAttribute"},{"attributeName":"refresh_ip_timeout","attributeValue":"refresh_ip_timeout","type":"customAttribute"},{"attributeName":"VM_UUID","attributeValue":"422203f6-eadd-9f88-5dc8-00c17f49fa21","type":"customAttribute"}],"type":"removeVlan"}]}}
+        self._set_disconnect_from_networks(request)
+        expected = self._get_disconnect_excepted_results(request)
+        return jsonpickle.encode(request), expected
