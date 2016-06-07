@@ -33,13 +33,11 @@
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="User" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Password" Type="Password">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="The default vCenter dvSwitch that will be used when configuring VM connectivity. Should be under the Default Datacenter." IsReadOnly="false" Name="Default dvSwitch" Type="String">
@@ -94,7 +92,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The vCenter storage that will be used when deploying a VM." IsReadOnly="false" Name="VM Storage" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Can be either s LUN or a storage cluster. It has to br the full path (not including the Datacenter)" IsReadOnly="false" Name="VM Storage" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
