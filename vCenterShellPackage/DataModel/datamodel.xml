@@ -110,7 +110,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created. Should be under the defined VM Cluster." IsReadOnly="false" Name="VM Resource Pool" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter Resource Pool in which the VM will be created. Should be under the defined VM Cluster (optional)." IsReadOnly="false" Name="VM Resource Pool" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
