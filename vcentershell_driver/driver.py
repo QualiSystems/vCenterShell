@@ -26,9 +26,6 @@ class VCenterShellDriver (ResourceDriverInterface):
     def disconnect(self, context, ports, network_name):
         return self.command_orchestrator.disconnect(context, ports, network_name)
 
-    def destroy_vm(self, context, ports):
-        return self.command_orchestrator.destroy_vm(context, ports)
-
     def destroy_vm_only(self, context, ports):
         return self.command_orchestrator.destroy_vm_only(context, ports)
 
