@@ -408,8 +408,6 @@ class pyVmomiService:
 
         snapshot = self._get_snapshot(clone_params, template)
 
-        datastore = self._get_datastore(clone_params)
-
         resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
 
         if not resource_pool and not host:
@@ -428,8 +426,8 @@ class pyVmomiService:
             clone_spec.snapshot = snapshot
             clone_spec.template = False
             placement.diskMoveType = 'createNewChildDiskBacking'
-        else:
-            placement.datastore = datastore
+
+        placement.datastore = self._get_datastore(clone_params)
 
         # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
         clone_spec.location = placement
