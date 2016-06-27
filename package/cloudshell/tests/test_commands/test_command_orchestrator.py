@@ -52,9 +52,9 @@ class TestCommandOrchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
-    def test_destroy_vm(self):
+    def test_destroy_vm_only(self):
         # act
-        self.command_orchestrator.destroy_vm(self.context, self.ports)
+        self.command_orchestrator.destroy_vm_only(self.context, self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
