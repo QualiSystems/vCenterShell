@@ -39,7 +39,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.VmDetails = create_autospec(VmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
         session.GetResourceDetails = Mock(return_value=resource_instance)
@@ -100,7 +100,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.VmDetails = create_autospec(VmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
         session.GetResourceDetails = Mock(return_value=resource_instance)
@@ -154,7 +154,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.VmDetails = create_autospec(VmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
-        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser())
+        refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
         session.GetResourceDetails = Mock(return_value=resource_instance)

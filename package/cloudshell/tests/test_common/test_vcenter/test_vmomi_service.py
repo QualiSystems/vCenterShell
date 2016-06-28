@@ -843,7 +843,7 @@ class TestVmomiService(unittest.TestCase):
         si.content = create_autospec(spec=vim.ServiceInstanceContent())
 
         '#act'
-        self.assertRaises(KeyError, pv_service.find_obj_by_path, si, '', '', '')
+        self.assertRaises(ValueError, pv_service.find_obj_by_path, si, '', '', '')
 
     def test_get_object_by_path_no_folder_found(self):
         """
@@ -863,7 +863,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_folder = Mock(return_value=None)
 
         '#act'
-        self.assertRaises(KeyError, pv_service.find_obj_by_path, si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
+        self.assertRaises(ValueError, pv_service.find_obj_by_path, si, 'nothing/to/be/found', 'fake_vm', pv_service.VM)
 
         '#assert'
         self.assertTrue(pv_service.get_folder.called)

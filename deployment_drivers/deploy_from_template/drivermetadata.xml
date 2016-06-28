@@ -1,4 +1,4 @@
-<Driver Description="Deploy App From Template" MainClass="driver.DeployFromTemplateDriver" Name="VM Deployment From Template" Version="1.0.0">
+<Driver Description="Deploy App From Template" MainClass="driver.DeployFromTemplateDriver" Name="VM Deployment From Template" Version="1.1.0">
     <Layout>
         <Category Name="App Management">
             <Command Description="" DisplayName="Deploy" Name="Deploy" Tags="allow_shared" />

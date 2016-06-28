@@ -109,3 +109,7 @@ class TestCommandOrchestrator(TestCase):
         self.command_orchestrator.refresh_ip(self.context, cancellation_context=cancellation_context, ports=self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_get_uuid(self):
+        self.command_orchestrator.get_vm_uuid_by_name(self.context, 'Name')
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
