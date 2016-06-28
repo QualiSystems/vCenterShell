@@ -193,7 +193,7 @@ class pyVmomiService:
 
         folder = self.get_folder(si, path)
         if folder is None:
-            raise KeyError('vmomi managed object not found at: {0}'.format(path))
+            raise ValueError('vmomi managed object not found at: {0}'.format(path))
 
         look_in = None
         if hasattr(folder, type_name):
@@ -201,7 +201,7 @@ class pyVmomiService:
         if hasattr(folder, self.ChildEntity):
             look_in = folder
         if look_in is None:
-            raise KeyError('vmomi managed object not found at: {0}'.format(path))
+            raise ValueError('vmomi managed object not found at: {0}'.format(path))
 
         search_index = si.content.searchIndex
         '#searches for the specific vm in the folder'
@@ -408,8 +408,6 @@ class pyVmomiService:
 
         snapshot = self._get_snapshot(clone_params, template)
 
-        datastore = self._get_datastore(clone_params)
-
         resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
 
         if not resource_pool and not host:
@@ -428,8 +426,8 @@ class pyVmomiService:
             clone_spec.snapshot = snapshot
             clone_spec.template = False
             placement.diskMoveType = 'createNewChildDiskBacking'
-        else:
-            placement.datastore = datastore
+
+        placement.datastore = self._get_datastore(clone_params)
 
         # after deployment the vm must be powered off and will be powered on if needed by orchestration driver
         clone_spec.location = placement

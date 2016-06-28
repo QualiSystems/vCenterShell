@@ -5,6 +5,7 @@ from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionComman
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
 from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
+from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
@@ -27,6 +28,7 @@ from cloudshell.cp.vcenter.network.vlan.range_parser import VLanIdRangeParser
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineConnector
+from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from pyVim.connect import SmartConnect, Disconnect
@@ -50,6 +52,9 @@ class CommandOrchestrator(object):
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         ovf_service = OvfImageDeployerService(self.resource_model_parser)
+
+
+        self.vm_loader = VMLoader(pv_service)
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
@@ -104,9 +109,13 @@ class CommandOrchestrator(object):
         self.vm_power_management_command = \
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
+
+        ip_manager = VMIPManager()
+
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
-                                                   resource_model_parser=ResourceModelParser())
+                                                   resource_model_parser=ResourceModelParser(),
+                                                   ip_manager=ip_manager)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
@@ -386,4 +395,10 @@ class CommandOrchestrator(object):
                                                                    self.vm_power_management_command.power_on,
                                                                    vm_uuid,
                                                                    resource_fullname)
+        return set_command_result(result=res, unpicklable=False)
+
+    def get_vm_uuid_by_name(self, context, vm_name):
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.vm_loader.load_vm_uuid_by_name,
+                                                                   vm_name)
         return set_command_result(result=res, unpicklable=False)
