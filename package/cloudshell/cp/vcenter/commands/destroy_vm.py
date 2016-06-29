@@ -15,6 +15,7 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover = resource_remover
         self.disconnector = disconnector
 
+    # obsolete
     def destroy(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
         """
         :param si:
@@ -43,23 +44,18 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover.remove_resource(session=session, resource_full_name=vm_name)
         return result
 
-    def destroy_vm_only(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name, reservation_id):
+    def destroy_vm_only(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name):
         """
         :param logger:
         :param CloudShellAPISession session:
         :param str vm_name: This is the resource name
         :return:
         """
-        # disconnect
-        self._disconnect_all_my_connectors(session=session,
-                                           resource_name=vm_name,
-                                           reservation_id=reservation_id,
-                                           logger=logger)
         # find vm
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
         if vm is not None:
             # destroy vm
-            result = self.pv_service.destroy_vm(vm=vm,logger=logger)
+            result = self.pv_service.destroy_vm(vm=vm, logger=logger)
         else:
             resource___format = "Could not find the VM {0},will remove the resource.".format(vm_name)
             logger.info(resource___format)
