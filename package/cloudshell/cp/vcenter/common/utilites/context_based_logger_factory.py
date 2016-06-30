@@ -34,7 +34,7 @@ class ContextBasedLoggerFactory(object):
     @staticmethod
     def _get_reservation_id(context):
         reservation_id = 'no reservation context'
-        reservation = getattr(context, 'remote_reservation', getattr(context, 'reservation'))
+        reservation = getattr(context, 'reservation', getattr(context, 'remote_reservation', None))
         if reservation:
             reservation_id = reservation.reservation_id
         return reservation_id
