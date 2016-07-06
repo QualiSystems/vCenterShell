@@ -18,6 +18,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
 
     def test_connect(self):
         # Arrange
+
+        
         si = Mock()
 
         py_vmomi_service = Mock()
