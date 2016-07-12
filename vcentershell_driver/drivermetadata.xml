@@ -12,6 +12,19 @@
             <Command Description="" DisplayName="Disconnect All" Name="disconnect_all" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
         </Category>
+        <Category Name="Snapshot">
+            <Command Description="" DisplayName="Save Snapshot" Name="remote_save_snapshot" Tags="remote_connectivity,allow_unreserved">
+                <Parameters>
+                    <Parameter DefaultValue="" Description="Snapshot name to save the snapshot to" DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
+                </Parameters>
+            </Command>
+            <Command Description="" DisplayName="Restore Snapshot" Name="remote_restore_snapshot" Tags="remote_connectivity,allow_unreserved">
+                <Parameters>
+                    <Parameter DefaultValue="" Description="Snapshot name to restore from" DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
+                </Parameters>
+            </Command>
+            <Command Description="" DisplayName="Get Snapshots" Name="remote_get_snapshots" Tags="remote_connectivity,allow_unreserved" />
+        </Category>
         <Category Name="Hidden Commands">
             <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />
             <Command Description="" DisplayName="Delete VM Only" Name="destroy_vm_only" Tags="remote_app_management,allow_shared" />

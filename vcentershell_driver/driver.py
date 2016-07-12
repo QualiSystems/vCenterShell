@@ -1,7 +1,3 @@
-from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
-from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
-
 
 class VCenterShellDriver (ResourceDriverInterface):
 
@@ -67,6 +63,15 @@ class VCenterShellDriver (ResourceDriverInterface):
 
         validator = VCenterAutoModelDiscovery()
         return validator.validate_and_discover(context)
+
+    def remote_save_snapshot(self, context, ports, snapshot_name):
+        pass
+
+    def remote_restore_snapshot(self, context, ports, snapshot_name):
+        pass
+
+    def remote_get_snapshots(self, context, ports):
+        pass
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
