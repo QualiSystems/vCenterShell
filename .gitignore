@@ -67,7 +67,7 @@ package/cloudshell/tests/config.ini
 *.tar.gz
 *.orig
 vCenterShell.zip
-vCenterShellPackage/*.*
+vCenterShellPackage/
 debug.txt
 package/cloudshell/tests/utils/config.ini
 
