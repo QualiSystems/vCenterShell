@@ -75,7 +75,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         :type snapshot_name: str
         :return:
         """
-        pass
+        return self.command_orchestrator.save_snapshot(context, snapshot_name)
 
     def remote_restore_snapshot(self, context, ports, snapshot_name):
         """

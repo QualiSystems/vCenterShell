@@ -8,6 +8,7 @@ from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMa
 from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
+from cloudshell.cp.vcenter.commands.save_snapshot import SnapshotSaver
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
@@ -52,7 +53,6 @@ class CommandOrchestrator(object):
         vnic_to_network_mapper = VnicToNetworkMapper(quali_name_generator=port_group_name_generator)
         resource_remover = CloudshellResourceRemover()
         ovf_service = OvfImageDeployerService(self.resource_model_parser)
-
 
         self.vm_loader = VMLoader(pv_service)
 
@@ -116,6 +116,11 @@ class CommandOrchestrator(object):
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=ResourceModelParser(),
                                                    ip_manager=ip_manager)
+
+        # Save Snapshot
+        self.snapshot_saver = SnapshotSaver(pyvmomi_service=pv_service,
+                                            resource_model_parser=ResourceModelParser(),
+                                            task_waiter=synchronous_task_waiter)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
@@ -380,4 +385,19 @@ class CommandOrchestrator(object):
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.vm_loader.load_vm_uuid_by_name,
                                                                    vm_name)
+        return set_command_result(result=res, unpicklable=False)
+
+    def save_snapshot(self, context, snapshot_name):
+        """
+        Saves virtual machine to a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param snapshot_name: snapshot name to save to
+        :type snapshot_name: str
+        :return:
+        """
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.snapshot_saver.save_snapshot,
+                                                                   snapshot_name)
+
         return set_command_result(result=res, unpicklable=False)
