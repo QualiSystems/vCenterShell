@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cloudshell.api.cloudshell_api import VmDetails, ResourceInfo, VmCustomParam
+from cloudshell.api.cloudshell_api import ResourceInfoVmDetails, ResourceInfo, VmCustomParam
 from mock import Mock, create_autospec
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -36,7 +36,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.ResourceAttributes = {'vm_uuis': '123',
                                                 'cloud_provider': 'vCenter'
                                                 }
-        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
@@ -97,7 +97,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.ResourceAttributes = {'vm_uuis': '123',
                                                 'cloud_provider': 'vCenter'
                                                 }
-        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
@@ -151,7 +151,7 @@ class TestRefreshIpCommand(TestCase):
         resource_instance.ResourceAttributes = {'vm_uuis': '123',
                                                 'cloud_provider': 'vCenter'
                                                 }
-        resource_instance.VmDetails = create_autospec(VmDetails)
+        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
         resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
