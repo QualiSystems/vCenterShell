@@ -65,12 +65,40 @@ class VCenterShellDriver (ResourceDriverInterface):
         return validator.validate_and_discover(context)
 
     def remote_save_snapshot(self, context, ports, snapshot_name):
+        """
+        Saves virtual machine to a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :param snapshot_name: snapshot name to save to
+        :type snapshot_name: str
+        :return:
+        """
         pass
 
     def remote_restore_snapshot(self, context, ports, snapshot_name):
+        """
+        Restores virtual machine from a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :param snapshot_name: Snapshot name to restore from
+        :type snapshot_name: str
+        :return:
+        """
         pass
 
     def remote_get_snapshots(self, context, ports):
+        """
+        Returns list of snapshots
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :return: list
+        """
         pass
 
     def get_vm_uuid(self, context, vm_name):
