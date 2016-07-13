@@ -3,8 +3,8 @@ python:
     - "2.7"
 
 install:
-    - pip install -r package/requirements.txt --extra-index-url https://testpypi.python.org/pypi
-    - pip install cloudshell-shell-core --extra-index-url https://testpypi.python.org/pypi
+    - pip install -r package/requirements.txt --extra-index-url https://testpypi.python.org/simple
+    - pip install cloudshell-shell-core --extra-index-url https://testpypi.python.org/simple
     - pip install -r test_requirements.txt
     - pip install coveralls
 
