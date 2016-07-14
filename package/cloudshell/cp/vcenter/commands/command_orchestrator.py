@@ -10,6 +10,7 @@ from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerM
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestorer
 from cloudshell.cp.vcenter.commands.save_snapshot import SnapshotSaver
+from cloudshell.cp.vcenter.commands.snapshots_retriever import SnapshotRetriever
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
@@ -127,6 +128,8 @@ class CommandOrchestrator(object):
         self.snapshot_restorer = SnapshotRestorer(pyvmomi_service=pv_service,
                                                   resource_model_parser=ResourceModelParser(),
                                                   task_waiter=synchronous_task_waiter)
+
+        self.snapshots_retriever = SnapshotRetriever(pyvmomi_service=pv_service)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
@@ -422,3 +425,16 @@ class CommandOrchestrator(object):
                                                                    self.snapshot_restorer.restore_snapshot,
                                                                    resource_details.vm_uuid,
                                                                    snapshot_name)
+
+    def get_snapshots(self, context):
+        """
+        Returns list of snapshots
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :return:
+        """
+        resource_details = self._parse_remote_model(context)
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.snapshots_retriever.get_snapshots,
+                                                                   resource_details.vm_uuid)
+        return set_command_result(result=res, unpicklable=False)

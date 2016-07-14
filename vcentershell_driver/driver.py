@@ -103,7 +103,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         :type ports: list[string]
         :return: list
         """
-        pass
+        return self.command_orchestrator.get_snapshots(context)
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
