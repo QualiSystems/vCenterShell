@@ -33,7 +33,7 @@ class SnapshotRestorer:
 
         try:
             snapshot = SnapshotRestorer._get_snapshot(vm=vm, snapshot_name=snapshot_name)
-            task = snapshot.RevertToSnapshot()
+            task = snapshot.RevertToSnapshot_Task()
             return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
         except vim.fault.NoPermission as error:
