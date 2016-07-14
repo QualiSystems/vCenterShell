@@ -20,28 +20,29 @@ class SnapshotRestorer:
         self.resource_model_parser = resource_model_parser
         self.task_waiter = task_waiter
 
-    def restore_snapshot(self, si, logger, vcenter_data_model, snapshot_name):
+    def restore_snapshot(self, si, logger, vcenter_data_model, vm_uuid, snapshot_name):
         """
         Restores a virtual machine to a snapshot
         :param vim.ServiceInstance si: py_vmomi service instance
         :param logger: Logger
+        :param vm_uuid: uuid of the virtual machine
         :param str snapshot_name: Snapshot name to save the snapshot to
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         """
-        vm = self.pyvmomi_service.find_by_uuid(si, vcenter_data_model.vm_uuid)
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         logger.info("Revert snapshot")
 
         try:
             snapshot = SnapshotRestorer._get_snapshot(vm=vm, snapshot_name=snapshot_name)
             task = snapshot.RevertToSnapshot()
-            return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
+            return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
         except Exception as e:
-            logger.error("error deploying: {0}".format(e))
-            raise Exception('Error has occurred while creating snapshot, please look at the log for more info.')
+            logger.error("error reverting to snapshot: {0}".format(e))
+            raise Exception('Error has occurred while reverting to snapshot, please look at the log for more info.')
 
     @staticmethod
     def _get_snapshot(vm, snapshot_name):

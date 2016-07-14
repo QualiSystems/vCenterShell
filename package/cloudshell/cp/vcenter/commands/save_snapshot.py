@@ -20,16 +20,17 @@ class SnapshotSaver:
         self.resource_model_parser = resource_model_parser
         self.task_waiter = task_waiter
 
-    def save_snapshot(self, si, logger, vcenter_data_model, snapshot_name):
+    def save_snapshot(self, si, logger, vcenter_data_model, vm_uuid, snapshot_name):
         """
         Creates a snapshot of the current state of the virtual machine
 
         :param vim.ServiceInstance si: py_vmomi service instance
         :param logger: Logger
+        :param vm_uuid:
         :param str snapshot_name: Snapshot name to save the snapshot to
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         """
-        vm = self.pyvmomi_service.find_by_uuid(si, vcenter_data_model.vm_uuid)
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         logger.info("Create virtual machine snapshot")
 
         try:

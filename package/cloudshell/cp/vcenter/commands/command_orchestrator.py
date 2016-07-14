@@ -8,6 +8,7 @@ from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMa
 from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
+from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestorer
 from cloudshell.cp.vcenter.commands.save_snapshot import SnapshotSaver
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
@@ -124,8 +125,8 @@ class CommandOrchestrator(object):
 
         # Snapshot Restorer
         self.snapshot_restorer = SnapshotRestorer(pyvmomi_service=pv_service,
-                                            resource_model_parser=ResourceModelParser(),
-                                            task_waiter=synchronous_task_waiter)
+                                                  resource_model_parser=ResourceModelParser(),
+                                                  task_waiter=synchronous_task_waiter)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
@@ -401,11 +402,11 @@ class CommandOrchestrator(object):
         :type snapshot_name: str
         :return:
         """
+        resource_details = self._parse_remote_model(context)
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.snapshot_saver.save_snapshot,
+                                                                   resource_details.vm_uuid,
                                                                    snapshot_name)
-
-        return set_command_result(result=res, unpicklable=False)
 
     def restore_snapshot(self, context, snapshot_name):
         """
@@ -416,9 +417,8 @@ class CommandOrchestrator(object):
         :type snapshot_name: str
         :return:
         """
+        resource_details = self._parse_remote_model(context)
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.snapshot_restorer.restore_snapshot,
+                                                                   resource_details.vm_uuid,
                                                                    snapshot_name)
-
-        return set_command_result(result=res, unpicklable=False)
-
