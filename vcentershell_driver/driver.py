@@ -1,3 +1,7 @@
+from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
+from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
+from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
+
 
 class VCenterShellDriver (ResourceDriverInterface):
 
