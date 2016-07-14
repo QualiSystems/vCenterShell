@@ -4,10 +4,10 @@ from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
 
-class SnapshotSaver:
+class SnapshotRestorer:
     def __init__(self, pyvmomi_service, resource_model_parser, task_waiter):
         """
-        Creates an instance of SnapshotSaver
+        Creates an instance of SnapshotRestorer
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
         :param resource_model_parser: Converts to flat resource model
@@ -20,23 +20,20 @@ class SnapshotSaver:
         self.resource_model_parser = resource_model_parser
         self.task_waiter = task_waiter
 
-    def save_snapshot(self, si, logger, vcenter_data_model, snapshot_name):
+    def restore_snapshot(self, si, logger, vcenter_data_model, snapshot_name):
         """
-        Creates a snapshot of the current state of the virtual machine
-
+        Restores a virtual machine to a snapshot
         :param vim.ServiceInstance si: py_vmomi service instance
         :param logger: Logger
         :param str snapshot_name: Snapshot name to save the snapshot to
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vcenter_data_model.vm_uuid)
-        logger.info("Create virtual machine snapshot")
+        logger.info("Revert snapshot")
 
         try:
-            dump_memory = False
-            quiesce = True
-            task = vm.CreateSnapshot(snapshot_name, 'Created by CloudShell vCenterShell', dump_memory, quiesce)
-
+            snapshot = SnapshotRestorer._get_snapshot(vm=vm, snapshot_name=snapshot_name)
+            task = snapshot.RevertToSnapshot()
             return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
 
         except vim.fault.NoPermission as error:
@@ -46,3 +43,20 @@ class SnapshotSaver:
             logger.error("error deploying: {0}".format(e))
             raise Exception('Error has occurred while creating snapshot, please look at the log for more info.')
 
+    @staticmethod
+    def _get_snapshot(vm, snapshot_name):
+        """
+        Returns snapshot object by its name
+        :param vm:
+        :param snapshot_name:
+        :type snapshot_name: str
+        :return: Snapshot by its name
+        :rtype vim.vm.Snapshot
+        """
+        snapshots = vm.snapshot.rootSnapshotList
+
+        for snapshot in snapshots:
+            if snapshot.name == snapshot_name:
+                return snapshot.snapshot
+
+        raise Exception('Snapshot {0} was not found'.format(snapshot_name))

@@ -122,6 +122,11 @@ class CommandOrchestrator(object):
                                             resource_model_parser=ResourceModelParser(),
                                             task_waiter=synchronous_task_waiter)
 
+        # Snapshot Restorer
+        self.snapshot_restorer = SnapshotRestorer(pyvmomi_service=pv_service,
+                                            resource_model_parser=ResourceModelParser(),
+                                            task_waiter=synchronous_task_waiter)
+
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
             context,
@@ -401,3 +406,19 @@ class CommandOrchestrator(object):
                                                                    snapshot_name)
 
         return set_command_result(result=res, unpicklable=False)
+
+    def restore_snapshot(self, context, snapshot_name):
+        """
+        Restores virtual machine from a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param snapshot_name: snapshot name to save to
+        :type snapshot_name: str
+        :return:
+        """
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.snapshot_restorer.restore_snapshot,
+                                                                   snapshot_name)
+
+        return set_command_result(result=res, unpicklable=False)
+
