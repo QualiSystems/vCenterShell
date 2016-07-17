@@ -9,7 +9,7 @@ from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestorer
-from cloudshell.cp.vcenter.commands.save_snapshot import SnapshotSaver
+from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
 from cloudshell.cp.vcenter.commands.snapshots_retriever import SnapshotRetriever
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
@@ -120,9 +120,9 @@ class CommandOrchestrator(object):
                                                    ip_manager=ip_manager)
 
         # Save Snapshot
-        self.snapshot_saver = SnapshotSaver(pyvmomi_service=pv_service,
-                                            resource_model_parser=ResourceModelParser(),
-                                            task_waiter=synchronous_task_waiter)
+        self.snapshot_saver = SaveSnapshotCommand(pyvmomi_service=pv_service,
+                                                  resource_model_parser=ResourceModelParser(),
+                                                  task_waiter=synchronous_task_waiter)
 
         # Snapshot Restorer
         self.snapshot_restorer = SnapshotRestorer(pyvmomi_service=pv_service,
