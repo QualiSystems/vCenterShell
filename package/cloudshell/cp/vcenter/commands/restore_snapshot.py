@@ -1,4 +1,6 @@
 from pyVmomi import vim
+
+from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
@@ -53,10 +55,10 @@ class SnapshotRestorer:
         :return: Snapshot by its name
         :rtype vim.vm.Snapshot
         """
-        snapshots = vm.snapshot.rootSnapshotList
+        snapshots = SnapshotRetriever.get_vm_snapshots(vm)
 
-        for snapshot in snapshots:
-            if snapshot.name == snapshot_name:
-                return snapshot.snapshot
+        if snapshot_name not in snapshots:
+            raise Exception('Snapshot {0} was not found'.format(snapshot_name))
 
-        raise Exception('Snapshot {0} was not found'.format(snapshot_name))
+        return snapshots[snapshot_name]
+
