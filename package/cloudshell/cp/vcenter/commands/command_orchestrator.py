@@ -121,7 +121,6 @@ class CommandOrchestrator(object):
 
         # Save Snapshot
         self.snapshot_saver = SaveSnapshotCommand(pyvmomi_service=pv_service,
-                                                  resource_model_parser=ResourceModelParser(),
                                                   task_waiter=synchronous_task_waiter)
 
         # Snapshot Restorer
