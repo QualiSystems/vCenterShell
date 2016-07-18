@@ -6,6 +6,10 @@ from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 
 
 class TestSnapshotRetriever(unittest.TestCase):
+    def test_ctor(self):
+        snapshot_retriever = SnapshotRetriever()
+        self.assertIsNotNone(snapshot_retriever)
+
     def test_empty_dict_when_vm_has_no_snapshots(self):
         # Arrange
         vm = Mock()
