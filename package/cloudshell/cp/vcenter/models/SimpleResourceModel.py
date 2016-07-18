@@ -1,2 +1,0 @@
-class SimpleResourceModel(object):
-    pass

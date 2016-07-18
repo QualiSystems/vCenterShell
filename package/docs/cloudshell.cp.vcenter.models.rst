@@ -73,14 +73,6 @@ cloudshell.cp.vcenter.models.GenericDeployedAppResourceModel module
     :undoc-members:
     :show-inheritance:
 
-cloudshell.cp.vcenter.models.GenericInstallationOptionResourceModel module
---------------------------------------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.GenericInstallationOptionResourceModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 cloudshell.cp.vcenter.models.ImageDeployedAppModel module
 ---------------------------------------------------------
 
@@ -89,34 +81,10 @@ cloudshell.cp.vcenter.models.ImageDeployedAppModel module
     :undoc-members:
     :show-inheritance:
 
-cloudshell.cp.vcenter.models.LinkModel module
----------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.LinkModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 cloudshell.cp.vcenter.models.QualiDriverModels module
 -----------------------------------------------------
 
 .. automodule:: cloudshell.cp.vcenter.models.QualiDriverModels
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cloudshell.cp.vcenter.models.SimpleResourceModel module
--------------------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.SimpleResourceModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cloudshell.cp.vcenter.models.TempCommandConnectorModelResourceModel module
---------------------------------------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.TempCommandConnectorModelResourceModel
     :members:
     :undoc-members:
     :show-inheritance:
