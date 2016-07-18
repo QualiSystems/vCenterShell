@@ -4,7 +4,7 @@ from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
 
-class SnapshotRetrieverCommand:
+class RetrieveSnapshotsCommand:
     def __init__(self, pyvmomi_service):
         """
         Creates an instance of SnapshotRestorer

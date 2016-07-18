@@ -13,7 +13,7 @@ from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerM
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
 from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
-from cloudshell.cp.vcenter.commands.snapshots_retriever import SnapshotRetrieverCommand
+from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
@@ -129,7 +129,7 @@ class CommandOrchestrator(object):
         self.snapshot_restorer = SnapshotRestoreCommand(pyvmomi_service=pv_service,
                                                         task_waiter=synchronous_task_waiter)
 
-        self.snapshots_retriever = SnapshotRetrieverCommand(pyvmomi_service=pv_service)
+        self.snapshots_retriever = RetrieveSnapshotsCommand(pyvmomi_service=pv_service)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
