@@ -89,14 +89,6 @@ cloudshell.cp.vcenter.models.ImageDeployedAppModel module
     :undoc-members:
     :show-inheritance:
 
-cloudshell.cp.vcenter.models.LinkModel module
----------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.LinkModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 cloudshell.cp.vcenter.models.QualiDriverModels module
 -----------------------------------------------------
 
