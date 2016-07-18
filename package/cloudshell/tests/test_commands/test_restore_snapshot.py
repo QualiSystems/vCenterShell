@@ -47,28 +47,34 @@ class TestSnapshotRestoreCommand(TestCase):
 
     def test_exception_raised_when_restore_snapshot_fails_with_no_permission_exception(self):
         vm = Mock()
-        vm.CreateSnapshot = Mock(side_effect=vim.fault.NoPermission())
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        snapshot_restore_command = SnapshotRestoreCommand(pyvmomi_service, Mock())
-        si = Mock()
-        logger = Mock()
+        with patch('cloudshell.cp.vcenter.commands.restore_snapshot.SnapshotRetriever.get_vm_snapshots') as get_vm_snapshots:
+            snapshot = Mock()
+            snapshot.RevertToSnapshot_Task = Mock(side_effect=vim.fault.NoPermission())
+            get_vm_snapshots.return_value = {'new_snapshot': snapshot}
+            snapshot_restore_command = SnapshotRestoreCommand(pyvmomi_service, Mock())
+            si = Mock()
+            logger = Mock()
 
-        # Act + Assert
-        self.assertRaises(Exception, snapshot_restore_command.restore_snapshot, si, logger, 'machine1', 'new_snapshot')
-        logger.error.assert_called()
+            # Act + Assert
+            self.assertRaises(Exception, snapshot_restore_command.restore_snapshot, si, logger, 'machine1', 'new_snapshot')
+            logger.error.assert_called()
 
     def test_exception_raised_when_restore_snapshot_fails_with_general_exception(self):
         vm = Mock()
-        vm.CreateSnapshot = Mock(side_effect=Exception())
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
-        snapshot_restore_command = SnapshotRestoreCommand(pyvmomi_service, Mock())
-        si = Mock()
-        logger = Mock()
+        with patch('cloudshell.cp.vcenter.commands.restore_snapshot.SnapshotRetriever.get_vm_snapshots') as get_vm_snapshots:
+            snapshot = Mock()
+            snapshot.RevertToSnapshot_Task = Mock(side_effect=Exception())
+            get_vm_snapshots.return_value = {'new_snapshot': snapshot}
+            snapshot_restore_command = SnapshotRestoreCommand(pyvmomi_service, Mock())
+            si = Mock()
+            logger = Mock()
 
-        # Act + Assert
-        self.assertRaises(Exception, snapshot_restore_command.restore_snapshot, si, logger, 'machine1', 'new_snapshot')
-        logger.error.assert_called()
+            # Act + Assert
+            self.assertRaises(Exception, snapshot_restore_command.restore_snapshot, si, logger, 'machine1', 'new_snapshot')
+            logger.error.assert_called()

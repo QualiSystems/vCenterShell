@@ -26,10 +26,11 @@ class SnapshotRestoreCommand:
         :param vm_uuid: uuid of the virtual machine
         :param str snapshot_name: Snapshot name to save the snapshot to
         """
-        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-        logger.info("Revert snapshot")
-
         try:
+
+            vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+            logger.info("Revert snapshot")
+
             snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
             task = snapshot.RevertToSnapshot_Task()
             return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
