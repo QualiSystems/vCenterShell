@@ -105,14 +105,6 @@ cloudshell.cp.vcenter.models.QualiDriverModels module
     :undoc-members:
     :show-inheritance:
 
-cloudshell.cp.vcenter.models.SimpleResourceModel module
--------------------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.SimpleResourceModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 cloudshell.cp.vcenter.models.TempCommandConnectorModelResourceModel module
 --------------------------------------------------------------------------
 
