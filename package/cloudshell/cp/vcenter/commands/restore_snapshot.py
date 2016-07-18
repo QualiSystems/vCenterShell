@@ -2,24 +2,20 @@ from pyVmomi import vim
 
 from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
 
-class SnapshotRestorer:
-    def __init__(self, pyvmomi_service, resource_model_parser, task_waiter):
+class SnapshotRestoreCommand:
+    def __init__(self, pyvmomi_service, task_waiter):
         """
         Creates an instance of SnapshotRestorer
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
-        :param resource_model_parser: Converts to flat resource model
-        :type resource_model_parser: ResourceModelParser
         :param task_waiter: Waits for the task to be completed
         :type task_waiter:  SynchronousTaskWaiter
         :return:
         """
         self.pyvmomi_service = pyvmomi_service
-        self.resource_model_parser = resource_model_parser
         self.task_waiter = task_waiter
 
     def restore_snapshot(self, si, logger, vm_uuid, snapshot_name):
@@ -34,7 +30,7 @@ class SnapshotRestorer:
         logger.info("Revert snapshot")
 
         try:
-            snapshot = SnapshotRestorer._get_snapshot(vm=vm, snapshot_name=snapshot_name)
+            snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
             task = snapshot.RevertToSnapshot_Task()
             return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
