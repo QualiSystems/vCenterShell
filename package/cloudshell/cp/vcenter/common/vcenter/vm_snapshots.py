@@ -4,6 +4,8 @@ class SnapshotRetriever:
 
     @staticmethod
     def get_vm_snapshots(vm):
+        if not vm.snapshot:
+            return {}
         return SnapshotRetriever._get_snapshots_recursively(vm.snapshot.rootSnapshotList, '')
 
     @staticmethod

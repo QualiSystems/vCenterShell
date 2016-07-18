@@ -9,8 +9,7 @@ class TestSnapshotRetriever(unittest.TestCase):
     def test_empty_dict_when_vm_has_no_snapshots(self):
         # Arrange
         vm = Mock()
-        vm.snapshot = Mock()
-        vm.snapshot.rootSnapshotList = []
+        vm.snapshot = None
 
         # Act
         all_snapshots = SnapshotRetriever.get_vm_snapshots(vm)
