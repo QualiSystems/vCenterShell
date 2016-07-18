@@ -406,10 +406,10 @@ class CommandOrchestrator(object):
         :return:
         """
         resource_details = self._parse_remote_model(context)
-        res = self.command_wrapper.execute_command_with_connection(context,
-                                                                   self.snapshot_saver.save_snapshot,
-                                                                   resource_details.vm_uuid,
-                                                                   snapshot_name)
+        self.command_wrapper.execute_command_with_connection(context,
+                                                             self.snapshot_saver.save_snapshot,
+                                                             resource_details.vm_uuid,
+                                                             snapshot_name)
 
     def restore_snapshot(self, context, snapshot_name):
         """
@@ -421,10 +421,10 @@ class CommandOrchestrator(object):
         :return:
         """
         resource_details = self._parse_remote_model(context)
-        res = self.command_wrapper.execute_command_with_connection(context,
-                                                                   self.snapshot_restorer.restore_snapshot,
-                                                                   resource_details.vm_uuid,
-                                                                   snapshot_name)
+        self.command_wrapper.execute_command_with_connection(context,
+                                                             self.snapshot_restorer.restore_snapshot,
+                                                             resource_details.vm_uuid,
+                                                             snapshot_name)
 
     def get_snapshots(self, context):
         """
