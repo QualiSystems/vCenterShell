@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from mock import Mock, patch
+from pyVmomi import vim
 
 from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
 
@@ -23,3 +24,31 @@ class TestRetrieveSnapshotCommand(TestCase):
 
         # Assert
         self.assertSequenceEqual(snapshots, ['snap1'])
+
+    def test_exception_raised_when_get_snapshots_fails_with_no_permission_exception(self):
+        vm = Mock()
+        vm.CreateSnapshot = Mock(side_effect=vim.fault.NoPermission())
+        pyvmomi_service = Mock()
+        pyvmomi_service.find_by_uuid = Mock(return_value=vm)
+
+        retrieve_snapshot_command = RetrieveSnapshotsCommand(pyvmomi_service)
+        si = Mock()
+        logger = Mock()
+
+        # Act + Assert
+        self.assertRaises(Exception, retrieve_snapshot_command.get_snapshots, si, logger, 'machine1')
+        logger.error.assert_called()
+
+    def test_exception_raised_when_save_snapshot_fails_with_general_exception(self):
+        vm = Mock()
+        vm.CreateSnapshot = Mock(side_effect=Exception())
+        pyvmomi_service = Mock()
+        pyvmomi_service.find_by_uuid = Mock(return_value=vm)
+
+        retrieve_snapshot_command = RetrieveSnapshotsCommand(pyvmomi_service)
+        si = Mock()
+        logger = Mock()
+
+        # Act + Assert
+        self.assertRaises(Exception, retrieve_snapshot_command.get_snapshots, si, logger, 'machine1')
+        logger.error.assert_called()
