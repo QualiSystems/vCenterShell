@@ -1,8 +1,6 @@
-from pyVmomi import vim
-
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
 
 class SnapshotRestoreCommand:
@@ -26,21 +24,12 @@ class SnapshotRestoreCommand:
         :param vm_uuid: uuid of the virtual machine
         :param str snapshot_name: Snapshot name to save the snapshot to
         """
-        try:
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        logger.info("Revert snapshot")
 
-            vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-            logger.info("Revert snapshot")
-
-            snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
-            task = snapshot.RevertToSnapshot_Task()
-            return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
-
-        except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
-            raise Exception('Permissions is not set correctly, please check the log for more info.')
-        except Exception as e:
-            logger.error("error reverting to snapshot: {0}".format(e))
-            raise Exception('Error has occurred while reverting to snapshot, please look at the log for more info.')
+        snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
+        task = snapshot.RevertToSnapshot_Task()
+        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
     @staticmethod
     def _get_snapshot(vm, snapshot_name):

@@ -1,5 +1,3 @@
-from pyVmomi import vim
-
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
@@ -30,20 +28,11 @@ class SaveSnapshotCommand:
         :param snapshot_name: Snapshot name to save the snapshot to
         :type snapshot_name: str
         """
-        try:
-            vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-            logger.info("Create virtual machine snapshot")
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        logger.info("Create virtual machine snapshot")
 
-            dump_memory = False
-            quiesce = True
-            task = vm.CreateSnapshot(snapshot_name, 'Created by CloudShell vCenterShell', dump_memory, quiesce)
+        dump_memory = False
+        quiesce = True
+        task = vm.CreateSnapshot(snapshot_name, 'Created by CloudShell vCenterShell', dump_memory, quiesce)
 
-            return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
-
-        except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
-            raise Exception('Permissions is not set correctly, please check the log for more info.')
-        except Exception as e:
-            logger.error("error deploying: {0}".format(e))
-            raise Exception('Error has occurred while creating snapshot, please look at the log for more info.')
-
+        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')

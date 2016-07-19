@@ -1,5 +1,3 @@
-from pyVmomi import vim
-
 from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
@@ -21,15 +19,6 @@ class RetrieveSnapshotsCommand:
         :param logger: Logger
         :param vm_uuid: uuid of the virtual machine
         """
-        try:
-            vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-            logger.info("Get snapshots")
-
-            return SnapshotRetriever.get_vm_snapshots(vm).keys()
-
-        except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
-            raise Exception('Permissions is not set correctly, please check the log for more info.')
-        except Exception as e:
-            logger.error("error reverting to snapshot: {0}".format(e))
-            raise Exception('Error has occurred while reverting to snapshot, please look at the log for more info.')
+        vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+        logger.info("Get snapshots")
+        return SnapshotRetriever.get_vm_snapshots(vm).keys()
