@@ -1,4 +1,4 @@
-<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.1.0">
+<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.2.0">
     <Layout>
         <Category Name="Deployment">
             <Command Description="" DisplayName="Deploy From Template" Name="deploy_from_template" Tags="allow_unreserved" />
@@ -11,6 +11,15 @@
             <Command Description="" DisplayName="Apply Connectivity Changes" Name="ApplyConnectivityChanges" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Disconnect All" Name="disconnect_all" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
+        </Category>
+        <Category Name="Snapshot">
+            <Command Description="" DisplayName="Save Snapshot" Name="remote_save_snapshot" Tags="remote_connectivity,allow_unreserved" />
+            <Command Description="" DisplayName="Restore Snapshot" Name="remote_restore_snapshot" Tags="remote_connectivity,allow_unreserved">
+                <Parameters>
+                    <Parameter DefaultValue="" Description="Please enter the full path of the VM snapshot, for example Snapshot1/Snapshot2." DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
+                </Parameters>
+            </Command>
+            <Command Description="" DisplayName="Get Snapshots" Name="remote_get_snapshots" Tags="remote_connectivity,allow_unreserved" />
         </Category>
         <Category Name="Hidden Commands">
             <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />

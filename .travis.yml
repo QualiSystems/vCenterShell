@@ -5,6 +5,7 @@ python:
 install:
     - pip install -r package/requirements.txt --extra-index-url https://testpypi.python.org/simple
     - pip install cloudshell-shell-core --extra-index-url https://testpypi.python.org/simple
+    - pip install cloudshell-core --extra-index-url https://testpypi.python.org/simple
     - pip install -r test_requirements.txt
     - pip install coveralls
 
