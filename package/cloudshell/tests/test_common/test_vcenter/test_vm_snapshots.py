@@ -56,3 +56,21 @@ class TestSnapshotRetriever(unittest.TestCase):
 
         # assert
         self.assertSequenceEqual(all_snapshots.keys(), ['root', 'root/child'])
+
+    def test_combine_should_combine_base_snapshot_location_with_snapshot_name(self):
+        # Act
+        snapshot_path = SnapshotRetriever.combine('snapshot1/snapshot2', 'snapshot3')
+
+        # Assert
+        self.assertEqual(snapshot_path, 'snapshot1/snapshot2/snapshot3')
+
+    def test_cet_current_snapshot_returns_none_when_no_snapshot_exists(self):
+        # Arrange
+        vm = Mock()
+        vm.snapshot = None
+
+        # Act
+        current_snapshot_name = SnapshotRetriever.get_current_snapshot_name(vm)
+
+        # assert
+        self.assertIsNone(current_snapshot_name)

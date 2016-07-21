@@ -3,6 +3,7 @@ from unittest import TestCase
 from mock import Mock, patch
 
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
+from cloudshell.cp.vcenter.exceptions.snapshot_not_found import SnapshotNotFoundException
 
 
 class TestSnapshotRestoreCommand(TestCase):
@@ -43,5 +44,5 @@ class TestSnapshotRestoreCommand(TestCase):
         mock_get_vm_snapshots.return_value = {'snap1': Mock()}
 
         # Act + Assert
-        self.assertRaises(Exception, snapshot_restore_command.restore_snapshot, si, Mock(), 'machine1',
+        self.assertRaises(SnapshotNotFoundException, snapshot_restore_command.restore_snapshot, si, Mock(), 'machine1',
                           'NOT_EXISTING_SNAPSHOT')
