@@ -1,6 +1,7 @@
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.exceptions.snapshot_not_found import SnapshotNotFoundException
 
 
 class SnapshotRestoreCommand:
@@ -44,7 +45,7 @@ class SnapshotRestoreCommand:
         snapshots = SnapshotRetriever.get_vm_snapshots(vm)
 
         if snapshot_name not in snapshots:
-            raise Exception('Snapshot {0} was not found'.format(snapshot_name))
+            raise SnapshotNotFoundException('Snapshot {0} was not found'.format(snapshot_name))
 
         return snapshots[snapshot_name]
 
