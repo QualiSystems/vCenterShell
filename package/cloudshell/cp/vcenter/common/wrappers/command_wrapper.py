@@ -102,7 +102,7 @@ class CommandWrapper:
             results = command(*tuple(command_args))
 
             logger.info(FINISHED_EXECUTING_COMMAND.format(command_name))
-            logger.debug(DEBUG_COMMAND_RESULT.format(str(results or "None")))
+            logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
 
             return results
         except Exception as e:
