@@ -1,5 +1,9 @@
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.exceptions.snapshot_exists import SnapshotAlreadyExistsException
+
+SNAPSHOT_ALREADY_EXISTS = 'A snapshot of this name already exist under this VM. Please select a different name for the VM snapshot'
 
 
 class SaveSnapshotCommand:
@@ -29,10 +33,27 @@ class SaveSnapshotCommand:
         :type snapshot_name: str
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
-        logger.info("Create virtual machine snapshot")
 
+        self._verify_snapshot_name_does_not_exists(snapshot_name, vm)
+
+        task = self._create_snapshot(logger, snapshot_name, vm)
+
+        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
+
+    @staticmethod
+    def _create_snapshot(logger, snapshot_name, vm):
+        logger.info("Create virtual machine snapshot")
         dump_memory = False
         quiesce = True
         task = vm.CreateSnapshot(snapshot_name, 'Created by CloudShell vCenterShell', dump_memory, quiesce)
+        return task
 
-        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
+    @staticmethod
+    def _verify_snapshot_name_does_not_exists(snapshot_name, vm):
+        current_snapshot_name = SnapshotRetriever.get_current_snapshot_name(vm)
+        if not current_snapshot_name:
+            return
+        snapshot_path_to_be_created = SnapshotRetriever.combine(current_snapshot_name, snapshot_name)
+        all_snapshots = SnapshotRetriever.get_vm_snapshots(vm)
+        if snapshot_path_to_be_created in all_snapshots:
+            raise SnapshotAlreadyExistsException(SNAPSHOT_ALREADY_EXISTS)
