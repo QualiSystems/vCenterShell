@@ -140,25 +140,25 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power off of an app during reservation Teardown." IsReadOnly="false" Name="Auto Power Off" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic power off of an app during reservation Teardown." IsReadOnly="false" Name="Auto Power Off" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic execution of the Autoload command during reservation Setup." IsReadOnly="false" Name="Autoload" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic execution of the Autoload command during reservation Setup." IsReadOnly="false" Name="Autoload" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
