@@ -2,6 +2,7 @@ from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWait
 from cloudshell.cp.vcenter.common.vcenter.vm_snapshots import SnapshotRetriever
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.exceptions.snapshot_not_found import SnapshotNotFoundException
+from cloudshell.api.cloudshell_api import CloudShellAPISession
 
 
 class SnapshotRestoreCommand:
@@ -17,18 +18,26 @@ class SnapshotRestoreCommand:
         self.pyvmomi_service = pyvmomi_service
         self.task_waiter = task_waiter
 
-    def restore_snapshot(self, si, logger, vm_uuid, snapshot_name):
+    def restore_snapshot(self, si, logger, session, vm_uuid, resource_fullname, snapshot_name):
         """
         Restores a virtual machine to a snapshot
         :param vim.ServiceInstance si: py_vmomi service instance
         :param logger: Logger
+        :param session: CloudShellAPISession
+        :type session: cloudshell_api.CloudShellAPISession
         :param vm_uuid: uuid of the virtual machine
+        :param resource_fullname:
+        :type: resource_fullname: str
         :param str snapshot_name: Snapshot name to save the snapshot to
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
+
         logger.info("Revert snapshot")
 
         snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
+
+        session.SetResourceLiveStatus(resource_fullname, "Offline", "Powered Off")
+
         task = snapshot.RevertToSnapshot_Task()
         return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
