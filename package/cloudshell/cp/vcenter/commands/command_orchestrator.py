@@ -424,6 +424,7 @@ class CommandOrchestrator(object):
         self.command_wrapper.execute_command_with_connection(context,
                                                              self.snapshot_restorer.restore_snapshot,
                                                              resource_details.vm_uuid,
+                                                             resource_details.fullname,
                                                              snapshot_name)
 
     def get_snapshots(self, context):
