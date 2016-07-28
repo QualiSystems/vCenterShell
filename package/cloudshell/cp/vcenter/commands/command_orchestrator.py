@@ -1,6 +1,9 @@
 import time
 from datetime import date
 import jsonpickle
+from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
+from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
+from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
 from pyVim.connect import SmartConnect, Disconnect
 
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
@@ -453,18 +456,20 @@ class CommandOrchestrator(object):
         created_date = date.today()
         snapshot_name = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
         created_snapshot_path = self.save_snapshot(context=context, snapshot_name=snapshot_name)
-        saved_results = SavedResults(saved_artifacts_info={
-                                        'resource_name': resource_details.cloud_provider,
-                                        'created_date': created_date,
-                                        'restore_rules': {
-                                            'requires_same_resource': True
-                                        }
-                                    },
-                                    saved_artifact={
-                                         'artifact_type': 'vcenter_snapshot',
-                                         'identifier': created_snapshot_path
-                                    })
-        return set_command_result(result=saved_results, unpicklable=False)
+
+        orchestration_saved_artifact = OrchestrationSavedArtifact()
+        orchestration_saved_artifact.artifact_type = 'vcenter_snapshot'
+        orchestration_saved_artifact.identifier = created_snapshot_path
+
+        saved_artifacts_info = OrchestrationSavedArtifactsInfo(
+            resource_name=resource_details.cloud_provider,
+            created_date=created_date,
+            restore_rules={'requires_same_resource': True},
+            saved_artifact=orchestration_saved_artifact)
+
+        orchestration_save_result = OrchestrationSaveResult(saved_artifacts_info)
+
+        return set_command_result(result=orchestration_save_result, unpicklable=False)
 
     def orchestration_restore(self, context, saved_details):
         """
@@ -473,12 +478,9 @@ class CommandOrchestrator(object):
         :param saved_details:
         :return:
         """
-        saved_details_obj = get_result_from_command_output(saved_details)
-        snapshot_name = saved_details_obj.saved_artifact['identifier']
+        saved_artifacts_info = get_result_from_command_output(saved_details)
+        snapshot_name = saved_artifacts_info['saved_artifacts_info']['saved_artifact']['identifier']
         return self.restore_snapshot(context=context, snapshot_name=snapshot_name)
 
 
-class SavedResults(object):
-    def __init__(self, saved_artifacts_info, saved_artifact):
-        self.saved_artifacts_info = saved_artifacts_info
-        self.saved_artifact = saved_artifact
+

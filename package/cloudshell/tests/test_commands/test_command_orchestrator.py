@@ -1,8 +1,13 @@
 from unittest import TestCase
 
+import jsonpickle
 from cloudshell.api.cloudshell_api import ResourceInfo
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from mock import Mock, create_autospec
+from cloudshell.shell.core.driver_context import ResourceRemoteCommandContext, ResourceContextDetails, AppContext
+from mock import Mock, create_autospec, patch
+
+RESTORE_SNAPSHOT = 'cloudshell.cp.vcenter.commands.command_orchestrator.CommandOrchestrator.restore_snapshot'
+SAVE_SNAPSHOT = 'cloudshell.cp.vcenter.commands.command_orchestrator.CommandOrchestrator.save_snapshot'
 
 
 class TestCommandOrchestrator(TestCase):
@@ -125,3 +130,51 @@ class TestCommandOrchestrator(TestCase):
     def test_get_snapshots(self):
         self.command_orchestrator.get_snapshots(self.context)
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_orchestration_save(self):
+        # Arrange
+        with patch(SAVE_SNAPSHOT) as save_snapshot_mock:
+            save_snapshot_mock.return_value = 'new_snapshot'
+
+            remote_command_context = create_autospec(ResourceRemoteCommandContext)
+            remote_command_context.resource = create_autospec(ResourceContextDetails)
+            remote_command_context.resource.fullname = 'vcenter'
+            endpoint = create_autospec(ResourceContextDetails)
+            endpoint.fullname = 'vm_111'
+            endpoint.app_context = create_autospec(AppContext)
+            endpoint.app_context.deployed_app_json = '{"vmdetails": {"uid": "vm_uuid1"}}'
+            remote_command_context.remote_endpoints = [endpoint]
+
+            # Act
+            saved_result = CommandOrchestrator().orchestration_save(context=remote_command_context,
+                                                                    mode='shallow',
+                                                                    custom_params=None)
+
+            # Assert
+            save_snapshot_mock.assert_called_once()
+            saved_result_dict = jsonpickle.decode(saved_result)
+            self.assertEqual(saved_result_dict['saved_artifacts_info']['saved_artifact']['artifact_type'],
+                             'vcenter_snapshot')
+            self.assertEqual(saved_result_dict['saved_artifacts_info']['saved_artifact']['identifier'], 'new_snapshot')
+            self.assertEqual(saved_result_dict['saved_artifacts_info']['resource_name'], 'vcenter')
+            self.assertIsNotNone(saved_result_dict['saved_artifacts_info']['created_date'])
+
+    def test_orchestration_restore(self):
+        # Arrange
+        with patch(RESTORE_SNAPSHOT) as mock_restore_snapshot:
+            # Act
+            self.command_orchestrator.orchestration_restore(self.context, '''{
+      "saved_artifacts_info": {
+        "resource_name": "ex cillum sed laboris",
+        "created_date": "4313-10-12T18:03:15.053Z",
+        "restore_rules": {
+          "requires_same_resource": false
+        },
+        "saved_artifact": {
+          "artifact_type": "veniam in qui",
+          "identifier": "deserunt1"
+        }
+      }
+    }''')
+            # Assert
+            mock_restore_snapshot.assert_called_once_with(context=self.context, snapshot_name='deserunt1')
