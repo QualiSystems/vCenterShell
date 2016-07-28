@@ -3,13 +3,15 @@ python:
     - "2.7"
 
 install:
-    - pip install -r package/requirements.txt --extra-index-url https://testpypi.python.org/pypi
-    - pip install cloudshell-shell-core --extra-index-url https://testpypi.python.org/pypi
+    - pip install -r package/requirements.txt --extra-index-url https://testpypi.python.org/simple
+    - pip install cloudshell-shell-core --extra-index-url https://testpypi.python.org/simple
+    - pip install cloudshell-core --extra-index-url https://testpypi.python.org/simple
     - pip install -r test_requirements.txt
     - pip install coveralls
 
 script:
     - pushd package
+    - pip install "cloudshell-automation-api>=7.1.0.0,<7.2.0.0" --extra-index-url https://testpypi.python.org/simple
     - python setup.py develop
     - popd
     - python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration

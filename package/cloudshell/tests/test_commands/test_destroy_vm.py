@@ -116,8 +116,7 @@ class TestDestroyVirtualMachineCommand(unittest.TestCase):
                                         session=session,
                                         vcenter_data_model=vcenter_data_model,
                                         vm_uuid=uuid,
-                                        vm_name=resource_name,
-                                        reservation_id="reservation_id")
+                                        vm_name=resource_name)
 
         # assert
         self.assertTrue(res)

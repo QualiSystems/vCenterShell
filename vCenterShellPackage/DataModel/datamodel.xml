@@ -140,25 +140,25 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic power off of an app during reservation Teardown." IsReadOnly="false" Name="Auto Power Off" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic power off of an app during reservation Teardown." IsReadOnly="false" Name="Auto Power Off" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables automatic deletion of an app during reservation Teardown." IsReadOnly="false" Name="Auto Delete" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Enables the automatic execution of the Autoload command during reservation Setup." IsReadOnly="false" Name="Autoload" Type="Boolean">
+    <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic execution of the Autoload command during reservation Setup." IsReadOnly="false" Name="Autoload" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -291,7 +291,7 @@
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
-        <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" ImagePath="DeploymentTypes-vCenterClone.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />
@@ -353,7 +353,7 @@
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="vCenter VM From Template" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="vCenter VM From Template" ImagePath="DeploymentTypes-vCenterTemplate.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />
@@ -415,7 +415,7 @@
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" ImagePath="DeploymentTypes-vCenterLinked.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
               <ns0:AllowedValues />
@@ -480,7 +480,7 @@
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="Deploy VM from Image with ovftool" ImagePath="DeploymentTypes-vCenterImage.png" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
               <ns0:AllowedValues />

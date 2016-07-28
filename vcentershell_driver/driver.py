@@ -26,9 +26,6 @@ class VCenterShellDriver (ResourceDriverInterface):
     def disconnect(self, context, ports, network_name):
         return self.command_orchestrator.disconnect(context, ports, network_name)
 
-    def destroy_vm(self, context, ports):
-        return self.command_orchestrator.destroy_vm(context, ports)
-
     def destroy_vm_only(self, context, ports):
         return self.command_orchestrator.destroy_vm_only(context, ports)
 
@@ -70,6 +67,43 @@ class VCenterShellDriver (ResourceDriverInterface):
 
         validator = VCenterAutoModelDiscovery()
         return validator.validate_and_discover(context)
+
+    def remote_save_snapshot(self, context, ports, snapshot_name):
+        """
+        Saves virtual machine to a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :param snapshot_name: snapshot name to save to
+        :type snapshot_name: str
+        :return:
+        """
+        return self.command_orchestrator.save_snapshot(context, snapshot_name)
+
+    def remote_restore_snapshot(self, context, ports, snapshot_name):
+        """
+        Restores virtual machine from a snapshot
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :param snapshot_name: Snapshot name to restore from
+        :type snapshot_name: str
+        :return:
+        """
+        return self.command_orchestrator.restore_snapshot(context, snapshot_name)
+
+    def remote_get_snapshots(self, context, ports):
+        """
+        Returns list of snapshots
+        :param context: resource context of the vCenterShell
+        :type context: models.QualiDriverModels.ResourceCommandContext
+        :param ports:list[string] ports: the ports of the connection between the remote resource and the local resource
+        :type ports: list[string]
+        :return: list
+        """
+        return self.command_orchestrator.get_snapshots(context)
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)

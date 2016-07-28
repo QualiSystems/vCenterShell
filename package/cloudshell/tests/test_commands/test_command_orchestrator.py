@@ -52,9 +52,9 @@ class TestCommandOrchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
-    def test_destroy_vm(self):
+    def test_destroy_vm_only(self):
         # act
-        self.command_orchestrator.destroy_vm(self.context, self.ports)
+        self.command_orchestrator.destroy_vm_only(self.context, self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
@@ -112,4 +112,16 @@ class TestCommandOrchestrator(TestCase):
 
     def test_get_uuid(self):
         self.command_orchestrator.get_vm_uuid_by_name(self.context, 'Name')
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_save_snapshot(self):
+        self.command_orchestrator.save_snapshot(self.context, 'new_snapshot')
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_restore_snapshot(self):
+        self.command_orchestrator.restore_snapshot(self.context, 'new_snapshot')
+        self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_get_snapshots(self):
+        self.command_orchestrator.get_snapshots(self.context)
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)

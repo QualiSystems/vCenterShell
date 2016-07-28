@@ -101,9 +101,6 @@ class CommandWrapper:
 
             results = command(*tuple(command_args))
 
-            if not results:
-                results = 'finished successfully'
-
             logger.info(FINISHED_EXECUTING_COMMAND.format(command_name))
             logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
 
@@ -121,10 +118,11 @@ class CommandWrapper:
     @staticmethod
     def _get_domain(context):
         # noinspection PyBroadException
-        try:
-            return context.remote_reservation.domain
-        except:
-            return context.reservation.domain
+        domain = 'Global'
+        reservation = getattr(context, 'reservation', getattr(context, 'remote_reservation', None))
+        if reservation:
+            domain = reservation.domain
+        return domain
 
     def _try_inject_arg(self, command, command_args, arg_object, arg_name):
         try:

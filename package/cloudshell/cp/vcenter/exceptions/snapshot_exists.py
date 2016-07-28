@@ -1,0 +1,2 @@
+class SnapshotAlreadyExistsException(Exception):
+    pass
