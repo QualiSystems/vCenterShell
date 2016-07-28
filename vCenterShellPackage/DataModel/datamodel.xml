@@ -480,7 +480,7 @@
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
-        <ns0:ResourceModel Description="Deploy VM from Image with ovftool" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
+        <ns0:ResourceModel Description="Deploy VM from Image with ovftool" ImagePath="DeploymentTypes-vCenterImage.png" Name="vCenter VM From Image" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Default Datacenter">
               <ns0:AllowedValues />
