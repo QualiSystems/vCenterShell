@@ -409,10 +409,11 @@ class CommandOrchestrator(object):
         :return:
         """
         resource_details = self._parse_remote_model(context)
-        return self.command_wrapper.execute_command_with_connection(context,
-                                                                    self.snapshot_saver.save_snapshot,
-                                                                    resource_details.vm_uuid,
-                                                                    snapshot_name)
+        created_snapshot_path = self.command_wrapper.execute_command_with_connection(context,
+                                                                                     self.snapshot_saver.save_snapshot,
+                                                                                     resource_details.vm_uuid,
+                                                                                     snapshot_name)
+        return set_command_result(created_snapshot_path)
 
     def restore_snapshot(self, context, snapshot_name):
         """
@@ -457,6 +458,8 @@ class CommandOrchestrator(object):
         snapshot_name = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
         created_snapshot_path = self.save_snapshot(context=context, snapshot_name=snapshot_name)
 
+        created_snapshot_path = self._strip_double_quotes(created_snapshot_path)
+
         orchestration_saved_artifact = OrchestrationSavedArtifact()
         orchestration_saved_artifact.artifact_type = 'vcenter_snapshot'
         orchestration_saved_artifact.identifier = created_snapshot_path
@@ -471,6 +474,12 @@ class CommandOrchestrator(object):
 
         return set_command_result(result=orchestration_save_result, unpicklable=False)
 
+    @staticmethod
+    def _strip_double_quotes(created_snapshot_path):
+        if created_snapshot_path.startswith('"') and created_snapshot_path.endswith('"'):
+            created_snapshot_path = created_snapshot_path[1:-1]
+        return created_snapshot_path
+
     def orchestration_restore(self, context, saved_details):
         """
 
@@ -481,6 +490,3 @@ class CommandOrchestrator(object):
         saved_artifacts_info = get_result_from_command_output(saved_details)
         snapshot_name = saved_artifacts_info['saved_artifacts_info']['saved_artifact']['identifier']
         return self.restore_snapshot(context=context, snapshot_name=snapshot_name)
-
-
-

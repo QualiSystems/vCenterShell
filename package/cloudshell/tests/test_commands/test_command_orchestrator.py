@@ -134,7 +134,7 @@ class TestCommandOrchestrator(TestCase):
     def test_orchestration_save(self):
         # Arrange
         with patch(SAVE_SNAPSHOT) as save_snapshot_mock:
-            save_snapshot_mock.return_value = 'new_snapshot'
+            save_snapshot_mock.return_value = '"new_snapshot"'
 
             remote_command_context = create_autospec(ResourceRemoteCommandContext)
             remote_command_context.resource = create_autospec(ResourceContextDetails)
