@@ -105,5 +105,11 @@ class VCenterShellDriver (ResourceDriverInterface):
         """
         return self.command_orchestrator.get_snapshots(context)
 
+    def orchestration_save(self, context, ports, mode="shallow", custom_params=None):
+        return self.command_orchestrator.orchestration_save(context, mode, custom_params)
+
+    def orchestration_restore(self, context, ports, saved_details):
+        return self.command_orchestrator.orchestration_restore(context, saved_details)
+
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)

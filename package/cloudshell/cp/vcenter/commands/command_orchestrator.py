@@ -1,6 +1,9 @@
 import time
-
+from datetime import date
 import jsonpickle
+from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
+from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
+from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
 from pyVim.connect import SmartConnect, Disconnect
 
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
@@ -17,7 +20,7 @@ from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsC
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
-from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result
+from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result, get_result_from_command_output
 from cloudshell.cp.vcenter.common.utilites.common_name import generate_unique_name
 from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
@@ -406,10 +409,11 @@ class CommandOrchestrator(object):
         :return:
         """
         resource_details = self._parse_remote_model(context)
-        self.command_wrapper.execute_command_with_connection(context,
-                                                             self.snapshot_saver.save_snapshot,
-                                                             resource_details.vm_uuid,
-                                                             snapshot_name)
+        created_snapshot_path = self.command_wrapper.execute_command_with_connection(context,
+                                                                                     self.snapshot_saver.save_snapshot,
+                                                                                     resource_details.vm_uuid,
+                                                                                     snapshot_name)
+        return set_command_result(created_snapshot_path)
 
     def restore_snapshot(self, context, snapshot_name):
         """
@@ -439,3 +443,50 @@ class CommandOrchestrator(object):
                                                                    self.snapshots_retriever.get_snapshots,
                                                                    resource_details.vm_uuid)
         return set_command_result(result=res, unpicklable=False)
+
+    def orchestration_save(self, context, mode="shallow", custom_params=None):
+        """
+        Creates a snapshot with a unique name and returns SavedResults as JSON
+        :param context: resource context of the vCenterShell
+        :param mode: Snapshot save mode, default shallow. Currently not it use
+        :param custom_params: Set of custom parameter to be supported in the future
+        :return: SavedResults serialized as JSON
+        :rtype: SavedResults
+        """
+        resource_details = self._parse_remote_model(context)
+        created_date = date.today()
+        snapshot_name = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
+        created_snapshot_path = self.save_snapshot(context=context, snapshot_name=snapshot_name)
+
+        created_snapshot_path = self._strip_double_quotes(created_snapshot_path)
+
+        orchestration_saved_artifact = OrchestrationSavedArtifact()
+        orchestration_saved_artifact.artifact_type = 'vcenter_snapshot'
+        orchestration_saved_artifact.identifier = created_snapshot_path
+
+        saved_artifacts_info = OrchestrationSavedArtifactsInfo(
+            resource_name=resource_details.cloud_provider,
+            created_date=created_date,
+            restore_rules={'requires_same_resource': True},
+            saved_artifact=orchestration_saved_artifact)
+
+        orchestration_save_result = OrchestrationSaveResult(saved_artifacts_info)
+
+        return set_command_result(result=orchestration_save_result, unpicklable=False)
+
+    @staticmethod
+    def _strip_double_quotes(created_snapshot_path):
+        if created_snapshot_path.startswith('"') and created_snapshot_path.endswith('"'):
+            created_snapshot_path = created_snapshot_path[1:-1]
+        return created_snapshot_path
+
+    def orchestration_restore(self, context, saved_details):
+        """
+
+        :param context:
+        :param saved_details:
+        :return:
+        """
+        saved_artifacts_info = get_result_from_command_output(saved_details)
+        snapshot_name = saved_artifacts_info['saved_artifacts_info']['saved_artifact']['identifier']
+        return self.restore_snapshot(context=context, snapshot_name=snapshot_name)
