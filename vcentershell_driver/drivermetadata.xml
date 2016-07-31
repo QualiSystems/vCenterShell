@@ -25,6 +25,8 @@
             <Command Description="" DisplayName="Power Cycle" Name="PowerCycle" Tags="power" />
             <Command Description="" DisplayName="Delete VM Only" Name="destroy_vm_only" Tags="remote_app_management,allow_shared" />
             <Command Description="" DisplayName="Get VM Uuid" Name="get_vm_uuid" Tags="allow_shared" />
+            <Command Description="" DisplayName="Orchestration Save" Name="orchestration_save" Tags="remote_connectivity,allow_unreserved" />
+            <Command Description="" DisplayName="Orchestration Restore" Name="orchestration_restore" Tags="remote_connectivity,allow_unreserved" />
         </Category>
         <Category Name="Power">
             <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />

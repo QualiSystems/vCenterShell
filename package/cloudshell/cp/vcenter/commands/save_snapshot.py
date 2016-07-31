@@ -34,11 +34,13 @@ class SaveSnapshotCommand:
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
-        self._verify_snapshot_name_does_not_exists(snapshot_name, vm)
+        snapshot_path_to_be_created = SaveSnapshotCommand._get_snapshot_name_to_be_created(snapshot_name, vm)
+        SaveSnapshotCommand._verify_snapshot_uniquness(snapshot_path_to_be_created, vm)
 
         task = self._create_snapshot(logger, snapshot_name, vm)
 
-        return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
+        self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
+        return snapshot_path_to_be_created
 
     @staticmethod
     def _create_snapshot(logger, snapshot_name, vm):
@@ -49,11 +51,14 @@ class SaveSnapshotCommand:
         return task
 
     @staticmethod
-    def _verify_snapshot_name_does_not_exists(snapshot_name, vm):
-        current_snapshot_name = SnapshotRetriever.get_current_snapshot_name(vm)
-        if not current_snapshot_name:
-            return
-        snapshot_path_to_be_created = SnapshotRetriever.combine(current_snapshot_name, snapshot_name)
+    def _verify_snapshot_uniquness(snapshot_path_to_be_created, vm):
         all_snapshots = SnapshotRetriever.get_vm_snapshots(vm)
         if snapshot_path_to_be_created in all_snapshots:
             raise SnapshotAlreadyExistsException(SNAPSHOT_ALREADY_EXISTS)
+
+    @staticmethod
+    def _get_snapshot_name_to_be_created(snapshot_name, vm):
+        current_snapshot_name = SnapshotRetriever.get_current_snapshot_name(vm)
+        if not current_snapshot_name:
+            return ''
+        return SnapshotRetriever.combine(current_snapshot_name, snapshot_name)

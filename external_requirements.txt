@@ -1,0 +1,3 @@
+pyvmomi==6.0.0
+jsonpickle==0.9.3
+enum==0.4.6
