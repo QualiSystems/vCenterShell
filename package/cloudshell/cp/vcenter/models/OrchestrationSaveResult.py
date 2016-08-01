@@ -1,6 +1,6 @@
 class OrchestrationSaveResult(object):
-    def __init__(self, saved_artifacts_info):
+    def __init__(self, saved_artifact_info):
         """
-        :type saved_artifacts_info: OrchestrationSavedArtifactsInfo
+        :type saved_artifact_info: OrchestrationSavedArtifactsInfo
         """
-        self.saved_artifacts_info = saved_artifacts_info
+        self.saved_artifact_info = saved_artifact_info
