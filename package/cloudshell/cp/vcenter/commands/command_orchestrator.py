@@ -371,7 +371,6 @@ class CommandOrchestrator(object):
         """
         parse the remote resource model and adds its full name
         :type context: models.QualiDriverModels.ResourceRemoteCommandContext
-
         """
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
@@ -465,7 +464,7 @@ class CommandOrchestrator(object):
         orchestration_saved_artifact.identifier = created_snapshot_path
 
         saved_artifact_info = OrchestrationSavedArtifactsInfo(
-            resource_name=resource_details.cloud_provider,
+            resource_name=resource_details.fullname,
             created_date=created_date,
             restore_rules={'requires_same_resource': True},
             saved_artifact=orchestration_saved_artifact)

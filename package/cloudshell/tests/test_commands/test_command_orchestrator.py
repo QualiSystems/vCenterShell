@@ -157,7 +157,7 @@ class TestCommandOrchestrator(TestCase):
             self.assertEqual(saved_result_dict['saved_artifact_info']['saved_artifact']['artifact_type'],
                              'vcenter_snapshot')
             self.assertEqual(saved_result_dict['saved_artifact_info']['saved_artifact']['identifier'], 'new_snapshot')
-            self.assertEqual(saved_result_dict['saved_artifact_info']['resource_name'], 'vcenter')
+            self.assertEqual(saved_result_dict['saved_artifact_info']['resource_name'], 'vm_111')
             self.assertIsNotNone(saved_result_dict['saved_artifact_info']['created_date'])
 
     @freeze_time("1984-12-31 11:12:13.4567")
