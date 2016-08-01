@@ -1,5 +1,5 @@
 import time
-from datetime import date
+from datetime import datetime, date
 import jsonpickle
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
@@ -454,7 +454,7 @@ class CommandOrchestrator(object):
         :rtype: SavedResults
         """
         resource_details = self._parse_remote_model(context)
-        created_date = date.today()
+        created_date = datetime.now()
         snapshot_name = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
         created_snapshot_path = self.save_snapshot(context=context, snapshot_name=snapshot_name)
 

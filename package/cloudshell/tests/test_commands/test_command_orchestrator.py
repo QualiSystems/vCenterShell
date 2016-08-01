@@ -1,4 +1,5 @@
 from unittest import TestCase
+from freezegun import freeze_time
 
 import jsonpickle
 from cloudshell.api.cloudshell_api import ResourceInfo
@@ -131,7 +132,7 @@ class TestCommandOrchestrator(TestCase):
         self.command_orchestrator.get_snapshots(self.context)
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
-    def test_orchestration_save(self):
+    def test_orchestration_save_double_quotes_in_snapshot_name_should_be_stripped(self):
         # Arrange
         with patch(SAVE_SNAPSHOT) as save_snapshot_mock:
             save_snapshot_mock.return_value = '"new_snapshot"'
@@ -158,6 +159,30 @@ class TestCommandOrchestrator(TestCase):
             self.assertEqual(saved_result_dict['saved_artifacts_info']['saved_artifact']['identifier'], 'new_snapshot')
             self.assertEqual(saved_result_dict['saved_artifacts_info']['resource_name'], 'vcenter')
             self.assertIsNotNone(saved_result_dict['saved_artifacts_info']['created_date'])
+
+    @freeze_time("1984-12-31 11:12:13.4567")
+    def test_orchestration_save_snapshot_name_should_contain_full_datetime(self):
+        # Arrange
+        with patch(SAVE_SNAPSHOT) as save_snapshot_mock:
+            save_snapshot_mock.return_value = '"new_snapshot"'
+
+            remote_command_context = create_autospec(ResourceRemoteCommandContext)
+            remote_command_context.resource = create_autospec(ResourceContextDetails)
+            remote_command_context.resource.fullname = 'vcenter'
+            endpoint = create_autospec(ResourceContextDetails)
+            endpoint.fullname = 'vm_111'
+            endpoint.app_context = create_autospec(AppContext)
+            endpoint.app_context.deployed_app_json = '{"vmdetails": {"uid": "vm_uuid1"}}'
+            remote_command_context.remote_endpoints = [endpoint]
+
+            # Act
+            CommandOrchestrator().orchestration_save(context=remote_command_context,
+                                                     mode='shallow',
+                                                     custom_params=None)
+
+            # Assert
+            args, kwargs = save_snapshot_mock.call_args
+            self.assertEqual(kwargs['snapshot_name'], "84_12_31 11_12_13_456700")
 
     def test_orchestration_restore(self):
         # Arrange
