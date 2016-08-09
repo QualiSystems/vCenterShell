@@ -554,10 +554,43 @@
       <ns0:Categories>
       </ns0:Categories>
     </ns0:ResourceFamily>
+
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Generic Static VM" ResourceType="Application" IsLockedByDefault="true">
+      <ns0:AttachedAttributes>
+      </ns0:AttachedAttributes>
+      <ns0:AttributeValues>
+      </ns0:AttributeValues>
+      <ns0:Models>
+        <ns0:ResourceModel Description="" Name="vCenter Static VM" SupportsConcurrentCommands="false">
+          <ns0:AttachedAttributes >
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" UserInput="false">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+          </ns0:AttachedAttributes>
+          <ns0:AttributeValues>
+          </ns0:AttributeValues>
+          <ns0:ParentModels />
+          <ns0:Drivers>
+            <ns0:DriverName>vCenter Static VM Autoload</ns0:DriverName>
+          </ns0:Drivers>
+          <ns0:Scripts>
+          </ns0:Scripts>
+        </ns0:ResourceModel>
+      </ns0:Models>
+      <ns0:Categories />
+    </ns0:ResourceFamily>
+
   </ns0:ResourceFamilies>
   <ns0:DriverDescriptors>
     <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
     <ns0:DriverDescriptor DriverType="PythonDriver" Name="VCenter Shell Driver" />
+    <ns0:DriverDescriptor DriverType="PythonDriver" Name="vCenter Static VM Autoload" />
   </ns0:DriverDescriptors>
   <ns0:ScriptDescriptors>
   </ns0:ScriptDescriptors>
