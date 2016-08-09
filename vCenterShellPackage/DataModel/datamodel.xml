@@ -555,7 +555,7 @@
       </ns0:Categories>
     </ns0:ResourceFamily>
 
-    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Generic Static VM" ResourceType="Application" IsLockedByDefault="true">
+    <ns0:ResourceFamily Description="" IsSearchable="true" Name="Generic Static VM" ResourceType="Application" IsLockedByDefault="false">
       <ns0:AttachedAttributes>
       </ns0:AttachedAttributes>
       <ns0:AttributeValues>
