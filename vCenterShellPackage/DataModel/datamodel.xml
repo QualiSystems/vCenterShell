@@ -554,7 +554,6 @@
       <ns0:Categories>
       </ns0:Categories>
     </ns0:ResourceFamily>
-
     <ns0:ResourceFamily Description="" IsSearchable="true" Name="Generic Static VM" ResourceType="Application" IsLockedByDefault="false">
       <ns0:AttachedAttributes>
       </ns0:AttachedAttributes>
@@ -563,13 +562,13 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter Static VM" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes >
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" >
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" >
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" UserInput="false">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Auto Power Off" >
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
@@ -585,7 +584,6 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-
   </ns0:ResourceFamilies>
   <ns0:DriverDescriptors>
     <ns0:DriverDescriptor DriverType="TestShellDriver" Name="Generic Driver" />
