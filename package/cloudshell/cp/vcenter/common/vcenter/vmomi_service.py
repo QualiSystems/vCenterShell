@@ -1,4 +1,6 @@
 ﻿import time
+from itertools import ifilter
+
 import requests
 from pyVmomi import vim
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
@@ -440,36 +442,48 @@ class pyVmomiService:
 
         logger.info("cloning VM...")
         try:
-            vm = self.try_run_clone(clone_params, clone_spec, dest_folder, logger, template)
-        except InvalidHostStateException as err:
-
-            logger.info("InvalidHostStateException retrying to run again.")
-            available_host = self._get_working_host(datacenter)
-            if available_host:
-                clone_spec.location.host =available_host
-                vm = self.try_run_clone(clone_params, clone_spec, dest_folder, logger, template)
-
-
+            vm = self.try_run_clone(clone_params, clone_spec, dest_folder, logger, template, datacenter)
         except Exception as e:
             logger.error("error deploying: {0}".format(e))
             raise Exception('Error has occurred while deploying, please look at the log for more info.')
-
+        except vim.fault.NoPermission as error:
+            logger.error("vCenter returned - no permission: {0}".format(error))
+            raise Exception('Permissions is not set correctly, please check the log for more info.')
         result.vm = vm
         return result
 
-    def _get_working_host(self,datacenter):
-        # datacenter.network[0].host[0].runtime.inMaintenanceMode
-        # datacenter.network[0].host[0].config.network.vnic[0].spec.ip.ipAddress
-        return None
-
-    def try_run_clone(self, clone_params, clone_spec, dest_folder, logger, template):
+    def try_run_clone(self, clone_params, clone_spec, dest_folder, logger, template, datacenter):
+        is_host_error = False
+        host_exception = None
         try:
-            task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+            vm = self.clone_a_vm(clone_params, clone_spec, dest_folder, logger, template)
+        except InvalidHostStateException as e:
+            is_host_error = True
+            host_exception = e
 
-        except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
-            raise Exception('Permissions is not set correctly, please check the log for more info.')
+        if is_host_error:
+            logger.info("InvalidHostStateException retrying to run again. " + e.message)
+            available_host = self._get_working_host(datacenter)
+            if available_host:
+                clone_spec.location.host = available_host
+                vm = self.clone_a_vm(clone_params, clone_spec, dest_folder, logger, template)
+            else:
+                raise host_exception
+
+        return vm
+
+    @staticmethod
+    def _get_working_host(datacenter):
+        host = None
+        if datacenter.network is not None and datacenter.network[0].host is not None:
+            res = next(ifilter(lambda x: not x.runtime.inMaintenanceMode, datacenter.network[0].host), None)
+            if res:
+                host = res.config.network.vnic[0].spec.ip.ipAddress
+        return host
+
+    def clone_a_vm(self, clone_params, clone_spec, dest_folder, logger, template):
+        task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
+        vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
         return vm
 
     def get_datacenter(self, clone_params):
