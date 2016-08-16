@@ -8,7 +8,7 @@ from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
-from package.cloudshell.cp.vcenter.exceptions.invalid_host_state_exception import InvalidHostStateException
+from cloudshell.cp.vcenter.exceptions.invalid_host_state_exception import InvalidHostStateException
 
 
 class pyVmomiService:
