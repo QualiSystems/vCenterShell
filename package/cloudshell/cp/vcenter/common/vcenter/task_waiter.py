@@ -1,6 +1,8 @@
 import time
 from pyVmomi import vim
 
+from cloudshell.cp.vcenter.exceptions.invalid_host_state_exception import InvalidHostStateException
+
 
 class SynchronousTaskWaiter(object):
     def __init__(self):
@@ -30,6 +32,12 @@ class SynchronousTaskWaiter(object):
             multi_msg = ''
             if task.info.error.faultMessage:
                 multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
+
+            if type(task.info.error) is vim.fault.InvalidHostState:
+                err_msg = task.info.error.Message + ' ' + task.info.error.msg
+                msg_n_err_msg = "vim.fault.InvalidHostState:" + multi_msg + '\n' + err_msg
+                logger.info(msg_n_err_msg)
+                raise InvalidHostStateException(msg_n_err_msg)
 
             logger.info(multi_msg)
             raise Exception(multi_msg)

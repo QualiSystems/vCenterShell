@@ -6,6 +6,9 @@ from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 
+from package.cloudshell.cp.vcenter.exceptions.invalid_host_state_exception import InvalidHostStateException
+
+
 class pyVmomiService:
     # region consts
     ChildEntity = 'childEntity'
@@ -437,18 +440,37 @@ class pyVmomiService:
 
         logger.info("cloning VM...")
         try:
-            task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+            vm = self.try_run_clone(clone_params, clone_spec, dest_folder, logger, template)
+        except InvalidHostStateException as err:
 
-        except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
-            raise Exception('Permissions is not set correctly, please check the log for more info.')
+            logger.info("InvalidHostStateException retrying to run again.")
+            available_host = self._get_working_host(datacenter)
+            if available_host:
+                clone_spec.location.host =available_host
+                vm = self.try_run_clone(clone_params, clone_spec, dest_folder, logger, template)
+
+
         except Exception as e:
             logger.error("error deploying: {0}".format(e))
             raise Exception('Error has occurred while deploying, please look at the log for more info.')
 
         result.vm = vm
         return result
+
+    def _get_working_host(self,datacenter):
+        # datacenter.network[0].host[0].runtime.inMaintenanceMode
+        # datacenter.network[0].host[0].config.network.vnic[0].spec.ip.ipAddress
+        return None
+
+    def try_run_clone(self, clone_params, clone_spec, dest_folder, logger, template):
+        try:
+            task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+
+        except vim.fault.NoPermission as error:
+            logger.error("vcenter returned - no permission: {0}".format(error))
+            raise Exception('Permissions is not set correctly, please check the log for more info.')
+        return vm
 
     def get_datacenter(self, clone_params):
         splited = clone_params.vm_folder.split('/')
