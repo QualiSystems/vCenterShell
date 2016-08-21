@@ -132,11 +132,11 @@ class DeployAppOrchestrationDriver(object):
         return session.DecryptPassword(password).Value
 
 
-class ApiVmDetails(object):
-    def __init__(self):
-        self.CloudProviderName = ''
-        self.UID = ''
-        self.VmCustomParams = []
+# class ApiVmDetails(object):
+#     def __init__(self):
+#         self.CloudProviderName = ''
+#         self.UID = ''
+#         self.VmCustomParams = []
 
 
 class ApiVmCustomParam(object):
