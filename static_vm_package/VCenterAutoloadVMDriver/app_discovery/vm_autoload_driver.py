@@ -1,5 +1,7 @@
 from cloudshell.api.cloudshell_api import InputNameValue
 from cloudshell.api.cloudshell_api import CloudShellAPISession
+from cloudshell.shell.core.driver_context import ApiVmDetails, ApiVmCustomParam
+
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
@@ -68,6 +70,7 @@ class DeployAppOrchestrationDriver(object):
 
     def _get_auto_load_response(self, uuid, vcenter_name, resource):
         vm_details = self._get_vm_details(uuid, vcenter_name, resource)
+        # return vm_details
         autoload_atts = [AutoLoadAttribute('', 'VmDetails', vm_details)]
         return AutoLoadDetails([], autoload_atts)
 
@@ -89,35 +92,16 @@ class DeployAppOrchestrationDriver(object):
 
     @staticmethod
     def _get_vm_details(uuid, vcenter_name, resource):
-        vm_details = ApiVmDetails()
 
+        vm_details = ApiVmDetails()
         vm_details.UID = uuid
         vm_details.CloudProviderName = vcenter_name
-
-        ip_regex = ApiVmCustomParam()
-        ip_regex.Name = 'ip_regex'
-        ip_regex.Value = resource.attributes['IP Regex']
-
-        timeout = ApiVmCustomParam()
-        timeout.Name = 'refresh_ip_timeout'
-        timeout.Value = resource.attributes['Refresh IP Timeout']
-
-        auto_power_off = ApiVmCustomParam()
-        auto_power_off.Name = 'auto_power_off'
-        auto_power_off.Value = resource.attributes['Auto Power Off']
-
-        # AutoDelete is set to False to prevent accidental termination of imported VM's
-        auto_delete = ApiVmCustomParam()
-        auto_delete.Name = 'auto_delete'
-        auto_delete.Value = 'False'
-
-        vm_details.VmCustomParams.append(timeout)
-        vm_details.VmCustomParams.append(ip_regex)
-        vm_details.VmCustomParams.append(auto_power_off)
-        vm_details.VmCustomParams.append(auto_delete)
-
+        vm_details.VmCustomParams = []
         str_vm_details = jsonpickle.encode(vm_details, unpicklable=False)
         return str_vm_details
+
+
+
 
     def _get_connection_to_vcenter(self, pv_service, session, vcenter_resource, address):
         password = self._decrypt_password(session, vcenter_resource.password)
@@ -130,16 +114,3 @@ class DeployAppOrchestrationDriver(object):
     @staticmethod
     def _decrypt_password(session, password):
         return session.DecryptPassword(password).Value
-
-
-# class ApiVmDetails(object):
-#     def __init__(self):
-#         self.CloudProviderName = ''
-#         self.UID = ''
-#         self.VmCustomParams = []
-
-
-class ApiVmCustomParam(object):
-    def __init__(self):
-        self.Name = ''
-        self.Value = ''
