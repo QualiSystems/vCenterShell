@@ -78,3 +78,6 @@ deployment
 #Misc
 .imdone
 develop.cmd
+*.zip
+debug.xml
+debug_info.txt
