@@ -318,6 +318,8 @@ class CommandOrchestrator(object):
         :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
+        self.do_not_run_on_static_vm(context)
+
         resource_details = self._parse_remote_model(context)
         # execute command
         res = self.command_wrapper.execute_command_with_connection(context,
@@ -326,6 +328,10 @@ class CommandOrchestrator(object):
                                                                    resource_details.fullname,
                                                                    cancellation_context)
         return set_command_result(result=res, unpicklable=False)
+
+    def do_not_run_on_static_vm(self, context):
+        if context.resource.app_context.deployed_app_json == '' or context.resource.app_context.deployed_app_json == None:
+            raise ValueError('This command cannot be executed on a Static VM.')
 
     # remote command
     def power_off(self, context, ports):
