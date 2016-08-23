@@ -1,3 +1,0 @@
-Debugging session started at: 18:41:42 08/22/16
-Python driver process is available for debugging at PID #8320
-Virtual environment is located at `C:\work\tfs\QualiSystems\Branches\7.1\Drop\TestShell\ExecutionServer\python\2.7.10`
