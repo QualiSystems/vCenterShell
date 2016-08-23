@@ -78,3 +78,4 @@ deployment
 #Misc
 .imdone
 develop.cmd
+*.zip
