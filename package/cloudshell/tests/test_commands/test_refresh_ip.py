@@ -8,7 +8,6 @@ from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 
 
 class TestRefreshIpCommand(TestCase):
-
     def test_refresh_ip(self):
         nic1 = Mock()
         nic1.network = 'A Network'
@@ -53,11 +52,12 @@ class TestRefreshIpCommand(TestCase):
         # Act
         refresh_ip_command.refresh_ip(si=si,
                                       session=session,
-                                      vcenter_data_model= center_resource_model,
+                                      vcenter_data_model=center_resource_model,
                                       vm_uuid='machine1',
                                       resource_name='default_network',
                                       cancellation_context=cancellation_context,
-                                      logger=Mock())
+                                      logger=Mock(),
+                                      app_request_json=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -119,7 +119,8 @@ class TestRefreshIpCommand(TestCase):
             vm_uuid='machine1',
             resource_name='default_network',
             cancellation_context=cancellation_context,
-            logger=Mock())
+            logger=Mock(),
+            app_request_json=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
@@ -173,7 +174,15 @@ class TestRefreshIpCommand(TestCase):
             vm_uuid='machine1',
             resource_name='default_network',
             cancellation_context=cancellation_context,
-            logger=Mock())
+            logger=Mock(),
+            app_request_json=Mock())
 
         # Assert
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
+
+    def test_refresh_ip_should_fail_static_vm(self):
+        # Act
+        refresh_ip_command = RefreshIpCommand(Mock(), Mock(), Mock())
+        # assert
+        self.assertRaises(ValueError, refresh_ip_command.refresh_ip, Mock(), Mock(), Mock(), Mock(), Mock(), Mock(),
+                          Mock(), None)
