@@ -1,5 +1,5 @@
-from cloudshell.api.cloudshell_api import InputNameValue
-from cloudshell.api.cloudshell_api import CloudShellAPISession
+# from cloudshell.api.cloudshell_api import InputNameValue
+# from cloudshell.api.cloudshell_api import CloudShellAPISession
 from cloudshell.shell.core.driver_context import ApiVmDetails, ApiVmCustomParam
 
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper

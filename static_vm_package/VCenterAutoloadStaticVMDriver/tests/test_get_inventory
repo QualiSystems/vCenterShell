@@ -1,0 +1,15 @@
+from unittest import TestCase
+from mock import Mock, create_autospec, patch
+
+from static_vm_package.VCenterAutoloadStaticVMDriver.app_discovery.vm_autoload_driver import \
+    DeployAppOrchestrationDriver
+
+
+class TestGetInventory(TestCase):
+    def setUp(self):
+        self.deploy_app_orchestration_driver = DeployAppOrchestrationDriver()
+        self.context = Mock()
+
+    def test_get_inventory(self):
+        self.deploy_app_orchestration_driver.get_inventory(self.context)
+        self.assertTrue(self.deploy_app_orchestration_driver.get_inventory.called)

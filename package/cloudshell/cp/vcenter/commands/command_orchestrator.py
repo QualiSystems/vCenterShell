@@ -326,7 +326,7 @@ class CommandOrchestrator(object):
                                                                    self.refresh_ip_command.refresh_ip,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   cancellation_context)
+                                                                   cancellation_context,)
         return set_command_result(result=res, unpicklable=False)
 
     def do_not_run_on_static_vm(self, context):
