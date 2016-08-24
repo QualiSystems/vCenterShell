@@ -37,6 +37,8 @@ class TestCommandOrchestrator(TestCase):
         remote_resource.uuid = 'this is full uuis of the remote resource'
         self.connection_details = Mock()
         self.context.resource = self.resource
+        self.context.resource.app_context = Mock()
+        self.context.resource.app_context.deployed_app_json = "some json"
         self.context.remote_endpoints = [self.resource]
         self.command_orchestrator = CommandOrchestrator()
         self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=True)
@@ -115,6 +117,13 @@ class TestCommandOrchestrator(TestCase):
         self.command_orchestrator.refresh_ip(self.context, cancellation_context=cancellation_context, ports=self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
+
+    def test_refresh_ip_should_fail_static_vm(self):
+        # act
+        self.context.resource.app_context.deployed_app_json = None
+        cancellation_context = object()
+        # assert
+        self.assertRaises(ValueError, self.command_orchestrator.refresh_ip,self.context, cancellation_context, self.ports)
 
     def test_get_uuid(self):
         self.command_orchestrator.get_vm_uuid_by_name(self.context, 'Name')
