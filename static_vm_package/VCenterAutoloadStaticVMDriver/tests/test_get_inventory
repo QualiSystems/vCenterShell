@@ -51,7 +51,7 @@ class TestGetInventory(TestCase):
                                                                           vcenter_name="Prinplup",
                                                                           resource="Empoleon")
         str_vm_details = jsonpickle.decode(vm_details)
-        self.assertTrue(str_vm_details['CloudProviderName']=="Prinplup2")
+        self.assertTrue(str_vm_details['CloudProviderName']=="Prinplup")
         self.assertTrue(str_vm_details['UID']=='Piplup')
 
 
