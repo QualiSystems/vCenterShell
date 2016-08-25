@@ -1,4 +1,3 @@
---- 
 after_success: coveralls
 env: 
   - CLOUD_SHELL_SHELL_CORE=1
@@ -7,8 +6,8 @@ install:
   - "pip install -r external_requirements.txt"
   - "pip install -r test_requirements.txt"
   - "pip install \"cloudshell-core>=2.0.0,<2.1.0\" --extra-index-url https://testpypi.python.org/simple"
-  - "if [[$CLOUD_SHELL_SHELL_CORE == 1]]; then pip install \"cloudshell-shell-core >=2.0.0,<2.1.0\" --extra-index-url https://testpypi.python.org/simple; fi"
-  - "if [[$CLOUD_SHELL_SHELL_CORE == 2]]; then pip install \"cloudshell-shell-core >=2.4.0,<2.5.0\" --extra-index-url https://testpypi.python.org/simple; fi"
+  - if [[$CLOUD_SHELL_SHELL_CORE == 1]]; then pip install \"cloudshell-shell-core >=2.0.0,<2.1.0\" --extra-index-url https://testpypi.python.org/simple; fi
+  - if [[$CLOUD_SHELL_SHELL_CORE == 2]]; then pip install \"cloudshell-shell-core >=2.4.0,<2.5.0\" --extra-index-url https://testpypi.python.org/simple; fi
   - "pip install \"cloudshell-automation-api>=7.1.0.0,<7.2.0.0\" --extra-index-url https://testpypi.python.org/simple"
 language: python
 notifications: 
@@ -19,5 +18,5 @@ script:
   - "pushd package"
   - "python setup.py develop"
   - popd
-  - "if [[$CLOUD_SHELL_SHELL_CORE == 1]]; then python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration; fi"
-  - "if [[$CLOUD_SHELL_SHELL_CORE == 2]]; then python runtestsStaticVM.py --with-coverage  --cover-package=package --exclude-dir=integration; fi"
+  - if [[$CLOUD_SHELL_SHELL_CORE == 1]]; then python runtests.py --with-coverage  --cover-package=package --exclude-dir=integration; fi
+  - if [[$CLOUD_SHELL_SHELL_CORE == 2]]; then python runtestsStaticVM.py --with-coverage  --cover-package=package --exclude-dir=integration; fi
