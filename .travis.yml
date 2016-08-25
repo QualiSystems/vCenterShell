@@ -1,7 +1,7 @@
 after_success: coveralls
 env: 
-  - CLOUD_SHELL_SHELL_CORE=1
-  - CLOUD_SHELL_SHELL_CORE=2
+  - CLOUD_SHELL_SHELL_CORE
+  - CLOUD_SHELL_SHELL_CORE
 install: 
   - "pip install -r external_requirements.txt"
   - "pip install -r test_requirements.txt"
