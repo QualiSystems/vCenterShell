@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ShellsConfiguration
+xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSchema.xsd">
+  <ResourceTemplates>
+    <ResourceTemplate Name="vCenter Static VM" Model="vCenter Static VM" Driver="VCenter Static VM Autoload" AddressRequired="false">
+      <Description>A generic shell for loading existing vCenter VMs to CloudShell inventory.</Description>
+      <AutoLoad Enable="true">
+        <Description>Fill in the inputs and click 'start discovery' to load a vCenter VM into CloudShell Inventory as a static VM.</Description>
+      </AutoLoad>
+      <Attributes>
+        <Attribute Name="vCenter Name" Value="" />
+        <Attribute Name="vCenter VM" Value="" />
+      </Attributes>
+    </ResourceTemplate>
+  </ResourceTemplates>
+</ShellsConfiguration>

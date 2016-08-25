@@ -1,0 +1,2 @@
+<Driver Description="Deploy App" MainClass="vm_autoload_driver.DeployAppOrchestrationDriver" Name="VCenter Static VM Autoload" Version="1.3.0">
+</Driver>
