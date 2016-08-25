@@ -24,6 +24,7 @@ class DeployAppOrchestrationDriver(object):
         self.ip_manager = VMIPManager()
         self.task_waiter = SynchronousTaskWaiter()
         self.logger = get_qs_logger('VM AutoLoad')
+        self.pv_service = pyVmomiService(SmartConnect, Disconnect, self.task_waiter)
 
     def get_inventory(self, context):
         """
@@ -44,18 +45,18 @@ class DeployAppOrchestrationDriver(object):
         vcenter_resource = self.model_parser.convert_to_vcenter_model(vcenter_api_res)
 
         si = None
-        pv_service = pyVmomiService(SmartConnect, Disconnect, self.task_waiter)
+
 
         try:
             self.logger.info('connecting to vcenter ({0})'.format(vcenter_api_res.Address))
-            si = self._get_connection_to_vcenter(pv_service, session, vcenter_resource, vcenter_api_res.Address)
+            si = self._get_connection_to_vcenter(self.pv_service, session, vcenter_resource, vcenter_api_res.Address)
 
             self.logger.info('loading vm uuid')
-            vm_loader = VMLoader(pv_service)
+            vm_loader = VMLoader(self.pv_service)
             uuid = vm_loader.load_vm_uuid_by_name(si, vcenter_resource, vcenter_vm_name)
             self.logger.info('vm uuid: {0}'.format(uuid))
             self.logger.info('loading the ip of the vm')
-            ip = self._try_get_ip(pv_service, si, uuid, vcenter_resource)
+            ip = self._try_get_ip(self.pv_service, si, uuid, vcenter_resource)
             if ip:
                 session.UpdateResourceAddress(context.resource.name, ip)
 
@@ -64,7 +65,7 @@ class DeployAppOrchestrationDriver(object):
             raise
         finally:
             if si:
-                pv_service.disconnect(si)
+                self.pv_service.disconnect(si)
 
         return self._get_auto_load_response(uuid, vcenter_name, context.resource)
 
