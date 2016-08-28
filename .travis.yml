@@ -16,5 +16,5 @@ script:
   - pushd package
   - python setup.py develop
   - popd
-  - if [$CLOUD_SHELL_SHELL_CORE==$true]; then echo 'true' fi 
+  - if [ "$CLOUD_SHELL_SHELL_CORE " -eq $true]; then echo 'true' fi 
   
