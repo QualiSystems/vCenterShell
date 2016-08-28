@@ -16,5 +16,5 @@ script:
   - pushd package
   - python setup.py develop
   - popd
-  - print "${CLOUD_SHELL_SHELL_CORE}"
+  - echo  $CLOUD_SHELL_SHELL_CORE
   
