@@ -18,5 +18,5 @@ script:
   - pushd package
   - python setup.py develop
   - popd  
-  - chmod 777 ./cloudshell_shell_core_install.sh
+  - chmod 777 ./cloudshell_shell_core_run_tests.sh
   - ./cloudshell_shell_core_run_tests.sh  
