@@ -21,7 +21,7 @@ class TestGetInventory(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'name'
         self.deploy_app_orchestration_driver.cs_helper.get_session = Mock(return_value=Mock())
-        self.deploy_app_orchestration_driver.model_parser.convert_to_vcenter_model = Mock(
+        self.deploy_app_orchetration_driver.model_parser.convert_to_vcenter_model = Mock(
             return_value=vcenter_data_model)
         self.deploy_app_orchestration_driver._get_connection_to_vcenter = Mock(return_value=Mock())
         self.deploy_app_orchestration_driver._try_get_ip = Mock(return_value=Mock())
