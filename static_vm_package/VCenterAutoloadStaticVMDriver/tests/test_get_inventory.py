@@ -45,6 +45,8 @@ class TestGetInventory(TestCase):
         self.assertTrue(self.deploy_app_orchestration_driver._try_get_ip.called)
         self.assertTrue(self.deploy_app_orchestration_driver._get_vm_details.called)
         self.assertTrue(self.deploy_app_orchestration_driver.pv_service.find_vm_by_name.called)
+        
+
 
     def test_get_vm_details(self):
         vm_details = self.deploy_app_orchestration_driver._get_vm_details(uuid="Piplup",
@@ -53,6 +55,7 @@ class TestGetInventory(TestCase):
         str_vm_details = jsonpickle.decode(vm_details)
         self.assertTrue(str_vm_details['CloudProviderName']=="Prinplup")
         self.assertTrue(str_vm_details['UID']=='Piplup')
+
 
 
 
