@@ -4,16 +4,16 @@ from urllib2 import urlopen
 from cloudshell.cp.vcenter.common.utilites.common_utils import fixurl
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
-OVF_DESTENATION_FORMAT = 'vi://{0}:{1}@{2}/{3}/host/{4}{5}'
+OVF_DESTENATION_FORMAT = '"vi://{0}:{1}@{2}/{3}/host/{4}{5}"'
 
 COMPLETED_SUCCESSFULLY = 'Completed successfully'
 NO_SSL_PARAM = '--noSSLVerify'
 ACCEPT_ALL_PARAM = '--acceptAllEulas'
 POWER_ON_PARAM = '--powerOn'
 POWER_OFF_PARAM = '--powerOffTarget'
-VM_FOLDER_PARAM = '--vmFolder={0}'
-VM_NAME_PARAM = '--name={0}'
-DATA_STORE_PARAM = '--datastore={0}'
+VM_FOLDER_PARAM = '--vmFolder="{0}"'
+VM_NAME_PARAM = '--name="{0}"'
+DATA_STORE_PARAM = '--datastore="{0}"'
 RESOURCE_POOL_PARAM_TO_URL = '/Resources/{0}'
 
 
