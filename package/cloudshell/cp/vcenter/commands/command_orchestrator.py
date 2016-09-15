@@ -1,5 +1,5 @@
 import time
-from datetime import date
+from datetime import datetime, date
 import jsonpickle
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
@@ -324,7 +324,8 @@ class CommandOrchestrator(object):
                                                                    self.refresh_ip_command.refresh_ip,
                                                                    resource_details.vm_uuid,
                                                                    resource_details.fullname,
-                                                                   cancellation_context)
+                                                                   cancellation_context,
+                                                                   context.remote_endpoints[0].app_context.app_request_json)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -454,7 +455,7 @@ class CommandOrchestrator(object):
         :rtype: SavedResults
         """
         resource_details = self._parse_remote_model(context)
-        created_date = date.today()
+        created_date = datetime.now()
         snapshot_name = created_date.strftime('%y_%m_%d %H_%M_%S_%f')
         created_snapshot_path = self.save_snapshot(context=context, snapshot_name=snapshot_name)
 

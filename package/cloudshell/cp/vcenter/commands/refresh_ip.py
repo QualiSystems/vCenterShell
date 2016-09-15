@@ -15,7 +15,11 @@ class RefreshIpCommand(object):
         self.resource_model_parser = resource_model_parser
         self.ip_manager = ip_manager
 
-    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context):
+    def _do_not_run_on_static_vm(self, app_request_json):
+        if app_request_json == '' or app_request_json is None:
+            raise ValueError('This command cannot be executed on a Static VM.')
+
+    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context,app_request_json):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 
@@ -27,7 +31,10 @@ class RefreshIpCommand(object):
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         :param cancellation_context:
         """
-        default_network = VMLocation.combine([vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
+        self._do_not_run_on_static_vm(app_request_json=app_request_json)
+
+        default_network = VMLocation.combine(
+            [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
         resource = session.GetResourceDetails(resource_name)
 
@@ -79,5 +86,3 @@ class RefreshIpCommand(object):
         if custom_param_values:
             return custom_param_values[0]
         return None
-
-

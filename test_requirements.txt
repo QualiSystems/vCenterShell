@@ -4,4 +4,5 @@ unittest2
 mock
 teamcity-messages
 nose-exclude
+freezegun
 coveralls

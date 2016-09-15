@@ -60,5 +60,5 @@ class SaveSnapshotCommand:
     def _get_snapshot_name_to_be_created(snapshot_name, vm):
         current_snapshot_name = SnapshotRetriever.get_current_snapshot_name(vm)
         if not current_snapshot_name:
-            return ''
+            return snapshot_name
         return SnapshotRetriever.combine(current_snapshot_name, snapshot_name)

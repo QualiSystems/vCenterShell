@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Metadata xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/PackageMetadataSchema.xsd">
+  <CreationDate>23/08/2016 12:47:00</CreationDate>
+  <ServerVersion>7.1.0</ServerVersion>
+  <PackageType>CloudShellPackage</PackageType>
+</Metadata>
