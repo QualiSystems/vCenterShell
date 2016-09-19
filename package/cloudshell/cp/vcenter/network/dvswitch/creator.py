@@ -24,7 +24,8 @@ class DvPortGroupCreator(object):
                               dv_switch_path,
                               vlan_id,
                               vlan_spec,
-                              logger):
+                              logger,
+                              promiscuous_mode):
         network = None
         error = None
         self._lock.acquire()
@@ -50,7 +51,8 @@ class DvPortGroupCreator(object):
                                            si,
                                            vlan_spec,
                                            vlan_id,
-                                           logger)
+                                           logger,
+                                           promiscuous_mode)
                 network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
 
             if not network:
@@ -63,20 +65,21 @@ class DvPortGroupCreator(object):
                 raise error
             return network
 
-    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id, logger):
+    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id,
+                              logger, promiscuous_mode):
         dv_switch = self.pyvmomi_service.get_folder(si, '{0}/{1}'.format(dv_switch_path, dv_switch_name))
         if not dv_switch:
             raise ValueError('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id,
-                                                            logger=logger)
+                                                            logger, promiscuous_mode)
         self.synchronous_task_waiter.wait_for_task(task=task,
                                                    logger=logger,
                                                    action_name='Create dv port group',
                                                    hide_result=False)
 
     @staticmethod
-    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, num_ports=32):
+    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, promiscuous_mode, num_ports=32):
         """
         Create ' Distributed Virtual Portgroup' Task
         :param dv_port_name: <str>  Distributed Virtual Portgroup Name
@@ -85,6 +88,7 @@ class DvPortGroupCreator(object):
         :param vlan_id: <int>
         :param logger:
         :param num_ports: <int> number of ports in this Group
+        :param promiscuous_mode <str> 'True' or 'False' turn on/off promiscuous mode for the port group
         :return: <vim.Task> Task which really provides update
         """
 
@@ -98,7 +102,9 @@ class DvPortGroupCreator(object):
 
         dv_pg_spec.defaultPortConfig.vlan = spec
         dv_pg_spec.defaultPortConfig.vlan.vlanId = vlan_id
-        dv_pg_spec.defaultPortConfig.securityPolicy.allowPromiscuous = vim.BoolPolicy(value=True)
+
+        promiscuous_mode = promiscuous_mode.lower() == 'true'
+        dv_pg_spec.defaultPortConfig.securityPolicy.allowPromiscuous = vim.BoolPolicy(value=promiscuous_mode)
         dv_pg_spec.defaultPortConfig.securityPolicy.forgedTransmits = vim.BoolPolicy(value=True)
 
         dv_pg_spec.defaultPortConfig.vlan.inherited = False
