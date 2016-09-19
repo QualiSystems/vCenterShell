@@ -54,24 +54,27 @@ class VCenterAutoModelDiscovery(object):
         resource = context.resource
         auto_attr = []
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
+
         if not si:
             error_message = 'Could not connect to the vCenter: {0}, with given credentials'\
                 .format(context.resource.address)
             logger.error(error_message)
             raise ValueError(error_message)
-        all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
 
-        dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
+        try:
+            all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
+            dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
+            all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
+            dc_name = dc.name
 
-        all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
-
-        dc_name = dc.name
-
-        for key, value in resource.attributes.items():
-            if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
-                continue
-            validation_method = self._get_validation_method(key)
-            validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
+            for key, value in resource.attributes.items():
+                if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
+                    continue
+                validation_method = self._get_validation_method(key)
+                validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
+        except vim.fault.NoPermission:
+            logger.exception('Autodiscovery failed due to permissions error:')
+            raise Exception("vCenter permissions for configured resource(s) are invalid")
 
         logger.info('Autodiscovery completed')
 
