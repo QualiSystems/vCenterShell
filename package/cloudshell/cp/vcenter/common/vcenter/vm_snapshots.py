@@ -1,3 +1,5 @@
+import collections
+
 from pyVmomi import vim
 
 
@@ -47,7 +49,7 @@ class SnapshotRetriever:
         :return: dictinary of snapshot path and snapshot instances
         :rtype: dict(str,vim.vm.Snapshot)
         """
-        snapshot_paths = {}
+        snapshot_paths = collections.OrderedDict()
 
         if not snapshots:
             return snapshot_paths
