@@ -13,7 +13,11 @@
             <Command Description="" DisplayName="Disconnect" Name="disconnect" Tags="allow_unreserved" />
         </Category>
         <Category Name="Snapshot">
-            <Command Description="" DisplayName="Save Snapshot" Name="remote_save_snapshot" Tags="remote_connectivity,allow_unreserved" />
+            <Command Description="" DisplayName="Save Snapshot" Name="remote_save_snapshot" Tags="remote_connectivity,allow_unreserved">
+                <Parameters>
+                    <Parameter DefaultValue="" Description="Please enter the VM snapshot name, for example Snapshot1" DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
+                </Parameters>
+            </Command>
             <Command Description="" DisplayName="Restore Snapshot" Name="remote_restore_snapshot" Tags="remote_connectivity,allow_unreserved">
                 <Parameters>
                     <Parameter DefaultValue="" Description="Please enter the full path of the VM snapshot, for example Snapshot1/Snapshot2." DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
