@@ -29,6 +29,18 @@ class DeployFromImage(ResourceDriverInterface):
                                              context.connectivity.admin_auth_token,
                                              context.reservation.domain)
 
+        app_request = jsonpickle.decode(context.resource.app_context.app_request_json)
+
+        if not Name:
+            Name = app_request['name']
+
+        # Cloudshell >= v7.2 have no vCenter Name attribute, fill it from the cloudProviderName context attr
+        cloud_provider_name = app_request["deploymentService"].get("cloudProviderName")
+
+        if cloud_provider_name:
+            attrs = self.resource_model_parser.get_resource_attributes(context.resource)
+            attrs["vCenter Name"] = cloud_provider_name
+
         # get vCenter resource name, template name, template folder
         vcenter_image_resource_model = \
             self.resource_model_parser.convert_to_resource_model(context.resource,
@@ -36,8 +48,6 @@ class DeployFromImage(ResourceDriverInterface):
 
         vcenter_res = vcenter_image_resource_model.vcenter_name
 
-        if not Name:
-            Name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']
 
         deployment_info = self._get_deployment_info(vcenter_image_resource_model, Name)
         result = session.ExecuteCommand(context.reservation.reservation_id,
