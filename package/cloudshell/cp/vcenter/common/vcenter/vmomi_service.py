@@ -1,10 +1,14 @@
 ﻿import time
+
 import requests
 from pyVmomi import vim
+
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
+
 
 class pyVmomiService:
     # region consts
@@ -439,7 +443,8 @@ class pyVmomiService:
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
             vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
-
+        except TaskFaultException:
+            raise
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
