@@ -85,12 +85,12 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.connector.virtual_machine_port_group_configurer.connect_by_mapping = Mock(return_value="OK")
         self.connector.connect_and_get_vm = Mock(return_value=(1, 1,))
 
-        res = self.connector.connect_by_mapping(self.si, self.vm, [], 'default_network', [], logger=Mock())
+        res = self.connector.connect_by_mapping(self.si, self.vm, [], 'default_network', [], Mock(), 'True')
         self.assertEqual(res, 'OK')
-        res = self.connector.connect_by_mapping(self.si, self.vm, [], None, [], logger=Mock())
+        res = self.connector.connect_by_mapping(self.si, self.vm, [], None, [], Mock(), 'True')
         self.assertEqual(res, 'OK')
 
-        res = self.connector.connect_by_mapping(self.si, self.vm, mapp, 'default_network', [], logger=Mock())
+        res = self.connector.connect_by_mapping(self.si, self.vm, mapp, 'default_network', [], Mock(), 'True')
         self.assertEqual(res, 'OK')
-        res = self.connector.connect_by_mapping(self.si, self.vm, mapp, None, [], logger=Mock())
+        res = self.connector.connect_by_mapping(self.si, self.vm, mapp, None, [], Mock(), 'True')
         self.assertEqual(res, 'OK')

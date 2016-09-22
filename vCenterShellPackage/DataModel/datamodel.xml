@@ -170,6 +170,12 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="true" Description="If enabled the port groups on the virtual switch will be configured to allow promiscuous mode." IsReadOnly="false" Name="Promiscuous Mode" Type="Boolean">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
     <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
@@ -220,6 +226,9 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Promiscuous Mode">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="Reserved Networks" Value="" />
@@ -234,6 +243,7 @@
             <ns0:AttributeValue Name="Shutdown Method" Value="hard" />
             <ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
             <ns0:AttributeValue Name="Execution Server Selector" Value="" />
+            <ns0:AttributeValue Name="Promiscuous Mode" Value="true" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>

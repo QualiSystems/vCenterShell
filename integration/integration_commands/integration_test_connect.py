@@ -46,7 +46,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
         vm = py_vmomi_service.find_vm_by_name(si, 'QualiSB/Raz', '2')
 
         # Act
-        connector.connect_by_mapping(si, vm, [mapping], None, [])
+        connector.connect_by_mapping(si, vm, [mapping], None, [], Mock(), 'True')
 
         pass
 
@@ -77,7 +77,7 @@ class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
 
         command = VirtualSwitchConnectCommand(py_vmomi_service, connector, name_gen, vlan_spec, range_fac, Mock())
 
-        command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork', [])
+        command.connect_to_networks(si, vm_uuid, [mapping], 'QualiSB/anetwork', [], 'True')
 
     def test_integration(self):
         self.integration_test_connect_A()
