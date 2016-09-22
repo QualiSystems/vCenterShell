@@ -49,20 +49,22 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         mapping.vlan_spec = 'trunc'
         mapping.dv_port_name = 'port_name'
         mapping.network = Mock()
+        logger = Mock()
 
         # act
         connect_results = connect_command.connect_to_networks(si=self.si,
-                                                              logger=Mock(),
+                                                              logger=logger,
                                                               vm_uuid=self.vm_uuid,
                                                               vm_network_mappings=[mapping],
                                                               default_network_name='default_network',
                                                               reserved_networks=[],
-                                                              dv_switch_name='')
+                                                              dv_switch_name='',
+                                                              promiscuous_mode='True')
 
         # assert
         self.assertTrue(self.vlan_id_range_parser.parse_vlan_id.called_with(self.vlan_id))
         self.assertTrue(
             self.dv_port_name_gen.generate_port_group_name.called_with(self.vlan_id, self.vlan_spec_factory))
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
-        self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping]))
+        self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping], logger, 'True'))
         self.assertEqual(connect_results[0].mac_address, 'AA-BB')

@@ -22,6 +22,7 @@ class TestCommandOrchestrator(TestCase):
         self.vc_data_model.default_network = 'Anetwork'
         self.vc_data_model.default_datacenter = 'datacenter'
         self.vc_data_model.holding_network = 'Holding Network'
+        self.vc_data_model.promiscuous_mode = 'True'
 
         self.si = Mock()
 
@@ -39,6 +40,7 @@ class TestCommandOrchestrator(TestCase):
         vc_data_model.default_network = 'Anetwork'
         vc_data_model.default_datacenter = 'datacenter'
         vc_data_model.holding_network = 'Holding Network'
+        self.vc_data_model.promiscuous_mode = 'True'
 
         request, expected = self._get_missing_dv_switch_params()
         results = self.ConnectionCommandOrchestrator.connect_bulk(si=self.si,
