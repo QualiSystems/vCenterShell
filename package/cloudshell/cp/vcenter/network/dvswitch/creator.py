@@ -41,6 +41,7 @@ class DvPortGroupCreator(object):
                                                                   '{0}/{1}'.format(dv_switch_path, dv_switch_name),
                                                                   dv_port_name)
                 except KeyError:
+                    logger.debug("Failed to find port group for {}".format(dv_port_name), exc_info=True)
                     network = None
 
             # if we still couldn't get the network ---> create it(can't find it, play god!)
@@ -58,6 +59,7 @@ class DvPortGroupCreator(object):
             if not network:
                 raise ValueError('Could not get or create vlan named: {0}'.format(dv_port_name))
         except ValueError as e:
+            logger.debug("Failed to find network", exc_info=True)
             error = e
         finally:
             self._lock.release()

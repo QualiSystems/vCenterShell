@@ -226,7 +226,7 @@ class ConnectionCommandOrchestrator(object):
             results += self._get_set_vlan_result_suc(act_by_mode_by_vlan_by_nic, connection_res_map)
 
         except Exception as e:
-            self.logger.error('Exception raised while connecting vm({0}) with exception: {1}'.format(vm_uuid, e))
+            self.logger.exception('Exception raised while connecting vm({})'.format(vm_uuid))
             for mode, actions in set_vlan_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
@@ -347,7 +347,7 @@ class ConnectionCommandOrchestrator(object):
                 results.append(action_result)
             final_res = self._consolidate_duplicate_results(results)
         except Exception as e:
-            self.logger.error('Exception raised while disconnecting vm({0}) with exception: {1}'.format(vm_uuid, e))
+            self.logger.exception('Exception raised while disconnecting vm({})'.format(vm_uuid))
             for mode, actions in mode_to_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
