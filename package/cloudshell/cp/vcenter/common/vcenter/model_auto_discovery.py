@@ -37,14 +37,19 @@ class VCenterAutoModelDiscovery(object):
         self.cs_helper = CloudshellDriverHelper()
         self.context_based_logger_factory = ContextBasedLoggerFactory()
 
+    def _get_logger(self, context):
+        """Get Quali logger from the given context
+        :param context: models.QualiDriverModels.AutoLoadCommandContext
+        """
+        return self.context_based_logger_factory.create_logger_for_context(
+            logger_name='vCenterShell',
+            context=context)
+
     def validate_and_discover(self, context):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
-        logger = self.context_based_logger_factory.create_logger_for_context(
-            logger_name='vCenterShell',
-            context=context)
-
+        logger = self._get_logger(context)
         logger.info('Autodiscovery started')
 
         session = self.cs_helper.get_session(context.connectivity.server_address,
@@ -143,6 +148,9 @@ class VCenterAutoModelDiscovery(object):
                                          connection_details.password,
                                          connection_details.port)
         except Exception:
+            logger = self._get_logger(context)
+            logger.exception("Could not connect to the vcenter")
+
             raise ValueError('could not connect to the vcenter: {0}, with the given credentials ({1})'.format(
                 connection_details.host,
                 connection_details.username))
