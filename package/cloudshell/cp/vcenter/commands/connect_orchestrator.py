@@ -1,3 +1,4 @@
+import traceback
 from multiprocessing.pool import ThreadPool
 
 import jsonpickle
@@ -347,7 +348,8 @@ class ConnectionCommandOrchestrator(object):
                 results.append(action_result)
             final_res = self._consolidate_duplicate_results(results)
         except Exception as e:
-            self.logger.exception('Exception raised while disconnecting vm({})'.format(vm_uuid))
+            self.logger.error('Exception raised while disconnecting vm {0}. Traceback: {1}'
+                              .format(vm_uuid, traceback.format_exc()))
             for mode, actions in mode_to_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)

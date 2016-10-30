@@ -1,4 +1,5 @@
 ﻿import time
+import traceback
 
 import requests
 from pyVmomi import vim
@@ -446,10 +447,10 @@ class pyVmomiService:
         except TaskFaultException:
             raise
         except vim.fault.NoPermission as error:
-            logger.error("vcenter returned - no permission: {0}".format(error))
+            logger.error("vcenter returned - no permission: {0}. Traceback: {1}".format(error, traceback.format_exc()))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
         except Exception as e:
-            logger.error("error deploying: {0}".format(e))
+            logger.error("error deploying: {0}.".format(traceback.format_exc()))
             raise Exception('Error has occurred while deploying, please look at the log for more info.')
 
         result.vm = vm
