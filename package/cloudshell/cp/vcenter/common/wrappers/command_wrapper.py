@@ -1,7 +1,10 @@
 import inspect
+
+from retrying import retry
+
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
-from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService, VCenterAuthError
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
@@ -21,6 +24,10 @@ END = 'END'
 LOG_FORMAT = 'action:{0} command_name:{1}'
 
 
+def retry_if_auth_error(ex):
+    return isinstance(ex, VCenterAuthError)
+
+
 class CommandWrapper:
     def __init__(self, pv_service, cloud_shell_helper, resource_model_parser, context_based_logger_factory):
         """
@@ -37,6 +44,7 @@ class CommandWrapper:
         self.resource_model_parser = resource_model_parser  # type: ResourceModelParser
         self.context_based_logger_factory = context_based_logger_factory  # type ContextBasedLoggerFactory
 
+    @retry(stop_max_attempt_number=3, wait_fixed=2000, retry_on_exception=retry_if_auth_error)
     def execute_command_with_connection(self, context, command, *args):
         """
         Note: session & vcenter_data_model objects will be injected dynamically to the command
@@ -47,8 +55,8 @@ class CommandWrapper:
         """
 
         logger = self.context_based_logger_factory.create_logger_for_context(
-            logger_name='vCenterShell',
-            context=context)
+                logger_name='vCenterShell',
+                context=context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)
@@ -76,9 +84,9 @@ class CommandWrapper:
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                    DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                 connection_details.username,
-                                                 connection_details.port))
+                        DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                     connection_details.username,
+                                                     connection_details.port))
 
                 si = self.pv_service.connect(connection_details.host,
                                              connection_details.username,
