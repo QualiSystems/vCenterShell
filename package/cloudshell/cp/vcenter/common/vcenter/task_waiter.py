@@ -32,6 +32,8 @@ class SynchronousTaskWaiter(object):
                 multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
 
             logger.info(multi_msg)
+            logger.info("task info dump: {0}".format(task.info))
+
             raise Exception(multi_msg)
 
         return task.info.result
