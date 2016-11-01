@@ -37,6 +37,8 @@ class SynchronousTaskWaiter(object):
                 multi_msg = task.info.error.msg
 
             logger.info("task execution failed due to: {}".format(multi_msg))
+            logger.info("task info dump: {0}".format(task.info))
+            
             raise TaskFaultException(multi_msg)
 
         return task.info.result
