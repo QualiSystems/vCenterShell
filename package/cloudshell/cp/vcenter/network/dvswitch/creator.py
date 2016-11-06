@@ -24,8 +24,7 @@ class DvPortGroupCreator(object):
                               dv_switch_path,
                               vlan_id,
                               vlan_spec,
-                              logger,
-                              promiscuous_mode):
+                              logger):
         network = None
         error = None
         self._lock.acquire()
@@ -41,7 +40,6 @@ class DvPortGroupCreator(object):
                                                                   '{0}/{1}'.format(dv_switch_path, dv_switch_name),
                                                                   dv_port_name)
                 except KeyError:
-                    logger.debug("Failed to find port group for {}".format(dv_port_name), exc_info=True)
                     network = None
 
             # if we still couldn't get the network ---> create it(can't find it, play god!)
@@ -52,14 +50,12 @@ class DvPortGroupCreator(object):
                                            si,
                                            vlan_spec,
                                            vlan_id,
-                                           logger,
-                                           promiscuous_mode)
+                                           logger)
                 network = self.pyvmomi_service.find_network_by_name(si, dv_switch_path, dv_port_name)
 
             if not network:
                 raise ValueError('Could not get or create vlan named: {0}'.format(dv_port_name))
         except ValueError as e:
-            logger.debug("Failed to find network", exc_info=True)
             error = e
         finally:
             self._lock.release()
@@ -67,21 +63,20 @@ class DvPortGroupCreator(object):
                 raise error
             return network
 
-    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id,
-                              logger, promiscuous_mode):
+    def _create_dv_port_group(self, dv_port_name, dv_switch_name, dv_switch_path, si, spec, vlan_id, logger):
         dv_switch = self.pyvmomi_service.get_folder(si, '{0}/{1}'.format(dv_switch_path, dv_switch_name))
         if not dv_switch:
             raise ValueError('DV Switch {0} not found in path {1}'.format(dv_switch_name, dv_switch_path))
 
         task = DvPortGroupCreator.dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id,
-                                                            logger, promiscuous_mode)
+                                                            logger=logger)
         self.synchronous_task_waiter.wait_for_task(task=task,
                                                    logger=logger,
                                                    action_name='Create dv port group',
                                                    hide_result=False)
 
     @staticmethod
-    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, promiscuous_mode, num_ports=32):
+    def dv_port_group_create_task(dv_port_name, dv_switch, spec, vlan_id, logger, num_ports=32):
         """
         Create ' Distributed Virtual Portgroup' Task
         :param dv_port_name: <str>  Distributed Virtual Portgroup Name
@@ -90,7 +85,6 @@ class DvPortGroupCreator(object):
         :param vlan_id: <int>
         :param logger:
         :param num_ports: <int> number of ports in this Group
-        :param promiscuous_mode <str> 'True' or 'False' turn on/off promiscuous mode for the port group
         :return: <vim.Task> Task which really provides update
         """
 
@@ -104,9 +98,7 @@ class DvPortGroupCreator(object):
 
         dv_pg_spec.defaultPortConfig.vlan = spec
         dv_pg_spec.defaultPortConfig.vlan.vlanId = vlan_id
-
-        promiscuous_mode = promiscuous_mode.lower() == 'true'
-        dv_pg_spec.defaultPortConfig.securityPolicy.allowPromiscuous = vim.BoolPolicy(value=promiscuous_mode)
+        dv_pg_spec.defaultPortConfig.securityPolicy.allowPromiscuous = vim.BoolPolicy(value=True)
         dv_pg_spec.defaultPortConfig.securityPolicy.forgedTransmits = vim.BoolPolicy(value=True)
 
         dv_pg_spec.defaultPortConfig.vlan.inherited = False

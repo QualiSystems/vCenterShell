@@ -1,8 +1,5 @@
 import time
-
 from pyVmomi import vim
-
-from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
 
 
 class SynchronousTaskWaiter(object):
@@ -33,10 +30,10 @@ class SynchronousTaskWaiter(object):
             multi_msg = ''
             if task.info.error.faultMessage:
                 multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
-            elif task.info.error.msg:
-                multi_msg = task.info.error.msg
 
-            logger.info("task execution failed due to: {}".format(multi_msg))
-            raise TaskFaultException(multi_msg)
+            logger.info(multi_msg)
+            logger.info("task info dump: {0}".format(task.info))
+
+            raise Exception(multi_msg)
 
         return task.info.result

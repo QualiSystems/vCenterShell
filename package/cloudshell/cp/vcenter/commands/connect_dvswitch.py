@@ -22,7 +22,7 @@ class VirtualSwitchConnectCommand:
         self.vlan_id_range_parser = vlan_id_range_parser
 
     def connect_to_networks(self, si, logger, vm_uuid, vm_network_mappings, default_network_name,
-                            reserved_networks, dv_switch_name, promiscuous_mode):
+                            reserved_networks, dv_switch_name):
         """
         Connect VM to Network
         :param si: VmWare Service Instance - defined connection to vCenter
@@ -32,7 +32,6 @@ class VirtualSwitchConnectCommand:
         :param default_network_name: <str> Full Network name - likes 'DataCenterName/NetworkName'
         :param reserved_networks:
         :param dv_switch_name: <str> Default dvSwitch name
-        :param promiscuous_mode <str> 'True' or 'False' turn on/off promiscuous mode for the port group
         :return: None
         """
         vm = self.pv_service.find_by_uuid(si, vm_uuid)
@@ -48,7 +47,7 @@ class VirtualSwitchConnectCommand:
         mappings = self._prepare_mappings(dv_switch_name=dv_switch_name, vm_network_mappings=vm_network_mappings)
 
         updated_mappings = self.virtual_switch_to_machine_connector.connect_by_mapping(
-            si, vm, mappings, default_network_instance, reserved_networks, logger, promiscuous_mode)
+            si, vm, mappings, default_network_instance, reserved_networks, logger)
 
         connection_results = []
         for updated_mapping in updated_mappings:

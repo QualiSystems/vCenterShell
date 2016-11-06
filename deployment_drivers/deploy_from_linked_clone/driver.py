@@ -31,21 +31,12 @@ class DeployCloneFromVMDriver(ResourceDriverInterface):
                                              context.connectivity.admin_auth_token,
                                              context.reservation.domain)
 
-        app_request = jsonpickle.decode(context.resource.app_context.app_request_json)
-
-        if not Name:
-            Name = app_request['name']
-
-        # Cloudshell >= v7.2 have no vCenter Name attribute, fill it from the cloudProviderName context attr
-        cloud_provider_name = app_request["deploymentService"].get("cloudProviderName")
-
-        if cloud_provider_name:
-            attrs = self.resource_model_parser.get_resource_attributes(context.resource)
-            attrs["vCenter Name"] = cloud_provider_name
-
         vcenter_template_resource_model = \
             self.resource_model_parser.convert_to_resource_model(context.resource,
                                                                  VCenterDeployVMFromLinkedCloneResourceModel)
+
+        if not Name:
+            Name = jsonpickle.decode(context.resource.app_context.app_request_json)['name']
 
         deploy_from_template_details = DeployFromTemplateDetails(vcenter_template_resource_model, Name)
 

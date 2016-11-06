@@ -22,10 +22,6 @@ def set_command_result(result, unpicklable=False):
     :param unpicklable: If True adds JSON can be deserialized as real object.
                         When False will be deserialized as dictionary
     """
-    # we do not need to serialize an empty response from the vCenter
-    if result is None:
-        return
-
     json = jsonpickle.encode(result, unpicklable=unpicklable)
     result_for_output = str(json)
     print result_for_output

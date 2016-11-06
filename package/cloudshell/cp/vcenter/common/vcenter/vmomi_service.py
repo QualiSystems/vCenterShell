@@ -1,13 +1,16 @@
 ﻿import time
-
 import requests
 from pyVmomi import vim
-
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
-from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
+
+
+class VCenterAuthError (Exception):
+    def __init__(self, original_exception):
+        super(VCenterAuthError, self).__init__(original_exception.message)
+        self.original_exception = original_exception
 
 
 class pyVmomiService:
@@ -65,7 +68,7 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except vim.fault.InvalidLogin as e:
-            raise ValueError(e.msg)
+            raise VCenterAuthError(e.msg)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
             raise ValueError('Cannot connect to vCenter, please check that the address is valid')
@@ -443,8 +446,7 @@ class pyVmomiService:
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
             vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
-        except TaskFaultException:
-            raise
+
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
