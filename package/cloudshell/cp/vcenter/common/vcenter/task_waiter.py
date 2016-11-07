@@ -1,18 +1,10 @@
 import time
 from pyVmomi import vim
 
-from cloudshell.cp.vcenter.exceptions.user_defined_exceptions import ActionCancelledException
-
 
 class SynchronousTaskWaiter(object):
     def __init__(self):
         pass
-
-    def _check_cancelation(self, cancellation_context, task, action_name):
-        if task.info.cancelable and cancellation_context.is_cancelled and not task.info.cancelled:
-            task.CancelTask()
-            msg = "Action '{0}' was cancelled.".format(action_name)
-            raise ActionCancelledException(msg)
 
     # noinspection PyMethodMayBeStatic
     def wait_for_task(self, task, logger, action_name='job', hide_result=False, cancellation_context=None):
@@ -24,11 +16,16 @@ class SynchronousTaskWaiter(object):
         :param hide_result:
         :param logger:
         """
-        cancellation_context.is_cancelled = True
 
         while task.info.state in [vim.TaskInfo.State.running, vim.TaskInfo.State.queued]:
-            self._check_cancelation(cancellation_context, task, action_name)
             time.sleep(2)
+            if cancellation_context is not None and task.info.cancelable and cancellation_context.is_cancelled and not task.info.cancelled:
+                # some times the cancel operation doesn't really cancel the task
+                # so consider an additional handling of the canceling
+                task.CancelTask()
+                logger.info("SynchronousTaskWaiter: task.CancelTask() " + str(task.info.name.info.name))
+                logger.info("SynchronousTaskWaiter: task.info.cancelled " + str(task.info.cancelled))
+                logger.info("SynchronousTaskWaiter: task.info.state " + str(task.info.state))
 
         if task.info.state == vim.TaskInfo.State.success:
             if task.info.result is not None and not hide_result:

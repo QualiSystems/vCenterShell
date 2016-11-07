@@ -102,6 +102,9 @@ class VirtualMachineDeployer(object):
                                                    power_on=other_params.auto_power_on,
                                                    snapshot=snapshot)
 
+        if cancellation_context.is_cancelled:
+            raise Exception("Action 'Clone VM' was cancelled.")
+
         clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger,
                                                    cancellation_context=cancellation_context)
         if clone_vm_result.error:
