@@ -5,6 +5,7 @@ from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.exceptions.user_defined_exceptions import ActionCancelledException
 
 
 class VCenterAuthError (Exception):
@@ -380,10 +381,11 @@ class pyVmomiService:
             self.vm = vm
             self.error = error
 
-    def clone_vm(self, clone_params, logger):
+    def clone_vm(self, clone_params, logger, cancellation_context):
         """
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
+        :param cancellation_context:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
@@ -445,11 +447,16 @@ class pyVmomiService:
         logger.info("cloning VM...")
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger,
+                                                action_name='Clone VM',
+                                                cancellation_context=cancellation_context)
 
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
+        except ActionCancelledException as e:
+            logger.error("error deploying: {0}".format(e))
+            raise Exception(e.message)
         except Exception as e:
             logger.error("error deploying: {0}".format(e))
             raise Exception('Error has occurred while deploying, please look at the log for more info.')
