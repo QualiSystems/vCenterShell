@@ -48,8 +48,8 @@ class VCenterShellDriver (ResourceDriverInterface):
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
-    def deploy_from_template(self, context, deploy_data):
-        return self.command_orchestrator.deploy_from_template(context, deploy_data)
+    def deploy_from_template(self, context, deploy_data, cancellation_context):
+        return self.command_orchestrator.deploy_from_template(context, deploy_data, cancellation_context)
 
     def deploy_clone_from_vm(self, context, deploy_data):
         return self.command_orchestrator.deploy_clone_from_vm(context, deploy_data)
