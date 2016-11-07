@@ -10,6 +10,13 @@ from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWait
 from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
 
 
+
+class VCenterAuthError (Exception):
+    def __init__(self, original_exception):
+        super(VCenterAuthError, self).__init__(original_exception.message)
+        self.original_exception = original_exception
+
+
 class pyVmomiService:
     # region consts
     ChildEntity = 'childEntity'
@@ -65,7 +72,7 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except vim.fault.InvalidLogin as e:
-            raise ValueError(e.msg)
+            raise VCenterAuthError(e.msg)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
             raise ValueError('Cannot connect to vCenter, please check that the address is valid')
