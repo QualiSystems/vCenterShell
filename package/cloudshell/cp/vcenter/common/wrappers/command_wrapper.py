@@ -1,4 +1,5 @@
 import inspect
+from threading import Lock
 
 from retrying import retry
 
@@ -43,6 +44,9 @@ class CommandWrapper:
         self.cs_helper = cloud_shell_helper  # type: CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type: ResourceModelParser
         self.context_based_logger_factory = context_based_logger_factory  # type ContextBasedLoggerFactory
+        # add lock
+        self.lock = Lock()
+        self.si = None
 
     @retry(stop_max_attempt_number=3, wait_fixed=2000, retry_on_exception=retry_if_auth_error)
     def execute_command_with_connection(self, context, command, *args):
@@ -55,8 +59,8 @@ class CommandWrapper:
         """
 
         logger = self.context_based_logger_factory.create_logger_for_context(
-                logger_name='vCenterShell',
-                context=context)
+            logger_name='vCenterShell',
+            context=context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)
@@ -84,14 +88,11 @@ class CommandWrapper:
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                        DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                     connection_details.username,
-                                                     connection_details.port))
+                    DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                 connection_details.username,
+                                                 connection_details.port))
 
-                si = self.pv_service.connect(connection_details.host,
-                                             connection_details.username,
-                                             connection_details.password,
-                                             connection_details.port)
+                si = self.get_py_service_connection(connection_details,logger)
             if si:
                 logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
                 command_args.append(si)
@@ -117,10 +118,19 @@ class CommandWrapper:
             logger.exception(COMMAND_ERROR.format(command_name))
             raise
         finally:
-            if si:
-                logger.info(DISCONNCTING_VCENERT.format(connection_details.host))
-                self.pv_service.disconnect(si)
             logger.info(LOG_FORMAT.format(END, command_name))
+
+    def get_py_service_connection(self, connection_details, logger):
+        logger.info("get_py_service_connection")
+        if self.si is None:
+            with self.lock:
+                if self.si is None:
+                    logger.info("Creating a new connection.")
+                    self.si = self.pv_service.connect(connection_details.host,
+                                                      connection_details.username,
+                                                      connection_details.password,
+                                                      connection_details.port)
+        return self.si
 
     @staticmethod
     def _get_domain(context):
