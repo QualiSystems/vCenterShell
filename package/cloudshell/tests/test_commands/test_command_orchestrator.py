@@ -68,28 +68,35 @@ class TestCommandOrchestrator(TestCase):
 
     def test_deploy_from_template(self):
         # act
+        cancellation_context = object()
         self.command_orchestrator.deploy_from_template(self.context,
-                                                       '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
+                                                       '{"name": "name", "template_resource_model": {"vcenter_template": ""}}',
+                                                       cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_vm_from_vm(self):
         # act
+        cancellation_context = object()
         self.command_orchestrator.deploy_clone_from_vm(self.context,
-                                                       '{"name": "name", "template_resource_model": {"vcenter_vm": ""}}')
+                                                       '{"name": "name", "template_resource_model": {"vcenter_vm": ""}}',
+                                                       cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_snapshot(self):
         # act
+        cancellation_context = object()
         self.command_orchestrator.deploy_from_linked_clone(self.context,
-                                                           '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vcenter_vm_snapshot": "snap"}}')
+                                                           '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vcenter_vm_snapshot": "snap"}}',
+                                                           cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_image(self):
         # act
-        self.command_orchestrator.deploy_from_image(self.context, '{"name": "name"}')
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_image(self.context, '{"name": "name"}', cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
