@@ -1,7 +1,6 @@
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
-from cloudshell.cp.vcenter.models.QualiDriverModels import CancellationContext
 
 
 class VCenterShellDriver (ResourceDriverInterface):
@@ -52,16 +51,14 @@ class VCenterShellDriver (ResourceDriverInterface):
     def deploy_from_template(self, context, deploy_data, cancellation_context):
         return self.command_orchestrator.deploy_from_template(context, deploy_data, cancellation_context)
 
-    def deploy_clone_from_vm(self, context, deploy_data, cancellation_context):
-        return self.command_orchestrator.deploy_clone_from_vm(context, deploy_data, cancellation_context)
+    def deploy_clone_from_vm(self, context, deploy_data):
+        return self.command_orchestrator.deploy_clone_from_vm(context, deploy_data)
 
-    def deploy_from_linked_clone(self, context, deploy_data, cancellation_context):
-        return self.command_orchestrator.deploy_from_linked_clone(context, deploy_data, cancellation_context)
+    def deploy_from_linked_clone(self, context, deploy_data):
+        return self.command_orchestrator.deploy_from_linked_clone(context, deploy_data)
 
-    def deploy_from_image(self, context, deploy_data, cancellation_context=None):
-        if cancellation_context is None:
-            cancellation_context = CancellationContext()
-        return self.command_orchestrator.deploy_from_image(context, deploy_data, cancellation_context)
+    def deploy_from_image(self, context, deploy_data):
+        return self.command_orchestrator.deploy_from_image(context, deploy_data)
 
     def get_inventory(self, context):
         """

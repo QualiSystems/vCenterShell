@@ -11,32 +11,28 @@ class DeployCommand(object):
         """
         self.deployer = deployer
 
-    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, deployment_params, cancellation_context):
+    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, deployment_params):
         """
         Calls the deployer to deploy vm from snapshot
-        :param cancellation_context:
         :param si:
         :param logger:
         :type deployment_params: DeployFromLinkedClone
         :param vcenter_data_model:
         :return:
         """
-        deploy_result = self.deployer.deploy_from_linked_clone(si, logger, deployment_params, cancellation_context,
-                                                               vcenter_data_model)
+        deploy_result = self.deployer.deploy_from_linked_clone(si, logger, deployment_params, vcenter_data_model)
         return deploy_result
 
-    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, deployment_params, cancellation_context):
+    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, deployment_params):
         """
         Calls the deployer to deploy vm from another vm
-        :param cancellation_context:
         :param si:
         :param logger:
         :type deployment_params: DeployFromTemplateDetails
         :param vcenter_data_model:
         :return:
         """
-        deploy_result = self.deployer.deploy_clone_from_vm(si, logger, deployment_params, cancellation_context,
-                                                           vcenter_data_model)
+        deploy_result = self.deployer.deploy_clone_from_vm(si, logger, deployment_params, vcenter_data_model)
         return deploy_result
 
     def execute_deploy_from_template(self, si, logger, vcenter_data_model, deployment_params, cancellation_context):
@@ -53,8 +49,7 @@ class DeployCommand(object):
                                                            vcenter_data_model)
         return deploy_result
 
-    def execute_deploy_from_image(self, si, logger, session, vcenter_data_model, deployment_params,
-                                  cancellation_context, resource_context):
+    def execute_deploy_from_image(self, si, logger, session, vcenter_data_model, deployment_params, resource_context):
         """
 
         :param si:
@@ -62,7 +57,6 @@ class DeployCommand(object):
         :param session:
         :param vcenter_data_model:
         :param deployment_params:
-        :param cancellation_context:
         :param resource_context:
         :return:
         """
@@ -71,6 +65,5 @@ class DeployCommand(object):
                                                         session=session,
                                                         vcenter_data_model=vcenter_data_model,
                                                         data_holder=deployment_params,
-                                                        cancellation_context=cancellation_context,
                                                         resource_context=resource_context)
         return deploy_result
