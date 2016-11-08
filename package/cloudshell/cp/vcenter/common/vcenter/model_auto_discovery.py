@@ -37,19 +37,14 @@ class VCenterAutoModelDiscovery(object):
         self.cs_helper = CloudshellDriverHelper()
         self.context_based_logger_factory = ContextBasedLoggerFactory()
 
-    def _get_logger(self, context):
-        """Get Quali logger from the given context
-        :param context: models.QualiDriverModels.AutoLoadCommandContext
-        """
-        return self.context_based_logger_factory.create_logger_for_context(
-            logger_name='vCenterShell',
-            context=context)
-
     def validate_and_discover(self, context):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
-        logger = self._get_logger(context)
+        logger = self.context_based_logger_factory.create_logger_for_context(
+            logger_name='vCenterShell',
+            context=context)
+
         logger.info('Autodiscovery started')
 
         session = self.cs_helper.get_session(context.connectivity.server_address,
@@ -59,27 +54,24 @@ class VCenterAutoModelDiscovery(object):
         resource = context.resource
         auto_attr = []
         si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
-
         if not si:
             error_message = 'Could not connect to the vCenter: {0}, with given credentials'\
                 .format(context.resource.address)
             logger.error(error_message)
             raise ValueError(error_message)
+        all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
 
-        try:
-            all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
-            dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
-            all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
-            dc_name = dc.name
+        dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
 
-            for key, value in resource.attributes.items():
-                if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
-                    continue
-                validation_method = self._get_validation_method(key)
-                validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
-        except vim.fault.NoPermission:
-            logger.exception('Autodiscovery failed due to permissions error:')
-            raise Exception("vCenter permissions for configured resource(s) are invalid")
+        all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
+
+        dc_name = dc.name
+
+        for key, value in resource.attributes.items():
+            if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
+                continue
+            validation_method = self._get_validation_method(key)
+            validation_method(si, all_items_in_dc, auto_attr, dc_name, resource.attributes, key)
 
         logger.info('Autodiscovery completed')
 
@@ -148,9 +140,6 @@ class VCenterAutoModelDiscovery(object):
                                          connection_details.password,
                                          connection_details.port)
         except Exception:
-            logger = self._get_logger(context)
-            logger.exception("Could not connect to the vcenter")
-
             raise ValueError('could not connect to the vcenter: {0}, with the given credentials ({1})'.format(
                 connection_details.host,
                 connection_details.username))

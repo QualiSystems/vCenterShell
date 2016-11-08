@@ -38,8 +38,7 @@ class TestDvPortGroupCreator(TestCase):
                                                     create_autospec(spec=vim.ServiceInstance),
                                                     spec=None,
                                                     vlan_id=1001,
-                                                    logger=Mock(),
-                                                    promiscuous_mode="True")
+                                                    logger=Mock())
 
         # Assert
         self.assertTrue(dv_port_group_creator.dv_port_group_create_task.called)
@@ -60,7 +59,6 @@ class TestDvPortGroupCreator(TestCase):
                                                         spec=spec,
                                                         vlan_id=1001,
                                                         logger=Mock(),
-                                                        promiscuous_mode="True",
                                                         num_ports=32)
 
         # assert

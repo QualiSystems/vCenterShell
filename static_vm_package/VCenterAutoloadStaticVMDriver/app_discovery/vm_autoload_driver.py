@@ -46,6 +46,7 @@ class DeployAppOrchestrationDriver(object):
 
         si = None
 
+
         try:
             self.logger.info('connecting to vcenter ({0})'.format(vcenter_api_res.Address))
             si = self._get_connection_to_vcenter(self.pv_service, session, vcenter_resource, vcenter_api_res.Address)
@@ -59,8 +60,8 @@ class DeployAppOrchestrationDriver(object):
             if ip:
                 session.UpdateResourceAddress(context.resource.name, ip)
 
-        except Exception:
-            self.logger.exception("Get inventory command failed")
+        except Exception as e:
+            self.logger.error(e)
             raise
         finally:
             if si:
@@ -86,8 +87,8 @@ class DeployAppOrchestrationDriver(object):
                                             logger=self.logger)
             if ip_res.ip_address:
                 ip = ip_res.ip_address
-        except Exception:
-            self.logger.debug('Error while trying to load VM({0}) IP'.format(uuid), exc_info=True)
+        except Exception as e:
+            self.logger.debug('Error while trying to load VM({0}) IP'.format(uuid))
         return ip
 
     @staticmethod

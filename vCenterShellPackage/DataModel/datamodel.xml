@@ -6,7 +6,7 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" Description="Customized properties of the image separated by comma ( , ). Example for OVF: --allowExtraConfig, --prop:Hostname=ASAvtest, --prop:HARole=Standalone, --prop:SSHEnable=True, --prop:DHCP=True, --net:Management0-0=Office LAN 41, --net:GigabitEthernet0-0=VLAN access 101" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
+    <ns0:AttributeInfo DefaultValue="" Description="Customized properties of the image separated by ','. Example for OVF: --allowExtraConfig, --prop:Hostname=ASAvtest, --prop:HARole=Standalone, --prop:SSHEnable=True, --prop:DHCP=True, --net:Management0-0='Office LAN 41', --net:GigabitEthernet0-0='VLAN_access_101'" IsReadOnly="false" Name="vCenter Image Arguments" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -134,6 +134,12 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue="" Description="The vCenter resource name in CloudShell." IsReadOnly="false" Name="vCenter Name" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="true" Description="Enables the automatic power on of an app following its deployment during reservation Setup." IsReadOnly="false" Name="Auto Power On" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -159,12 +165,6 @@
       </ns0:Rules>
     </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="The datacenter within the vCenter that will be used for VM deployment. All other settings of this vCenter resource should refer to entities associated with this datacenter." IsReadOnly="false" Name="Default Datacenter" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="true" Description="If enabled the port groups on the virtual switch will be configured to allow promiscuous mode." IsReadOnly="false" Name="Promiscuous Mode" Type="Boolean">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -220,9 +220,6 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Reserved Networks">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Promiscuous Mode">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
             <ns0:AttributeValue Name="Reserved Networks" Value="" />
@@ -237,7 +234,6 @@
             <ns0:AttributeValue Name="Shutdown Method" Value="hard" />
             <ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
             <ns0:AttributeValue Name="Execution Server Selector" Value="" />
-            <ns0:AttributeValue Name="Promiscuous Mode" Value="true" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
           <ns0:Drivers>
@@ -297,6 +293,9 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" ImagePath="DeploymentTypes-vCenterClone.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -335,6 +334,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="vCenter Name" Value="VMWare vCenter" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
             <ns0:AttributeValue Name="Wait for IP" Value="True" />
@@ -355,6 +355,9 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="vCenter VM From Template" ImagePath="DeploymentTypes-vCenterTemplate.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -393,6 +396,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="vCenter Name" Value="VMWare vCenter" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
             <ns0:AttributeValue Name="Wait for IP" Value="True" />
@@ -413,6 +417,9 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" ImagePath="DeploymentTypes-vCenterLinked.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -454,6 +461,7 @@
             </ns0:AttachedAttribute>
           </ns0:AttachedAttributes>
           <ns0:AttributeValues>
+            <ns0:AttributeValue Name="vCenter Name" Value="VMware vCenter" />
             <ns0:AttributeValue Name="Auto Power On" Value="True" />
             <ns0:AttributeValue Name="Auto Power Off" Value="True" />
             <ns0:AttributeValue Name="Wait for IP" Value="True" />
@@ -501,6 +509,9 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Name" UserInput="true">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -529,6 +540,7 @@
             <ns0:AttributeValue Name="IP Regex" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="vCenter Image" Value="" />
+            <ns0:AttributeValue Name="vCenter Name" Value="" />
             <ns0:AttributeValue Name="vCenter Image Arguments" Value="" />
             <ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>

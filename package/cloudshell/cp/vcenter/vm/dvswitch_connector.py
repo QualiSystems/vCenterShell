@@ -39,7 +39,7 @@ class VirtualSwitchToMachineConnector(object):
         self.dv_port_group_creator = dv_port_group_creator
         self.virtual_machine_port_group_configurer = virtual_machine_port_group_configurer
 
-    def connect_by_mapping(self, si, vm, mapping, default_network, reserved_networks, logger, promiscuous_mode):
+    def connect_by_mapping(self, si, vm, mapping, default_network, reserved_networks, logger):
         """
         gets the mapping to the vnics and connects it to the vm
         :param default_network:
@@ -48,7 +48,6 @@ class VirtualSwitchToMachineConnector(object):
         :param mapping: [VmNetworkMapping]
         :param reserved_networks:
         :param logger:
-        :param promiscuous_mode <str> 'True' or 'False' turn on/off promiscuous mode for the port group
         """
         request_mapping = []
 
@@ -63,8 +62,7 @@ class VirtualSwitchToMachineConnector(object):
                                                                        network_map.dv_switch_path,
                                                                        network_map.vlan_id,
                                                                        network_map.vlan_spec,
-                                                                       logger,
-                                                                       promiscuous_mode)
+                                                                       logger=logger)
 
             request_mapping.append(ConnectRequest(network_map.vnic_name, network))
 
