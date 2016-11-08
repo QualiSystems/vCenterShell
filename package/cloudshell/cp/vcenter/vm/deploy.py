@@ -145,20 +145,20 @@ class VirtualMachineDeployer(object):
         image_params = self._get_deploy_image_params(data_holder.image_params, connection_details, vm_name)
 
         if cancellation_context.is_cancelled:
-            raise Exception("Action 'Clone VM' was cancelled.")
+            raise Exception("Action 'Deploy from image' was cancelled.")
 
         res = self.ovf_service.deploy_image(vcenter_data_model, image_params, logger)
-
-        # remove a new created vm due to cancellation
-        if cancellation_context.is_cancelled:
-            # todo self.pv_service.destroy_vm(vm=clone_vm_result.vm, logger=logger)
-            raise Exception("Action 'Clone VM' was cancelled.")
 
         if res:
             vm_path = image_params.datacenter + '/' + \
                       image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
+                # remove a new created vm due to cancellation
+                if cancellation_context.is_cancelled:
+                    self.pv_service.destroy_vm(vm=vm, logger=logger)
+                    raise Exception("Action 'Deploy from image' was cancelled.")
+
                 return DeployResult(vm_name=vm_name,
                                     vm_uuid=vm.config.uuid,
                                     cloud_provider_resource_name=data_holder.image_params.vcenter_name,
