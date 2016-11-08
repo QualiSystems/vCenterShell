@@ -76,9 +76,10 @@ class TestVmomiService(unittest.TestCase):
                                               vm_name='my_name',
                                               vm_folder='my_folder',
                                               power_on=False)
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -118,9 +119,10 @@ class TestVmomiService(unittest.TestCase):
                                               vm_name='my_name',
                                               vm_folder='my_folder',
                                               resource_pool='my_resource_pool')
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -160,9 +162,10 @@ class TestVmomiService(unittest.TestCase):
                                               vm_name='my_name',
                                               vm_folder='my_folder',
                                               datastore_name='my_datastore')
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -201,9 +204,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder='my_folder')
+        cancellation_context = object()
 
         '#assert'
-        self.assertRaises(ValueError, pv_service.clone_vm, params, Mock())
+        self.assertRaises(ValueError, pv_service.clone_vm, params, Mock(), cancellation_context)
         self.assertTrue(pv_service.get_folder.called)
         self.assertFalse(vim_mock.vm.RelocateSpec.called)
         self.assertFalse(vim_mock.vm.CloneSpec.called)
@@ -239,9 +243,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder='my_folder')
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -279,10 +284,12 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder='my_folder')
+        cancellation_context = object()
 
         '#act'
         res = pv_service.clone_vm(clone_params=params,
-                                  logger=Mock())
+                                  logger=Mock(),
+                                  cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -304,9 +311,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder=None)
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -323,9 +331,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name=None,
                                               vm_folder=None)
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -342,9 +351,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name=None,
                                               vm_name=None,
                                               vm_folder=None)
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -359,9 +369,10 @@ class TestVmomiService(unittest.TestCase):
                                               template_name=None,
                                               vm_name=None,
                                               vm_folder=None)
+        cancellation_context = object()
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertTrue(res.error is not None)

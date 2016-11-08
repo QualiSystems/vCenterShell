@@ -171,12 +171,13 @@ class CommandOrchestrator(object):
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_clone_from_vm(self, context, deploy_data):
+    def deploy_clone_from_vm(self, context, deploy_data, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :param cancellation_context:
         :return str deploy results
         """
 
@@ -190,16 +191,18 @@ class CommandOrchestrator(object):
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
-            data_holder)
+            data_holder,
+            cancellation_context)
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_from_linked_clone(self, context, deploy_data):
+    def deploy_from_linked_clone(self, context, deploy_data, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :param cancellation_context:
         :return str deploy results
         """
 
@@ -223,11 +226,12 @@ class CommandOrchestrator(object):
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
-            data_holder)
+            data_holder,
+            cancellation_context)
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_from_image(self, context, deploy_data):
+    def deploy_from_image(self, context, deploy_data, cancellation_context):
         """
         Deploy From Image Command, will deploy vm from ovf image
 
@@ -244,6 +248,7 @@ class CommandOrchestrator(object):
                 "app_name": "appName"
                 "user_arguments": ["--compress=9", " --schemaValidate", "--etc"]
             }
+        :param cancellation_context:
         :return str deploy results
         """
         # get command parameters from the environment
@@ -255,6 +260,7 @@ class CommandOrchestrator(object):
             context,
             self.deploy_command.execute_deploy_from_image,
             data_holder,
+            cancellation_context,
             context.resource)
 
         return set_command_result(result=result, unpicklable=False)
