@@ -63,9 +63,8 @@ class VirtualMachineDeployer(object):
                                     template_resource_model,
                                     vcenter_data_model)
 
-    def deploy_from_template(self, si, logger, data_holder, cancellation_context, vcenter_data_model):
+    def deploy_from_template(self, si, logger, data_holder, vcenter_data_model):
         """
-        :param cancellation_context:
         :param si:
         :param logger:
         :type data_holder: DeployFromTemplateDetails
@@ -78,11 +77,9 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_template,
                                     template_resource_model,
-                                    vcenter_data_model,
-                                    cancellation_context)
+                                    vcenter_data_model)
 
-    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model,
-                        cancellation_context, snapshot=''):
+    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model, snapshot=''):
         # generate unique name
         vm_name = self.name_generator(app_name)
 
@@ -102,18 +99,9 @@ class VirtualMachineDeployer(object):
                                                    power_on=other_params.auto_power_on,
                                                    snapshot=snapshot)
 
-        if cancellation_context.is_cancelled:
-            raise Exception("Action 'Clone VM' was cancelled.")
-
-        clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger,
-                                                   cancellation_context=cancellation_context)
+        clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger)
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
-
-        # remove a new created vm due to cancellation
-        if cancellation_context.is_cancelled:
-            self.pv_service.destroy_vm(vm=clone_vm_result.vm, logger=logger)
-            raise Exception("Action 'Clone VM' was cancelled.")
 
         return DeployResult(vm_name=vm_name,
                             vm_uuid=clone_vm_result.vm.summary.config.uuid,

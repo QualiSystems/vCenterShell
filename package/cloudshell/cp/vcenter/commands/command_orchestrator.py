@@ -146,13 +146,12 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def deploy_from_template(self, context, deploy_data, cancellation_context):
+    def deploy_from_template(self, context, deploy_data):
         """
         Deploy From Template Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
-        :param cancellation_context:
         :return str deploy results
         """
 
@@ -166,8 +165,7 @@ class CommandOrchestrator(object):
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder,
-            cancellation_context)
+            data_holder)
 
         return set_command_result(result=result, unpicklable=False)
 
