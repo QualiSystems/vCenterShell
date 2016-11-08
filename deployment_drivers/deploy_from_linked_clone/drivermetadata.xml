@@ -1,4 +1,4 @@
-<Driver Description="Deploy App From VM" MainClass="driver.DeployCloneFromVMDriver" Name="Deploy Clone From VM Driver" Version="1.6.0">
+<Driver Description="Deploy App From VM" MainClass="driver.DeployCloneFromVMDriver" Name="Deploy Clone From VM Driver" Version="1.5.0">
     <Layout>
         <Category Name="App Management">
             <Command Description="" DisplayName="Deploy" Name="Deploy" Tags="allow_shared" />
