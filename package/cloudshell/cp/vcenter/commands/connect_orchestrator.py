@@ -211,15 +211,13 @@ class ConnectionCommandOrchestrator(object):
             self.logger.debug('connecting vm({0}) with the mappings'.format(vm_uuid,
                                                                             jsonpickle.encode(action_mappings,
                                                                                               unpicklable=False)))
-            connection_results = self.connector.connect_to_networks(
-                si=si,
-                logger=logger,
-                vm_uuid=vm_uuid,
-                vm_network_mappings=action_mappings.set_mapping,
-                default_network_name=self.default_network,
-                reserved_networks=self.reserved_networks,
-                dv_switch_name=self.dv_switch_name,
-                promiscuous_mode=self.vcenter_data_model.promiscuous_mode)
+            connection_results = self.connector.connect_to_networks(si=si,
+                                                                    logger=logger,
+                                                                    vm_uuid=vm_uuid,
+                                                                    vm_network_mappings=action_mappings.set_mapping,
+                                                                    default_network_name=self.default_network,
+                                                                    reserved_networks=self.reserved_networks,
+                                                                    dv_switch_name=self.dv_switch_name)
 
             connection_res_map = self._prepare_connection_results_for_extraction(connection_results)
             act_by_mode_by_vlan = self._group_action_by_vlan_id(set_vlan_actions)
@@ -227,7 +225,7 @@ class ConnectionCommandOrchestrator(object):
             results += self._get_set_vlan_result_suc(act_by_mode_by_vlan_by_nic, connection_res_map)
 
         except Exception as e:
-            self.logger.exception('Exception raised while connecting vm({})'.format(vm_uuid))
+            self.logger.error('Exception raised while connecting vm({0}) with exception: {1}'.format(vm_uuid, e))
             for mode, actions in set_vlan_actions.items():
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)

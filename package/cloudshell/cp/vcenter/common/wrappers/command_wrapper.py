@@ -114,8 +114,9 @@ class CommandWrapper:
             logger.debug(DEBUG_COMMAND_RESULT.format(str(results)))
 
             return results
-        except Exception:
-            logger.exception(COMMAND_ERROR.format(command_name))
+        except Exception as e:
+            logger.error(COMMAND_ERROR.format(command_name))
+            logger.exception(e)
             raise
         finally:
             logger.info(LOG_FORMAT.format(END, command_name))

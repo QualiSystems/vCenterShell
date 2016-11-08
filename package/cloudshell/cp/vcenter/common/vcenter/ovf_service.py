@@ -30,9 +30,9 @@ class OvfImageDeployerService(object):
         """
         ovf_tool_exe_path = vcenter_data_model.ovf_tool_path
 
-        self._validate_url_exists(ovf_tool_exe_path, 'OVF Tool', logger)
+        self._validate_url_exists(ovf_tool_exe_path, 'OVF Tool')
 
-        args = self._get_args(ovf_tool_exe_path, image_params, logger)
+        args = self._get_args(ovf_tool_exe_path, image_params)
         logger.debug('opening ovf tool process with the params: {0}'.format(','.join(args)))
         process = subprocess.Popen(args, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -53,11 +53,11 @@ class OvfImageDeployerService(object):
             return True
 
         image_params.connectivity.password = '******'
-        args_for_error = ' '.join(self._get_args(ovf_tool_exe_path, image_params, logger))
+        args_for_error = ' '.join(self._get_args(ovf_tool_exe_path, image_params))
         logger.error('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
         raise Exception('error deploying image with the args: {0}, error: {1}'.format(args_for_error, res))
 
-    def _get_args(self, ovf_tool_exe_path, image_params, logger):
+    def _get_args(self, ovf_tool_exe_path, image_params):
         """
         :type image_params: vCenterShell.vm.ovf_image_params.OvfImageParams
         """
@@ -95,7 +95,7 @@ class OvfImageDeployerService(object):
         ovf_destination = self._get_ovf_destenation(image_params)
 
         image_url = image_params.image_url
-        self._validate_image_exists(image_url, logger)
+        self._validate_image_exists(image_url)
 
         # set location and destination
         args += [image_url,
@@ -124,17 +124,16 @@ class OvfImageDeployerService(object):
             return '\"{0}\"'.format(param)
         return param
 
-    def _validate_image_exists(self, image_url, logger):
-        self._validate_url_exists(image_url, 'Image', logger)
+    def _validate_image_exists(self, image_url):
+        self._validate_url_exists(image_url, 'Image')
 
     @staticmethod
-    def _validate_url_exists(image_url, type_name, logger):
+    def _validate_url_exists(image_url, type_name):
         try:
             f = urlopen(image_url)
             if f:
                 return True
         except Exception:  # invalid URL
-            logger.debug("Invalid URL", exc_info=True)
             exists = os.path.exists(image_url) and os.path.isfile(image_url)
             if exists:
                 return True

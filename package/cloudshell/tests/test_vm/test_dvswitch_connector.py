@@ -43,8 +43,7 @@ class TestVirtualSwitchToMachineConnector(TestCase):
                                                                mapping=[network_map],
                                                                default_network=Mock(spec=vim.Network),
                                                                reserved_networks=[],
-                                                               logger=Mock(),
-                                                               promiscuous_mode='True')
+                                                               logger=Mock())
 
     def integrationtest(self):
         resource_connection_details_retriever = Mock()

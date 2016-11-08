@@ -28,8 +28,7 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
                                    'reserved_networks': '',
-                                   'default_datacenter': '',
-                                   'promiscuous_mode': ''}
+                                   'default_datacenter': ''}
 
         api.GetResourceDetails = Mock(return_value=vcenter_resource)
 
@@ -58,8 +57,7 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'ovf_tool_path': '',
                                    'execution_server_selector': '',
                                    'reserved_networks': '',
-                                   'default_datacenter': '',
-                                   'promiscuous_mode': ''}
+                                   'default_datacenter': ''}
 
         api.GetResourceDetails = Mock(return_value=vcenter_resource)
 

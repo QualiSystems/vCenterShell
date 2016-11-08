@@ -1,13 +1,16 @@
 ﻿import time
-
 import requests
 from pyVmomi import vim
-
 from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
-from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
+
+
+class VCenterAuthError (Exception):
+    def __init__(self, original_exception):
+        super(VCenterAuthError, self).__init__(original_exception.message)
+        self.original_exception = original_exception
 
 
 
@@ -384,10 +387,11 @@ class pyVmomiService:
             self.vm = vm
             self.error = error
 
-    def clone_vm(self, clone_params, logger):
+    def clone_vm(self, clone_params, logger, cancellation_context):
         """
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
+        :param cancellation_context:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
@@ -449,9 +453,10 @@ class pyVmomiService:
         logger.info("cloning VM...")
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
-        except TaskFaultException:
-            raise
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger,
+                                                action_name='Clone VM',
+                                                cancellation_context=cancellation_context)
+
         except vim.fault.NoPermission as error:
             logger.error("vcenter returned - no permission: {0}".format(error))
             raise Exception('Permissions is not set correctly, please check the log for more info.')
