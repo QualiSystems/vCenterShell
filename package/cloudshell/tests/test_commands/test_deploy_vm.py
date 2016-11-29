@@ -32,13 +32,15 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_command = DeployCommand(deployer)
 
         resource_context = Mock()
+        cancellation_context = object()
 
         # act
         result = deploy_command.execute_deploy_from_template(
             si=si,
             logger=Mock(),
             deployment_params=deploy_params,
-            vcenter_data_model=Mock())
+            vcenter_data_model=Mock(),
+            cancellation_context=cancellation_context)
 
         # assert
         self.assertTrue(result)
@@ -55,6 +57,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         vcenter_data_model = Mock()
 
         deploy_command = DeployCommand(deployer)
+        cancellation_context = object()
 
         # act
         result = deploy_command.execute_deploy_from_image(si=si,
@@ -62,7 +65,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                                                           session=session,
                                                           vcenter_data_model=vcenter_data_model,
                                                           deployment_params=deployment_params,
-                                                          resource_context=connectivity)
+                                                          resource_context=connectivity,
+                                                          cancellation_context=cancellation_context)
 
         # assert
         self.assertTrue(result)
@@ -88,6 +92,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_params = DeployFromTemplateDetails(template_resource_model, 'VM Deployment')
 
         deploy_command = DeployCommand(deployer)
+        cancellation_context = object()
 
         resource_context = Mock()
 
@@ -96,7 +101,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
             si=si,
             logger=Mock(),
             vcenter_data_model=Mock(),
-            deployment_params=deploy_params)
+            deployment_params=deploy_params,
+            cancellation_context=cancellation_context)
 
         # assert
         self.assertTrue(result)
@@ -124,13 +130,15 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_command = DeployCommand(deployer)
 
         resource_context = Mock()
+        cancellation_context = object()
 
         # act
         result = deploy_command.execute_deploy_from_linked_clone(
             si=si,
             logger=Mock(),
             deployment_params=deploy_params,
-            vcenter_data_model=Mock())
+            vcenter_data_model=Mock(),
+            cancellation_context=cancellation_context)
 
         # assert
         self.assertTrue(result)

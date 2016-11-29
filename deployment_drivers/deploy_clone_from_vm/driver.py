@@ -1,5 +1,5 @@
 import jsonpickle
-from cloudshell.api.cloudshell_api import InputNameValue
+from cloudshell.api.cloudshell_api import InputNameValue, CommandExecutionCancelledResultInfo
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 
@@ -50,4 +50,5 @@ class DeployCloneFromVMDriver(ResourceDriverInterface):
                                         params,
                                         False)
 
-        return result.Output
+        return self.cs_helper.proceed_command_execution_result(reservation_id=reservation_id, result=result,
+                                                               context=context)
