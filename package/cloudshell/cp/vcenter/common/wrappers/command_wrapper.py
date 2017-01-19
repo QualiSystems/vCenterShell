@@ -47,6 +47,7 @@ class CommandWrapper:
         # add lock
         self.lock = Lock()
         self.si = None
+        self.connection_details = None
 
     @retry(stop_max_attempt_number=3, wait_fixed=2000, retry_on_exception=retry_if_auth_error)
     def execute_command_with_connection(self, context, command, *args):
@@ -59,8 +60,8 @@ class CommandWrapper:
         """
 
         logger = self.context_based_logger_factory.create_logger_for_context(
-            logger_name='vCenterShell',
-            context=context)
+                logger_name='vCenterShell',
+                context=context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)
@@ -88,11 +89,11 @@ class CommandWrapper:
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                    DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                 connection_details.username,
-                                                 connection_details.port))
+                        DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                     connection_details.username,
+                                                     connection_details.port))
 
-                si = self.get_py_service_connection(connection_details,logger)
+                si = self.get_py_service_connection(connection_details, logger)
             if si:
                 logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
                 command_args.append(si)
@@ -120,17 +121,32 @@ class CommandWrapper:
         finally:
             logger.info(LOG_FORMAT.format(END, command_name))
 
-    def get_py_service_connection(self, connection_details, logger):
+    def get_py_service_connection(self, req_connection_details, logger):
         logger.info("get_py_service_connection")
-        if self.si is None:
+        if self.si is None or self.has_connection_details_changed(req_connection_details):
             with self.lock:
-                if self.si is None:
+                if self.si is None or self.has_connection_details_changed(req_connection_details):
                     logger.info("Creating a new connection.")
-                    self.si = self.pv_service.connect(connection_details.host,
-                                                      connection_details.username,
-                                                      connection_details.password,
-                                                      connection_details.port)
+                    self.si = self.pv_service.connect(req_connection_details.host,
+                                                      req_connection_details.username,
+                                                      req_connection_details.password,
+                                                      req_connection_details.port)
+                    self.connection_details = req_connection_details
         return self.si
+
+    def has_connection_details_changed(self, req_connection_details):
+        """
+        :param cloudshell.cp.vcenter.models.VCenterConnectionDetails.VCenterConnectionDetails req_connection_details:
+        :return:
+        """
+        if self.connection_details is None and req_connection_details is None:
+            return False
+        if self.connection_details is None or req_connection_details is None:
+            return True
+        return not all([self.connection_details.host == req_connection_details.host,
+                        self.connection_details.username == req_connection_details.username,
+                        self.connection_details.password == req_connection_details.password,
+                        self.connection_details.port == req_connection_details.port])
 
     @staticmethod
     def _get_domain(context):
