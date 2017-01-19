@@ -1,5 +1,6 @@
-from cloudshell.api.cloudshell_api import CloudShellAPISession
+from cloudshell.api.cloudshell_api import CloudShellAPISession, CommandExecutionCancelledResultInfo
 
+from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 
 
@@ -38,4 +39,14 @@ class CloudshellDriverHelper(object):
         password = session.DecryptPassword(encrypted_pass).Value
 
         return VCenterConnectionDetails(vcenter_url, user, password)
+
+    def proceed_command_execution_result(self, reservation_id, result, context):
+        if isinstance(result, CommandExecutionCancelledResultInfo):
+            logger_factory = ContextBasedLoggerFactory()
+            logger = logger_factory.create_logger_for_context(logger_name='vCenterShell',
+                                                              context=context)
+            logger.info("Deploy from template for reservation '{0}': {1}".format(reservation_id, result.Message))
+            return result.Message
+        else:
+            return result.Output
 

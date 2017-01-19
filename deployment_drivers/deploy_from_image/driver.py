@@ -1,5 +1,5 @@
 import jsonpickle
-from cloudshell.api.cloudshell_api import InputNameValue
+from cloudshell.api.cloudshell_api import InputNameValue, CommandExecutionCancelledResultInfo
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
@@ -50,13 +50,17 @@ class DeployFromImage(ResourceDriverInterface):
 
 
         deployment_info = self._get_deployment_info(vcenter_image_resource_model, Name)
+
+        reservation_id = context.reservation.reservation_id
         result = session.ExecuteCommand(context.reservation.reservation_id,
                                         vcenter_res,
                                         "Resource",
                                         "deploy_from_image",
                                         self._get_command_inputs_list(deployment_info),
                                         False)
-        return result.Output
+
+        return self.cs_helper.proceed_command_execution_result(reservation_id=reservation_id, result=result,
+                                                               context=context)
 
     def _get_deployment_info(self, image_model, name):
         """
