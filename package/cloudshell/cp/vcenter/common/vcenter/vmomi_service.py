@@ -10,10 +10,14 @@ from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWait
 from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
 
 
-
-class VCenterAuthError (Exception):
-    def __init__(self, original_exception):
-        super(VCenterAuthError, self).__init__(original_exception.message)
+class VCenterAuthError(Exception):
+    def __init__(self, message, original_exception):
+        """
+        :param str message:
+        :param original_exception: The orginoal exception that was raised
+        :return:
+        """
+        super(VCenterAuthError, self).__init__(message)
         self.original_exception = original_exception
 
 
@@ -72,7 +76,7 @@ class pyVmomiService:
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
             return si
         except vim.fault.InvalidLogin as e:
-            raise VCenterAuthError(e.msg)
+            raise VCenterAuthError(e.msg, e)
         except IOError as e:
             # logger.info("I/O error({0}): {1}".format(e.errno, e.strerror))
             raise ValueError('Cannot connect to vCenter, please check that the address is valid')
@@ -314,7 +318,7 @@ class pyVmomiService:
     @staticmethod
     def _get_all_objects_by_type(content, vimtype):
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vimtype, True)
+                content.rootFolder, vimtype, True)
         return container
 
     @staticmethod
