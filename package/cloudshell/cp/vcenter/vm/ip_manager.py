@@ -7,8 +7,9 @@ class VMIPManager(object):
     INTERVAL = 5
     IP_V4_PATTERN = re.compile('^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$')
 
-    def get_ip(self, vm, default_network, match_function, cancellation_context, timeout, logger):
-        self._validate_vmware_tools_installed(logger, vm)
+    def get_ip(self, vm, default_network, match_function, cancellation_context, timeout, logger,
+               guest_tools_timeout=None):
+        self._validate_vmware_tools_installed(logger, vm, guest_tools_timeout or 300000)
         ip = None
         reason = IpReason.Success
         if not timeout:
@@ -71,9 +72,15 @@ class VMIPManager(object):
         return [ip for ip in ips if match_function(ip)]
 
     @staticmethod
-    def _validate_vmware_tools_installed(logger, vm):
-        if vm.guest.toolsStatus == 'toolsNotInstalled':
-            msg = 'VMWare Tools status on virtual machine \'{0}\' are not installed'.format(vm.name)
-            logger.warning(msg)
-            raise ValueError(msg)
-        return True
+    def _validate_vmware_tools_installed(logger, vm, guest_tools_timeout=300000):
+        sleep = 1
+        while guest_tools_timeout > 0:
+                if vm.guest.toolsStatus == 'toolsNotInstalled':
+                    msg = 'VMWare Tools status on virtual machine \'{0}\' are not installed'.format(vm.name)
+                    logger.warning(msg)
+                    time.sleep(sleep)
+                    guest_tools_timeout -= sleep * 1000
+                    sleep *= 2 # exponential backoff
+                else:
+                    return True
+        raise ValueError(msg)
