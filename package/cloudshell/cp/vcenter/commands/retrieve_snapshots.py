@@ -21,4 +21,6 @@ class RetrieveSnapshotsCommand:
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
         logger.info("Get snapshots")
-        return SnapshotRetriever.get_vm_snapshots(vm).keys()
+        snapshots = SnapshotRetriever.get_vm_snapshots(vm)
+
+        return snapshots.keys()

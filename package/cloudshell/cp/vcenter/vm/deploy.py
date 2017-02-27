@@ -24,11 +24,10 @@ class VirtualMachineDeployer(object):
         self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
-    def deploy_from_linked_clone(self, si, logger, data_holder, cancellation_context, vcenter_data_model):
+    def deploy_from_linked_clone(self, si, logger, data_holder, vcenter_data_model):
         """
         deploy Cloned VM From VM Command, will deploy vm from a snapshot
 
-        :param cancellation_context:
         :param si:
         :param logger:
         :type data_holder:
@@ -44,14 +43,12 @@ class VirtualMachineDeployer(object):
                                     template_resource_model.vcenter_vm,
                                     template_resource_model,
                                     vcenter_data_model,
-                                    cancellation_context=cancellation_context,
                                     snapshot=template_resource_model.vcenter_vm_snapshot)
 
-    def deploy_clone_from_vm(self, si, logger, data_holder, cancellation_context, vcenter_data_model):
+    def deploy_clone_from_vm(self, si, logger, data_holder, vcenter_data_model):
         """
         deploy Cloned VM From VM Command, will deploy vm from another vm
 
-        :param cancellation_context:
         :param si:
         :param logger:
         :type data_holder:
@@ -64,12 +61,10 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_vm,
                                     template_resource_model,
-                                    vcenter_data_model,
-                                    cancellation_context)
+                                    vcenter_data_model)
 
-    def deploy_from_template(self, si, logger, data_holder, cancellation_context, vcenter_data_model):
+    def deploy_from_template(self, si, logger, data_holder, vcenter_data_model):
         """
-        :param cancellation_context:
         :param si:
         :param logger:
         :type data_holder: DeployFromTemplateDetails
@@ -82,11 +77,9 @@ class VirtualMachineDeployer(object):
                                     data_holder.app_name,
                                     template_resource_model.vcenter_template,
                                     template_resource_model,
-                                    vcenter_data_model,
-                                    cancellation_context)
+                                    vcenter_data_model)
 
-    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model,
-                        cancellation_context, snapshot=''):
+    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model, snapshot=''):
         # generate unique name
         vm_name = self.name_generator(app_name)
 
@@ -106,18 +99,9 @@ class VirtualMachineDeployer(object):
                                                    power_on=other_params.auto_power_on,
                                                    snapshot=snapshot)
 
-        if cancellation_context.is_cancelled:
-            raise Exception("Action 'Clone VM' was cancelled.")
-
-        clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger,
-                                                   cancellation_context=cancellation_context)
+        clone_vm_result = self.pv_service.clone_vm(clone_params=params, logger=logger)
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
-
-        # remove a new created vm due to cancellation
-        if cancellation_context.is_cancelled:
-            self.pv_service.destroy_vm(vm=clone_vm_result.vm, logger=logger)
-            raise Exception("Action 'Clone VM' was cancelled.")
 
         return DeployResult(vm_name=vm_name,
                             vm_uuid=clone_vm_result.vm.summary.config.uuid,
@@ -131,8 +115,7 @@ class VirtualMachineDeployer(object):
                             autoload=other_params.autoload
                             )
 
-    def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, cancellation_context,
-                          resource_context):
+    def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context):
         vm_name = self.name_generator(data_holder.app_name)
 
         connection_details = self.cs_helper.get_connection_details(session=session,
@@ -144,21 +127,12 @@ class VirtualMachineDeployer(object):
 
         image_params = self._get_deploy_image_params(data_holder.image_params, connection_details, vm_name)
 
-        if cancellation_context.is_cancelled:
-            raise Exception("Action 'Deploy from image' was cancelled.")
-
         res = self.ovf_service.deploy_image(vcenter_data_model, image_params, logger)
-
         if res:
             vm_path = image_params.datacenter + '/' + \
                       image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
-                # remove a new created vm due to cancellation
-                if cancellation_context.is_cancelled:
-                    self.pv_service.destroy_vm(vm=vm, logger=logger)
-                    raise Exception("Action 'Deploy from image' was cancelled.")
-
                 return DeployResult(vm_name=vm_name,
                                     vm_uuid=vm.config.uuid,
                                     cloud_provider_resource_name=data_holder.image_params.vcenter_name,

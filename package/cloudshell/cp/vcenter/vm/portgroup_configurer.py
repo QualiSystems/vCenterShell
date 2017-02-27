@@ -55,6 +55,7 @@ class VirtualMachinePortGroupConfigurer(object):
             self.update_vnic_by_mapping(vm, update_mapping, logger)
             return update_mapping
         except Exception as e:
+            logger.exception("Failed to connect VM: {}".format(vm.name))
             raise ValueError('VM: {0} failed with: "{1}"'.format(vm.name, e.message))
 
     def erase_network_by_mapping(self, networks, reserved_networks, logger):
@@ -75,6 +76,7 @@ class VirtualMachinePortGroupConfigurer(object):
                                                                                logger=logger,
                                                                                action_name='Erase dv Port Group')
                 except Exception as e:
+                    logger.debug("Failed to erase network", exc_info=True)
                     a = e.msg
                     continue
         finally:

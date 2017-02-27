@@ -89,5 +89,5 @@ class DestroyVirtualMachineCommand(object):
         try:
             session.DisconnectRoutesInReservation(reservation_id, endpoints)
         except Exception as exc:
-            logger.error("Error disconnecting routes for resource {0} in reservation {1}. Error: {2}"
-                         .format(resource_name, reservation_id, get_error_message_from_exception(exc)))
+            logger.exception("Error disconnecting routes for resource {0} in reservation {1}. Error: {2}"
+                             .format(resource_name, reservation_id, get_error_message_from_exception(exc)))
