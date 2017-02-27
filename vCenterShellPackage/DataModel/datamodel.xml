@@ -268,29 +268,6 @@
       </ns0:Models>
       <ns0:Categories />
     </ns0:ResourceFamily>
-    <ns0:ResourceFamily Description="" IsService="true" Name="Installation Options" ServiceType="Installation">
-      <ns0:AttachedAttributes />
-      <ns0:AttributeValues />
-      <ns0:Models>
-        <ns0:ResourceModel Description="" Name="Generic Installation Option" SupportsConcurrentCommands="false">
-          <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Generic Input" UserInput="true">
-              <ns0:AllowedValues />
-            </ns0:AttachedAttribute>
-          </ns0:AttachedAttributes>
-          <ns0:AttributeValues>
-            <ns0:AttributeValue Name="Generic Input" Value="" />
-          </ns0:AttributeValues>
-          <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Generic Driver</ns0:DriverName>
-          </ns0:Drivers>
-          <ns0:Scripts />
-        </ns0:ResourceModel>
-      </ns0:Models>
-      <ns0:Categories>
-      </ns0:Categories>
-    </ns0:ResourceFamily>
     <ns0:ResourceFamily Description="" IsService="true" Name="Deployment Options" ServiceType="Deployment">
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
