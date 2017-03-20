@@ -113,3 +113,10 @@ class VCenterShellDriver (ResourceDriverInterface):
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
+
+    def modify_vm_hardware(self, context, ports, vm_changes):
+        """
+        :param vm_changes: changes to CPU, memory or number of ethernet adapters - json string
+        :type vm_changes: str
+        """
+        return self.command_orchestrator.modify_vm_hardware(context, vm_changes)
