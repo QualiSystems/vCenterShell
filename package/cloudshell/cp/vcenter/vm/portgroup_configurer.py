@@ -62,7 +62,11 @@ class VirtualMachinePortGroupConfigurer(object):
         self._lock.acquire()
         try:
             for net in networks:
-                nets[net.name] = net
+                try:
+                    nets[net.name] = net
+                except:
+                    continue
+
                 for network in nets.values():
                     try:
                         if self.network_name_gen.is_generated_name(network.name) \
