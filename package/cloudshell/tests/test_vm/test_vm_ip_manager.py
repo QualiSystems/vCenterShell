@@ -23,6 +23,7 @@ class TestVMIPManager(TestCase):
         self.vm = Mock()
         self.vm.guest = Mock()
         self.vm.guest.toolsStatus = 'running'
+        self.guest_tools_timeout = 500
 
     def test_get_match_method_none(self):
         method = self.ip_manager.get_ip_match_function(None)
@@ -43,7 +44,8 @@ class TestVMIPManager(TestCase):
                           self.function,
                           self.cancel,
                           self.timeout,
-                          self.logger)
+                          self.logger,
+                          self.guest_tools_timeout)
 
     def test_get_ip_no_timeout_no_found(self):
         self.vm.guest.ipAddress = None

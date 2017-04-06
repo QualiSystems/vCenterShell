@@ -119,7 +119,7 @@ class VirtualMachineDeployer(object):
         vm_name = self.name_generator(data_holder.app_name)
 
         connection_details = self.cs_helper.get_connection_details(session=session,
-                                                                   vcenter_resource_model=vcenter_data_model,
+                                                                   hyperv_resource_model=vcenter_data_model,
                                                                    resource_context=resource_context)
 
         VCenterDetailsFactory.set_deplyment_vcenter_params(vcenter_resource_model=vcenter_data_model,

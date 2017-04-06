@@ -15,6 +15,7 @@ from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
+from cloudshell.cp.vcenter.commands.modify_hardware import ModifyHardwareCommand
 from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
 from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
@@ -133,6 +134,10 @@ class CommandOrchestrator(object):
                                                         task_waiter=synchronous_task_waiter)
 
         self.snapshots_retriever = RetrieveSnapshotsCommand(pyvmomi_service=pv_service)
+
+        self.hardware_modifier = ModifyHardwareCommand(pyvmomi_service=pv_service,
+                                                       task_waiter=synchronous_task_waiter,
+                                                       resource_model_parser=ResourceModelParser())
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
@@ -399,6 +404,14 @@ class CommandOrchestrator(object):
                                                                    self.vm_loader.load_vm_uuid_by_name,
                                                                    vm_name)
         return set_command_result(result=res, unpicklable=False)
+
+    def modify_vm_hardware(self, context, vm_changes):
+        resource_details = self._parse_remote_model(context)
+        result = self.command_wrapper.execute_command_with_connection(context,
+                                                                      self.hardware_modifier.modify_vm_hardware,
+                                                                      resource_details.vm_uuid,
+                                                                      vm_changes)
+        return set_command_result(result=result, unpicklable=False)
 
     def save_snapshot(self, context, snapshot_name):
         """

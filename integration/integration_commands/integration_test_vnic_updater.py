@@ -1,12 +1,12 @@
 import os
 from unittest import TestCase
-from cloudshell.helpers.scripts import cloudshell_dev_helpers as dev_helpers
-from cloudshell.helpers.scripts import cloudshell_scripts_helpers as helpers
-from pyVim.connect import SmartConnect, Disconnect
-from pyVmomi import vim
 
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.helpers.scripts import cloudshell_dev_helpers as dev_helpers
 from cloudshell.tests.utils.testing_credentials import TestCredentials
+from ixia_breakingpoint_vchassis.src import cloudshell_scripts_helpers as helpers
+from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 
 
 class VirtualSwitchToMachineCommandIntegrationTest(TestCase):
