@@ -23,6 +23,7 @@ A repository for projects providing out of the box capabilities within CloudShel
     The vCenter Python package hosted in [PyPi](https://pypi.python.org/). The package contains most of the logic relate
     to working with the vCenter API.
 
+
 * **vcentershell_driver**
 
     The CloudShell driver for controlling vCenter via CloudShell.
