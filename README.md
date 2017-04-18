@@ -17,7 +17,6 @@ A repository for projects providing out of the box capabilities within CloudShel
     * **deploy_vm_from_linked_clone**
     App deployment type driver for deploying a linked clone (deploy from snapshot)
 
-
 * **package**
 
     The vCenter Python package hosted in [PyPi](https://pypi.python.org/). The package contains most of the logic relate
