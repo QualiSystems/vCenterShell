@@ -2,6 +2,8 @@
 [![Dependency Status](https://dependencyci.com/github/QualiSystems/vCenterShell/badge)](https://dependencyci.com/github/QualiSystems/vCenterShell)
 [ ![Foo](https://qualisystems.getbadges.io/shield/company/qualisystems) ](https://getbadges.io) [![Stories in Ready](https://badge.waffle.io/QualiSystems/vCenterShell.svg?label=ready&title=Ready)](http://waffle.io/QualiSystems/vCenterShell) [![Join the chat at https://gitter.im/QualiSystems/vCenterShell](https://badges.gitter.im/QualiSystems/vCenterShell.svg)](https://gitter.im/QualiSystems/vCenterShell?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Analytics](https://ga-beacon.appspot.com/UA-72194260-1/QualiSystems/vCenterShell)](https://github.com/QualiSystems/vCenterShell/)
 
+
+
 A repository for projects providing out of the box capabilities within CloudShell to define VMWare vCenter instances in CloudShell and leverage vCenter's capabilities to deploy and connect apps in CloudShell sandboxes.
 
 ## Projects
