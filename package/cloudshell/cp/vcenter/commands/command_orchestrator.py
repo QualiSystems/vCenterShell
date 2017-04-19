@@ -372,7 +372,6 @@ class CommandOrchestrator(object):
         """
         parse the remote resource model and adds its full name
         :type context: models.QualiDriverModels.ResourceRemoteCommandContext
-
         """
         if not context.remote_endpoints:
             raise Exception('no remote resources found in context: {0}', jsonpickle.encode(context, unpicklable=False))
@@ -465,13 +464,13 @@ class CommandOrchestrator(object):
         orchestration_saved_artifact.artifact_type = 'vcenter_snapshot'
         orchestration_saved_artifact.identifier = created_snapshot_path
 
-        saved_artifacts_info = OrchestrationSavedArtifactsInfo(
-            resource_name=resource_details.cloud_provider,
+        saved_artifact_info = OrchestrationSavedArtifactsInfo(
+            resource_name=resource_details.fullname,
             created_date=created_date,
             restore_rules={'requires_same_resource': True},
             saved_artifact=orchestration_saved_artifact)
 
-        orchestration_save_result = OrchestrationSaveResult(saved_artifacts_info)
+        orchestration_save_result = OrchestrationSaveResult(saved_artifact_info)
 
         return set_command_result(result=orchestration_save_result, unpicklable=False)
 
@@ -488,6 +487,6 @@ class CommandOrchestrator(object):
         :param saved_details:
         :return:
         """
-        saved_artifacts_info = get_result_from_command_output(saved_details)
-        snapshot_name = saved_artifacts_info['saved_artifacts_info']['saved_artifact']['identifier']
+        saved_artifact_info = get_result_from_command_output(saved_details)
+        snapshot_name = saved_artifact_info['saved_artifact_info']['saved_artifact']['identifier']
         return self.restore_snapshot(context=context, snapshot_name=snapshot_name)

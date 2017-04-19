@@ -156,11 +156,11 @@ class TestCommandOrchestrator(TestCase):
             # Assert
             save_snapshot_mock.assert_called_once()
             saved_result_dict = jsonpickle.decode(saved_result)
-            self.assertEqual(saved_result_dict['saved_artifacts_info']['saved_artifact']['artifact_type'],
+            self.assertEqual(saved_result_dict['saved_artifact_info']['saved_artifact']['artifact_type'],
                              'vcenter_snapshot')
-            self.assertEqual(saved_result_dict['saved_artifacts_info']['saved_artifact']['identifier'], 'new_snapshot')
-            self.assertEqual(saved_result_dict['saved_artifacts_info']['resource_name'], 'vcenter')
-            self.assertIsNotNone(saved_result_dict['saved_artifacts_info']['created_date'])
+            self.assertEqual(saved_result_dict['saved_artifact_info']['saved_artifact']['identifier'], 'new_snapshot')
+            self.assertEqual(saved_result_dict['saved_artifact_info']['resource_name'], 'vm_111')
+            self.assertIsNotNone(saved_result_dict['saved_artifact_info']['created_date'])
 
     @freeze_time("1984-12-31 11:12:13.4567")
     def test_orchestration_save_snapshot_name_should_contain_full_datetime(self):
@@ -191,7 +191,7 @@ class TestCommandOrchestrator(TestCase):
         with patch(RESTORE_SNAPSHOT) as mock_restore_snapshot:
             # Act
             self.command_orchestrator.orchestration_restore(self.context, '''{
-      "saved_artifacts_info": {
+      "saved_artifact_info": {
         "resource_name": "ex cillum sed laboris",
         "created_date": "4313-10-12T18:03:15.053Z",
         "restore_rules": {
