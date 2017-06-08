@@ -31,7 +31,9 @@ class TestCommandOrchestrator(TestCase):
                 "Refresh IP Timeout": "600",
                 "Auto Delete": "True",
                 "Autoload": "True",
-                "Vcenter VM Snapshot": "sds"
+                "VCenter VM": "sds",
+                "VCenter VM Snapshot": "sds",
+                "VCenter Template": "dsds"
             },
             "LogicalResourceRequestAttributes": {
                 "Public IP": "",
@@ -40,6 +42,7 @@ class TestCommandOrchestrator(TestCase):
             }
         }'''
         self.resource = create_autospec(ResourceInfo)
+        self.resource.name = 'Cloud1'
         self.resource.ResourceModelName = 'VMwarev Center'
         self.resource.ResourceAttributes = {'User': 'user',
                                             'Password': '123',
