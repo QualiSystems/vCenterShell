@@ -1,6 +1,8 @@
 import time
 from datetime import datetime, date
 import jsonpickle
+
+from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
@@ -31,6 +33,11 @@ from cloudshell.cp.vcenter.common.wrappers.command_wrapper import CommandWrapper
 from cloudshell.cp.vcenter.models.DeployDataHolder import DeployDataHolder
 from cloudshell.cp.vcenter.models.DriverResponse import DriverResponse, DriverResponseRoot
 from cloudshell.cp.vcenter.models.GenericDeployedAppResourceModel import GenericDeployedAppResourceModel
+from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import \
+    VCenterDeployVMFromLinkedCloneResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
+from cloudshell.cp.vcenter.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
+from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.network.dvswitch.creator import DvPortGroupCreator
 from cloudshell.cp.vcenter.network.dvswitch.name_generator import DvPortGroupNameGenerator
 from cloudshell.cp.vcenter.network.vlan.factory import VlanSpecFactory
@@ -41,6 +48,7 @@ from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineCo
 from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
+from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
 
 class CommandOrchestrator(object):
@@ -151,15 +159,15 @@ class CommandOrchestrator(object):
         Deploy From Template Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
         """
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
-        data_holder = DeployDataHolder(data)
-        data_holder.template_resource_model.vcenter_template = \
-            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_template)
+        data['Attributes']['vCenter Name'] = context.resource.name
+        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterVMFromTemplateResourceModel)
+        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -169,20 +177,20 @@ class CommandOrchestrator(object):
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_clone_from_vm(self, context, deploy_data):
+    def deploy_clone_from_vm(self, context, request):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
         """
 
         # get command parameters from the environment
-        data = jsonpickle.decode(deploy_data)
-        data_holder = DeployDataHolder(data)
-        data_holder.template_resource_model.vcenter_vm = \
-            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
+        data = jsonpickle.decode(request)
+        data['Attributes']['vCenter Name'] = context.resource.name
+        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterCloneVMFromVMResourceModel)
+        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -190,32 +198,27 @@ class CommandOrchestrator(object):
             self.deploy_command.execute_deploy_clone_from_vm,
             data_holder)
 
-        return set_command_result(result=result, unpicklable=False)
+        res = set_command_result(result=result, unpicklable=False)
+        return res
 
     def deploy_from_linked_clone(self, context, deploy_data):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str deploy_data: represent a json of the parameters, example: {"template_resource_model": {"vm_location": "", "vcenter_name": "VMware vCenter", "refresh_ip_timeout": "600", "auto_delete": "True", "vm_storage": "", "auto_power_on": "True", "autoload": "True", "ip_regex": "", "auto_power_off": "True", "vcenter_template": "Alex\\test", "vm_cluster": "", "vm_resource_pool": "", "wait_for_ip": "True"}, "app_name": "Temp"}
+        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
         """
 
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
-        data_holder = DeployDataHolder(data)
+        data['Attributes']['vCenter Name'] = context.resource.name
+        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], VCenterDeployVMFromLinkedCloneResourceModel)
 
-        if not data_holder.template_resource_model.vcenter_vm:
-            raise ValueError('Please insert vm to deploy from')
-
-        data_holder.template_resource_model.vcenter_vm = \
-            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm)
-
-        if not data_holder.template_resource_model.vcenter_vm_snapshot:
+        if not linked_clone_from_vm_model.vcenter_vm_snapshot:
             raise ValueError('Please insert snapshot to deploy from')
 
-        data_holder.template_resource_model.vcenter_vm_snapshot = \
-            back_slash_to_front_converter(data_holder.template_resource_model.vcenter_vm_snapshot)
+        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -230,23 +233,15 @@ class CommandOrchestrator(object):
         Deploy From Image Command, will deploy vm from ovf image
 
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str deploy_data: represent a json of the parameters, example: {
-                "image_url": "c:\image.ovf" or
-                             "\\nas\shared\image.ovf" or
-                             "http://192.168.65.88/ovf/Debian%2064%20-%20Yoav.ovf",
-                "cluster_name": "QualiSB Cluster",
-                "resource_pool": "LiverPool",
-                "datastore_name": "eric ds cluster",
-                "datacenter_name": "QualiSB"
-                "power_on": False
-                "app_name": "appName"
-                "user_arguments": ["--compress=9", " --schemaValidate", "--etc"]
-            }
+        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
         """
+
         # get command parameters from the environment
         data = jsonpickle.decode(deploy_data)
-        data_holder = DeployDataHolder(data)
+        data['Attributes']['vCenter Name'] = context.resource.name
+        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], vCenterVMFromImageResourceModel)
+        data_holder = DeployFromImageDetails(deploy_from_image_model, data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
