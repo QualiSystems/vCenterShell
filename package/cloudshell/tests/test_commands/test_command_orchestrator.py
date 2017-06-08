@@ -38,7 +38,7 @@ class TestCommandOrchestrator(TestCase):
                 "Password": "Password1",
                 "User": "root"
             }
-        })'''
+        }'''
         self.resource = create_autospec(ResourceInfo)
         self.resource.ResourceModelName = 'VMwarev Center'
         self.resource.ResourceAttributes = {'User': 'user',
