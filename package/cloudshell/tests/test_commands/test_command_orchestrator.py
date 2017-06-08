@@ -13,6 +13,32 @@ SAVE_SNAPSHOT = 'cloudshell.cp.vcenter.commands.command_orchestrator.CommandOrch
 
 class TestCommandOrchestrator(TestCase):
     def setUp(self):
+        self.deploy_request = '''{
+            "AppName": "TestApp",
+            "DeploymentServiceName": "vCenter VM From Image",
+            "Attributes": {
+                "Default Datacenter": "",
+                "Auto Power Off": "True",
+                "Auto Power On": "True",
+                "Wait for IP": "True",
+                "VM Cluster": "",
+                "VM Location": "",
+                "VM Storage": "",
+                "VM Resource Pool": "",
+                "vCenter Image": "c:\\tinyvm1.ova",
+                "vCenter Image Arguments": "",
+                "IP Regex": "",
+                "Refresh IP Timeout": "600",
+                "Auto Delete": "True",
+                "Autoload": "True",
+                "Vcenter VM Snapshot": "sds"
+            },
+            "LogicalResourceRequestAttributes": {
+                "Public IP": "",
+                "Password": "Password1",
+                "User": "root"
+            }
+        })'''
         self.resource = create_autospec(ResourceInfo)
         self.resource.ResourceModelName = 'VMwarev Center'
         self.resource.ResourceAttributes = {'User': 'user',
@@ -68,28 +94,25 @@ class TestCommandOrchestrator(TestCase):
 
     def test_deploy_from_template(self):
         # act
-        self.command_orchestrator.deploy_from_template(self.context,
-                                                       '{"name": "name", "template_resource_model": {"vcenter_template": ""}}')
+        self.command_orchestrator.deploy_from_template(self.context, self.deploy_request)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_vm_from_vm(self):
         # act
-        self.command_orchestrator.deploy_clone_from_vm(self.context,
-                                                       '{"name": "name", "template_resource_model": {"vcenter_vm": ""}}')
+        self.command_orchestrator.deploy_clone_from_vm(self.context, self.deploy_request)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_snapshot(self):
         # act
-        self.command_orchestrator.deploy_from_linked_clone(self.context,
-                                                           '{"name": "name", "template_resource_model": {"vcenter_vm": "name", "vcenter_vm_snapshot": "snap"}}')
+        self.command_orchestrator.deploy_from_linked_clone(self.context, self.deploy_request)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_image(self):
         # act
-        self.command_orchestrator.deploy_from_image(self.context, '{"name": "name"}')
+        self.command_orchestrator.deploy_from_image(self.context, self.deploy_request)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
