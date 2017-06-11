@@ -154,7 +154,7 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def deploy_from_template(self, context, deploy_data):
+    def deploy_from_template(self, context, request):
         """
         Deploy From Template Command, will deploy vm from template
 
@@ -164,10 +164,10 @@ class CommandOrchestrator(object):
         """
 
         # get command parameters from the environment
-        data = jsonpickle.decode(deploy_data)
+        data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
         clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterVMFromTemplateResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['AppName'])
+        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -190,7 +190,7 @@ class CommandOrchestrator(object):
         data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
         clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterCloneVMFromVMResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['AppName'])
+        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -201,7 +201,7 @@ class CommandOrchestrator(object):
         res = set_command_result(result=result, unpicklable=False)
         return res
 
-    def deploy_from_linked_clone(self, context, deploy_data):
+    def deploy_from_linked_clone(self, context, request):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
@@ -211,14 +211,14 @@ class CommandOrchestrator(object):
         """
 
         # get command parameters from the environment
-        data = jsonpickle.decode(deploy_data)
+        data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
         linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], VCenterDeployVMFromLinkedCloneResourceModel)
 
         if not linked_clone_from_vm_model.vcenter_vm_snapshot:
             raise ValueError('Please insert snapshot to deploy from')
 
-        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, data['AppName'])
+        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
@@ -228,7 +228,7 @@ class CommandOrchestrator(object):
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_from_image(self, context, deploy_data):
+    def deploy_from_image(self, context, request):
         """
         Deploy From Image Command, will deploy vm from ovf image
 
@@ -238,10 +238,10 @@ class CommandOrchestrator(object):
         """
 
         # get command parameters from the environment
-        data = jsonpickle.decode(deploy_data)
+        data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
         deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], vCenterVMFromImageResourceModel)
-        data_holder = DeployFromImageDetails(deploy_from_image_model, data['AppName'])
+        data_holder = DeployFromImageDetails(deploy_from_image_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(

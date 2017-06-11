@@ -57,7 +57,7 @@ class VCenterShellDriver (ResourceDriverInterface):
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
-    def Deploy(self, context, Name=None, request=None):
+    def Deploy(self, context, request=None):
         app_request = jsonpickle.decode(request)
         deployment_name = app_request['DeploymentServiceName']
         if deployment_name in self.deployments.keys():
