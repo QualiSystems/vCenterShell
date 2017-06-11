@@ -15,6 +15,7 @@ class TestCommandOrchestrator(TestCase):
     def setUp(self):
         self.deploy_request = '''{
             "AppName": "TestApp",
+            "UserRequestedAppName": "TestApp123",
             "DeploymentServiceName": "vCenter VM From Image",
             "Attributes": {
                 "Default Datacenter": "",
