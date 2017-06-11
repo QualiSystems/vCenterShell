@@ -5,6 +5,7 @@
             <Command Description="" DisplayName="Deploy Clone From VM" EnableCancellation="true" Name="deploy_clone_from_vm" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Deploy from Linked Clone" EnableCancellation="true" Name="deploy_from_linked_clone" Tags="allow_unreserved" />
             <Command Description="" DisplayName="Deploy From Image" EnableCancellation="true" Name="deploy_from_image" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="Deploy" Name="Deploy" Tags="allow_unreserved" />
         </Category>
         <Category Name="Connectivity">
             <Command Description="" DisplayName="Refresh IP" EnableCancellation="true" Name="remote_refresh_ip" Tags="remote_connectivity,allow_shared" />
