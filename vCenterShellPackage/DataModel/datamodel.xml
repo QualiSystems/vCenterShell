@@ -172,7 +172,7 @@
     </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
-    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
+    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider" AllowRemoteConnection="false">
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
