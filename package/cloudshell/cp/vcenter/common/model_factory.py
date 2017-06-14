@@ -11,7 +11,7 @@ class ResourceModelParser:
 
     def convert_to_vcenter_model(self, resource):
         vcenter_data_model = self.convert_to_resource_model(
-            attributes=ResourceModelParser.get_resource_attributes(resource),
+            attributes=ResourceModelParser.get_resource_attributes_as_dict(resource),
             resource_model_type=VMwarevCenterResourceModel)
 
         vcenter_data_model.default_dvswitch = back_slash_to_front_converter(vcenter_data_model.default_dvswitch)
@@ -83,6 +83,18 @@ class ResourceModelParser:
         if hasattr(resource_instance, "attributes"):
             return resource_instance.attributes
         raise ValueError('Object {0} does not have any attributes property'.format(str(resource_instance)))
+
+    @staticmethod
+    def get_resource_attributes_as_dict(resource_instance):
+        attributes = ResourceModelParser.get_resource_attributes(resource_instance)
+        if len(attributes) == 0:
+            return {}
+        if hasattr(attributes[0], 'Value') and hasattr(attributes[0], 'Name'):
+            return dict((att.Name,att.Value) for att in attributes)
+        elif isinstance(attributes, dict):
+            return attributes
+        else:
+            ValueError('Attribute object {0} was not recognized'.format(str(resource_instance)))
 
     @staticmethod
     def get_public_properties(instance):
