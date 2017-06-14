@@ -89,10 +89,10 @@ class ResourceModelParser:
         attributes = ResourceModelParser.get_resource_attributes(resource_instance)
         if len(attributes) == 0:
             return {}
-        if hasattr(attributes[0], 'Value') and hasattr(attributes[0], 'Name'):
-            return dict((att.Name,att.Value) for att in attributes)
         elif isinstance(attributes, dict):
             return attributes
+        if isinstance(attributes, list) and hasattr(attributes[0], 'Value') and hasattr(attributes[0], 'Name'):
+            return dict((att.Name,att.Value) for att in attributes)
         else:
             ValueError('Attribute object {0} was not recognized'.format(str(resource_instance)))
 
