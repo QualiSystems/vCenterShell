@@ -683,3 +683,9 @@ class pyVmomiService:
             if snapshot_header.name == name:
                 return snapshot_header
         return None
+
+
+def vm_has_no_vnics(vm):
+    # Is there any network device on vm
+    return next((False for device in vm.config.hardware.device
+                if isinstance(device, vim.vm.device.VirtualEthernetCard) and hasattr(device, 'macAddress')), True)
