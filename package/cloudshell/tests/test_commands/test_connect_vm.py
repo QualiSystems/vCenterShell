@@ -12,9 +12,14 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.vlan_id_gen = 'gen_id'
         self.name_gen = 'gen_name'
         self.spec = Mock()
-        self.vm = Mock()
+        self.vm = Fake()
+        nic = Mock(spec=vim.vm.device.VirtualEthernetCard)
+        nic.macAddress = True
+        self.vm.config = Fake()
+        self.vm.config.hardware=Fake()
+        self.vm.config.hardware.device = [nic]
         self.pv_service = Mock()
-        self.pv_service.find_by_uuid = Mock(self.vm)
+        self.pv_service.find_by_uuid = lambda x, y: self.vm
         self.si = Mock()
         self.vm_uuid = 'uuid'
         self.vlan_id = 100
@@ -68,3 +73,11 @@ class TestVirtualSwitchToMachineDisconnectCommand(TestCase):
         self.assertTrue(self.vlan_spec_factory.get_vlan_spec.called_with(self.spec_type))
         self.assertTrue(self.dv_connector.connect_by_mapping.called_with(self.si, self.vm, [mapping], logger, 'True'))
         self.assertEqual(connect_results[0].mac_address, 'AA-BB')
+
+
+def vm_has_no_vnics():
+    return False
+
+
+class Fake(object):
+    pass

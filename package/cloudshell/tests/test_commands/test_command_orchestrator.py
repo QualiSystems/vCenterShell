@@ -4,7 +4,8 @@ from freezegun import freeze_time
 import jsonpickle
 from cloudshell.api.cloudshell_api import ResourceInfo
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from cloudshell.shell.core.driver_context import ResourceRemoteCommandContext, ResourceContextDetails, AppContext
+from cloudshell.shell.core.driver_context import ResourceRemoteCommandContext, ResourceContextDetails
+from cloudshell.shell.core.context import AppContext
 from mock import Mock, create_autospec, patch
 
 RESTORE_SNAPSHOT = 'cloudshell.cp.vcenter.commands.command_orchestrator.CommandOrchestrator.restore_snapshot'
