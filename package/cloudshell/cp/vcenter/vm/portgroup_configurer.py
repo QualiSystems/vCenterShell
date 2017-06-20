@@ -55,6 +55,7 @@ class VirtualMachinePortGroupConfigurer(object):
             self.update_vnic_by_mapping(vm, update_mapping, logger)
             return update_mapping
         except Exception as e:
+            self.erase_network_by_mapping([request.network for request in mapping], reserved_networks, logger)
             logger.exception("Failed to connect VM: {}".format(vm.name))
             raise ValueError('VM: {0} failed with: "{1}"'.format(vm.name, e.message))
 
