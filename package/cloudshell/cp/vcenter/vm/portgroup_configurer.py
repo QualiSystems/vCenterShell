@@ -55,6 +55,13 @@ class VirtualMachinePortGroupConfigurer(object):
             self.update_vnic_by_mapping(vm, update_mapping, logger)
             return update_mapping
         except Exception as e:
+            # If we fail to connect to a vm, make sure we clear the mapping and delete the network if necessary
+            #
+            # Example: we have a VM with no nics (ethernet adapters).
+            # We have created a vlan for this VM, but were unable to connect to any nic.
+            # We dispose of the VLAN now, rolling back the network
+            # This way we don't have to deal with disposing of the vlan later when no object references the vlan
+            # since it wasnt mapped to any nic
             self.erase_network_by_mapping([request.network for request in mapping], reserved_networks, logger)
             logger.exception("Failed to connect VM: {}".format(vm.name))
             raise ValueError('VM: {0} failed with: "{1}"'.format(vm.name, e.message))
