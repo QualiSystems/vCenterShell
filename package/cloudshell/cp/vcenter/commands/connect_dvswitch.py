@@ -1,4 +1,5 @@
 from cloudshell.cp.vcenter.models.ConnectionResult import ConnectionResult
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import vm_has_no_vnics
 
 
 class VirtualSwitchConnectCommand:
@@ -44,6 +45,9 @@ class VirtualSwitchConnectCommand:
 
         if not default_network_instance:
             raise ValueError('Default Network {0} not found'.format(default_network_name))
+
+        if vm_has_no_vnics(vm):
+            raise ValueError('Trying to connect VM (uuid: {0}) but it has no vNics'.format(vm_uuid))
 
         mappings = self._prepare_mappings(dv_switch_name=dv_switch_name, vm_network_mappings=vm_network_mappings)
 

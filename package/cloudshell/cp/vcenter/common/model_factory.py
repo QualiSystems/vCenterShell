@@ -1,4 +1,5 @@
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 
 
@@ -10,7 +11,7 @@ class ResourceModelParser:
 
     def convert_to_vcenter_model(self, resource):
         vcenter_data_model = self.convert_to_resource_model(
-            resource_instance=resource,
+            attributes=ResourceModelParser.get_resource_attributes_as_dict(resource),
             resource_model_type=VMwarevCenterResourceModel)
 
         vcenter_data_model.default_dvswitch = back_slash_to_front_converter(vcenter_data_model.default_dvswitch)
@@ -23,11 +24,11 @@ class ResourceModelParser:
 
         return vcenter_data_model
 
-    def convert_to_resource_model(self, resource_instance, resource_model_type):
+    def convert_to_resource_model(self, attributes, resource_model_type):
         """
         Converts an instance of resource with dictionary of attributes
         to a class instance according to family and assigns its properties
-        :param resource_instance: Instance of resource
+        :type attributes: dict
         :param resource_model_type: Resource Model type to create
         :return:
         """
@@ -36,13 +37,14 @@ class ResourceModelParser:
                 raise ValueError('resource_model_type {0} cannot be instantiated'.format(resource_model_type))
             instance = resource_model_type()
         else:
-            instance = ResourceModelParser.create_resource_model_instance(resource_instance)
+            raise ValueError('resource_model_type must have a value')
+            #instance = ResourceModelParser.create_resource_model_instance(resource_instance)
         props = ResourceModelParser.get_public_properties(instance)
-        for attrib in ResourceModelParser.get_resource_attributes(resource_instance):
+        for attrib in attributes:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
             property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
             if props.__contains__(property_name):
-                value = self.get_attribute_value(attrib, resource_instance)
+                value = attributes[attrib]
                 setattr(instance, property_name, value)
                 if hasattr(instance, property_name_for_attribute_name):
                     setattr(instance, property_name_for_attribute_name, attrib)
@@ -52,7 +54,14 @@ class ResourceModelParser:
         if props:
             raise ValueError('Property(ies) {0} not found on resource with attributes {1}'
                              .format(','.join(props),
-                                     ','.join(ResourceModelParser.get_resource_attributes(resource_instance))))
+                                     ','.join(attributes)))
+
+        if hasattr(instance, 'vcenter_vm'):
+            instance.vcenter_vm = back_slash_to_front_converter(instance.vcenter_vm)
+
+        if hasattr(instance, 'vcenter_vm_snapshot'):
+            instance.vcenter_vm_snapshot = back_slash_to_front_converter(instance.vcenter_vm_snapshot)
+
         return instance
 
     def get_attribute_value(self, attrib, resource_instance):
@@ -74,6 +83,18 @@ class ResourceModelParser:
         if hasattr(resource_instance, "attributes"):
             return resource_instance.attributes
         raise ValueError('Object {0} does not have any attributes property'.format(str(resource_instance)))
+
+    @staticmethod
+    def get_resource_attributes_as_dict(resource_instance):
+        attributes = ResourceModelParser.get_resource_attributes(resource_instance)
+        if len(attributes) == 0:
+            return {}
+        elif isinstance(attributes, dict):
+            return attributes
+        if isinstance(attributes, list) and hasattr(attributes[0], 'Value') and hasattr(attributes[0], 'Name'):
+            return dict((att.Name,att.Value) for att in attributes)
+        else:
+            ValueError('Attribute object {0} was not recognized'.format(str(resource_instance)))
 
     @staticmethod
     def get_public_properties(instance):

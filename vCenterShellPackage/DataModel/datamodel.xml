@@ -172,7 +172,7 @@
     </ns0:AttributeInfo>
   </ns0:Attributes>
   <ns0:ResourceFamilies>
-    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider">
+    <ns0:ResourceFamily Description="" IsAdminOnly="true" IsSearchable="true" Name="Cloud Provider" AllowRemoteConnection="false">
       <ns0:AttachedAttributes />
       <ns0:AttributeValues />
       <ns0:Models>
@@ -324,9 +324,7 @@
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Deploy Clone From VM Driver</ns0:DriverName>
-          </ns0:Drivers>
+          <ns0:Drivers/>
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
@@ -382,9 +380,7 @@
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Deploy From Template Driver</ns0:DriverName>
-          </ns0:Drivers>
+          <ns0:Drivers/>
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
@@ -443,9 +439,7 @@
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Deploy from Linked Clone Driver</ns0:DriverName>
-          </ns0:Drivers>
+          <ns0:Drivers/>
           <ns0:Scripts>
           </ns0:Scripts>
         </ns0:ResourceModel>
@@ -510,9 +504,7 @@
             <ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
           <ns0:ParentModels />
-          <ns0:Drivers>
-            <ns0:DriverName>Deploy From Image Driver</ns0:DriverName>
-          </ns0:Drivers>
+          <ns0:Drivers/>
           <ns0:Scripts />
         </ns0:ResourceModel>
       </ns0:Models>
