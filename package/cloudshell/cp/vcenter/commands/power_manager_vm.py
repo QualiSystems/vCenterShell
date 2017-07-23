@@ -30,7 +30,7 @@ class VirtualMachinePowerManagementCommand(object):
 
         if vm.summary.runtime.powerState == 'poweredOff':
             logger.info('vm already powered off')
-            task_result = 'already powered off'
+            task_result = 'Already powered off'
         else:
             # hard power off
             logger.info('{0} powering of vm'.format(vcenter_data_model.shutdown_method))
@@ -72,7 +72,7 @@ class VirtualMachinePowerManagementCommand(object):
 
         if vm.summary.runtime.powerState == 'poweredOn':
             logger.info('vm already powered on')
-            task_result = 'already powered on'
+            task_result = 'Already powered on'
         else:
             logger.info('powering on vm')
             task = vm.PowerOn()

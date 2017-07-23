@@ -26,6 +26,9 @@ def set_command_result(result, unpicklable=False):
     if result is None:
         return
 
+    if isinstance(result, basestring):
+        return result
+
     json = jsonpickle.encode(result, unpicklable=unpicklable)
     result_for_output = str(json)
     print result_for_output
