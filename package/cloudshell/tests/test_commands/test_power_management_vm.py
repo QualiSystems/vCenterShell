@@ -27,7 +27,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
                                       resource_fullname=None)
 
         # assert
-        self.assertTrue(res, 'already powered off')
+        self.assertTrue(res, 'Already powered off')
         self.assertFalse(vm.PowerOn.called)
 
     def test_power_on_already(self):
@@ -51,7 +51,7 @@ class TestVirtualMachinePowerManagementCommand(TestCase):
                                      resource_fullname=None)
 
         # assert
-        self.assertTrue(res, 'already powered on')
+        self.assertTrue(res, 'Already powered on')
         self.assertFalse(vm.PowerOn.called)
 
     def test_power_on(self):
