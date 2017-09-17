@@ -1,4 +1,4 @@
-<Driver Description="Deploy App From Image" MainClass="driver.DeployFromImage" Name="VM Deployment From Image" Version="1.7.0">
+<Driver Description="Deploy App From Image" MainClass="driver.DeployFromImage" Name="VM Deployment From Image" Version="1.7.1">
     <Layout>
         <Category Name="App Management">
             <Command Description="" DisplayName="Deploy" Name="Deploy" Tags="allow_shared" />
