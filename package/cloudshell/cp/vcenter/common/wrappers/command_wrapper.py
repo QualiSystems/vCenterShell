@@ -52,7 +52,7 @@ class CommandWrapper:
     @retry(stop_max_attempt_number=3, wait_fixed=2000, retry_on_exception=retry_if_auth_error)
     def execute_command_with_connection(self, context, command, *args):
         """
-        Note: session & vcenter_data_model objects will be injected dynamically to the command
+        Note: session & vcenter_data_model & reservation id objects will be injected dynamically to the command
         :param command:
         :param context: instance of ResourceCommandContext or AutoLoadCommandContext
         :type context: cloudshell.shell.core.context.ResourceCommandContext
@@ -98,10 +98,21 @@ class CommandWrapper:
                 logger.info(CONNECTED_TO_CENTER.format(connection_details.host))
                 command_args.append(si)
 
-            self._try_inject_arg(command=command, command_args=command_args, arg_object=session, arg_name='session')
-            self._try_inject_arg(command=command, command_args=command_args, arg_object=vcenter_data_model,
+            self._try_inject_arg(command=command,
+                                 command_args=command_args,
+                                 arg_object=session,
+                                 arg_name='session')
+            self._try_inject_arg(command=command,
+                                 command_args=command_args,
+                                 arg_object=vcenter_data_model,
                                  arg_name='vcenter_data_model')
-            self._try_inject_arg(command=command, command_args=command_args, arg_object=logger,
+            self._try_inject_arg(command=command,
+                                 command_args=command_args,
+                                 arg_object=self._get_reservation_id(context),
+                                 arg_name='reservation_id')
+            self._try_inject_arg(command=command,
+                                 command_args=command_args,
+                                 arg_object=logger,
                                  arg_name='logger')
 
             command_args.extend(args)
@@ -156,6 +167,14 @@ class CommandWrapper:
         if reservation:
             domain = reservation.domain
         return domain
+
+    @staticmethod
+    def _get_reservation_id(context):
+        reservation_id = None
+        reservation = getattr(context, 'reservation', getattr(context, 'remote_reservation', None))
+        if reservation:
+            reservation_id = reservation.reservation_id
+        return reservation_id
 
     def _try_inject_arg(self, command, command_args, arg_object, arg_name):
         try:

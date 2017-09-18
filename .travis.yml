@@ -4,10 +4,10 @@ env:
 install: 
   - pip install -r external_requirements.txt
   - pip install -r test_requirements.txt
-  - pip install "cloudshell-core>=2.0.0,<2.1.0" --extra-index-url https://testpypi.python.org/simple  
+  - pip install "cloudshell-core>=2.2.0,<2.3.0" --extra-index-url https://testpypi.python.org/simple
   - chmod 777 ./cloudshell_shell_core_install.sh
   - ./cloudshell_shell_core_install.sh
-  - pip install "cloudshell-automation-api>=8.0.0.0,<8.1.0.0" --extra-index-url https://testpypi.python.org/simple
+  - pip install "cloudshell-automation-api>=8.2.0.0,<8.3.0.0" --extra-index-url https://testpypi.python.org/simple
 language: python
 notifications: 
   webhools: "https://qualisystems.getbadges.io/api/app/webhook/63350e33-4119-49c3-8127-075aaa022926"
