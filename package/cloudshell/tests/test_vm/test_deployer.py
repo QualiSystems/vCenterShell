@@ -49,7 +49,8 @@ class TestVirtualMachineDeployer(TestCase):
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
-            logger=Mock())
+            logger=Mock(),
+            reservation_id=Mock())
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -61,12 +62,14 @@ class TestVirtualMachineDeployer(TestCase):
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
         deploy_from_template_details.vcenter_vm = 'name'
         resource_context = self._create_vcenter_resource_context()
+        reservation_id = Mock()
 
         res = self.deployer.deploy_clone_from_vm(
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
-            logger=Mock())
+            logger=Mock(),
+            reservation_id=reservation_id)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -83,7 +86,8 @@ class TestVirtualMachineDeployer(TestCase):
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
-            logger=Mock())
+            logger=Mock(),
+            reservation_id=Mock())
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -119,7 +123,7 @@ class TestVirtualMachineDeployer(TestCase):
         vcenter_data_model = self._create_vcenter_resource_context()
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si,
-                          Mock(), deploy_from_template_details, vcenter_data_model)
+                          Mock(), deploy_from_template_details, vcenter_data_model, Mock())
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):
@@ -164,7 +168,8 @@ class TestVirtualMachineDeployer(TestCase):
                                               session=session,
                                               vcenter_data_model=vcenter_data_model,
                                               data_holder=params,
-                                              resource_context=resource_context)
+                                              resource_context=resource_context,
+                                              reservation_id=Mock())
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
