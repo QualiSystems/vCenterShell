@@ -12,6 +12,7 @@ from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
+from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
 
 DOMAIN = 'Global'
 ADDRESS = 'address'
@@ -69,6 +70,7 @@ class VCenterAutoModelDiscovery(object):
         try:
             all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
             dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
+
             all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
             dc_name = dc.name
 
@@ -110,6 +112,21 @@ class VCenterAutoModelDiscovery(object):
             dc = self._get_default(all_item_in_vc, vim.Datacenter, DEFAULT_DATACENTER)
         auto_att.append(AutoLoadAttribute('', DEFAULT_DATACENTER, dc.name))
         return dc
+
+    def _validate_default_dvswitch(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+
+        dvs_path = attributes[key]
+
+        path, name = get_path_and_name(dvs_path)
+        path = "{}/{}".format(dc_name, path)
+        dv = self.pv_service.find_dvs_by_name(si, path, name)
+
+        if not dv:
+            raise ValueError('Could not find Default DvSwitch {0} in path {1}'.format(name, path))
+
+        auto_att.append(AutoLoadAttribute('', DEFAULT_DVSWITCH, dvs_path))
+
+        return dv
 
     def _validate_attribute(self, si, attributes, vim_type, name, prefix=''):
         if name in attributes and attributes[name]:

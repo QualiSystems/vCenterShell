@@ -222,6 +222,19 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
+    def find_dvs_by_name(self,si ,path, name):
+        """
+        Finds vm in the vCenter or returns "None"
+
+        :param si:         pyvmomi 'ServiceInstance'
+        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        :param name:       the dvSwitch name to return
+        """
+
+        dvs = self.find_obj_by_path(si, path, name, '') # empty type_name, will resolve with ChildEntity
+
+        return dvs
+
     def get_folder(self, si, path, root=None):
         """
         Finds folder in the vCenter or returns "None"
@@ -304,9 +317,11 @@ class pyVmomiService:
         obj = None
 
         container = self._get_all_objects_by_type(content, vimtype)
+
+        # If no name was given will return the first object from list of a objects matching the given vimtype type
         for c in container.view:
             if name:
-                if c.name == name:
+                if  c.name == name:
                     obj = c
                     break
             else:
