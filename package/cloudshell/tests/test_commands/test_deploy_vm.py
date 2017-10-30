@@ -32,17 +32,22 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_command = DeployCommand(deployer)
 
         resource_context = Mock()
+        logger = Mock()
+        vcenter_data_model = Mock()
+        reservation_id = Mock()
 
         # act
         result = deploy_command.execute_deploy_from_template(
-            si=si,
-            logger=Mock(),
-            deployment_params=deploy_params,
-            vcenter_data_model=Mock())
+                si=si,
+                logger=logger,
+                deployment_params=deploy_params,
+                vcenter_data_model=vcenter_data_model,
+                reservation_id=reservation_id)
 
         # assert
         self.assertTrue(result)
-        self.assertTrue(deployer.deploy_from_template.called_with(si, deploy_params, resource_context))
+        deployer.deploy_from_template.assert_called_once_with(si, logger, deploy_params, vcenter_data_model,
+                                                              reservation_id)
 
     def test_deploy_image_execute(self):
         deployer = Mock()
@@ -53,20 +58,29 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deployer.deploy_from_image = Mock(return_value=res)
         session = Mock()
         vcenter_data_model = Mock()
+        logger = Mock()
+        reservation_id = Mock()
 
         deploy_command = DeployCommand(deployer)
 
         # act
         result = deploy_command.execute_deploy_from_image(si=si,
-                                                          logger=Mock(),
+                                                          logger=logger,
                                                           session=session,
                                                           vcenter_data_model=vcenter_data_model,
                                                           deployment_params=deployment_params,
-                                                          resource_context=connectivity)
+                                                          resource_context=connectivity,
+                                                          reservation_id=reservation_id)
 
         # assert
         self.assertTrue(result)
-        self.assertTrue(deployer.deploy_from_image.called_with(si, deployment_params, connectivity))
+        deployer.deploy_from_image.assert_called_once_with(si=si,
+                                                           logger=logger,
+                                                           session=session,
+                                                           vcenter_data_model=vcenter_data_model,
+                                                           data_holder=deployment_params,
+                                                           resource_context=connectivity,
+                                                           reservation_id=reservation_id)
 
     def test_deploy_clone_execute(self):
         # arrange
@@ -83,6 +97,10 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         template_model.vm_folder = 'temp folder'
         deployer.deploy_from_template = Mock(return_value=deploy_res)
 
+        reservation_id = Mock()
+        logger = Mock()
+        vcenter_data_model = Mock()
+
         template_resource_model = vCenterVMFromTemplateResourceModel()
 
         deploy_params = DeployFromTemplateDetails(template_resource_model, 'VM Deployment')
@@ -93,14 +111,16 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
 
         # act
         result = deploy_command.execute_deploy_clone_from_vm(
-            si=si,
-            logger=Mock(),
-            vcenter_data_model=Mock(),
-            deployment_params=deploy_params)
+                si=si,
+                logger=logger,
+                vcenter_data_model=vcenter_data_model,
+                deployment_params=deploy_params,
+                reservation_id=reservation_id)
 
         # assert
         self.assertTrue(result)
-        self.assertTrue(deployer.deploy_from_template.called_with(si, deploy_params, resource_context))
+        deployer.deploy_clone_from_vm.assert_called_once_with(si, logger, deploy_params, vcenter_data_model,
+                                                              reservation_id)
 
     def test_deploy_snapshot_execute(self):
         # arrange
@@ -124,14 +144,19 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deploy_command = DeployCommand(deployer)
 
         resource_context = Mock()
+        logger = Mock()
+        vcenter_data_model = Mock()
+        reservation_id = Mock()
 
         # act
         result = deploy_command.execute_deploy_from_linked_clone(
-            si=si,
-            logger=Mock(),
-            deployment_params=deploy_params,
-            vcenter_data_model=Mock())
+                si=si,
+                logger=logger,
+                deployment_params=deploy_params,
+                vcenter_data_model=vcenter_data_model,
+                reservation_id=reservation_id)
 
         # assert
         self.assertTrue(result)
-        self.assertTrue(deployer.deploy_from_template.called_with(si, deploy_params, resource_context))
+        deployer.deploy_from_linked_clone.assert_called_once_with(si, logger, deploy_params, vcenter_data_model,
+                                                               reservation_id)
