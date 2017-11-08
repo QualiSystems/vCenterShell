@@ -81,5 +81,4 @@ develop.cmd
 *.zip
 debug.xml
 debug_info.txt
-/package/package
-/package/version.txt
+
