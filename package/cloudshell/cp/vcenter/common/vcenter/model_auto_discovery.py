@@ -116,13 +116,8 @@ class VCenterAutoModelDiscovery(object):
     def _validate_default_dvswitch(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
 
         dvs_path = attributes[key]
-
-        path, name = get_path_and_name(dvs_path)
-        path = "{}/{}".format(dc_name, path)
-        dv = self.pv_service.find_dvs_by_name(si, path, name)
-
-        if not dv:
-            raise ValueError('Could not find Default DvSwitch {0} in path {1}'.format(name, path))
+        path = "{}/{}".format(dc_name, dvs_path)
+        dv = self.pv_service.find_dvs_by_path(si, path)
 
         auto_att.append(AutoLoadAttribute('', DEFAULT_DVSWITCH, dvs_path))
 

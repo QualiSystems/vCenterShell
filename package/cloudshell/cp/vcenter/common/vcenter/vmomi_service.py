@@ -222,16 +222,18 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
-    def find_dvs_by_name(self,si ,path, name):
+    def find_dvs_by_path(self,si ,path):
         """
         Finds vm in the vCenter or returns "None"
-
         :param si:         pyvmomi 'ServiceInstance'
         :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
-        :param name:       the dvSwitch name to return
         """
+        dvs = self.get_folder(si, path)
 
-        dvs = self.find_obj_by_path(si, path, name, '') # empty type_name, will resolve with ChildEntity
+        if not dvs:
+            raise ValueError('Could not find Default DvSwitch in path {0}'.format(path))
+        elif not isinstance(dvs, vim.dvs.VmwareDistributedVirtualSwitch):
+            raise ValueError('The object in path {0} is {1} and not a DvSwitch'.format(path, type(dvs)))
 
         return dvs
 
