@@ -116,6 +116,11 @@ class VCenterAutoModelDiscovery(object):
     def _validate_default_dvswitch(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
 
         dvs_path = attributes[key]
+
+        # optional pararm
+        if(not attributes[key]):
+            return
+
         path = "{}/{}".format(dc_name, dvs_path)
         dv = self.pv_service.find_dvs_by_path(si, path)
 
