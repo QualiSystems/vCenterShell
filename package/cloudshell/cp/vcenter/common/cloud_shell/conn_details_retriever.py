@@ -2,28 +2,24 @@ from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnect
 
 
 class ResourceConnectionDetailsRetriever:
-    def __init__(self, qualipy_helpers):
-        """
-        :param qualipy.scripts.cloudshell_scripts_helpers qualipy_helpers:
-        :param cs_retriever_service:
-        :return:
-        """
-        self.qualipy_helpers = qualipy_helpers
 
-    def connection_details(self):
-        """ Retrieves connection details to vCenter from specified resource
-
-        :param resource_name: Resource name to get connection details from
-        :rtype VCenterConnectionDetails:
+    @staticmethod
+    def get_connection_details(session, vcenter_resource_model, resource_context):
         """
-        # gets the vcenter resource context to connect. We assume this will only run on a cloud prodvider resource
-        session = self.qualipy_helpers.get_api_session()
-        resource_context = self.qualipy_helpers.get_resource_context_details()
+        Methods retrieves the connection details from the vcenter resource model attributes.
+
+        :param CloudShellAPISession session:
+        :param VMwarevCenterResourceModel vcenter_resource_model: Instance of VMwarevCenterResourceModel
+        :param ResourceContextDetails resource_context: the context of the command
+        """
+
+        session = session
+        resource_context = resource_context
 
         # get vCenter connection details from vCenter resource
-        user = resource_context.attributes["User"]
-        encrypted_pass = resource_context.attributes["Password"]
+        user = vcenter_resource_model.user
         vcenter_url = resource_context.address
-        password = session.DecryptPassword(encrypted_pass).Value
+        password = session.DecryptPassword(vcenter_resource_model.password).Value
 
         return VCenterConnectionDetails(vcenter_url, user, password)
+

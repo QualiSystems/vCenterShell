@@ -43,14 +43,8 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         self.synchronous_task_waiter.wait_for_task = Mock(return_value="TASK OK")
         self.si = Mock()
 
-        resource_model_parser = ResourceModelParser()
-        # vc_model_retriever = VCenterDataModelRetriever(helpers, resource_model_parser, cloudshell_data_retriever_service)
-        # vc_data_model = vc_model_retriever.get_vcenter_data_model()
-        vc_data_model = Mock()
         name_generator = generate_unique_name
-        # vnic_to_network_mapper = VnicToNetworkMapper(name_generator, vc_data_model.default_network)
         vnic_to_network_mapper = VnicToNetworkMapper(name_generator)
-
         helpers = Mock()
         cs_retriever_service = Mock()
         session = Mock()
@@ -61,7 +55,6 @@ class TestVirtualSwitchToMachineConnector(TestCase):
         helpers.get_api_session = Mock(return_value=session)
         cs_retriever_service.getVCenterConnectionDetails = Mock(return_value=connection_details)
 
-        self.connection_details_retriever = ResourceConnectionDetailsRetriever(helpers)
         self.configurer = VirtualMachinePortGroupConfigurer(self.py_vmomi_service,
                                                             self.synchronous_task_waiter,
                                                             vnic_to_network_mapper,

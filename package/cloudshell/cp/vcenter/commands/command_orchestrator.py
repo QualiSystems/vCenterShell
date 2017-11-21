@@ -19,12 +19,10 @@ from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
 from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
 from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
-from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result, get_result_from_command_output
 from cloudshell.cp.vcenter.common.utilites.common_name import generate_unique_name
-from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import ContextBasedLoggerFactory
 from cloudshell.cp.vcenter.common.vcenter.ovf_service import OvfImageDeployerService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
@@ -50,16 +48,13 @@ from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGrou
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
-
 class CommandOrchestrator(object):
     def __init__(self):
         """
         Initialize the driver session, this function is called everytime a new instance of the driver is created
         in here the driver is going to be bootstrapped
 
-        :param context: models.QualiDriverModels.InitCommandContext
         """
-        self.cs_helper = CloudshellDriverHelper()
         synchronous_task_waiter = SynchronousTaskWaiter()
         pv_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=synchronous_task_waiter)
         self.resource_model_parser = ResourceModelParser()
@@ -74,7 +69,6 @@ class CommandOrchestrator(object):
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             cs_helper=self.cs_helper,
                                              resource_model_parser=ResourceModelParser())
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
@@ -89,7 +83,6 @@ class CommandOrchestrator(object):
                                                                               virtual_machine_port_group_configurer)
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
-                                              cloud_shell_helper=self.cs_helper,
                                               resource_model_parser=self.resource_model_parser,
                                               context_based_logger_factory=ContextBasedLoggerFactory())
         # Deploy Command
@@ -261,6 +254,7 @@ class CommandOrchestrator(object):
         :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
+
         resource_details = self._parse_remote_model(context)
         # execute command
         res = self.command_wrapper.execute_command_with_connection(

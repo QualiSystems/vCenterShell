@@ -1,2 +1,2 @@
-cloudshell-shell-core>=3.0.0,<3.1.0
+cloudshell-shell-core>=3.1.0,<3.2.0
 cloudshell-cp-vcenter>=1.9.0,<1.10.0

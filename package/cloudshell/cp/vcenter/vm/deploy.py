@@ -3,10 +3,10 @@ from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCente
 from cloudshell.cp.vcenter.vm.ovf_image_params import OvfImageParams
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
-
+from cloudshell.cp.vcenter.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
 
 class VirtualMachineDeployer(object):
-    def __init__(self, pv_service, name_generator, ovf_service, cs_helper, resource_model_parser):
+    def __init__(self, pv_service, name_generator, ovf_service, resource_model_parser):
         """
 
         :param pv_service:
@@ -14,14 +14,12 @@ class VirtualMachineDeployer(object):
         :param name_generator:
         :param ovf_service:
         :type ovf_service: cloudshell.cp.vcenter.common.vcenter.ovf_service.OvfImageDeployerService
-        :param cs_helper:
         :type resource_model_parser: ResourceModelParser
         :return:
         """
         self.pv_service = pv_service
         self.name_generator = name_generator
         self.ovf_service = ovf_service  # type common.vcenter.ovf_service.OvfImageDeployerService
-        self.cs_helper = cs_helper  # type CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
 
     def deploy_from_linked_clone(self, si, logger, data_holder, vcenter_data_model, reservation_id):
@@ -125,7 +123,7 @@ class VirtualMachineDeployer(object):
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context, reservation_id):
         vm_name = self.name_generator(data_holder.app_name, reservation_id)
 
-        connection_details = self.cs_helper.get_connection_details(session=session,
+        connection_details = ResourceConnectionDetailsRetriever.get_connection_details(session=session,
                                                                    vcenter_resource_model=vcenter_data_model,
                                                                    resource_context=resource_context)
 

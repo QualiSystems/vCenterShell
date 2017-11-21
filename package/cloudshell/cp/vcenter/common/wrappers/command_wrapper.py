@@ -4,9 +4,9 @@ from threading import Lock
 from retrying import retry
 
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
-from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService, VCenterAuthError
-from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
+from cloudshell.cp.vcenter.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
 COMMAND_ERROR = 'error has occurred while executing command: {0}'
@@ -30,7 +30,7 @@ def retry_if_auth_error(ex):
 
 
 class CommandWrapper:
-    def __init__(self, pv_service, cloud_shell_helper, resource_model_parser, context_based_logger_factory):
+    def __init__(self, pv_service, resource_model_parser, context_based_logger_factory):
         """
 
         :param pv_service:
@@ -41,7 +41,6 @@ class CommandWrapper:
         :return:
         """
         self.pv_service = pv_service  # type: pyVmomiService
-        self.cs_helper = cloud_shell_helper  # type: CloudshellDriverHelper
         self.resource_model_parser = resource_model_parser  # type: ResourceModelParser
         self.context_based_logger_factory = context_based_logger_factory  # type ContextBasedLoggerFactory
         # add lock
@@ -78,11 +77,11 @@ class CommandWrapper:
 
             # get connection details
             if context:
-                session = self.cs_helper.get_session(server_address=context.connectivity.server_address,
-                                                     token=context.connectivity.admin_auth_token,
-                                                     reservation_domain=self._get_domain(context))
+                with CloudShellSessionContext(context) as cloudshell_session:
+                    session = cloudshell_session
+
                 vcenter_data_model = self.resource_model_parser.convert_to_vcenter_model(context.resource)
-                connection_details = self.cs_helper.get_connection_details(session=session,
+                connection_details = ResourceConnectionDetailsRetriever.get_connection_details(session=session,
                                                                            vcenter_resource_model=vcenter_data_model,
                                                                            resource_context=context.resource)
 
