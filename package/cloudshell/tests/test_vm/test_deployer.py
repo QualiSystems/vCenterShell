@@ -34,10 +34,8 @@ class TestVirtualMachineDeployer(TestCase):
         self.vm.config = Mock()
         self.vm.config.uuid = self.uuid
         self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
-        self.cs_helper = Mock()
         self.model_parser = ResourceModelParser()
-        self.deployer = VirtualMachineDeployer(self.pv_service, self.name_gen, self.image_deployer, self.cs_helper,
-                                               self.model_parser)
+        self.deployer = VirtualMachineDeployer(pv_service=self.pv_service, name_generator=self.name_gen, ovf_service=self.image_deployer, resource_model_parser= self.model_parser)
 
     def test_vm_deployer(self):
         deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')
@@ -155,9 +153,6 @@ class TestVirtualMachineDeployer(TestCase):
         connectivity.address = 'vcenter ip or name'
         connectivity.user = 'user'
         connectivity.password = 'password'
-
-        self.cs_helper.get_connection_details = Mock(return_value=connectivity)
-
         session = Mock()
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'qualisb'

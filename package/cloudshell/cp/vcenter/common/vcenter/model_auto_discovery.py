@@ -7,12 +7,12 @@ from cloudshell.cp.vcenter.common.utilites.context_based_logger_factory import C
 from cloudshell.cp.vcenter.models.QualiDriverModels import AutoLoadDetails, AutoLoadAttribute
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
 
-from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
+
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
-from cloudshell.cp.vcenter.common.utilites.io import get_path_and_name
+from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 
 DOMAIN = 'Global'
 ADDRESS = 'address'
@@ -35,7 +35,6 @@ class VCenterAutoModelDiscovery(object):
     def __init__(self):
         self.parser = ResourceModelParser()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect, SynchronousTaskWaiter())
-        self.cs_helper = CloudshellDriverHelper()
         self.context_based_logger_factory = ContextBasedLoggerFactory()
 
     def _get_logger(self, context):
@@ -52,15 +51,15 @@ class VCenterAutoModelDiscovery(object):
         """
         logger = self._get_logger(context)
         logger.info('Autodiscovery started')
+        si = None
+        resource = None
 
-        session = self.cs_helper.get_session(context.connectivity.server_address,
-                                             context.connectivity.admin_auth_token,
-                                             DOMAIN)
-        self._check_if_attribute_not_empty(context.resource, ADDRESS)
-        resource = context.resource
+        with CloudShellSessionContext(context) as cloudshell_session:
+            self._check_if_attribute_not_empty(context.resource, ADDRESS)
+            resource = context.resource
+            si = self._check_if_vcenter_user_pass_valid(context, cloudshell_session, resource.attributes)
+
         auto_attr = []
-        si = self._check_if_vcenter_user_pass_valid(context, session, resource.attributes)
-
         if not si:
             error_message = 'Could not connect to the vCenter: {0}, with given credentials'\
                 .format(context.resource.address)
