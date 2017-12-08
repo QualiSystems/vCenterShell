@@ -1,6 +1,8 @@
 import re
 import time
 
+from retrying import retry
+
 from cloudshell.cp.vcenter.commands.ip_result import IpResult, IpReason
 
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
@@ -19,7 +21,8 @@ class RefreshIpCommand(object):
         if app_request_json == '' or app_request_json is None:
             raise ValueError('This command cannot be executed on a Static VM.')
 
-    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context,app_request_json):
+    def refresh_ip(self, si, logger, session, vcenter_data_model, vm_uuid, resource_name, cancellation_context,
+                   app_request_json):
         """
         Refreshes IP address of virtual machine and updates Address property on the resource
 
@@ -34,9 +37,10 @@ class RefreshIpCommand(object):
         self._do_not_run_on_static_vm(app_request_json=app_request_json)
 
         default_network = VMLocation.combine(
-            [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
+                [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
-        resource = session.GetResourceDetails(resource_name)
+        # TODO remove this call and use data from context
+        resource = self._get_resource_with_retry(session=session, resource_name=resource_name)
 
         match_function = self.ip_manager.get_ip_match_function(self._get_ip_refresh_ip_regex(resource))
 
@@ -51,15 +55,25 @@ class RefreshIpCommand(object):
                              .format(resource_name, timeout))
 
         if ip_res.reason == IpReason.Success:
-            session.UpdateResourceAddress(resource_name, ip_res.ip_address)
+            self._update_resource_address_with_retry(session=session,
+                                                     resource_name=resource_name,
+                                                     ip_address=ip_res.ip_address)
 
             return ip_res.ip_address
+
+    @retry(stop_max_attempt_number=5, wait_fixed=1000)
+    def _update_resource_address_with_retry(self, session, resource_name, ip_address):
+        session.UpdateResourceAddress(resource_name, ip_address)
+
+    @retry(stop_max_attempt_number=5, wait_fixed=1000)
+    def _get_resource_with_retry(self, session, resource_name):
+        return session.GetResourceDetails(resource_name)
 
     @staticmethod
     def _get_ip_refresh_timeout(resource):
         timeout = RefreshIpCommand._get_custom_param(
-            resource=resource,
-            custom_param_name='refresh_ip_timeout')
+                resource=resource,
+                custom_param_name='refresh_ip_timeout')
 
         if not timeout:
             raise ValueError('Refresh IP Timeout is not set')
@@ -69,8 +83,8 @@ class RefreshIpCommand(object):
     @staticmethod
     def _get_ip_refresh_ip_regex(resource):
         return RefreshIpCommand._get_custom_param(
-            resource=resource,
-            custom_param_name='ip_regex')
+                resource=resource,
+                custom_param_name='ip_regex')
 
     @staticmethod
     def _get_custom_param(resource, custom_param_name):
