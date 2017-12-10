@@ -373,7 +373,8 @@ class CommandOrchestrator(object):
         app_resource_detail.vm_uuid = holder.vmdetails.uid
         app_resource_detail.cloud_provider = context.resource.fullname
         app_resource_detail.fullname = resource.fullname
-        app_resource_detail.vm_custom_params = holder.vmdetails.vmCustomParams
+        if hasattr(holder.vmdetails, 'vmCustomParams'):
+            app_resource_detail.vm_custom_params = holder.vmdetails.vmCustomParams
         return app_resource_detail
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
