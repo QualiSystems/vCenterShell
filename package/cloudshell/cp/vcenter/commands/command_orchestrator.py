@@ -3,6 +3,7 @@ from datetime import datetime, date
 import jsonpickle
 
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
+from cloudshell.shell.core.context import ResourceRemoteCommandContext
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
@@ -303,7 +304,7 @@ class CommandOrchestrator(object):
     def refresh_ip(self, context, cancellation_context, ports):
         """
         Refresh IP Command, will refresh the ip of the vm and will update it on the resource
-        :param models.QualiDriverModels.ResourceRemoteCommandContext context: the context the command runs on
+        :param ResourceRemoteCommandContext context: the context the command runs on
         :param cancellation_context:
         :param list[string] ports: the ports of the connection between the remote resource and the local resource, NOT IN USE!!!
         """
@@ -311,8 +312,7 @@ class CommandOrchestrator(object):
         # execute command
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.refresh_ip_command.refresh_ip,
-                                                                   resource_details.vm_uuid,
-                                                                   resource_details.fullname,
+                                                                   resource_details,
                                                                    cancellation_context,
                                                                    context.remote_endpoints[0].app_context.app_request_json)
         return set_command_result(result=res, unpicklable=False)
@@ -373,6 +373,8 @@ class CommandOrchestrator(object):
         app_resource_detail.vm_uuid = holder.vmdetails.uid
         app_resource_detail.cloud_provider = context.resource.fullname
         app_resource_detail.fullname = resource.fullname
+        if hasattr(holder.vmdetails, 'vmCustomParams'):
+            app_resource_detail.vm_custom_params = holder.vmdetails.vmCustomParams
         return app_resource_detail
 
     def power_on_not_roemote(self, context, vm_uuid, resource_fullname):
