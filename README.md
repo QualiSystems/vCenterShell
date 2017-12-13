@@ -47,8 +47,8 @@ A repository for projects providing out of the box capabilities within CloudShel
 9. Run Connect All command
 
 ## Links
-[Offline Package] (https://support.quali.com/hc/en-us/articles/231613247)
-[VmWare vCenter] (https://github.com/vmware/pyvmomi/tree/master/docs)
+* [Offline Package] (https://support.quali.com/hc/en-us/articles/231613247)
+* [VmWare vCenter] (https://github.com/vmware/pyvmomi/tree/master/docs)
 
 ## License
 [Apache License 2.0](https://github.com/QualiSystems/vCenterShell/blob/master/LICENSE)
