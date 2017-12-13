@@ -222,6 +222,21 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
+    def find_dvs_by_path(self,si ,path):
+        """
+        Finds vm in the vCenter or returns "None"
+        :param si:         pyvmomi 'ServiceInstance'
+        :param path:       the path to find the object ('dc' or 'dc/folder' or 'dc/folder/folder/etc...')
+        """
+        dvs = self.get_folder(si, path)
+
+        if not dvs:
+            raise ValueError('Could not find Default DvSwitch in path {0}'.format(path))
+        elif not isinstance(dvs, vim.dvs.VmwareDistributedVirtualSwitch):
+            raise ValueError('The object in path {0} is {1} and not a DvSwitch'.format(path, type(dvs)))
+
+        return dvs
+
     def get_folder(self, si, path, root=None):
         """
         Finds folder in the vCenter or returns "None"
@@ -304,9 +319,11 @@ class pyVmomiService:
         obj = None
 
         container = self._get_all_objects_by_type(content, vimtype)
+
+        # If no name was given will return the first object from list of a objects matching the given vimtype type
         for c in container.view:
             if name:
-                if c.name == name:
+                if  c.name == name:
                     obj = c
                     break
             else:

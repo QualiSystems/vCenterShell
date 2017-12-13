@@ -73,9 +73,6 @@ class TestCommandOrchestrator(TestCase):
         self.context.remote_endpoints = [self.resource]
         self.command_orchestrator = CommandOrchestrator()
         self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=True)
-        self.command_orchestrator.cs_helper = Mock()
-        self.command_orchestrator.cs_helper.get_session = Mock(return_value=session)
-        self.command_orchestrator.cs_helper.get_connection_details = Mock(return_value=self.connection_details)
         self.ports = [Mock()]
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 

@@ -69,12 +69,3 @@ class TestResourceModelParser(TestCase):
         resource_model_parser = ResourceModelParser()
 
         self.assertRaises(ValueError, resource_model_parser.convert_to_resource_model, {}, None)
-
-    def test_parse_response_info(self):
-        resource_model_parser = ResourceModelParser()
-
-        attributes = {'VM_UUID': '422258cd-8b76-e375-8c3b-8e1bf86a4713', 'Cloud Provider':'vCenter' }
-
-        resource_model = resource_model_parser.convert_to_resource_model(attributes, GenericDeployedAppResourceModel)
-
-        self.assertEqual(resource_model.vm_uuid, '422258cd-8b76-e375-8c3b-8e1bf86a4713')

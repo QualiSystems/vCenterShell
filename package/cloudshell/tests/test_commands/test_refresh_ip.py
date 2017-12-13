@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from cloudshell.api.cloudshell_api import ResourceInfoVmDetails, ResourceInfo, VmCustomParam
+from cloudshell.cp.vcenter.models import GenericDeployedAppResourceModel
 from mock import Mock, create_autospec
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
@@ -30,18 +31,15 @@ class TestRefreshIpCommand(TestCase):
         ip_regex = self._create_custom_param('ip_regex', '192\.168\..*')
         refresh_ip_timeout = self._create_custom_param('refresh_ip_timeout', '10')
 
-        resource_instance = create_autospec(ResourceInfo)
-        resource_instance.ResourceModelName = 'Generic Deployed App'
-        resource_instance.ResourceAttributes = {'vm_uuis': '123',
-                                                'cloud_provider': 'vCenter'
-                                                }
-        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
-        resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
+        resource_model = create_autospec(GenericDeployedAppResourceModel)
+        resource_model.fullname = 'Generic Deployed App'
+        resource_model.vm_uuid = '123',
+        resource_model.cloud_provider = 'vCenter'
+        resource_model.vm_custom_params = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
-        session.GetResourceDetails = Mock(return_value=resource_instance)
         si = Mock()
 
         center_resource_model = VMwarevCenterResourceModel()
@@ -53,8 +51,7 @@ class TestRefreshIpCommand(TestCase):
         refresh_ip_command.refresh_ip(si=si,
                                       session=session,
                                       vcenter_data_model=center_resource_model,
-                                      vm_uuid='machine1',
-                                      resource_name='default_network',
+                                      resource_model=resource_model,
                                       cancellation_context=cancellation_context,
                                       logger=Mock(),
                                       app_request_json=Mock())
@@ -63,11 +60,9 @@ class TestRefreshIpCommand(TestCase):
         self.assertTrue(session.UpdateResourceAddress.called_with('machine1', '192.168.1.1'))
 
     def _create_custom_param(self, name, value):
-        node = Mock()
-        node.attrib = {'Name': name, 'Value': value}
-        vm_custom_param = VmCustomParam(node, '')
-        vm_custom_param.Name = name
-        vm_custom_param.Value = value
+        vm_custom_param = Mock()
+        vm_custom_param.name = name
+        vm_custom_param.value = value
         return vm_custom_param
 
     def test_refresh_ip_choose_ipv4(self):
@@ -92,18 +87,16 @@ class TestRefreshIpCommand(TestCase):
         ip_regex = self._create_custom_param('ip_regex', '')
         refresh_ip_timeout = self._create_custom_param('refresh_ip_timeout', '10')
 
-        resource_instance = create_autospec(ResourceInfo)
-        resource_instance.ResourceModelName = 'Generic Deployed App'
-        resource_instance.ResourceAttributes = {'vm_uuis': '123',
-                                                'cloud_provider': 'vCenter'
-                                                }
-        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
-        resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
+        resource_model = create_autospec(GenericDeployedAppResourceModel)
+        resource_model.fullname = 'Generic Deployed App'
+        resource_model.vm_uuid = '123',
+        resource_model.cloud_provider = 'vCenter'
+        resource_model.vm_custom_params = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
-        session.GetResourceDetails = Mock(return_value=resource_instance)
+        session.GetResourceDetails = Mock(return_value=resource_model)
         si = Mock()
 
         center_resource_model = VMwarevCenterResourceModel()
@@ -116,8 +109,7 @@ class TestRefreshIpCommand(TestCase):
             si=si,
             session=session,
             vcenter_data_model=center_resource_model,
-            vm_uuid='machine1',
-            resource_name='default_network',
+            resource_model=resource_model,
             cancellation_context=cancellation_context,
             logger=Mock(),
             app_request_json=Mock())
@@ -147,18 +139,16 @@ class TestRefreshIpCommand(TestCase):
         ip_regex = self._create_custom_param('ip_regex', '192\.168\..*')
         refresh_ip_timeout = self._create_custom_param('refresh_ip_timeout', '10')
 
-        resource_instance = create_autospec(ResourceInfo)
-        resource_instance.ResourceModelName = 'Generic Deployed App'
-        resource_instance.ResourceAttributes = {'vm_uuis': '123',
-                                                'cloud_provider': 'vCenter'
-                                                }
-        resource_instance.VmDetails = create_autospec(ResourceInfoVmDetails)
-        resource_instance.VmDetails.VmCustomParams = [ip_regex, refresh_ip_timeout]
+        resource_model = create_autospec(GenericDeployedAppResourceModel)
+        resource_model.fullname = 'Generic Deployed App'
+        resource_model.vm_uuid = '123',
+        resource_model.cloud_provider = 'vCenter'
+        resource_model.vm_custom_params = [ip_regex, refresh_ip_timeout]
 
         refresh_ip_command = RefreshIpCommand(pyvmomi_service, ResourceModelParser(), Mock())
         session = Mock()
         session.UpdateResourceAddress = Mock(return_value=True)
-        session.GetResourceDetails = Mock(return_value=resource_instance)
+        session.GetResourceDetails = Mock(return_value=resource_model)
         si = Mock()
 
         center_resource_model = VMwarevCenterResourceModel()
@@ -171,8 +161,7 @@ class TestRefreshIpCommand(TestCase):
             si=si,
             session=session,
             vcenter_data_model=center_resource_model,
-            vm_uuid='machine1',
-            resource_name='default_network',
+            resource_model=resource_model,
             cancellation_context=cancellation_context,
             logger=Mock(),
             app_request_json=Mock())
@@ -184,5 +173,5 @@ class TestRefreshIpCommand(TestCase):
         # Act
         refresh_ip_command = RefreshIpCommand(Mock(), Mock(), Mock())
         # assert
-        self.assertRaises(ValueError, refresh_ip_command.refresh_ip, Mock(), Mock(), Mock(), Mock(), Mock(), Mock(),
+        self.assertRaises(ValueError, refresh_ip_command.refresh_ip, Mock(), Mock(), Mock(), Mock(), Mock(),
                           Mock(), None)
