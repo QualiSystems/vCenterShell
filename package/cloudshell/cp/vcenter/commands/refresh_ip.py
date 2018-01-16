@@ -30,7 +30,7 @@ class RefreshIpCommand(object):
         :param vim.ServiceInstance si: py_vmomi service instance
         :param logger:
         :param vCenterShell.driver.SecureCloudShellApiSession session: cloudshell session
-        :param GenericDeployedAppResourceModel resource_model: UUID of Virtual Machine
+        resource_model
         :param VMwarevCenterResourceModel vcenter_data_model: the vcenter data model attributes
         :param cancellation_context:
         """
@@ -39,10 +39,9 @@ class RefreshIpCommand(object):
         default_network = VMLocation.combine(
             [vcenter_data_model.default_datacenter, vcenter_data_model.holding_network])
 
-        match_function = self.ip_manager.get_ip_match_function(
-            self._get_ip_refresh_ip_regex(resource_model.vm_custom_params))
+        match_function = self.ip_manager.get_ip_match_function(resource_model.get_refresh_ip_regex())
 
-        timeout = self._get_ip_refresh_timeout(resource_model.vm_custom_params)
+        timeout = self._get_ip_refresh_timeout(resource_model)
 
         vm = self.pyvmomi_service.find_by_uuid(si, resource_model.vm_uuid)
 
@@ -64,30 +63,10 @@ class RefreshIpCommand(object):
         session.UpdateResourceAddress(resource_name, ip_address)
 
     @staticmethod
-    def _get_ip_refresh_timeout(custom_params):
-        timeout = RefreshIpCommand._get_custom_param(
-            custom_params=custom_params,
-            custom_param_name='refresh_ip_timeout')
+    def _get_ip_refresh_timeout(resource_model):
+        timeout = resource_model.get_refresh_ip_timeout()
 
         if not timeout:
             raise ValueError('Refresh IP Timeout is not set')
 
         return float(timeout)
-
-    @staticmethod
-    def _get_ip_refresh_ip_regex(custom_params):
-        return RefreshIpCommand._get_custom_param(
-            custom_params=custom_params,
-            custom_param_name='ip_regex')
-
-    @staticmethod
-    def _get_custom_param(custom_params, custom_param_name):
-        if not custom_params:
-            return None
-
-        custom_param_values = [custom_param.value for custom_param in custom_params
-                               if custom_param.name == custom_param_name]
-
-        if custom_param_values:
-            return custom_param_values[0]
-        return None

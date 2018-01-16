@@ -6,7 +6,6 @@ from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTem
 import jsonpickle
 
 
-
 class VCenterShellDriver (ResourceDriverInterface):
 
     def cleanup(self):
@@ -132,3 +131,6 @@ class VCenterShellDriver (ResourceDriverInterface):
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
+
+    def get_vm_details(self, context, ports):
+        return self.command_orchestrator.get_vm_details(context)
