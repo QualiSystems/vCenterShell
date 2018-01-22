@@ -380,6 +380,7 @@ class CommandOrchestrator(object):
         app_resource_detail = GenericDeployedAppResourceModel()
         app_resource_detail.vm_uuid = holder.vmdetails.uid
         app_resource_detail.cloud_provider = context.resource.fullname
+        app_resource_detail.cloud_provider_attributes = context.resource.attributes
         app_resource_detail.fullname = resource.fullname
         if hasattr(holder.vmdetails, 'vmCustomParams'):
             app_resource_detail.vm_custom_params = holder.vmdetails.vmCustomParams

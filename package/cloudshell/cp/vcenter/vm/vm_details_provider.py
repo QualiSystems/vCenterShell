@@ -29,16 +29,18 @@ class VmDetailsProvider(object):
     def _get_vm_network_data(self, vm, resource_model, logger):
         data_list = []
         primary_ip = self._try_primary_ip(vm, resource_model, logger)
+        reserved_networks = resource_model.get_reserved_networks()
         for net in vm.guest.net:
             vlan_name = net.network
             vlan_id = self._try_get_vlan_id(vm, vlan_name)
             ip = next(iter(net.ipAddress), None)
-            if vlan_id:
+            if vlan_id and (vlan_name.startswith('QS_') or vlan_name in reserved_networks):
                 data = VmNetworkData()
                 data.interface_id = net.macAddress
                 data.network_id = vlan_id
                 data.network_data['mac_address'] = net.macAddress
                 data.network_data['vlan_name'] = vlan_name
+                data.network_data['reserved_network'] = vlan_name in reserved_networks
                 if ip:
                     data.network_data['ip'] = ip
                     data.is_primary = primary_ip == ip

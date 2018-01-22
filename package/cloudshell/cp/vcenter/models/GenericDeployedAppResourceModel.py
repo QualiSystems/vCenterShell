@@ -2,8 +2,12 @@ class GenericDeployedAppResourceModel(object):
     def __init__(self):
         self.vm_uuid = ''
         self.cloud_provider = ''
+        self.cloud_provider_attributes = []
         self.fullname = ''
         self.vm_custom_params = None
+
+    def get_reserved_networks(self):
+        return self.cloud_provider_attributes['Reserved Networks'].split(';')
 
     def get_refresh_ip_regex(self):
         return self._get_custom_param('ip_regex')

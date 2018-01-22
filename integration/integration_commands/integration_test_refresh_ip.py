@@ -4,13 +4,36 @@ from mock import Mock
 from pyVim.connect import SmartConnect, Disconnect
 
 from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
+from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
+from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
+from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
+from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.tests.utils.testing_credentials import TestCredentials
 from cloudshell.tests.utils import helpers
 
 
 class TestRefreshIpCommand(TestCase):
+
+    def my_test(self):
+        credentials = TestCredentials()
+        py_vmomi_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=SynchronousTaskWaiter())
+        si = py_vmomi_service.connect(credentials.host, credentials.username, credentials.password)
+
+        vm_details_provider = VmDetailsProvider(VMIPManager())
+        logger = Mock()
+        resource_model = Mock()
+        resource_model.vm_uuid = '423283e4-0003-6e04-07bb-7e4c3ebcf993'
+        resource_model.get_refresh_ip_regex = Mock(return_value='.*')
+        resource_model.get_reserved_networks = Mock(return_value=[])
+        cmd = VmDetailsCommand(py_vmomi_service, vm_details_provider)
+        d = cmd.get_vm_details(si, logger, resource_model)
+        # d = cmd.get_vm_details_by_vm_uuid(si, '42328fd2-98ee-6563-bcf9-ab12af30df66')
+
+        pass
+
+
     def integrationtest_refresh_ip(self):
         resource_context = Mock()
         resource_context.attributes = {"vCenter Template": "vCenter/Alex/test"}
