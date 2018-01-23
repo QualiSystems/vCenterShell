@@ -5,6 +5,7 @@ import jsonpickle
 from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
 from cloudshell.shell.core.context import ResourceRemoteCommandContext
+
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
@@ -400,11 +401,13 @@ class CommandOrchestrator(object):
                                                                    vm_name)
         return set_command_result(result=res, unpicklable=False)
 
-    def get_vm_details(self, context):
-        resource_details = self._parse_remote_model(context)
+    def get_vm_details(self, context,cancellation_context, requests_json):
+        requests = DeployDataHolder(jsonpickle.decode(requests_json)).items
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.vm_details.get_vm_details,
-                                                                   resource_details)
+                                                                   context.resource,
+                                                                   requests,
+                                                                   cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
     def save_snapshot(self, context, snapshot_name):
