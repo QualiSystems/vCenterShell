@@ -17,7 +17,6 @@ class VmDetailsCommand(object):
                 break
             app_name = request.deployedAppJson.name
             try:
-                #logger.info(jsonpickle.encode(request.appRequestJson))
                 vm = self.pyvmomi_service.find_by_uuid(si, request.deployedAppJson.vmdetails.uid)
                 result = self.vm_details_provider.create(
                     vm=vm,
