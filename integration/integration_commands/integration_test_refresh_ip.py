@@ -16,31 +16,6 @@ from cloudshell.tests.utils import helpers
 
 class TestRefreshIpCommand(TestCase):
 
-    # def my_test(self):
-    #     credentials = TestCredentials()
-    #     py_vmomi_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=SynchronousTaskWaiter())
-    #     si = py_vmomi_service.connect(credentials.host, credentials.username, credentials.password)
-    #
-    #     vm_details_provider = VmDetailsProvider(VMIPManager())
-    #     logger = Mock()
-    #     resource_context = Mock()
-    #     resource_context.attributes = {'Reserved Networks': 'A'}
-    #     requests = [Mock()]
-    #     requests[0].deployedAppJson = Mock()
-    #     requests[0].deployedAppJson.name = 'SomeApp'
-    #     requests[0].deployedAppJson.vmdetails = Mock()
-    #     requests[0].deployedAppJson.vmdetails.uid = '423283e4-0003-6e04-07bb-7e4c3ebcf993'
-    #     requests[0].deployedAppJson.vmdetails.vmCustomParams = []
-    #
-    #     vm = py_vmomi_service.find_by_uuid(si, '423283e4-0003-6e04-07bb-7e4c3ebcf993')
-    #
-    #     cmd = VmDetailsCommand(py_vmomi_service, vm_details_provider)
-    #     d = cmd.get_vm_details(si, logger, resource_context, requests)
-    #     # d = cmd.get_vm_details_by_vm_uuid(si, '42328fd2-98ee-6563-bcf9-ab12af30df66')
-    #
-    #     pass
-
-
     def integrationtest_refresh_ip(self):
         resource_context = Mock()
         resource_context.attributes = {"vCenter Template": "vCenter/Alex/test"}

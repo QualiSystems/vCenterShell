@@ -8,35 +8,24 @@ class VmDetailsProvider(object):
     def __init__(self, ip_manager):
         self.ip_manager = ip_manager  # type: VMIPManager
 
-    def create(self, vm, name, vcenter_attributes, vm_custom_params, deployment_service, logger):
+    def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, logger):
         """"""
         vm_details = VmDetails(name)
-        vm_details.vm_instance_data = self._get_vm_instance_data(vm, deployment_service)
-        vm_details.vm_network_data = self._get_vm_network_data(vm, vcenter_attributes, vm_custom_params, logger)
+        vm_details.vm_instance_data = self._get_vm_instance_data(vm, deployment_details_provider)
+        vm_details.vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
         return vm_details
 
-    def _get_vm_instance_data(self, vm, deployment_service):
+    def _get_vm_instance_data(self, vm, deployment_details_provider):
         data = []
 
-        deployment = deployment_service.model
-        dep_attributes = dict((att.name,att.value) for att in deployment_service.attributes)
-
-        if deployment == 'vCenter Clone VM From VM':
-            data.append(VmDataField('Cloned VM Name', dep_attributes.get('vCenter VM')))
-
-        if deployment == 'VCenter Deploy VM From Linked Clone':
-            data.append(VmDataField('Cloned VM Name', dep_attributes.get('vCenter VM')))
-
-        if deployment == 'vCenter VM From Image':
-            data.append(VmDataField('Base Image Name', dep_attributes.get('vCenter Image')))
-
-        if deployment == 'vCenter VM From Template':
-            data.append(VmDataField('Template Name', (dep_attributes.get('vCenter Template') or '').split('/')[-1]))
+        data.extend(deployment_details_provider.get_details())
 
         memo_size_kb = vm.summary.config.memorySizeMB * 1024
         disk_size_kb = next((device.capacityInKB for device in vm.config.hardware.device if
                              isinstance(device, vim.vm.device.VirtualDisk)), 0)
-        snapshot = self._get_snapshot_path(vm.snapshot.rootSnapshotList, vm.snapshot.currentSnapshot)
+        snapshot = None
+        if vm.snapshot:
+            snapshot = self._get_snapshot_path(vm.snapshot.rootSnapshotList, vm.snapshot.currentSnapshot)
 
         data.append(VmDataField('Current Snapshot', snapshot))
         data.append(VmDataField('CPU', '%s vCPU' % vm.summary.config.numCpu))
@@ -46,10 +35,9 @@ class VmDetailsProvider(object):
 
         return data
 
-    def _get_vm_network_data(self, vm, vcenter_attributes, vm_custom_params, logger):
+    def _get_vm_network_data(self, vm, reserved_networks, ip_regex, logger):
         data_list = []
-        primary_ip = self._get_primary_ip(vm, vm_custom_params, logger)
-        reserved_networks = self._get_reserved_networks(vcenter_attributes)
+        primary_ip = self._get_primary_ip(vm, ip_regex, logger)
         for net in vm.guest.net:
             vlan_name = net.network
             vlan_id = self._get_vlan_id(vm, vlan_name)
@@ -57,25 +45,26 @@ class VmDetailsProvider(object):
             if vlan_id and (vlan_name.startswith('QS_') or vlan_name in reserved_networks):
                 data = VmNetworkData()
                 data.interface_id = net.macAddress
+                data.is_predefined = vlan_name in reserved_networks
                 data.network_id = vlan_id
-                data.network_data.append(VmDataField('MAC Address', net.macAddress))
-                data.network_data.append(VmDataField('VLAN Name', vlan_name))
-                data.network_data.append(VmDataField('Reserved Network', vlan_name in reserved_networks, hidden=True))
                 if ip:
-                    data.network_data.append(VmDataField('IP', ip))
                     data.is_primary = primary_ip == ip
+                data.network_data.append(VmDataField('IP', ip))
+                data.network_data.append(VmDataField('MAC Address', net.macAddress))
+                data.network_data.append(VmDataField('Network Adapter', self._get_nic_label(vm, net.deviceConfigId)))
+                data.network_data.append(VmDataField('Port Group Name', vlan_name))
                 data_list.append(data)
 
         return data_list
 
-    def _get_primary_ip(self, vm, vm_custom_params, logger):
-        match_function = self.ip_manager.get_ip_match_function(vm_custom_params.get('ip_regex'))
+    def _get_primary_ip(self, vm, ip_regex, logger):
+        match_function = self.ip_manager.get_ip_match_function(ip_regex)
         primary_ip = self.ip_manager.get_ip(vm, None, match_function, None, None, logger).ip_address
         return primary_ip
 
     @staticmethod
-    def _get_reserved_networks(vcenter_attributes):
-        return (vcenter_attributes.get('Reserved Networks') or '').split(';')
+    def _get_nic_label(vm, device_id):
+        return next((device.deviceInfo.label for device in vm.config.hardware.device if device.key == device_id), None)
 
     @staticmethod
     def _get_vlan_id(vm, network_name):
