@@ -1,17 +1,8 @@
 from unittest import TestCase
-from pyVmomi import vim
 from mock import Mock
-from pyVim.connect import SmartConnect, Disconnect
 
-from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
-from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
-from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
-from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
-from cloudshell.tests.utils.testing_credentials import TestCredentials
-from cloudshell.tests.utils import helpers
 
 
 class TestVmDetailsCommand(TestCase):
