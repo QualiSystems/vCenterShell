@@ -158,7 +158,7 @@ class VirtualMachineDeployer(object):
                     vm=vm,
                     name=vm_name,
                     reserved_networks=vcenter_data_model.reserved_networks,
-                    ip_regex=data_holder.template_resource_model.ip_regex,
+                    ip_regex=data_holder.image_params.ip_regex,
                     deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(data_holder.image_params),
                     logger=logger)
                 return DeployResult(vm_name=vm_name,
