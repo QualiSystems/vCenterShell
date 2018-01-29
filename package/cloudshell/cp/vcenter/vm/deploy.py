@@ -1,12 +1,19 @@
+import traceback
+
+from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import VCenterDeployVMFromLinkedCloneResourceModel
 from cloudshell.cp.vcenter.models.DeployResultModel import DeployResult
-from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
+from cloudshell.cp.vcenter.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
+from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
 from cloudshell.cp.vcenter.vm.ovf_image_params import OvfImageParams
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
+from cloudshell.cp.vcenter.vm.vm_details_provider import VmDataField
+
 
 class VirtualMachineDeployer(object):
-    def __init__(self, pv_service, name_generator, ovf_service, resource_model_parser):
+    def __init__(self, pv_service, name_generator, ovf_service, resource_model_parser, vm_details_provider):
         """
 
         :param pv_service:
@@ -15,12 +22,15 @@ class VirtualMachineDeployer(object):
         :param ovf_service:
         :type ovf_service: cloudshell.cp.vcenter.common.vcenter.ovf_service.OvfImageDeployerService
         :type resource_model_parser: ResourceModelParser
+        :param vm_details_provider:
+        :type vm_details_provider: cloudshell.cp.vcenter.vm.vm_details_provider.VmDetailsProvider
         :return:
         """
         self.pv_service = pv_service
         self.name_generator = name_generator
         self.ovf_service = ovf_service  # type common.vcenter.ovf_service.OvfImageDeployerService
         self.resource_model_parser = resource_model_parser  # type ResourceModelParser
+        self.vm_details_provider = vm_details_provider
 
     def deploy_from_linked_clone(self, si, logger, data_holder, vcenter_data_model, reservation_id):
         """
@@ -108,6 +118,8 @@ class VirtualMachineDeployer(object):
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
 
+        vm_details_data = self._safely_get_vm_details(clone_vm_result.vm, vm_name, vcenter_data_model, other_params, logger)
+
         return DeployResult(vm_name=vm_name,
                             vm_uuid=clone_vm_result.vm.summary.config.uuid,
                             cloud_provider_resource_name=other_params.vcenter_name,
@@ -117,8 +129,8 @@ class VirtualMachineDeployer(object):
                             auto_power_off=other_params.auto_power_off,
                             wait_for_ip=other_params.wait_for_ip,
                             auto_delete=other_params.auto_delete,
-                            autoload=other_params.autoload
-                            )
+                            autoload=other_params.autoload,
+                            vm_details_data=vm_details_data)
 
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context, reservation_id):
         vm_name = self.name_generator(data_holder.app_name, reservation_id)
@@ -138,6 +150,7 @@ class VirtualMachineDeployer(object):
                       image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
+                vm_details_data = self._safely_get_vm_details(vm, vm_name,vcenter_data_model, data_holder.image_params, logger)
                 return DeployResult(vm_name=vm_name,
                                     vm_uuid=vm.config.uuid,
                                     cloud_provider_resource_name=data_holder.image_params.vcenter_name,
@@ -147,9 +160,24 @@ class VirtualMachineDeployer(object):
                                     auto_power_off=data_holder.image_params.auto_power_off,
                                     wait_for_ip=data_holder.image_params.wait_for_ip,
                                     auto_delete=data_holder.image_params.auto_delete,
-                                    autoload=data_holder.image_params.autoload)
+                                    autoload=data_holder.image_params.autoload,
+                                    vm_details_data=vm_details_data)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
+
+    def _safely_get_vm_details(self, vm, vm_name, vcenter_model, deploy_model, logger):
+        data = None
+        try:
+            data = self.vm_details_provider.create(
+                vm=vm,
+                name=vm_name,
+                reserved_networks=vcenter_model.reserved_networks,
+                ip_regex=deploy_model.ip_regex,
+                deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(deploy_model),
+                logger=logger)
+        except Exception as e:
+            logger.error("Error getting vm details for '{0}': {1}".format(vm_name, traceback.format_exc()))
+        return data
 
     @staticmethod
     def _get_deploy_image_params(data_holder, host_info, vm_name):
@@ -171,3 +199,27 @@ class VirtualMachineDeployer(object):
         image_params.power_on = data_holder.auto_power_on
         image_params.vcenter_name = data_holder.vcenter_name
         return image_params
+
+
+class DeploymentDetailsProviderFromTemplateModel(object):
+    def __init__(self, template_resource_model):
+        self.model = template_resource_model
+
+    def get_details(self):
+        """
+        :rtype list[VmDataField]
+        """
+        data = []
+        if isinstance(self.model, vCenterCloneVMFromVMResourceModel):
+            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm.split('/')[-1]))
+
+        if isinstance(self.model, VCenterDeployVMFromLinkedCloneResourceModel):
+            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm.split('/')[-1]))
+
+        if isinstance(self.model, vCenterVMFromImageResourceModel):
+            data.append(VmDataField('Base Image Name', self.model.vcenter_image.split('/')[-1]))
+
+        if isinstance(self.model, vCenterVMFromTemplateResourceModel):
+            data.append(VmDataField('Template Name', self.model.vcenter_template.split('/')[-1]))
+
+        return data

@@ -35,7 +35,8 @@ class TestVirtualMachineDeployer(TestCase):
         self.vm.config.uuid = self.uuid
         self.pv_service.find_vm_by_name = Mock(return_value=self.vm)
         self.model_parser = ResourceModelParser()
-        self.deployer = VirtualMachineDeployer(pv_service=self.pv_service, name_generator=self.name_gen, ovf_service=self.image_deployer, resource_model_parser= self.model_parser)
+        self.vm_details_provider=Mock()
+        self.deployer = VirtualMachineDeployer(pv_service=self.pv_service, name_generator=self.name_gen, ovf_service=self.image_deployer, resource_model_parser= self.model_parser, vm_details_provider=self.vm_details_provider)
 
     def test_vm_deployer(self):
         deploy_from_template_details = DeployFromTemplateDetails(vCenterVMFromTemplateResourceModel(), 'VM Deployment')

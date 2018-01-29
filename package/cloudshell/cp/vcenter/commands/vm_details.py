@@ -2,7 +2,7 @@ import traceback
 
 import jsonpickle
 
-from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetails
+from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetails, VmDataField
 
 
 class VmDetailsCommand(object):
@@ -21,9 +21,9 @@ class VmDetailsCommand(object):
                 result = self.vm_details_provider.create(
                     vm=vm,
                     name=app_name,
-                    vcenter_attributes=resource_context.attributes,
-                    vm_custom_params=dict((p.name,p.value) for p in request.deployedAppJson.vmdetails.vmCustomParams),
-                    deployment_service=request.appRequestJson.deploymentService,
+                    reserved_networks=resource_context.attributes.get('Reserved Networks', '').split(';'),
+                    ip_regex=next((p.value for p in request.deployedAppJson.vmdetails.vmCustomParams if p.name=='ip_regex'), None),
+                    deployment_details_provider=DeploymentDetailsProviderFromAppJson(request.appRequestJson.deploymentService),
                     logger=logger)
             except Exception as e:
                 logger.error("Error getting vm details for '{0}': {1}".format(app_name, traceback.format_exc()))
@@ -33,3 +33,28 @@ class VmDetailsCommand(object):
             results.append(result)
 
         return results
+
+
+class DeploymentDetailsProviderFromAppJson(object):
+    def __init__(self, deployment_service):
+        self.deployment = deployment_service.model
+        self.dep_attributes = dict((att.name, att.value) for att in deployment_service.attributes)
+
+    def get_details(self):
+        """
+        :rtype list[VmDataField]
+        """
+        data = []
+        if self.deployment == 'vCenter Clone VM From VM':
+            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '').split('/')[-1]))
+
+        if self.deployment == 'VCenter Deploy VM From Linked Clone':
+            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '').split('/')[-1]))
+
+        if self.deployment == 'vCenter VM From Image':
+            data.append(VmDataField('Base Image Name', self.dep_attributes.get('vCenter Image', '').split('/')[-1]))
+
+        if self.deployment == 'vCenter VM From Template':
+            data.append(VmDataField('Template Name', self.dep_attributes.get('vCenter Template', '').split('/')[-1]))
+
+        return data

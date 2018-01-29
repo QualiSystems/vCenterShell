@@ -70,10 +70,14 @@ class CommandOrchestrator(object):
 
         self.vm_loader = VMLoader(pv_service)
 
+        ip_manager = VMIPManager()
+        vm_details_provider = VmDetailsProvider(ip_manager)
+
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             resource_model_parser=ResourceModelParser())
+                                             resource_model_parser=ResourceModelParser(),
+                                             vm_details_provider=vm_details_provider)
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
@@ -85,9 +89,6 @@ class CommandOrchestrator(object):
                                               name_gen=port_group_name_generator)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
-
-        ip_manager = VMIPManager()
-        vm_details_provider = VmDetailsProvider(ip_manager)
 
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
