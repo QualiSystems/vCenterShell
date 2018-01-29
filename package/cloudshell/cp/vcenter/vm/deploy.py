@@ -1,3 +1,5 @@
+import traceback
+
 from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import VCenterDeployVMFromLinkedCloneResourceModel
 from cloudshell.cp.vcenter.models.DeployResultModel import DeployResult
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
@@ -116,13 +118,7 @@ class VirtualMachineDeployer(object):
         if clone_vm_result.error:
             raise Exception(clone_vm_result.error)
 
-        vm_details_data = self.vm_details_provider.create(
-            vm=clone_vm_result.vm,
-            name=vm_name,
-            reserved_networks=vcenter_data_model.reserved_networks,
-            ip_regex=other_params.ip_regex,
-            deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(other_params),
-            logger=logger)
+        vm_details_data = self._safely_get_vm_details(clone_vm_result.vm, vm_name, vcenter_data_model, other_params, logger)
 
         return DeployResult(vm_name=vm_name,
                             vm_uuid=clone_vm_result.vm.summary.config.uuid,
@@ -154,13 +150,7 @@ class VirtualMachineDeployer(object):
                       image_params.vm_folder if hasattr(image_params, 'vm_folder') and image_params.vm_folder else ''
             vm = self.pv_service.find_vm_by_name(si, vm_path, vm_name)
             if vm:
-                vm_details_data = self.vm_details_provider.create(
-                    vm=vm,
-                    name=vm_name,
-                    reserved_networks=vcenter_data_model.reserved_networks,
-                    ip_regex=data_holder.image_params.ip_regex,
-                    deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(data_holder.image_params),
-                    logger=logger)
+                vm_details_data = self._safely_get_vm_details(vm, vm_name,vcenter_data_model, data_holder.image_params, logger)
                 return DeployResult(vm_name=vm_name,
                                     vm_uuid=vm.config.uuid,
                                     cloud_provider_resource_name=data_holder.image_params.vcenter_name,
@@ -174,6 +164,20 @@ class VirtualMachineDeployer(object):
                                     vm_details_data=vm_details_data)
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
+
+    def _safely_get_vm_details(self, vm, vm_name, vcenter_model, deploy_model, logger):
+        data = None
+        try:
+            data = self.vm_details_provider.create(
+                vm=vm,
+                name=vm_name,
+                reserved_networks=vcenter_model.reserved_networks,
+                ip_regex=deploy_model.ip_regex,
+                deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(deploy_model),
+                logger=logger)
+        except Exception as e:
+            logger.error("Error getting vm details for '{0}': {1}".format(vm_name, traceback.format_exc()))
+        return data
 
     @staticmethod
     def _get_deploy_image_params(data_holder, host_info, vm_name):
