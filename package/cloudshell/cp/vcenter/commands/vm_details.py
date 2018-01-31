@@ -1,6 +1,5 @@
 import traceback
-
-import jsonpickle
+import time
 
 from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetails, VmDataField
 
@@ -9,6 +8,8 @@ class VmDetailsCommand(object):
     def __init__(self, pyvmomi_service, vm_details_provider):
         self.pyvmomi_service = pyvmomi_service
         self.vm_details_provider = vm_details_provider
+        self.timeout = 30
+        self.delay = 1
 
     def get_vm_details(self, si, logger, resource_context, requests, cancellation_context):
         results = []
@@ -18,6 +19,7 @@ class VmDetailsCommand(object):
             app_name = request.deployedAppJson.name
             try:
                 vm = self.pyvmomi_service.find_by_uuid(si, request.deployedAppJson.vmdetails.uid)
+                self._wait_for_vm_to_be_ready(vm, request, logger)
                 result = self.vm_details_provider.create(
                     vm=vm,
                     name=app_name,
@@ -33,6 +35,21 @@ class VmDetailsCommand(object):
             results.append(result)
 
         return results
+
+    def _wait_for_vm_to_be_ready(self, vm, request, logger):
+        start_time = time.time()
+        while time.time()-start_time<self.timeout and (self._not_guest_net(vm) or self._no_guest_ip(vm, request)):
+            time.sleep(self.delay)
+        logger.info('_wait_for_vm_to_be_ready: '+str(time.time()-start_time)+' sec')
+
+    @staticmethod
+    def _not_guest_net(vm):
+        return not vm.guest.net
+
+    @staticmethod
+    def _no_guest_ip(vm, request):
+        wait_for_ip = next((p.value for p in request.deployedAppJson.vmdetails.vmCustomParams if p.name == 'wait_for_ip'), False)
+        return wait_for_ip and not vm.guest.ipAddress
 
 
 class DeploymentDetailsProviderFromAppJson(object):
