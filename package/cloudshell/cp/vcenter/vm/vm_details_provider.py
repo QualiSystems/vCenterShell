@@ -1,11 +1,14 @@
 import re
 from pyVmomi import vim
 
+from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
+from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 
 
 class VmDetailsProvider(object):
-    def __init__(self, ip_manager):
+    def __init__(self, pyvmomi_service, ip_manager):
+        self.pyvmomi_service = pyvmomi_service # type: pyVmomiService
         self.ip_manager = ip_manager  # type: VMIPManager
 
     def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, logger):
@@ -38,21 +41,24 @@ class VmDetailsProvider(object):
     def _get_vm_network_data(self, vm, reserved_networks, ip_regex, logger):
         data_list = []
         primary_ip = self._get_primary_ip(vm, ip_regex, logger)
-        for net in vm.guest.net:
-            vlan_name = net.network
-            vlan_id = self._get_vlan_id(vm, vlan_name)
-            ip = next(iter(net.ipAddress), None)
-            if vlan_id and (vlan_name.startswith('QS_') or vlan_name in reserved_networks):
+        net_devices = [d for d in vm.config.hardware.device if isinstance(d, vim.vm.device.VirtualEthernetCard)]
+
+        for device in net_devices:
+            network = VNicService.get_network_by_device(vm, device, self.pyvmomi_service, logger)
+            vlan_id = self._convert_vlan_id_to_str(VNicService.get_network_vlan_id(network))
+            ip = self._get_ip_by_device(vm , device)
+
+            if vlan_id and (network.name.startswith('QS_') or network.name in reserved_networks):
                 data = VmNetworkData()
-                data.interface_id = net.macAddress
-                data.is_predefined = vlan_name in reserved_networks
+                data.interface_id = device.macAddress
+                data.is_predefined = network.name in reserved_networks
                 data.network_id = vlan_id
                 if ip:
                     data.is_primary = primary_ip == ip
                 data.network_data.append(VmDataField('IP', ip))
-                data.network_data.append(VmDataField('MAC Address', net.macAddress))
-                data.network_data.append(VmDataField('Network Adapter', self._get_nic_label(vm, net.deviceConfigId)))
-                data.network_data.append(VmDataField('Port Group Name', vlan_name))
+                data.network_data.append(VmDataField('MAC Address', device.macAddress))
+                data.network_data.append(VmDataField('Network Adapter', device.deviceInfo.label))
+                data.network_data.append(VmDataField('Port Group Name', network.name))
                 data_list.append(data)
 
         return data_list
@@ -63,17 +69,10 @@ class VmDetailsProvider(object):
         return primary_ip
 
     @staticmethod
-    def _get_nic_label(vm, device_id):
-        return next((device.deviceInfo.label for device in vm.config.hardware.device if device.key == device_id), None)
-
-    @staticmethod
-    def _get_vlan_id(vm, network_name):
-        try:
-            network = next((n for n in vm.network if n.name == network_name), None)
-            vlan_id = network.config.defaultPortConfig.vlan.vlanId
-            return VmDetailsProvider._convert_vlan_id_to_str(vlan_id)
-        except AttributeError:
-            pass
+    def _get_ip_by_device(vm, device):
+        for net in vm.guest.net:
+            if str(net.deviceConfigId) == str(device.key):
+                return next(iter(net.ipAddress), None)
         return None
 
     @staticmethod

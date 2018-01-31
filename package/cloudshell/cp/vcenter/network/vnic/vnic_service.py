@@ -65,7 +65,7 @@ class VNicService(object):
         return network
 
     @staticmethod
-    def vnic_get_network_attached(vm, device, pyvmomi_service, logger):
+    def get_network_by_device(vm, device, pyvmomi_service, logger):
         """
         Get a Network connected to a particular Device (vNIC)
         @see https://github.com/vmware/pyvmomi/blob/master/docs/vim/dvs/PortConnection.rst
@@ -296,3 +296,12 @@ class VNicService(object):
         nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
         nic_spec.device.connectable.connected = to_connect
         nic_spec.device.connectable.startConnected = to_connect
+
+    @staticmethod
+    def get_network_vlan_id(network):
+        if hasattr(network, 'config'):
+            if hasattr(network.config, 'defaultPortConfig'):
+                if hasattr(network.config.defaultPortConfig, 'vlan'):
+                    if hasattr(network.config.defaultPortConfig.vlan, 'vlanId'):
+                        return network.config.defaultPortConfig.vlan.vlanId
+        return None
