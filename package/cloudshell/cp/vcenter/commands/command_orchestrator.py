@@ -71,7 +71,8 @@ class CommandOrchestrator(object):
         self.vm_loader = VMLoader(pv_service)
 
         ip_manager = VMIPManager()
-        vm_details_provider = VmDetailsProvider(ip_manager)
+        vm_details_provider = VmDetailsProvider(pyvmomi_service=pv_service,
+                                                ip_manager=ip_manager)
 
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
