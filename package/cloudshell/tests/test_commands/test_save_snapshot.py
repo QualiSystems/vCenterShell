@@ -28,7 +28,8 @@ class TestSaveSnapshotCommand(TestCase):
                 save_snapshot_command.save_snapshot(si=si,
                                                     logger=Mock(),
                                                     vm_uuid='machine1',
-                                                    snapshot_name='new_snapshot')
+                                                    snapshot_name='new_snapshot',
+                                                    save_memory='No')
 
         # Assert
         vm.CreateSnapshot.called_with('new_snapshot', 'Created by CloudShell vCenterShell', False, True)
@@ -50,7 +51,8 @@ class TestSaveSnapshotCommand(TestCase):
                 save_snapshot_command.save_snapshot(si=si,
                                                     logger=Mock(),
                                                     vm_uuid='machine1',
-                                                    snapshot_name='new_snapshot')
+                                                    snapshot_name='new_snapshot',
+                                                    save_memory='No')
 
         # Assert
         vm.CreateSnapshot.called_with('new_snapshot', 'Created by CloudShell vCenterShell', False, True)
@@ -74,4 +76,17 @@ class TestSaveSnapshotCommand(TestCase):
                         save_snapshot_command.save_snapshot(si=si,
                                                             logger=Mock(),
                                                             vm_uuid='machine1',
-                                                            snapshot_name='snapshot2')
+                                                            snapshot_name='snapshot2',
+                                                            save_memory='No')
+
+    def test_save_memory_yes(self):
+        save_memory_string = 'Yes'
+        self.assertTrue(SaveSnapshotCommand._get_save_vm_memory_to_snapshot(save_memory_string))
+        save_memory_string = 'yEs'
+        self.assertTrue(SaveSnapshotCommand._get_save_vm_memory_to_snapshot(save_memory_string))
+
+    def test_save_memory_no(self):
+        save_memory_string = 'No'
+        self.assertTrue(not SaveSnapshotCommand._get_save_vm_memory_to_snapshot(save_memory_string))
+        save_memory_string = 'nO'
+        self.assertTrue(not SaveSnapshotCommand._get_save_vm_memory_to_snapshot(save_memory_string))
