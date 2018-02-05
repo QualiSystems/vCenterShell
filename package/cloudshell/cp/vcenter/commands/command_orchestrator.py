@@ -411,20 +411,23 @@ class CommandOrchestrator(object):
                                                                    cancellation_context)
         return set_command_result(result=res, unpicklable=False)
 
-    def save_snapshot(self, context, snapshot_name):
+    def save_snapshot(self, context, snapshot_name, save_memory='No'):
         """
         Saves virtual machine to a snapshot
         :param context: resource context of the vCenterShell
         :type context: models.QualiDriverModels.ResourceCommandContext
         :param snapshot_name: snapshot name to save to
         :type snapshot_name: str
+        :param save_memory: Snapshot the virtual machine's memory. Lookup, Yes / No
+        :type save_memory: str
         :return:
         """
         resource_details = self._parse_remote_model(context)
         created_snapshot_path = self.command_wrapper.execute_command_with_connection(context,
                                                                                      self.snapshot_saver.save_snapshot,
                                                                                      resource_details.vm_uuid,
-                                                                                     snapshot_name)
+                                                                                     snapshot_name,
+                                                                                     save_memory)
         return set_command_result(created_snapshot_path)
 
     def restore_snapshot(self, context, snapshot_name):
