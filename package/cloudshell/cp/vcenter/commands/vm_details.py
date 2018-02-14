@@ -72,6 +72,6 @@ class DeploymentDetailsProviderFromAppJson(object):
             data.append(VmDataField('Base Image Name', self.dep_attributes.get('vCenter Image', '').split('/')[-1]))
 
         if self.deployment == 'vCenter VM From Template':
-            data.append(VmDataField('Template Name', self.dep_attributes.get('vCenter Template', '').split('/')[-1]))
+            data.append(VmDataField('Template Name', self.dep_attributes.get('vCenter Template', '')))
 
         return data
