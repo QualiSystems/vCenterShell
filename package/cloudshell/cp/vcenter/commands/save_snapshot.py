@@ -19,7 +19,7 @@ class SaveSnapshotCommand:
         self.pyvmomi_service = pyvmomi_service
         self.task_waiter = task_waiter
 
-    def save_snapshot(self, si, logger, vm_uuid, snapshot_name):
+    def save_snapshot(self, si, logger, vm_uuid, snapshot_name, save_memory):
         """
         Creates a snapshot of the current state of the virtual machine
 
@@ -31,21 +31,33 @@ class SaveSnapshotCommand:
         :type vm_uuid: str
         :param snapshot_name: Snapshot name to save the snapshot to
         :type snapshot_name: str
+        :param save_memory: Snapshot the virtual machine's memory. Lookup, Yes / No
+        :type save_memory: str
         """
         vm = self.pyvmomi_service.find_by_uuid(si, vm_uuid)
 
         snapshot_path_to_be_created = SaveSnapshotCommand._get_snapshot_name_to_be_created(snapshot_name, vm)
+
+        save_vm_memory_to_snapshot = SaveSnapshotCommand._get_save_vm_memory_to_snapshot(save_memory)
+
         SaveSnapshotCommand._verify_snapshot_uniquness(snapshot_path_to_be_created, vm)
 
-        task = self._create_snapshot(logger, snapshot_name, vm)
+        task = self._create_snapshot(logger, snapshot_name, vm, save_vm_memory_to_snapshot)
 
         self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Create Snapshot')
         return snapshot_path_to_be_created
 
     @staticmethod
-    def _create_snapshot(logger, snapshot_name, vm):
+    def _get_save_vm_memory_to_snapshot(save_memory):
+        return True if save_memory is not None and save_memory.lower() == 'yes' else False
+
+    @staticmethod
+    def _create_snapshot(logger, snapshot_name, vm, save_vm_memory_to_snapshot):
+        """
+        :type save_vm_memory_to_snapshot: bool
+        """
         logger.info("Create virtual machine snapshot")
-        dump_memory = False
+        dump_memory = save_vm_memory_to_snapshot
         quiesce = True
         task = vm.CreateSnapshot(snapshot_name, 'Created by CloudShell vCenterShell', dump_memory, quiesce)
         return task
