@@ -63,10 +63,10 @@ class DeploymentDetailsProviderFromAppJson(object):
         """
         data = []
         if self.deployment == 'vCenter Clone VM From VM':
-            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '').split('/')[-1]))
+            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '')))
 
         if self.deployment == 'VCenter Deploy VM From Linked Clone':
-            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '').split('/')[-1]))
+            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '')))
 
         if self.deployment == 'vCenter VM From Image':
             data.append(VmDataField('Base Image Name', self.dep_attributes.get('vCenter Image', '').split('/')[-1]))
