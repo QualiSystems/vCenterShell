@@ -211,15 +211,15 @@ class DeploymentDetailsProviderFromTemplateModel(object):
         """
         data = []
         if isinstance(self.model, vCenterCloneVMFromVMResourceModel):
-            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm.split('/')[-1]))
+            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm))
 
         if isinstance(self.model, VCenterDeployVMFromLinkedCloneResourceModel):
-            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm.split('/')[-1]))
+            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm))
 
         if isinstance(self.model, vCenterVMFromImageResourceModel):
             data.append(VmDataField('Base Image Name', self.model.vcenter_image.split('/')[-1]))
 
         if isinstance(self.model, vCenterVMFromTemplateResourceModel):
-            data.append(VmDataField('Template Name', self.model.vcenter_template.split('/')[-1]))
+            data.append(VmDataField('Template Name', self.model.vcenter_template))
 
         return data
