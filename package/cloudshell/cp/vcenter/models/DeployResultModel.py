@@ -1,6 +1,6 @@
 class DeployResult(object):
     def __init__(self, vm_name, vm_uuid, cloud_provider_resource_name, ip_regex, refresh_ip_timeout, auto_power_on,
-                 auto_power_off, wait_for_ip, auto_delete, autoload):
+                 auto_power_off, wait_for_ip, auto_delete, autoload, vm_details_data):
         """
         :param str vm_name: The name of the virtual machine
         :param uuid uuid: The UUID
@@ -24,3 +24,4 @@ class DeployResult(object):
         self.wait_for_ip = str(wait_for_ip)
         self.auto_delete = str(auto_delete)
         self.autoload = str(autoload)
+        self.vm_details_data = vm_details_data

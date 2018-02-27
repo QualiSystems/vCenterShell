@@ -14,6 +14,8 @@ from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionContext
 
+from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
+
 DOMAIN = 'Global'
 ADDRESS = 'address'
 USER = 'User'
@@ -29,6 +31,9 @@ VM_LOCATION = 'VM Location'
 VM_RESOURCE_POOL = 'VM Resource Pool'
 VM_STORAGE = 'VM Storage'
 SHUTDOWN_METHODS = ['soft', 'hard']
+
+ATTRIBUTE_NAMES_THAT_ARE_SLASH_BACKSLASH_AGNOSTIC = [DEFAULT_DVSWITCH, DEFAULT_DATACENTER, VM_LOCATION, VM_STORAGE,
+                                                     VM_RESOURCE_POOL, VM_CLUSTER]
 
 
 class VCenterAutoModelDiscovery(object):
@@ -58,6 +63,8 @@ class VCenterAutoModelDiscovery(object):
             self._check_if_attribute_not_empty(context.resource, ADDRESS)
             resource = context.resource
             si = self._check_if_vcenter_user_pass_valid(context, cloudshell_session, resource.attributes)
+
+        resource.attributes = VCenterAutoModelDiscovery._make_attributes_slash_backslash_agnostic(resource.attributes)
 
         auto_attr = []
         if not si:
@@ -298,3 +305,20 @@ class VCenterAutoModelDiscovery(object):
         if name:
             curr_path = '{0}/{1}'.format(managed_object.name, name)
         return VCenterAutoModelDiscovery.get_full_name(dc_name, managed_object.parent, curr_path)
+
+    @staticmethod
+    def _make_attributes_slash_backslash_agnostic(attributes_with_slash_or_backslash):
+        """
+        :param attributes_with_slash_or_backslash: resource attributes from
+               cloudshell.cp.vcenter.models.QualiDriverModels.ResourceContextDetails
+        :type attributes_with_slash_or_backslash: dict[str,str]
+        :return: attributes_with_slash
+        :rtype attributes_with_slash: dict[str,str]
+        """
+        attributes_with_slash = dict()
+        for key, value in attributes_with_slash_or_backslash.items():
+            if key in ATTRIBUTE_NAMES_THAT_ARE_SLASH_BACKSLASH_AGNOSTIC:
+                value = back_slash_to_front_converter(value)
+            attributes_with_slash[key] = value
+
+        return attributes_with_slash

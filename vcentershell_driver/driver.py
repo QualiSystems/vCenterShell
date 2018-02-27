@@ -6,7 +6,6 @@ from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTem
 import jsonpickle
 
 
-
 class VCenterShellDriver (ResourceDriverInterface):
 
     def cleanup(self):
@@ -87,7 +86,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         validator = VCenterAutoModelDiscovery()
         return validator.validate_and_discover(context)
 
-    def remote_save_snapshot(self, context, ports, snapshot_name):
+    def remote_save_snapshot(self, context, ports, snapshot_name, save_memory):
         """
         Saves virtual machine to a snapshot
         :param context: resource context of the vCenterShell
@@ -96,9 +95,11 @@ class VCenterShellDriver (ResourceDriverInterface):
         :type ports: list[string]
         :param snapshot_name: snapshot name to save to
         :type snapshot_name: str
+        :param save_memory: Snapshot the virtual machine's memory. Lookup, Yes / No
+        :type save_memory: str
         :return:
         """
-        return self.command_orchestrator.save_snapshot(context, snapshot_name)
+        return self.command_orchestrator.save_snapshot(context, snapshot_name, save_memory)
 
     def remote_restore_snapshot(self, context, ports, snapshot_name):
         """
@@ -132,3 +133,6 @@ class VCenterShellDriver (ResourceDriverInterface):
 
     def get_vm_uuid(self, context, vm_name):
         return self.command_orchestrator.get_vm_uuid_by_name(context, vm_name)
+
+    def GetVmDetails(self, context, cancellation_context, requests):
+        return self.command_orchestrator.get_vm_details(context, cancellation_context, requests)

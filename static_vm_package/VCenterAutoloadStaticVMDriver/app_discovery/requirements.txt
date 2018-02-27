@@ -1,4 +1,4 @@
 cloudshell-core>=2.0.0,<2.1.0
 cloudshell-cp-vcenter>=1.10.0,<1.11.0
-cloudshell-automation-api>=8.2.0.0,<8.2.1.0
+cloudshell-automation-api>=8.3.0.0,<8.3.1.0
 cloudshell-shell-core>=3.1.0,<3.2.0

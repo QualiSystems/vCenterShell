@@ -1,4 +1,4 @@
-<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.9.0">
+<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.11.0">
     <Layout>
         <Category Name="Deployment">
             <Command Description="" DisplayName="Deploy From Template" EnableCancellation="true" Name="deploy_from_template" Tags="allow_unreserved" />
@@ -17,6 +17,7 @@
             <Command Description="" DisplayName="Save Snapshot" Name="remote_save_snapshot" Tags="remote_connectivity,allow_unreserved">
                 <Parameters>
                     <Parameter DefaultValue="" Description="Please enter the VM snapshot name, for example Snapshot1" DisplayName="Snapshot Name" Mandatory="True" Name="snapshot_name" Type="String" />
+                    <Parameter DefaultValue="No" Description="Snapshot the virtual machine's memory" DisplayName="Save Memory" Mandatory="True" Name="save_memory" Type="Lookup" AllowedValues="Yes,No" />
                 </Parameters>
             </Command>
             <Command Description="" DisplayName="Restore Snapshot" Name="remote_restore_snapshot" Tags="remote_connectivity,allow_unreserved">
@@ -32,6 +33,7 @@
             <Command Description="" DisplayName="Get VM Uuid" Name="get_vm_uuid" Tags="allow_shared" />
             <Command Description="" DisplayName="Orchestration Save" Name="orchestration_save" Tags="remote_connectivity,allow_unreserved" />
             <Command Description="" DisplayName="Orchestration Restore" Name="orchestration_restore" Tags="remote_connectivity,allow_unreserved" />
+            <Command Description="" DisplayName="Get VmDetails" EnableCancellation="true" Name="GetVmDetails" Tags="allow_unreserved" />
         </Category>
         <Category Name="Power">
             <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />

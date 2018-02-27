@@ -101,7 +101,7 @@ class VirtualMachinePortGroupConfigurer(object):
         return res
 
     def get_networks_on_vnics(self, vm, vnics, logger):
-        return [self.vnic_service.vnic_get_network_attached(vm, vnic, self.pyvmomi_service, logger)
+        return [self.vnic_service.get_network_by_device(vm, vnic, self.pyvmomi_service, logger)
                 for vnic in vnics]
 
     def create_mappings_for_all_networks(self, vm, default_network):

@@ -2,8 +2,10 @@ import time
 from datetime import datetime, date
 import jsonpickle
 
+from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
 from cloudshell.shell.core.context import ResourceRemoteCommandContext
+
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifact import OrchestrationSavedArtifact
@@ -46,6 +48,7 @@ from cloudshell.cp.vcenter.vm.deploy import VirtualMachineDeployer
 from cloudshell.cp.vcenter.vm.dvswitch_connector import VirtualSwitchToMachineConnector
 from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
 from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGroupConfigurer
+from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
@@ -67,10 +70,15 @@ class CommandOrchestrator(object):
 
         self.vm_loader = VMLoader(pv_service)
 
+        ip_manager = VMIPManager()
+        vm_details_provider = VmDetailsProvider(pyvmomi_service=pv_service,
+                                                ip_manager=ip_manager)
+
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             resource_model_parser=ResourceModelParser())
+                                             resource_model_parser=ResourceModelParser(),
+                                             vm_details_provider=vm_details_provider)
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
                                                    synchronous_task_waiter=synchronous_task_waiter)
@@ -82,6 +90,7 @@ class CommandOrchestrator(object):
                                               name_gen=port_group_name_generator)
         virtual_switch_to_machine_connector = VirtualSwitchToMachineConnector(dv_port_group_creator,
                                                                               virtual_machine_port_group_configurer)
+
         # Command Wrapper
         self.command_wrapper = CommandWrapper(pv_service=pv_service,
                                               resource_model_parser=self.resource_model_parser,
@@ -119,12 +128,14 @@ class CommandOrchestrator(object):
             VirtualMachinePowerManagementCommand(pyvmomi_service=pv_service,
                                                  synchronous_task_waiter=synchronous_task_waiter)
 
-        ip_manager = VMIPManager()
-
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
                                                    resource_model_parser=ResourceModelParser(),
                                                    ip_manager=ip_manager)
+
+        # Get Vm Details command
+        self.vm_details = VmDetailsCommand(pyvmomi_service=pv_service,
+                                           vm_details_provider=vm_details_provider)
 
         # Save Snapshot
         self.snapshot_saver = SaveSnapshotCommand(pyvmomi_service=pv_service,
@@ -391,20 +402,32 @@ class CommandOrchestrator(object):
                                                                    vm_name)
         return set_command_result(result=res, unpicklable=False)
 
-    def save_snapshot(self, context, snapshot_name):
+    def get_vm_details(self, context,cancellation_context, requests_json):
+        requests = DeployDataHolder(jsonpickle.decode(requests_json)).items
+        res = self.command_wrapper.execute_command_with_connection(context,
+                                                                   self.vm_details.get_vm_details,
+                                                                   context.resource,
+                                                                   requests,
+                                                                   cancellation_context)
+        return set_command_result(result=res, unpicklable=False)
+
+    def save_snapshot(self, context, snapshot_name, save_memory='No'):
         """
         Saves virtual machine to a snapshot
         :param context: resource context of the vCenterShell
         :type context: models.QualiDriverModels.ResourceCommandContext
         :param snapshot_name: snapshot name to save to
         :type snapshot_name: str
+        :param save_memory: Snapshot the virtual machine's memory. Lookup, Yes / No
+        :type save_memory: str
         :return:
         """
         resource_details = self._parse_remote_model(context)
         created_snapshot_path = self.command_wrapper.execute_command_with_connection(context,
                                                                                      self.snapshot_saver.save_snapshot,
                                                                                      resource_details.vm_uuid,
-                                                                                     snapshot_name)
+                                                                                     snapshot_name,
+                                                                                     save_memory)
         return set_command_result(created_snapshot_path)
 
     def restore_snapshot(self, context, snapshot_name):
