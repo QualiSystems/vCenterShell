@@ -43,13 +43,15 @@ class TestVirtualMachineDeployer(TestCase):
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
 
         resource_context = self._create_vcenter_resource_context()
+        cancellation_context = Mock()
+        cancellation_context.is_cancelled = False
 
         res = self.deployer.deploy_from_template(
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
             logger=Mock(),
-            reservation_id=Mock())
+            reservation_id=Mock(), cancellation_context=cancellation_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -62,13 +64,15 @@ class TestVirtualMachineDeployer(TestCase):
         deploy_from_template_details.vcenter_vm = 'name'
         resource_context = self._create_vcenter_resource_context()
         reservation_id = Mock()
+        cancellation_context = Mock()
+        cancellation_context.is_cancelled = False
 
         res = self.deployer.deploy_clone_from_vm(
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
             logger=Mock(),
-            reservation_id=reservation_id)
+            reservation_id=reservation_id, cancellation_context=cancellation_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -80,13 +84,15 @@ class TestVirtualMachineDeployer(TestCase):
         deploy_from_template_details.template_resource_model.vcenter_name = 'vcenter_resource_name'
         deploy_from_template_details.vcenter_vm_snapshot = 'name/shanpshot'
         resource_context = self._create_vcenter_resource_context()
+        cancellation_context = Mock()
+        cancellation_context.is_cancelled = False
 
         res = self.deployer.deploy_from_linked_clone(
             si=self.si,
             data_holder=deploy_from_template_details,
             vcenter_data_model=resource_context,
             logger=Mock(),
-            reservation_id=Mock())
+            reservation_id=Mock(), cancellation_context=cancellation_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)
@@ -122,7 +128,7 @@ class TestVirtualMachineDeployer(TestCase):
         vcenter_data_model = self._create_vcenter_resource_context()
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si,
-                          Mock(), deploy_from_template_details, vcenter_data_model, Mock())
+                          Mock(), deploy_from_template_details, vcenter_data_model, Mock(), Mock())
         self.assertTrue(self.pv_service.CloneVmParameters.called)
 
     def test_vm_deployer_image(self):
@@ -158,6 +164,8 @@ class TestVirtualMachineDeployer(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'qualisb'
         resource_context = Mock()
+        cancellation_context = Mock()
+        cancellation_context.is_cancelled = False
 
         res = self.deployer.deploy_from_image(si=self.si,
                                               logger=Mock(),
@@ -165,7 +173,7 @@ class TestVirtualMachineDeployer(TestCase):
                                               vcenter_data_model=vcenter_data_model,
                                               data_holder=params,
                                               resource_context=resource_context,
-                                              reservation_id=Mock())
+                                              reservation_id=Mock(), cancellation_context=cancellation_context)
 
         self.assertEqual(res.vm_name, self.name)
         self.assertEqual(res.vm_uuid, self.uuid)

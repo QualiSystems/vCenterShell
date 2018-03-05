@@ -52,6 +52,7 @@ from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
+
 class CommandOrchestrator(object):
     def __init__(self):
         """
@@ -159,10 +160,11 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def deploy_from_template(self, context, request):
+    def deploy_from_template(self, context, request, cancellation_context):
         """
         Deploy From Template Command, will deploy vm from template
 
+        :param cancellation_context:
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
@@ -171,21 +173,24 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterVMFromTemplateResourceModel)
+        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'],
+                                                                              vCenterVMFromTemplateResourceModel)
         data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder)
+            data_holder,
+            cancellation_context)
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_clone_from_vm(self, context, request):
+    def deploy_clone_from_vm(self, context, request, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
+        :param cancellation_context:
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
@@ -194,22 +199,25 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterCloneVMFromVMResourceModel)
+        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'],
+                                                                              vCenterCloneVMFromVMResourceModel)
         data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
-            data_holder)
+            data_holder,
+            cancellation_context)
 
         res = set_command_result(result=result, unpicklable=False)
         return res
 
-    def deploy_from_linked_clone(self, context, request):
+    def deploy_from_linked_clone(self, context, request, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
+        :param cancellation_context:
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
@@ -218,25 +226,29 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
-        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], VCenterDeployVMFromLinkedCloneResourceModel)
+        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'],
+                                                                                          VCenterDeployVMFromLinkedCloneResourceModel)
 
         if not linked_clone_from_vm_model.vcenter_vm_snapshot:
             raise ValueError('Please insert snapshot to deploy from')
 
-        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
+        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model,
+                                                data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
         result = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
-            data_holder)
+            data_holder,
+            cancellation_context)
 
         return set_command_result(result=result, unpicklable=False)
 
-    def deploy_from_image(self, context, request):
+    def deploy_from_image(self, context, request, cancellation_context):
         """
         Deploy From Image Command, will deploy vm from ovf image
 
+        :param cancellation_context:
         :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
         :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
         :return str deploy results
@@ -245,7 +257,8 @@ class CommandOrchestrator(object):
         # get command parameters from the environment
         data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
-        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], vCenterVMFromImageResourceModel)
+        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'],
+                                                                                       vCenterVMFromImageResourceModel)
         data_holder = DeployFromImageDetails(deploy_from_image_model, data['UserRequestedAppName'] or data['AppName'])
 
         # execute command
@@ -253,7 +266,8 @@ class CommandOrchestrator(object):
             context,
             self.deploy_command.execute_deploy_from_image,
             data_holder,
-            context.resource)
+            context.resource,
+            cancellation_context)
 
         return set_command_result(result=result, unpicklable=False)
 
@@ -325,7 +339,8 @@ class CommandOrchestrator(object):
                                                                    self.refresh_ip_command.refresh_ip,
                                                                    resource_details,
                                                                    cancellation_context,
-                                                                   context.remote_endpoints[0].app_context.app_request_json)
+                                                                   context.remote_endpoints[
+                                                                       0].app_context.app_request_json)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -402,7 +417,7 @@ class CommandOrchestrator(object):
                                                                    vm_name)
         return set_command_result(result=res, unpicklable=False)
 
-    def get_vm_details(self, context,cancellation_context, requests_json):
+    def get_vm_details(self, context, cancellation_context, requests_json):
         requests = DeployDataHolder(jsonpickle.decode(requests_json)).items
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.vm_details.get_vm_details,

@@ -1,13 +1,12 @@
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from cloudshell.shell.core.context import ResourceCommandContext
+from cloudshell.shell.core.context import ResourceCommandContext, CancellationContext
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 import jsonpickle
 
 
-class VCenterShellDriver (ResourceDriverInterface):
-
+class VCenterShellDriver(ResourceDriverInterface):
     def cleanup(self):
         pass
 
@@ -56,27 +55,28 @@ class VCenterShellDriver (ResourceDriverInterface):
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
-    def Deploy(self, context, request=None):
+    def Deploy(self, context, request=None, cancellation_context=None):
         app_request = jsonpickle.decode(request)
         deployment_name = app_request['DeploymentServiceName']
         if deployment_name in self.deployments.keys():
             deploy_method = self.deployments[deployment_name]
-            return deploy_method(context, request)
+            return deploy_method(context, request, cancellation_context)
         else:
             raise Exception('Could not find the deployment')
 
+    def deploy_from_template(self, context, request, cancellation_context):
+        return self.command_orchestrator.deploy_from_template(context, request, cancellation_context)
 
-    def deploy_from_template(self, context, request):
-        return self.command_orchestrator.deploy_from_template(context, request)
+    def deploy_clone_from_vm(self, context, request, cancellation_context):
+        return self.command_orchestrator.deploy_clone_from_vm(context, request, cancellation_context)
 
-    def deploy_clone_from_vm(self, context, request):
-        return self.command_orchestrator.deploy_clone_from_vm(context, request)
+    def deploy_from_linked_clone(self, context, request, cancellation_context):
+        return self.command_orchestrator.deploy_from_linked_clone(context, request, cancellation_context)
 
-    def deploy_from_linked_clone(self, context, request):
-        return self.command_orchestrator.deploy_from_linked_clone(context, request)
-
-    def deploy_from_image(self, context, request):
-        return self.command_orchestrator.deploy_from_image(context, request)
+    def deploy_from_image(self, context, request, cancellation_context):
+        if cancellation_context is None:
+            cancellation_context = CancellationContext()
+        return self.command_orchestrator.deploy_from_image(context, request, cancellation_context)
 
     def get_inventory(self, context):
         """
