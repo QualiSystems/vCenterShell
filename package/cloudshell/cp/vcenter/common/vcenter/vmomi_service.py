@@ -405,10 +405,11 @@ class pyVmomiService:
             self.vm = vm
             self.error = error
 
-    def clone_vm(self, clone_params, logger):
+    def clone_vm(self, clone_params, logger, cancellation_context):
         """
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
+        :param cancellation_context:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
@@ -470,7 +471,8 @@ class pyVmomiService:
         logger.info("cloning VM...")
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM',
+                                                cancellation_context=cancellation_context)
         except TaskFaultException:
             raise
         except vim.fault.NoPermission as error:

@@ -96,25 +96,29 @@ class TestCommandOrchestrator(TestCase):
 
     def test_deploy_from_template(self):
         # act
-        self.command_orchestrator.deploy_from_template(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_template(self.context, self.deploy_request, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_vm_from_vm(self):
         # act
-        self.command_orchestrator.deploy_clone_from_vm(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_clone_from_vm(self.context, self.deploy_request, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_snapshot(self):
         # act
-        self.command_orchestrator.deploy_from_linked_clone(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_linked_clone(self.context, self.deploy_request, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_image(self):
         # act
-        self.command_orchestrator.deploy_from_image(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_image(self.context, self.deploy_request, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 

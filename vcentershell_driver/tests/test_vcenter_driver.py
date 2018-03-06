@@ -70,7 +70,7 @@ class TestCommandOrchestrator(TestCase):
         self.setUp()
         deploy_data = Mock()
 
-        res = self.driver.deploy_from_template(self.context, deploy_data)
+        res = self.driver.deploy_from_template(self.context, deploy_data, Mock())
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.deploy_from_template.called_with(self.context,
@@ -80,7 +80,7 @@ class TestCommandOrchestrator(TestCase):
         self.setUp()
         deploy_data = Mock()
 
-        res = self.driver.deploy_from_image(self.context, deploy_data)
+        res = self.driver.deploy_from_image(self.context, deploy_data, Mock())
 
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.deploy_from_image.called_with(self.context,

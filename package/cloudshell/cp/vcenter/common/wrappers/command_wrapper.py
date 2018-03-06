@@ -59,8 +59,8 @@ class CommandWrapper:
         """
 
         logger = self.context_based_logger_factory.create_logger_for_context(
-                logger_name='vCenterShell',
-                context=context)
+            logger_name='vCenterShell',
+            context=context)
 
         if not command:
             logger.error(COMMAND_CANNOT_BE_NONE)
@@ -82,15 +82,15 @@ class CommandWrapper:
 
                 vcenter_data_model = self.resource_model_parser.convert_to_vcenter_model(context.resource)
                 connection_details = ResourceConnectionDetailsRetriever.get_connection_details(session=session,
-                                                                           vcenter_resource_model=vcenter_data_model,
-                                                                           resource_context=context.resource)
+                                                                                               vcenter_resource_model=vcenter_data_model,
+                                                                                               resource_context=context.resource)
 
             if connection_details:
                 logger.info(INFO_CONNECTING_TO_VCENTER.format(connection_details.host))
                 logger.debug(
-                        DEBUG_CONNECTION_INFO.format(connection_details.host,
-                                                     connection_details.username,
-                                                     connection_details.port))
+                    DEBUG_CONNECTION_INFO.format(connection_details.host,
+                                                 connection_details.username,
+                                                 connection_details.port))
 
                 si = self.get_py_service_connection(connection_details, logger)
             if si:
@@ -127,7 +127,7 @@ class CommandWrapper:
             return results
         except Exception as ex:
             logger.exception(COMMAND_ERROR.format(command_name))
-            logger.exception(str(type(ex)) + ': '+ str(ex))
+            logger.exception(str(type(ex)) + ': ' + str(ex))
             raise
         finally:
             logger.info(LOG_FORMAT.format(END, command_name))

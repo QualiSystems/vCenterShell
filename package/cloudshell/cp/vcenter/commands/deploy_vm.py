@@ -11,9 +11,10 @@ class DeployCommand(object):
         """
         self.deployer = deployer
 
-    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, reservation_id, deployment_params):
+    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
         """
         Calls the deployer to deploy vm from snapshot
+        :param cancellation_context:
         :param str reservation_id:
         :param si:
         :param logger:
@@ -22,12 +23,13 @@ class DeployCommand(object):
         :return:
         """
         deploy_result = self.deployer.deploy_from_linked_clone(si, logger, deployment_params, vcenter_data_model,
-                                                               reservation_id)
+                                                               reservation_id, cancellation_context)
         return deploy_result
 
-    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, reservation_id, deployment_params):
+    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
         """
         Calls the deployer to deploy vm from another vm
+        :param cancellation_context:
         :param str reservation_id:
         :param si:
         :param logger:
@@ -36,10 +38,10 @@ class DeployCommand(object):
         :return:
         """
         deploy_result = self.deployer.deploy_clone_from_vm(si, logger, deployment_params, vcenter_data_model,
-                                                           reservation_id)
+                                                           reservation_id, cancellation_context)
         return deploy_result
 
-    def execute_deploy_from_template(self, si, logger, vcenter_data_model, reservation_id, deployment_params):
+    def execute_deploy_from_template(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
         """
 
         :param str reservation_id:
@@ -50,13 +52,14 @@ class DeployCommand(object):
         :return:
         """
         deploy_result = self.deployer.deploy_from_template(si, logger, deployment_params, vcenter_data_model,
-                                                           reservation_id)
+                                                           reservation_id, cancellation_context)
         return deploy_result
 
     def execute_deploy_from_image(self, si, logger, session, vcenter_data_model, reservation_id, deployment_params,
-                                  resource_context):
+                                  resource_context, cancellation_context):
         """
 
+        :param cancellation_context:
         :param str reservation_id:
         :param si:
         :param logger:
@@ -72,5 +75,6 @@ class DeployCommand(object):
                                                         vcenter_data_model=vcenter_data_model,
                                                         data_holder=deployment_params,
                                                         resource_context=resource_context,
-                                                        reservation_id=reservation_id)
+                                                        reservation_id=reservation_id,
+                                                        cancellation_context=cancellation_context)
         return deploy_result
