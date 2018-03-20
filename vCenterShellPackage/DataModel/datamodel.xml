@@ -274,7 +274,7 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" ImagePath="DeploymentTypes-vCenterClone.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -330,7 +330,7 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="vCenter VM From Template" ImagePath="DeploymentTypes-vCenterTemplate.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -386,10 +386,10 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" ImagePath="DeploymentTypes-vCenterLinked.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM Snapshot" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM Snapshot" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -469,10 +469,10 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="false">
