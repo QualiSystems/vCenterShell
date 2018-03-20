@@ -20,8 +20,7 @@ class TestSnapshotRestoreCommand(TestCase):
 
         snapshot = Mock()
         mock_get_vm_snapshots.return_value = {'snap1': snapshot}
-        session = MagicMock()
-        session.SetResourceLiveStatus = MagicMock()
+        session = MagicMock()        
 
         # Act
         snapshot_restore_command.restore_snapshot(si=si,
@@ -32,8 +31,7 @@ class TestSnapshotRestoreCommand(TestCase):
                                                   snapshot_name='snap1')
 
         # Assert
-        self.assertTrue(snapshot.RevertToSnapshot_Task.called)
-        session.SetResourceLiveStatus.assert_called_with('vm_machine1', 'Offline', 'Powered Off')
+        self.assertTrue(snapshot.RevertToSnapshot_Task.called)        
 
     @patch('cloudshell.cp.vcenter.commands.restore_snapshot.SnapshotRetriever.get_vm_snapshots')
     def test_restore_snapshot_should_throw_exception_on_none_existing_snapshot(self, mock_get_vm_snapshots):
@@ -49,11 +47,9 @@ class TestSnapshotRestoreCommand(TestCase):
         mock_get_vm_snapshots.return_value = {'snap1': Mock()}
 
         session = MagicMock()
-        session.SetResourceLiveStatus = MagicMock()
-
+        
         # Act + Assert
         self.assertRaises(SnapshotNotFoundException, snapshot_restore_command.restore_snapshot, si, Mock(), session,
                           'machine1', 'vm_machine1',
                           'NOT_EXISTING_SNAPSHOT')
-
-        session.SetResourceLiveStatus.assert_not_called()
+        

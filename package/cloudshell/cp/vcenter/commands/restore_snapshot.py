@@ -35,10 +35,9 @@ class SnapshotRestoreCommand:
         logger.info("Revert snapshot")
 
         snapshot = SnapshotRestoreCommand._get_snapshot(vm=vm, snapshot_name=snapshot_name)
-
         session.SetResourceLiveStatus(resource_fullname, "Offline", "Powered Off")
-
         task = snapshot.RevertToSnapshot_Task()
+		
         return self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Revert Snapshot')
 
     @staticmethod
