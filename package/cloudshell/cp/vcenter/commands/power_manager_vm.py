@@ -50,11 +50,7 @@ class VirtualMachinePowerManagementCommand(object):
 
                 vm.ShutdownGuest()
                 task_result = 'vm powered off'
-
-        # Set live status - deployment done
-        if resource_fullname:
-            session.SetResourceLiveStatus(resource_fullname, "Offline", "Powered Off")
-
+        
         return task_result
 
     def power_on(self, si, logger, session, vm_uuid, resource_fullname):
@@ -79,9 +75,5 @@ class VirtualMachinePowerManagementCommand(object):
             task_result = self.synchronous_task_waiter.wait_for_task(task=task,
                                                                      logger=logger,
                                                                      action_name='Power On')
-
-        # Set live status - deployment done
-        if resource_fullname:
-            session.SetResourceLiveStatus(resource_fullname, "Online", "Active")
 
         return task_result
