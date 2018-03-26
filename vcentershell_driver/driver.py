@@ -33,8 +33,8 @@ class VCenterShellDriver(ResourceDriverInterface):
     def disconnect(self, context, ports, network_name):
         return self.command_orchestrator.disconnect(context, ports, network_name)
 
-    def destroy_vm_only(self, context, ports):
-        return self.command_orchestrator.destroy_vm_only(context, ports)
+    def DeleteInstance(self, context, ports):
+        return self.command_orchestrator.DeleteInstance(context, ports)
 
     def remote_refresh_ip(self, context, cancellation_context, ports):
         return self.command_orchestrator.refresh_ip(context, cancellation_context, ports)

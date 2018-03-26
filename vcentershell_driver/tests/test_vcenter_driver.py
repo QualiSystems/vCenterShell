@@ -58,13 +58,13 @@ class TestCommandOrchestrator(TestCase):
         self.assertIsNotNone(res)
         self.assertTrue(self.driver.command_orchestrator.disconnect.called_with(self.context, self.ports, network_name))
 
-    def test_destroy_vm_only(self):
+    def test_DeleteInstance(self):
         self.setUp()
 
-        res = self.driver.destroy_vm_only(self.context, self.ports)
+        res = self.driver.DeleteInstance(self.context, self.ports)
 
         self.assertIsNotNone(res)
-        self.assertTrue(self.driver.command_orchestrator.destroy_vm_only.called_with(self.context, self.ports))
+        self.assertTrue(self.driver.command_orchestrator.DeleteInstance.called_with(self.context, self.ports))
 
     def test_deploy_from_template(self):
         self.setUp()

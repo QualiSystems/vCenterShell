@@ -1,4 +1,4 @@
-from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
+from cloudshell.cp.vcenter.commands.DeleteInstance import DestroyVirtualMachineCommand
 import unittest
 from mock import Mock, create_autospec
 from pyVmomi import vim
@@ -111,7 +111,7 @@ class TestDestroyVirtualMachineCommand(unittest.TestCase):
         destroyer = DestroyVirtualMachineCommand(pv_service, resource_remover, disconnector)
 
         # act
-        res = destroyer.destroy_vm_only(si=si,
+        res = destroyer.DeleteInstance(si=si,
                                         logger=Mock(),
                                         session=session,
                                         vcenter_data_model=vcenter_data_model,

@@ -44,7 +44,7 @@ class DestroyVirtualMachineCommand(object):
         self.resource_remover.remove_resource(session=session, resource_full_name=vm_name)
         return result
 
-    def destroy_vm_only(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name):
+    def DeleteInstance(self, si, logger, session, vcenter_data_model, vm_uuid, vm_name):
         """
         :param logger:
         :param CloudShellAPISession session:
