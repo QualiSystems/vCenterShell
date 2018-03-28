@@ -14,7 +14,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
-from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
+from cloudshell.cp.vcenter.commands.DeleteInstance import DestroyVirtualMachineCommand
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
@@ -309,7 +309,7 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
-    def destroy_vm_only(self, context, ports):
+    def DeleteInstance(self, context, ports):
         """
         Destroy Vm Command, will only destroy the vm and will not remove the resource
 
@@ -320,7 +320,7 @@ class CommandOrchestrator(object):
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             context,
-            self.destroy_virtual_machine_command.destroy_vm_only,
+            self.destroy_virtual_machine_command.DeleteInstance,
             resource_details.vm_uuid,
             resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
