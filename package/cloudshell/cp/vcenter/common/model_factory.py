@@ -38,7 +38,7 @@ class ResourceModelParser:
             instance = resource_model_type()
         else:
             raise ValueError('resource_model_type must have a value')
-            #instance = ResourceModelParser.create_resource_model_instance(resource_instance)
+
         props = ResourceModelParser.get_public_properties(instance)
         for attrib in attributes:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)

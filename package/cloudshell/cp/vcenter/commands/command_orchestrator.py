@@ -1,10 +1,11 @@
 import time
-from datetime import datetime, date
+from datetime import datetime
 import jsonpickle
 
 from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
 from cloudshell.shell.core.context import ResourceRemoteCommandContext
+from cloudshell.shell.core.driver_context import CancellationContext
 
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
@@ -51,6 +52,7 @@ from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGrou
 from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.core.models import DeployApp, DeployAppResult
 
 
 class CommandOrchestrator(object):
@@ -78,7 +80,7 @@ class CommandOrchestrator(object):
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             resource_model_parser=ResourceModelParser(),
+                                             resource_model_parser=self.resource_model_parser,
                                              vm_details_provider=vm_details_provider)
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
@@ -131,7 +133,7 @@ class CommandOrchestrator(object):
 
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
-                                                   resource_model_parser=ResourceModelParser(),
+                                                   resource_model_parser=self.resource_model_parser,
                                                    ip_manager=ip_manager)
 
         # Get Vm Details command
@@ -160,102 +162,85 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def deploy_from_template(self, context, request, cancellation_context):
+    def deploy_from_template(self, context, deploy_action, cancellation_context):
         """
         Deploy From Template Command, will deploy vm from template
 
-        :param cancellation_context:
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
+        deploy_from_template_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=vCenterVMFromTemplateResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_template_model, deploy_action.actionParams.appName)
 
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'],
-                                                                              vCenterVMFromTemplateResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        return self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
             data_holder,
             cancellation_context)
 
-        return set_command_result(result=result, unpicklable=False)
-
-    def deploy_clone_from_vm(self, context, request, cancellation_context):
+    def deploy_clone_from_vm(self, context, deploy_action, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
-        :param cancellation_context:
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
+        deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=vCenterCloneVMFromVMResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_vm_model, deploy_action.actionParams.appName)
 
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'],
-                                                                              vCenterCloneVMFromVMResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        return self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
             data_holder,
             cancellation_context)
 
-        res = set_command_result(result=result, unpicklable=False)
-        return res
-
-    def deploy_from_linked_clone(self, context, request, cancellation_context):
+    def deploy_from_linked_clone(self, context, deploy_action, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
-        :param cancellation_context:
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
-
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'],
-                                                                                          VCenterDeployVMFromLinkedCloneResourceModel)
+        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=VCenterDeployVMFromLinkedCloneResourceModel)
+        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, deploy_action.actionParams.appName)
 
         if not linked_clone_from_vm_model.vcenter_vm_snapshot:
-            raise ValueError('Please insert snapshot to deploy from')
+            raise ValueError('Please insert snapshot to deploy an app from a linked clone')
 
-        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model,
-                                                data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        return self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
             data_holder,
             cancellation_context)
 
-        return set_command_result(result=result, unpicklable=False)
-
-    def deploy_from_image(self, context, request, cancellation_context):
+    def deploy_from_image(self, context, deploy_action, cancellation_context):
         """
         Deploy From Image Command, will deploy vm from ovf image
 
-        :param cancellation_context:
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
         :return str deploy results
         """
+        # todo - fix this deploy type
+        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=VCenterDeployVMFromLinkedCloneResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_image_model, deploy_action.actionParams.appName)
 
         # get command parameters from the environment
-        data = jsonpickle.decode(request)
         data['Attributes']['vCenter Name'] = context.resource.name
         deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'],
                                                                                        vCenterVMFromImageResourceModel)

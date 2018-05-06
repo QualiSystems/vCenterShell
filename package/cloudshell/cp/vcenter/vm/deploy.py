@@ -1,5 +1,6 @@
 import traceback
 
+from cloudshell.cp.core.models import DeployAppResult
 from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import \
     VCenterDeployVMFromLinkedCloneResourceModel
 from cloudshell.cp.vcenter.models.DeployResultModel import DeployResult
@@ -44,6 +45,7 @@ class VirtualMachineDeployer(object):
         :param data_holder:
         :param vcenter_data_model:
         :param str reservation_id:
+        :rtype DeployAppResult:
         :return:
         """
 
@@ -69,6 +71,7 @@ class VirtualMachineDeployer(object):
         :param logger:
         :type data_holder:
         :type vcenter_data_model:
+        :rtype DeployAppResult:
         :return:
         """
         template_resource_model = data_holder.template_resource_model
@@ -89,6 +92,7 @@ class VirtualMachineDeployer(object):
         :param logger:
         :type data_holder: DeployFromTemplateDetails
         :type vcenter_data_model
+        :rtype DeployAppResult:
         :return:
         """
         template_resource_model = data_holder.template_resource_model
@@ -104,6 +108,9 @@ class VirtualMachineDeployer(object):
     def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model, reservation_id,
                         cancellation_context,
                         snapshot=''):
+        """
+        :rtype DeployAppResult:
+        """
         # generate unique name
         vm_name = self.name_generator(app_name, reservation_id)
 
@@ -139,17 +146,11 @@ class VirtualMachineDeployer(object):
         vm_details_data = self._safely_get_vm_details(clone_vm_result.vm, vm_name, vcenter_data_model, other_params,
                                                       logger)
 
-        return DeployResult(vm_name=vm_name,
-                            vm_uuid=clone_vm_result.vm.summary.config.uuid,
-                            cloud_provider_resource_name=other_params.vcenter_name,
-                            ip_regex=other_params.ip_regex,
-                            refresh_ip_timeout=other_params.refresh_ip_timeout,
-                            auto_power_on=other_params.auto_power_on,
-                            auto_power_off=other_params.auto_power_off,
-                            wait_for_ip=other_params.wait_for_ip,
-                            auto_delete=other_params.auto_delete,
-                            autoload=other_params.autoload,
-                            vm_details_data=vm_details_data)
+        return DeployAppResult(vmName=vm_name,
+                               vmUuid=clone_vm_result.vm.summary.config.uuid,
+                               vmDetailsData=vm_details_data,
+                               deployedAppAdditionalData={'ip_regex': other_params.ip_regex,
+                                                          'refresh_ip_timeout': other_params.refresh_ip_timeout})
 
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context, reservation_id,
                           cancellation_context):

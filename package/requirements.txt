@@ -6,3 +6,4 @@ pyvmomi==6.5.0
 jsonpickle==0.9.3
 enum34==1.1.6
 retrying==1.3.3
+cloudshell-cp-core
