@@ -143,10 +143,3 @@ class VCenterShellDriver(ResourceDriverInterface):
 
     def GetVmDetails(self, context, cancellation_context, requests):
         return self.command_orchestrator.get_vm_details(context, cancellation_context, requests)
-
-    @staticmethod
-    def stop_on_debug():
-        import sys
-        while not sys.gettrace():
-            import time
-            time.sleep(0.5)
