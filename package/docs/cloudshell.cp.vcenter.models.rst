@@ -41,14 +41,6 @@ cloudshell.cp.vcenter.models.DeployFromTemplateDetails module
     :undoc-members:
     :show-inheritance:
 
-cloudshell.cp.vcenter.models.DeployResultModel module
------------------------------------------------------
-
-.. automodule:: cloudshell.cp.vcenter.models.DeployResultModel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 cloudshell.cp.vcenter.models.DriverResponse module
 --------------------------------------------------
 

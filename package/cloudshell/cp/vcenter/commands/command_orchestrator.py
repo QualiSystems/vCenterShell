@@ -176,11 +176,14 @@ class CommandOrchestrator(object):
             resource_model_type=vCenterVMFromTemplateResourceModel)
         data_holder = DeployFromTemplateDetails(deploy_from_template_model, deploy_action.actionParams.appName)
 
-        return self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
             data_holder,
             cancellation_context)
+
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
     def deploy_clone_from_vm(self, context, deploy_action, cancellation_context):
         """
@@ -196,11 +199,14 @@ class CommandOrchestrator(object):
             resource_model_type=vCenterCloneVMFromVMResourceModel)
         data_holder = DeployFromTemplateDetails(deploy_from_vm_model, deploy_action.actionParams.appName)
 
-        return self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
             data_holder,
             cancellation_context)
+
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
     def deploy_from_linked_clone(self, context, deploy_action, cancellation_context):
         """
@@ -219,11 +225,14 @@ class CommandOrchestrator(object):
         if not linked_clone_from_vm_model.vcenter_vm_snapshot:
             raise ValueError('Please insert snapshot to deploy an app from a linked clone')
 
-        return self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
             data_holder,
             cancellation_context)
+
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
     def deploy_from_image(self, context, deploy_action, cancellation_context):
         """
@@ -234,27 +243,22 @@ class CommandOrchestrator(object):
         :param DeployApp deploy_action:
         :return str deploy results
         """
-        # todo - fix this deploy type
+        deploy_action.actionParams.deployment.attributes['vCenter Name'] = context.resource.name
         deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(
             attributes=deploy_action.actionParams.deployment.attributes,
-            resource_model_type=VCenterDeployVMFromLinkedCloneResourceModel)
-        data_holder = DeployFromTemplateDetails(deploy_from_image_model, deploy_action.actionParams.appName)
-
-        # get command parameters from the environment
-        data['Attributes']['vCenter Name'] = context.resource.name
-        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'],
-                                                                                       vCenterVMFromImageResourceModel)
-        data_holder = DeployFromImageDetails(deploy_from_image_model, data['UserRequestedAppName'] or data['AppName'])
+            resource_model_type=vCenterVMFromImageResourceModel)
+        data_holder = DeployFromImageDetails(deploy_from_image_model, deploy_action.actionParams.appName)
 
         # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_image,
             data_holder,
             context.resource,
             cancellation_context)
 
-        return set_command_result(result=result, unpicklable=False)
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
     # remote command
     def disconnect_all(self, context, ports):

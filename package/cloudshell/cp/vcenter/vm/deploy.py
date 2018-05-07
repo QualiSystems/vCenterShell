@@ -3,7 +3,6 @@ import traceback
 from cloudshell.cp.core.models import DeployAppResult
 from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import \
     VCenterDeployVMFromLinkedCloneResourceModel
-from cloudshell.cp.vcenter.models.DeployResultModel import DeployResult
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.models.vCenterVMFromImageResourceModel import vCenterVMFromImageResourceModel
 from cloudshell.cp.vcenter.models.vCenterVMFromTemplateResourceModel import vCenterVMFromTemplateResourceModel
@@ -181,17 +180,15 @@ class VirtualMachineDeployer(object):
 
                 vm_details_data = self._safely_get_vm_details(vm, vm_name, vcenter_data_model, data_holder.image_params,
                                                               logger)
-                return DeployResult(vm_name=vm_name,
-                                    vm_uuid=vm.config.uuid,
-                                    cloud_provider_resource_name=data_holder.image_params.vcenter_name,
-                                    ip_regex=data_holder.image_params.ip_regex,
-                                    refresh_ip_timeout=data_holder.image_params.refresh_ip_timeout,
-                                    auto_power_on=data_holder.image_params.auto_power_on,
-                                    auto_power_off=data_holder.image_params.auto_power_off,
-                                    wait_for_ip=data_holder.image_params.wait_for_ip,
-                                    auto_delete=data_holder.image_params.auto_delete,
-                                    autoload=data_holder.image_params.autoload,
-                                    vm_details_data=vm_details_data)
+
+                additional_data = {'ip_regex': data_holder.image_params.ip_regex,
+                                   'refresh_ip_timeout': data_holder.image_params.refresh_ip_timeout}
+
+                return DeployAppResult(vmName=vm_name,
+                                       vmUuid=vm.config.uuid,
+                                       vmDetailsData=vm_details_data,
+                                       deployedAppAdditionalData=additional_data)
+
             raise Exception('the deployed vm from image({0}/{1}) could not be found'.format(vm_path, vm_name))
         raise Exception('failed deploying image')
 
@@ -205,7 +202,7 @@ class VirtualMachineDeployer(object):
                 ip_regex=deploy_model.ip_regex,
                 deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(deploy_model),
                 logger=logger)
-        except Exception as e:
+        except Exception:
             logger.error("Error getting vm details for '{0}': {1}".format(vm_name, traceback.format_exc()))
         return data
 
