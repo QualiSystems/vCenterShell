@@ -3,3 +3,4 @@ requests==2.18.4
 pyvmomi==6.5.0
 jsonpickle==0.9.3
 enum==0.4.6
+retrying==1.3.3

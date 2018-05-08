@@ -1,6 +1,5 @@
 class vCenterVMFromTemplateResourceModel(object):
     def __init__(self):
-        self.vcenter_name = ''
         self.vcenter_template = ''
         self.vm_cluster = ''
         self.vm_storage = ''

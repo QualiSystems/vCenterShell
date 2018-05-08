@@ -53,10 +53,9 @@ class TestVirtualMachineDeployer(TestCase):
             logger=Mock(),
             reservation_id=Mock(), cancellation_context=cancellation_context)
 
-        self.assertEqual(res.vm_name, self.name)
-        self.assertEqual(res.vm_uuid, self.uuid)
-        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
-        self.assertTrue(self.pv_service.CloneVmParameters.called)
+        self.assertEqual(res.vmName, self.name)
+        self.assertEqual(res.vmUuid, self.uuid)
+        self.pv_service.CloneVmParameters.assert_called()
 
     def test_clone_deployer(self):
         deploy_from_template_details = DeployFromTemplateDetails(vCenterCloneVMFromVMResourceModel(), 'VM Deployment')
@@ -74,10 +73,9 @@ class TestVirtualMachineDeployer(TestCase):
             logger=Mock(),
             reservation_id=reservation_id, cancellation_context=cancellation_context)
 
-        self.assertEqual(res.vm_name, self.name)
-        self.assertEqual(res.vm_uuid, self.uuid)
-        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
-        self.assertTrue(self.pv_service.CloneVmParameters.called)
+        self.assertEqual(res.vmName, self.name)
+        self.assertEqual(res.vmUuid, self.uuid)
+        self.pv_service.CloneVmParameters.assert_called()
 
     def test_snapshot_deployer(self):
         deploy_from_template_details = DeployFromTemplateDetails(VCenterDeployVMFromLinkedCloneResourceModel(), 'VM Deployment')
@@ -94,10 +92,9 @@ class TestVirtualMachineDeployer(TestCase):
             logger=Mock(),
             reservation_id=Mock(), cancellation_context=cancellation_context)
 
-        self.assertEqual(res.vm_name, self.name)
-        self.assertEqual(res.vm_uuid, self.uuid)
-        self.assertEqual(res.cloud_provider_resource_name, 'vcenter_resource_name')
-        self.assertTrue(self.pv_service.CloneVmParameters.called)
+        self.assertEqual(res.vmName, self.name)
+        self.assertEqual(res.vmUuid, self.uuid)
+        self.pv_service.CloneVmParameters.assert_called()
 
     def _create_vcenter_resource_context(self):
         vc = VMwarevCenterResourceModel()
@@ -129,7 +126,7 @@ class TestVirtualMachineDeployer(TestCase):
 
         self.assertRaises(Exception, self.deployer.deploy_from_template, self.si,
                           Mock(), deploy_from_template_details, vcenter_data_model, Mock(), Mock())
-        self.assertTrue(self.pv_service.CloneVmParameters.called)
+        self.pv_service.CloneVmParameters.assert_called()
 
     def test_vm_deployer_image(self):
         params = DeployDataHolder({
@@ -175,10 +172,8 @@ class TestVirtualMachineDeployer(TestCase):
                                               resource_context=resource_context,
                                               reservation_id=Mock(), cancellation_context=cancellation_context)
 
-        self.assertEqual(res.vm_name, self.name)
-        self.assertEqual(res.vm_uuid, self.uuid)
-        self.assertEqual(res.cloud_provider_resource_name,
-                         params.vcenter_name)
+        self.assertEqual(res.vmName, self.name)
+        self.assertEqual(res.vmUuid, self.uuid)
 
     def test_vm_deployer_image_no_res(self):
         self.image_deployer.deploy_image = Mock(return_value=None)
