@@ -1,5 +1,5 @@
 from cloudshell.cp.core import DriverRequestParser
-from cloudshell.cp.core.models import DeployApp, DriverResponse
+from cloudshell.cp.core.models import DeployApp, DriverResponse, SaveApp
 from cloudshell.cp.core.utils import single
 
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
@@ -70,6 +70,12 @@ class VCenterShellDriver(ResourceDriverInterface):
             return DriverResponse([deploy_result]).to_driver_response_json()
         else:
             raise Exception('Could not find the deployment')
+
+    def SaveApp(self, context, request=None, cancellation_context=None):
+        actions = self.request_parser.convert_driver_request_to_actions(request)
+        save_actions = [x for x in actions if isinstance(x, SaveApp)]
+        save_app_results = self.command_orchestrator.save_app(context, save_actions, cancellation_context)
+        return DriverResponse(save_app_results).to_driver_response_json()
 
     def deploy_from_template(self, context, deploy_action, cancellation_context):
         return self.command_orchestrator.deploy_from_template(context, deploy_action, cancellation_context)
