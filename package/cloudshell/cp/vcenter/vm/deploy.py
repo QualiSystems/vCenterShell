@@ -10,7 +10,7 @@ from cloudshell.cp.vcenter.vm.ovf_image_params import OvfImageParams
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.cloud_shell.conn_details_retriever import ResourceConnectionDetailsRetriever
-from cloudshell.cp.vcenter.vm.vm_details_provider import VmDataField
+from cloudshell.cp.core.models import  VmDetailsProperty
 
 
 class VirtualMachineDeployer(object):
@@ -238,17 +238,17 @@ class DeploymentDetailsProviderFromTemplateModel(object):
         """
         data = []
         if isinstance(self.model, vCenterCloneVMFromVMResourceModel):
-            data.append(VmDataField('Cloned VM Name', self.model.vcenter_vm))
+            data.append(VmDetailsProperty(key='Cloned VM Name', value=self.model.vcenter_vm))
 
         if isinstance(self.model, VCenterDeployVMFromLinkedCloneResourceModel):
             template = self.model.vcenter_vm
             snapshot = self.model.vcenter_vm_snapshot
-            data.append(VmDataField('Cloned VM Name', '{0} (snapshot: {1})'.format(template, snapshot)))
+            data.append(VmDetailsProperty(key='Cloned VM Name',value= '{0} (snapshot: {1})'.format(template, snapshot)))
 
         if isinstance(self.model, vCenterVMFromImageResourceModel):
-            data.append(VmDataField('Base Image Name', self.model.vcenter_image.split('/')[-1]))
+            data.append(VmDetailsProperty(key='Base Image Name', value=self.model.vcenter_image.split('/')[-1]))
 
         if isinstance(self.model, vCenterVMFromTemplateResourceModel):
-            data.append(VmDataField('Template Name', self.model.vcenter_template))
+            data.append(VmDetailsProperty(key='Template Name', value=self.model.vcenter_template))
 
         return data
