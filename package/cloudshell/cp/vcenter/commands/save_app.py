@@ -1,3 +1,5 @@
+from threading import Lock
+
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.core.models import SaveApp
@@ -5,6 +7,9 @@ from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCent
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.core.utils import convert_attributes_list_to_dict as convert_to_dict
 from contextlib import contextmanager
+from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
+from itertools import groupby
+from debug_utils import debugger
 
 
 class SaveAppCommand:
@@ -36,72 +41,133 @@ class SaveAppCommand:
         if not save_app_actions:
             raise Exception('Failed to save app, missing data in request.')
 
-        for save in save_app_actions:
-            # handle cancellation
-            # get source vm for saving app
-            app_saver = ArtifactSaver.factory(save, self.pyvmomi_service, vcenter_data_model, si, logger, self.deployer,
-                                              reservation_id, self.resource_model_parser, self.snapshot_saver)
-            app_saver.save(cancellation_context)
+        actions_grouped_by_save_types = groupby(save_app_actions, lambda x: x.actionParams.savedType)
+        artifactSaversToActions = {ArtifactSaver.factory(k,
+                                                         self.pyvmomi_service,
+                                                         vcenter_data_model,
+                                                         si,
+                                                         logger,
+                                                         self.deployer,
+                                                         reservation_id,
+                                                         self.resource_model_parser,
+                                                         self.snapshot_saver,
+                                                         self.task_waiter): list(g)
+                                   for k, g in actions_grouped_by_save_types}
+
+        for artifactSaver in artifactSaversToActions.keys():
+            save_actions = artifactSaversToActions[artifactSaver]
+            for action in save_actions:
+                artifactSaver.save(save_action=action, cancellation_context=cancellation_context)
         return
 
 
 class ArtifactSaver(object):
     @staticmethod
-    def factory(save_action, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
-                resource_model_parser, snapshot_saver):
-        if save_action.actionParams.savedType == 'linkedClone':
-            return LinkedCloneArtifactSaver(save_action, pv_service, vcenter_data_model, si, logger, deployer,
-                                            reservation_id, resource_model_parser, snapshot_saver)
+    def factory(savedType, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
+                resource_model_parser, snapshot_saver, task_waiter):
+        if savedType == 'linkedClone':
+            return LinkedCloneArtifactSaver(pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
+                                            resource_model_parser, snapshot_saver, task_waiter)
         raise Exception('Artifact save type not supported')
 
 
+# todo interface for save from base
 class LinkedCloneArtifactSaver(object):
-    def __init__(self, save_action, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
+    def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
                  resource_model_parser, snapshot_saver, task_waiter):
-        self.save_action = save_action
+        debugger.attach_debugger()
+        self.saved_apps_folder_lock = Lock()
+        self.saved_sandbox_folder_lock = Lock()
         self.pv_service = pv_service
         self.vcenter_data_model = vcenter_data_model
         self.si = si
         self.logger = logger
         self.deployer = deployer
         self.reservation_id = reservation_id
-        deploy_from_vm_model = resource_model_parser.convert_to_resource_model(
-            attributes=save_action.actionParams.appAttributes,
-            resource_model_type=vCenterCloneVMFromVMResourceModel)
-        self.data_holder = DeployFromTemplateDetails(deploy_from_vm_model, save_action.actionParams.sourceVmUuid)  # todo: change name for cloned vm!
         self.snapshot_saver = snapshot_saver
         self.task_waiter = task_waiter
-        # self.data_holder.template_resource_model.vm_location
+        self.resource_model_parser = resource_model_parser
 
-    def save(self, cancellation_context):
-        save_attributes = convert_to_dict(self.save_action.actionParams.appAttributes)
+    def save(self, save_action, cancellation_context):
+        # todo folderService (which will also handle locks)
+        # todo: make sure vm location exists when saving
+        data_holder = self.prepare_vm_data_holder(save_action)
 
-        # If the behavior during save is power off, we will power off VMs and then power on after clone
-        power_off_during_clone = save_attributes.get("Behavior during save") == "Power Off"
+        saved_sandbox_id = save_action.actionParams.savedSandboxId
 
-        with self.manage_power_during_save(self.save_action.actionParams.sourceVmUuid, power_off_during_clone):
+        self.prepare_cloned_vm_vcenter_folder_structure(data_holder, saved_sandbox_id)
+
+        self.update_cloned_vm_target_location(data_holder, saved_sandbox_id)
+
+        with self.manage_power_during_save(save_action):
             result = self.deployer.deploy_clone_from_vm(self.si,
                                                         self.logger,
-                                                        self.data_holder,
+                                                        data_holder,
                                                         self.vcenter_data_model,
                                                         self.reservation_id,
                                                         cancellation_context)
 
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
-                                          snapshot_name="artifact", save_memory=False)
-        # save_snapshot should indicate by live status that process is occurring + activity feed
+                                          snapshot_name="artifact", save_memory='Nope')
+
+    def update_cloned_vm_target_location(self, data_holder, saved_sandbox_id):
+        data_holder.template_resource_model.vm_location = self._vcenter_sandbox_folder_path(saved_sandbox_id,
+                                                                                            data_holder)
+
+    def prepare_cloned_vm_vcenter_folder_structure(self, data_holder, saved_sandbox_id):
+        saved_apps_folder = self._get_or_create_saved_apps_folder_in_vcenter(data_holder)
+        self._get_or_create_saved_sandbox_folder(saved_apps_folder, saved_sandbox_id, data_holder)
+
+    def prepare_vm_data_holder(self, save_action):
+        deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=save_action.actionParams.appAttributes,
+            resource_model_type=vCenterCloneVMFromVMResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_vm_model,
+                                                save_action.actionParams.sourceVmUuid)  # todo: change name for cloned vm!
+        return data_holder
+
+    def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
+        sandbox_path = self._vcenter_sandbox_folder_path(saved_sandbox_id, data_holder)
+        saved_sandbox_folder = self.pv_service.get_folder(self.si, sandbox_path)
+        if not saved_sandbox_folder:
+            saved_apps_folder.CreateFolder(saved_sandbox_id)
+
+    def _vcenter_sandbox_folder_path(self, saved_sandbox_id, data_holder):
+        return '/'.join([data_holder.template_resource_model.vm_location,
+                         'SavedApps',
+                         saved_sandbox_id])
+
+    def _get_or_create_saved_apps_folder_in_vcenter(self, data_holder):
+        saved_apps_path = data_holder.template_resource_model.vm_location + '/' + "SavedApps"
+        saved_apps_folder = self.pv_service.get_folder(self.si, saved_apps_path)
+        if not saved_apps_folder:
+            vm_location_path = VMLocation.combine([self.vcenter_data_model.default_datacenter,
+                                                   data_holder.template_resource_model.vm_location])
+            vm_location_folder = self.pv_service.get_folder(self.si, vm_location_path)
+            saved_apps_folder = vm_location_folder.CreateFolder("SavedApps")
+        return saved_apps_folder
 
     @contextmanager
-    def manage_power_during_save(self, vm_uuid, power_off_during_clone):
+    def manage_power_during_save(self, save_action):
+        # https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
+
+        save_attributes = save_action.actionParams.appAttributes
+        power_off_during_clone = save_attributes.get("Behavior during save") == "Power Off"
+        source_vm_uuid = save_action.actionParams.sourceVmUuid
+
         if power_off_during_clone:
-            vm = self.pv_service.find_by_uuid(self.si,vm_uuid)
+            vm = self.pv_service.find_by_uuid(self.si, source_vm_uuid)
             vm_started_as_powered_on = vm.summary.runtime.powerState == 'poweredOn'
             if vm_started_as_powered_on:
                 task = vm.PowerOff()
                 self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
+
             yield
+
             # power on vm_uuid -> if not originally powered off
             if vm_started_as_powered_on:
                 task = vm.PowerOn()
                 self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
-        yield
+
+        else:
+            yield
