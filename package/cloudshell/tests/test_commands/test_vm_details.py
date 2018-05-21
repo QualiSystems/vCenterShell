@@ -54,12 +54,6 @@ class TestVmDetailsCommand(TestCase):
         self.assertEqual(vm_details.appName, 'App1')
         self.assertEqual(vm_details.errorMessage, '')
         self.assertEqual(len(vm_details.vmInstanceData), 6)
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Cloned VM Name'), '')
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Current Snapshot'), 'Snap1')
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'CPU'), '4 vCPU')
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Memory'), '2 GB')
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Disk Size'), '20 GB')
-        # self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Guest OS'), 'Centos')
 
         self.assertEqual(len(vm_details.vmNetworkData), 1)
         nic = vm_details.vmNetworkData[0]
