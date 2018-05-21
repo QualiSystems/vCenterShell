@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from cloudshell.cp.core import DeployApp, DeployAppParams, AppResourceInfo, DeployAppDeploymentInfo, DeployAppResult
+from cloudshell.cp.core.models import DeployApp, DeployAppParams, AppResourceInfo, DeployAppDeploymentInfo, DeployAppResult
 from freezegun import freeze_time
 
 import jsonpickle

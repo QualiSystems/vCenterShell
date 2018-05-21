@@ -1,7 +1,7 @@
 import traceback
 import time
 
-from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetails, VmDataField
+from cloudshell.cp.core.models import  VmDetailsProperty,VmDetailsData
 
 
 class VmDetailsCommand(object):
@@ -13,13 +13,17 @@ class VmDetailsCommand(object):
 
     def get_vm_details(self, si, logger, resource_context, requests, cancellation_context):
         results = []
+
         for request in requests:
             if cancellation_context.is_cancelled:
                 break
+
             app_name = request.deployedAppJson.name
+
             try:
                 vm = self.pyvmomi_service.find_by_uuid(si, request.deployedAppJson.vmdetails.uid)
                 self._wait_for_vm_to_be_ready(vm, request, logger)
+
                 result = self.vm_details_provider.create(
                     vm=vm,
                     name=app_name,
@@ -27,11 +31,12 @@ class VmDetailsCommand(object):
                     ip_regex=next((p.value for p in request.deployedAppJson.vmdetails.vmCustomParams if p.name=='ip_regex'), None),
                     deployment_details_provider=DeploymentDetailsProviderFromAppJson(request.appRequestJson.deploymentService),
                     logger=logger)
+
             except Exception as e:
                 logger.error("Error getting vm details for '{0}': {1}".format(app_name, traceback.format_exc()))
-                result = VmDetails(app_name)
-                result.error = e.message
+                result = VmDetailsData(errorMessage=e.message)
 
+            result.appName = app_name
             results.append(result)
 
         return results
@@ -62,18 +67,19 @@ class DeploymentDetailsProviderFromAppJson(object):
         :rtype list[VmDataField]
         """
         data = []
+        
         if self.deployment == 'vCenter Clone VM From VM':
-            data.append(VmDataField('Cloned VM Name', self.dep_attributes.get('vCenter VM', '')))
+            data.append(VmDetailsProperty(key='Cloned VM Name',value= self.dep_attributes.get('vCenter VM','')))
 
         if self.deployment == 'VCenter Deploy VM From Linked Clone':
-            template = self.dep_attributes.get('vCenter VM', '')
-            snapshot = self.dep_attributes.get('vCenter VM Snapshot', '')
-            data.append(VmDataField('Cloned VM Name', '{0} (snapshot: {1})'.format(template, snapshot)))
+            template = self.dep_attributes.get('vCenter VM','')
+            snapshot = self.dep_attributes.get('vCenter VM Snapshot','')
+            data.append(VmDetailsProperty(key='Cloned VM Name',value= '{0} (snapshot: {1})'.format(template, snapshot)))
 
         if self.deployment == 'vCenter VM From Image':
-            data.append(VmDataField('Base Image Name', self.dep_attributes.get('vCenter Image', '').split('/')[-1]))
+            data.append(VmDetailsProperty(key='Base Image Name',value= self.dep_attributes.get('vCenter Image','').split('/')[-1]))
 
         if self.deployment == 'vCenter VM From Template':
-            data.append(VmDataField('Template Name', self.dep_attributes.get('vCenter Template', '')))
+            data.append(VmDetailsProperty(key='Template Name',value= self.dep_attributes.get('vCenter Template','')))
 
         return data
