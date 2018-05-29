@@ -4,7 +4,7 @@ from pyVmomi import vim
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
-
+from cloudshell.cp.core.models import  VmDetailsProperty,VmDetailsData,VmDetailsNetworkInterface
 
 class VmDetailsProvider(object):
     def __init__(self, pyvmomi_service, ip_manager):
@@ -13,10 +13,11 @@ class VmDetailsProvider(object):
 
     def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, logger):
         """"""
-        vm_details = VmDetails(name)
-        vm_details.vm_instance_data = self._get_vm_instance_data(vm, deployment_details_provider)
-        vm_details.vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
-        return vm_details
+
+        vm_instance_data = self._get_vm_instance_data(vm, deployment_details_provider)
+        vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
+
+        return VmDetailsData(vmInstanceData=vm_instance_data, vmNetworkData=vm_network_data)
 
     def _get_vm_instance_data(self, vm, deployment_details_provider):
         data = []
@@ -30,38 +31,41 @@ class VmDetailsProvider(object):
         if vm.snapshot:
             snapshot = self._get_snapshot_path(vm.snapshot.rootSnapshotList, vm.snapshot.currentSnapshot)
 
-        data.append(VmDataField('Current Snapshot', snapshot))
-        data.append(VmDataField('CPU', '%s vCPU' % vm.summary.config.numCpu))
-        data.append(VmDataField('Memory', self._convert_kb_to_str(memo_size_kb)))
-        data.append(VmDataField('Disk Size', self._convert_kb_to_str(disk_size_kb)))
-        data.append(VmDataField('Guest OS', vm.summary.config.guestFullName))
+        data.append(VmDetailsProperty(key='Current Snapshot',value=snapshot))
+        data.append(VmDetailsProperty(key='CPU', value='%s vCPU' % vm.summary.config.numCpu))
+        data.append(VmDetailsProperty(key='Memory', value=self._convert_kb_to_str(memo_size_kb)))
+        data.append(VmDetailsProperty(key='Disk Size', value=self._convert_kb_to_str(disk_size_kb)))
+        data.append(VmDetailsProperty(key='Guest OS', value=vm.summary.config.guestFullName))
 
         return data
 
     def _get_vm_network_data(self, vm, reserved_networks, ip_regex, logger):
-        data_list = []
+        network_interfaces = []
+
         primary_ip = self._get_primary_ip(vm, ip_regex, logger)
         net_devices = [d for d in vm.config.hardware.device if isinstance(d, vim.vm.device.VirtualEthernetCard)]
 
         for device in net_devices:
             network = VNicService.get_network_by_device(vm, device, self.pyvmomi_service, logger)
             vlan_id = self._convert_vlan_id_to_str(VNicService.get_network_vlan_id(network))
-            ip = self._get_ip_by_device(vm , device)
+            private_ip = self._get_ip_by_device(vm , device)
 
             if vlan_id and (network.name.startswith('QS_') or network.name in reserved_networks):
-                data = VmNetworkData()
-                data.interface_id = device.macAddress
-                data.is_predefined = network.name in reserved_networks
-                data.network_id = vlan_id
-                if ip:
-                    data.is_primary = primary_ip == ip
-                data.network_data.append(VmDataField('IP', ip))
-                data.network_data.append(VmDataField('MAC Address', device.macAddress))
-                data.network_data.append(VmDataField('Network Adapter', device.deviceInfo.label))
-                data.network_data.append(VmDataField('Port Group Name', network.name))
-                data_list.append(data)
+                is_primary = private_ip and primary_ip == private_ip
+                is_predefined = network.name in reserved_networks
 
-        return data_list
+                network_data =  [VmDetailsProperty(key='IP', value=private_ip),
+                                 VmDetailsProperty(key='MAC Address', value=device.macAddress),
+                                 VmDetailsProperty(key='Network Adapter', value=device.deviceInfo.label),
+                                 VmDetailsProperty(key='Port Group Name', value=network.name)]
+
+                current_interface = VmDetailsNetworkInterface(interfaceId=device.macAddress, networkId=vlan_id,
+                                                              isPrimary=is_primary,
+                                                              isPredefined= is_predefined,
+                                                              networkData=network_data, privateIpAddress=private_ip)
+                network_interfaces.append(current_interface)
+
+        return network_interfaces
 
     def _get_primary_ip(self, vm, ip_regex, logger):
         match_function = self.ip_manager.get_ip_match_function(ip_regex)
@@ -116,25 +120,3 @@ class VmDetailsProvider(object):
 
         return ''
 
-
-class VmDetails(object):
-    def __init__(self, app_name):
-        self.app_name = app_name
-        self.error = None
-        self.vm_instance_data = []  # type: list[VmDataField]
-        self.vm_network_data = []  # type: list[VmNetworkData]
-
-
-class VmNetworkData(object):
-    def __init__(self):
-        self.interface_id = None  # type: str
-        self.network_id = None  # type: str
-        self.is_primary = False  # type: bool
-        self.network_data = []  # type: list[VmDataField]
-
-
-class VmDataField(object):
-    def __init__(self, key, value, hidden=False):
-        self.key = key
-        self.value = value
-        self.hidden = hidden

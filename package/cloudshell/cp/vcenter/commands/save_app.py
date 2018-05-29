@@ -7,7 +7,6 @@ from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTem
 from cloudshell.cp.core.utils import convert_attributes_list_to_dict as convert_to_dict
 from contextlib import contextmanager
 from itertools import groupby
-from debug_utils import debugger
 
 
 class SaveAppCommand:
@@ -73,7 +72,6 @@ class ArtifactSaver(object):
 class LinkedCloneArtifactSaver(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
                  resource_model_parser, snapshot_saver, task_waiter):
-        debugger.attach_debugger()
         self.pv_service = pv_service
         self.vcenter_data_model = vcenter_data_model
         self.si = si
