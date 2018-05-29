@@ -1,4 +1,3 @@
-from threading import Lock
 
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
@@ -7,7 +6,6 @@ from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCent
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.core.utils import convert_attributes_list_to_dict as convert_to_dict
 from contextlib import contextmanager
-from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from itertools import groupby
 from debug_utils import debugger
 
@@ -76,8 +74,6 @@ class LinkedCloneArtifactSaver(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
                  resource_model_parser, snapshot_saver, task_waiter):
         debugger.attach_debugger()
-        self.saved_apps_folder_lock = Lock()
-        self.saved_sandbox_folder_lock = Lock()
         self.pv_service = pv_service
         self.vcenter_data_model = vcenter_data_model
         self.si = si
@@ -110,14 +106,6 @@ class LinkedCloneArtifactSaver(object):
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name="artifact", save_memory='Nope')
 
-    def update_cloned_vm_target_location(self, data_holder, saved_sandbox_id):
-        data_holder.template_resource_model.vm_location = self._vcenter_sandbox_folder_path(saved_sandbox_id,
-                                                                                            data_holder)
-
-    def prepare_cloned_vm_vcenter_folder_structure(self, data_holder, saved_sandbox_id):
-        saved_apps_folder = self._get_or_create_saved_apps_folder_in_vcenter(data_holder)
-        self._get_or_create_saved_sandbox_folder(saved_apps_folder, saved_sandbox_id, data_holder)
-
     def prepare_vm_data_holder(self, save_action):
         deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
             attributes=save_action.actionParams.appAttributes,
@@ -125,27 +113,6 @@ class LinkedCloneArtifactSaver(object):
         data_holder = DeployFromTemplateDetails(deploy_from_vm_model,
                                                 save_action.actionParams.sourceVmUuid)  # todo: change name for cloned vm!
         return data_holder
-
-    def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
-        sandbox_path = self._vcenter_sandbox_folder_path(saved_sandbox_id, data_holder)
-        saved_sandbox_folder = self.pv_service.get_folder(self.si, sandbox_path)
-        if not saved_sandbox_folder:
-            saved_apps_folder.CreateFolder(saved_sandbox_id)
-
-    def _vcenter_sandbox_folder_path(self, saved_sandbox_id, data_holder):
-        return '/'.join([data_holder.template_resource_model.vm_location,
-                         'SavedApps',
-                         saved_sandbox_id])
-
-    def _get_or_create_saved_apps_folder_in_vcenter(self, data_holder):
-        saved_apps_path = data_holder.template_resource_model.vm_location + '/' + "SavedApps"
-        saved_apps_folder = self.pv_service.get_folder(self.si, saved_apps_path)
-        if not saved_apps_folder:
-            vm_location_path = VMLocation.combine([self.vcenter_data_model.default_datacenter,
-                                                   data_holder.template_resource_model.vm_location])
-            vm_location_folder = self.pv_service.get_folder(self.si, vm_location_path)
-            saved_apps_folder = vm_location_folder.CreateFolder("SavedApps")
-        return saved_apps_folder
 
     @contextmanager
     def manage_power_during_save(self, save_action):
