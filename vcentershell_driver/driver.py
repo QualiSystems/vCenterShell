@@ -71,7 +71,7 @@ class VCenterShellDriver(ResourceDriverInterface):
         else:
             raise Exception('Could not find the deployment')
 
-    def SaveApp(self, context, ports, request, cancellation_context=None):
+    def SaveApp(self, context, request, cancellation_context=None):
         actions = self.request_parser.convert_driver_request_to_actions(request)
         save_actions = [x for x in actions if isinstance(x, SaveApp)]
         save_app_results = self.command_orchestrator.save_app(context, save_actions, cancellation_context)
