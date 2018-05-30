@@ -23,6 +23,7 @@ from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
 from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
 from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
+from cloudshell.cp.vcenter.commands.save_app import SaveAppCommand
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result, get_result_from_command_output
@@ -52,7 +53,7 @@ from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGrou
 from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-from cloudshell.cp.core.models import DeployApp, DeployAppResult
+from cloudshell.cp.core.models import DeployApp, DeployAppResult, SaveApp, SaveAppResult
 
 
 class CommandOrchestrator(object):
@@ -150,6 +151,12 @@ class CommandOrchestrator(object):
 
         self.snapshots_retriever = RetrieveSnapshotsCommand(pyvmomi_service=pv_service)
 
+        self.save_app_command = SaveAppCommand(pyvmomi_service=pv_service,
+                                               task_waiter=synchronous_task_waiter,
+                                               deployer=vm_deployer,
+                                               resource_model_parser=self.resource_model_parser,
+                                               snapshot_saver=self.snapshot_saver)
+
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
             context,
@@ -161,6 +168,20 @@ class CommandOrchestrator(object):
         driver_response_root = DriverResponseRoot()
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
+
+    def save_app(self, context, save_actions, cancellation_context):
+        """
+        Save App command, persists an artifact of an existing VM, from which a new vm can be restored
+        :param ResourceCommandContext context:
+        :param list[SaveApp] save_actions:
+        :param CancellationContext cancellation_context:
+        :return: list[SaveAppResult] save_app_results
+        """
+        save_app_results = self.command_wrapper.execute_command_with_connection(context,
+                                                                                self.save_app_command.save_app,
+                                                                                save_actions,
+                                                                                cancellation_context,)
+        return save_app_results
 
     def deploy_from_template(self, context, deploy_action, cancellation_context):
         """
