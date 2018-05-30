@@ -2,7 +2,7 @@ from threading import Lock
 
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
-from cloudshell.cp.core.models import SaveApp
+from cloudshell.cp.core.models import SaveApp, SaveAppResult, Artifact, CustomDataElement
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from contextlib import contextmanager
@@ -38,6 +38,8 @@ class SaveAppCommand:
         :param list[SaveApp] save_app_actions:
         :param cancellation_context:
         """
+        results = []
+
         logger.info('Save apps command starting on ' + vcenter_data_model.default_datacenter)
 
         if not save_app_actions:
@@ -59,8 +61,12 @@ class SaveAppCommand:
         for artifactSaver in artifactSaversToActions.keys():
             save_actions = artifactSaversToActions[artifactSaver]
             for action in save_actions:
-                artifactSaver.save(save_action=action, cancellation_context=cancellation_context)
-        return
+                try:
+                    results.append(artifactSaver.save(save_action=action, cancellation_context=cancellation_context))
+                except Exception as e:
+                    results.append(SaveAppResult(action.actionId, success=False, errorMessage=e.message))
+
+        return results
 
 
 class ArtifactSaver(object):
@@ -114,6 +120,9 @@ class LinkedCloneArtifactSaver(object):
 
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name="artifact", save_memory='Nope')
+
+        save_artifact = Artifact(artifactId=result.vmUuid, customData=[CustomDataElement('SnapshotName', 'artifact')])
+        return SaveAppResult(save_action.actionId, True, artifacts=[save_artifact])
 
     def update_cloned_vm_target_location(self, data_holder, saved_sandbox_id):
         data_holder.template_resource_model.vm_location = self._vcenter_sandbox_folder_path(saved_sandbox_id,
