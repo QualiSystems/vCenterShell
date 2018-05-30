@@ -9,6 +9,8 @@ from contextlib import contextmanager
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from itertools import groupby
 
+from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
+
 
 class SaveAppCommand:
     def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver):
@@ -28,6 +30,7 @@ class SaveAppCommand:
         """
         Cretaes an artifact of an app, that can later be restored
 
+        :param vcenter_data_model: VMwarevCenterResourceModel
         :param vim.ServiceInstance si: py_vmomi service instance
         :type si: vim.ServiceInstance
         :param logger: Logger
@@ -35,6 +38,7 @@ class SaveAppCommand:
         :param list[SaveApp] save_app_actions:
         :param cancellation_context:
         """
+        logger.info('Save apps command starting on ' + vcenter_data_model.default_datacenter)
 
         if not save_app_actions:
             raise Exception('Failed to save app, missing data in request.')
@@ -89,7 +93,10 @@ class LinkedCloneArtifactSaver(object):
     def save(self, save_action, cancellation_context):
         # todo folderService (which will also handle locks)
         # todo: make sure vm location exists when saving
-        data_holder = self.prepare_vm_data_holder(save_action)
+
+        self.logger.info('Saving artifact as linked clone')
+
+        data_holder = self.prepare_vm_data_holder(save_action, self.vcenter_data_model)
 
         saved_sandbox_id = save_action.actionParams.savedSandboxId
 
@@ -116,10 +123,14 @@ class LinkedCloneArtifactSaver(object):
         saved_apps_folder = self._get_or_create_saved_apps_folder_in_vcenter(data_holder)
         self._get_or_create_saved_sandbox_folder(saved_apps_folder, saved_sandbox_id, data_holder)
 
-    def prepare_vm_data_holder(self, save_action):
+    def prepare_vm_data_holder(self, save_action, vcenter_data_model):
         deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
-            attributes=save_action.actionParams.appAttributes,
+            attributes=save_action.actionParams.deploymentPathAttributes,
             resource_model_type=vCenterCloneVMFromVMResourceModel)
+
+        VCenterDetailsFactory.set_deplyment_vcenter_params(
+            vcenter_resource_model=vcenter_data_model, deploy_params=deploy_from_vm_model)
+
         data_holder = DeployFromTemplateDetails(deploy_from_vm_model,
                                                 save_action.actionParams.sourceVmUuid)  # todo: change name for cloned vm!
         return data_holder
@@ -127,33 +138,42 @@ class LinkedCloneArtifactSaver(object):
     def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
         sandbox_path = self._vcenter_sandbox_folder_path(saved_sandbox_id, data_holder)
         saved_sandbox_folder = self.pv_service.get_folder(self.si, sandbox_path)
+        self.logger.info('Checking if saved sandbox folder {0} exists under SavedApps folder in vCenter'.format(saved_sandbox_id))
         if not saved_sandbox_folder:
             saved_apps_folder.CreateFolder(saved_sandbox_id)
+            self.logger.info('Saved sandbox folder didn''t exist, was created.')
 
     def _vcenter_sandbox_folder_path(self, saved_sandbox_id, data_holder):
-        return '/'.join([data_holder.template_resource_model.vm_location,
-                         'SavedApps',
-                         saved_sandbox_id])
+        vm_location = '/'.join(data_holder.template_resource_model.vm_location.split('/')[1:])
+        return '/'.join([vm_location, 'SavedApps', saved_sandbox_id])
 
     def _get_or_create_saved_apps_folder_in_vcenter(self, data_holder):
+        self.logger.info('Checking if SavedApps folder exists in VM Location: ' + data_holder.template_resource_model.vm_location)
+
         saved_apps_path = data_holder.template_resource_model.vm_location + '/' + "SavedApps"
         saved_apps_folder = self.pv_service.get_folder(self.si, saved_apps_path)
         if not saved_apps_folder:
             vm_location_path = VMLocation.combine([self.vcenter_data_model.default_datacenter,
                                                    data_holder.template_resource_model.vm_location])
+
+            self.logger.info('SavedApps folder not found, creating saved apps in path ' + vm_location_path)
+
             vm_location_folder = self.pv_service.get_folder(self.si, vm_location_path)
             saved_apps_folder = vm_location_folder.CreateFolder("SavedApps")
+
+            self.logger.info('SavedApps folder created')
         return saved_apps_folder
 
     @contextmanager
     def manage_power_during_save(self, save_action):
         # https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
-        save_attributes = save_action.actionParams.appAttributes
+        save_attributes = save_action.actionParams.deploymentPathAttributes
         power_off_during_clone = save_attributes.get("Behavior during save") == "Power Off"
         source_vm_uuid = save_action.actionParams.sourceVmUuid
 
         if power_off_during_clone:
+            self.logger.info('Behavior during save: Power Off')
             vm = self.pv_service.find_by_uuid(self.si, source_vm_uuid)
             vm_started_as_powered_on = vm.summary.runtime.powerState == 'poweredOn'
             if vm_started_as_powered_on:
@@ -165,7 +185,7 @@ class LinkedCloneArtifactSaver(object):
             # power on vm_uuid -> if not originally powered off
             if vm_started_as_powered_on:
                 task = vm.PowerOn()
-                self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
+                self.task_waiter.wait_for_task(task, self.logger, 'Power On')
 
         else:
             yield
