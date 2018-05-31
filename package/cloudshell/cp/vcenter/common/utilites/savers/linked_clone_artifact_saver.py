@@ -93,8 +93,7 @@ class LinkedCloneArtifactSaver(object):
         saved_apps_path = data_holder.template_resource_model.vm_location + '/' + "SavedApps"
         saved_apps_folder = self.pv_service.get_folder(self.si, saved_apps_path)
         if not saved_apps_folder:
-            vm_location_path = VMLocation.combine([self.vcenter_data_model.default_datacenter,
-                                                   data_holder.template_resource_model.vm_location])
+            vm_location_path = data_holder.template_resource_model.vm_location
 
             self.logger.info('SavedApps folder not found, creating saved apps in path ' + vm_location_path)
 

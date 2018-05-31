@@ -60,6 +60,7 @@ class SaveAppCommand:
                     results.append(artifactSaver.save(save_action=action, cancellation_context=cancellation_context))
                 except Exception as e:
                     results.append(SaveAppResult(action.actionId, success=False, errorMessage=e.message))
+                    logger.exception('Save app action {0} failed'.format(action.actionId))
 
         return results
 
