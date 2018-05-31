@@ -65,8 +65,8 @@ class LinkedCloneArtifactSaver(object):
 
     def prepare_vm_data_holder(self, save_action, vcenter_data_model):
         deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
-            attributes=save_action.actionParams.deploymentPathAttributes,
-            resource_model_type=vCenterCloneVMFromVMResourceModel)
+            save_action.actionParams.deploymentPathAttributes,
+            vCenterCloneVMFromVMResourceModel)
 
         VCenterDetailsFactory.set_deplyment_vcenter_params(
             vcenter_resource_model=vcenter_data_model, deploy_params=deploy_from_vm_model)
@@ -76,7 +76,7 @@ class LinkedCloneArtifactSaver(object):
         return data_holder
 
     def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
-        sandbox_path = self._vcenter_sandbox_folder_path(saved_sandbox_id, data_holder)
+        sandbox_path = '/'.join([data_holder.template_resource_model.vm_location, 'SavedApps', saved_sandbox_id])
         saved_sandbox_folder = self.pv_service.get_folder(self.si, sandbox_path)
         self.logger.info('Checking if saved sandbox folder {0} exists under SavedApps folder in vCenter'.format(saved_sandbox_id))
         if not saved_sandbox_folder:

@@ -1,8 +1,9 @@
 from itertools import groupby
+import sys, traceback
 
 from cloudshell.cp.core.models import SaveApp, SaveAppResult
 
-from cloudshell.cp.vcenter.common.utilites.savers.artifact_saver import ArtifactSaver
+from cloudshell.cp.vcenter.common.utilites.savers.artifact_saver import ArtifactSaver, UnsupportedArtifactSaver
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
@@ -53,15 +54,47 @@ class SaveAppCommand:
                                                          self.task_waiter): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
+        self.validate_requested_save_types_supported(artifactSaversToActions,
+                                                     logger,
+                                                     results)
+
+        error_results = [r for r in results if not r.success]
+        if not error_results:
+            self.execute_save_actions_grouped_by_type(artifactSaversToActions,
+                                                      cancellation_context,
+                                                      logger,
+                                                      results)
+
+        return results
+
+    def execute_save_actions_grouped_by_type(self, artifactSaversToActions, cancellation_context, logger, results):
         for artifactSaver in artifactSaversToActions.keys():
             save_actions = artifactSaversToActions[artifactSaver]
             for action in save_actions:
                 try:
                     results.append(artifactSaver.save(save_action=action, cancellation_context=cancellation_context))
-                except Exception as e:
-                    results.append(SaveAppResult(action.actionId, success=False, errorMessage=e.message))
+                except Exception:
+                    ex_type, ex, tb = sys.exc_info()
+                    results.append(SaveAppResult(action.actionId,
+                                                 success=False,
+                                                 errorMessage=ex.message,
+                                                 infoMessage='\n'.join(traceback.format_exception(ex_type, ex, tb))))
                     logger.exception('Save app action {0} failed'.format(action.actionId))
 
-        return results
+    def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
+        unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
+                              isinstance(saver, UnsupportedArtifactSaver)]
+        if unsupported_savers:
+            error_message = "Unsupported save type was included in save app request: {0}" \
+                .format(', '.join({saver.unsupported_save_type for saver in unsupported_savers}))
+
+            logger.error(error_message)
+
+            for artifactSaver in artifactSaversToActions.keys():
+                save_actions = artifactSaversToActions[artifactSaver]
+                for action in save_actions:
+                    results.append(SaveAppResult(action.actionId,
+                                                 success=False,
+                                                 errorMessage=error_message))
 
 
