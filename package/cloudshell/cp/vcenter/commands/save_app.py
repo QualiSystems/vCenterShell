@@ -41,7 +41,7 @@ class SaveAppCommand:
         if not save_app_actions:
             raise Exception('Failed to save app, missing data in request.')
 
-        actions_grouped_by_save_types = groupby(save_app_actions, lambda x: x.actionParams.savedType)
+        actions_grouped_by_save_types = groupby(save_app_actions, lambda x: x.actionParams.saveDeploymentModel)
         artifactSaversToActions = {ArtifactSaver.factory(k,
                                                          self.pyvmomi_service,
                                                          vcenter_data_model,
@@ -68,6 +68,7 @@ class SaveAppCommand:
         return results
 
     def execute_save_actions_grouped_by_type(self, artifactSaversToActions, cancellation_context, logger, results):
+        # TODO run all saves in parallel, not grouped by savers
         for artifactSaver in artifactSaversToActions.keys():
             save_actions = artifactSaversToActions[artifactSaver]
             for action in save_actions:
@@ -85,16 +86,20 @@ class SaveAppCommand:
         unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
                               isinstance(saver, UnsupportedArtifactSaver)]
         if unsupported_savers:
-            error_message = "Unsupported save type was included in save app request: {0}" \
+            log_error_message = "Unsupported save type was included in save app request: {0}" \
                 .format(', '.join({saver.unsupported_save_type for saver in unsupported_savers}))
-
-            logger.error(error_message)
+            logger.error(log_error_message)
 
             for artifactSaver in artifactSaversToActions.keys():
+                if artifactSaver in unsupported_savers:
+                    result_error_message = 'Unsupported save type ' + artifactSaver.unsupported_save_type
+                else:
+                    result_error_message = ''
+
                 save_actions = artifactSaversToActions[artifactSaver]
                 for action in save_actions:
                     results.append(SaveAppResult(action.actionId,
                                                  success=False,
-                                                 errorMessage=error_message))
+                                                 errorMessage=result_error_message))
 
 
