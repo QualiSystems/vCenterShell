@@ -51,8 +51,8 @@ class LinkedCloneArtifactSaver(object):
 
         save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
 
-        vcenter_vm = '/'.join(data_holder.template_resource_model.vm_location, result.vmName)
-        saved_entity_attributes = {'vCenter VM': vcenter_vm,
+        vcenter_vm_path = '/'.join([data_holder.template_resource_model.vm_location, result.vmName])
+        saved_entity_attributes = {'vCenter VM': vcenter_vm_path,
                                    'vCenter VM Snapshot': self.SNAPSHOT_NAME}
 
         return SaveAppResult(save_action.actionId,

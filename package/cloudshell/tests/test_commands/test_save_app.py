@@ -15,12 +15,18 @@ class MockResourceParser(object):
 class TestSaveAppCommand(TestCase):
     def setUp(self):
         self.pyvmomi_service = Mock()
-        self.pyvmomi_service.get_vm_by_uuid = Mock()
+        vm = Mock()
+        vm.name = 'some string'
+        self.pyvmomi_service.get_vm_by_uuid = Mock(return_value=vm)
         self.save_command = SaveAppCommand(pyvmomi_service=self.pyvmomi_service,
                                            task_waiter=Mock(),
                                            deployer=Mock(),
                                            resource_model_parser=MockResourceParser(),
                                            snapshot_saver=Mock())
+        clone_result = Mock()
+        clone_result.vmName = 'whatever'
+        self.save_command.deployer.deploy_clone_from_vm = Mock(return_value=clone_result)
+
 
     def test_save_runs_successfully(self):
         # receive a save request with 2 actions, return a save response with 2 results.
@@ -59,6 +65,7 @@ class TestSaveAppCommand(TestCase):
 
         vm = Mock()
         vm.summary.runtime.powerState = 'poweredOn'
+        vm.name = 'some string'
         self.save_command.pyvmomi_service.find_by_uuid = Mock(return_value=vm)
 
         vcenter_data_model = Mock()
@@ -202,7 +209,7 @@ class TestSaveAppCommand(TestCase):
 
         # Assert
         self.assertTrue(not result[0].success)
-        self.assertTrue(result[0].errorMessage == 'Unsupported save type was included in save app request: {0}'
+        self.assertTrue(result[0].errorMessage == 'Unsupported save type {0}'
                         .format(save_action.actionParams.saveDeploymentModel))
 
     def _save_app_without_actions(self):
