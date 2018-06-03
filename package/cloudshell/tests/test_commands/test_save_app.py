@@ -14,7 +14,9 @@ class MockResourceParser(object):
 
 class TestSaveAppCommand(TestCase):
     def setUp(self):
-        self.save_command = SaveAppCommand(pyvmomi_service=Mock(),
+        self.pyvmomi_service = Mock()
+        self.pyvmomi_service.get_vm_by_uuid = Mock()
+        self.save_command = SaveAppCommand(pyvmomi_service=self.pyvmomi_service,
                                            task_waiter=Mock(),
                                            deployer=Mock(),
                                            resource_model_parser=MockResourceParser(),
@@ -186,7 +188,7 @@ class TestSaveAppCommand(TestCase):
         # an exception will be thrown
 
         save_action = self._create_arbitrary_save_app_action()
-        save_action.actionParams.savedType = 'mass quantum cloning'
+        save_action.actionParams.saveDeploymentModel = 'mass quantum cloning'
 
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
@@ -201,7 +203,7 @@ class TestSaveAppCommand(TestCase):
         # Assert
         self.assertTrue(not result[0].success)
         self.assertTrue(result[0].errorMessage == 'Unsupported save type was included in save app request: {0}'
-                        .format(save_action.actionParams.savedType))
+                        .format(save_action.actionParams.saveDeploymentModel))
 
     def _save_app_without_actions(self):
         vcenter_data_model = Mock()
@@ -217,7 +219,7 @@ class TestSaveAppCommand(TestCase):
     def _create_arbitrary_save_app_action(self):
         save_action = SaveApp()
         actionParams = SaveAppParams()
-        actionParams.savedType = 'linkedClone'
+        actionParams.saveDeploymentModel = 'VCenter Deploy VM From Linked Clone'
         actionParams.savedSandboxId = str(guid())
         actionParams.sourceVmUuid = str(guid())
         actionParams.deploymentPathAttributes = dict()

@@ -1,9 +1,8 @@
 from contextlib import contextmanager
 from threading import Lock
 
-from cloudshell.cp.core.models import Artifact, CustomDataElement, SaveAppResult
+from cloudshell.cp.core.models import Artifact, DataElement, SaveAppResult
 
-from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
@@ -28,7 +27,6 @@ class LinkedCloneArtifactSaver(object):
 
     def save(self, save_action, cancellation_context):
         # todo folderService (which will also handle locks)
-        # todo: make sure vm location exists when saving
 
         self.logger.info('Saving artifact as linked clone')
 
@@ -51,9 +49,16 @@ class LinkedCloneArtifactSaver(object):
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name=self.SNAPSHOT_NAME, save_memory='Nope')
 
-        save_artifact = Artifact(artifactId=result.vmUuid,
-                                 customData=[CustomDataElement('SnapshotName', self.SNAPSHOT_NAME)])
-        return SaveAppResult(save_action.actionId, True, artifacts=[save_artifact])
+        save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
+
+        vcenter_vm = '/'.join(data_holder.template_resource_model.vm_location, result.vmName)
+        saved_entity_attributes = {'vCenter VM': vcenter_vm,
+                                   'vCenter VM Snapshot': self.SNAPSHOT_NAME}
+
+        return SaveAppResult(save_action.actionId,
+                             True,
+                             artifacts=[save_artifact],
+                             savedEntityAttributes=saved_entity_attributes)
 
     def update_cloned_vm_target_location(self, data_holder, saved_sandbox_id):
         data_holder.template_resource_model.vm_location = self._vcenter_sandbox_folder_path(saved_sandbox_id,
@@ -71,9 +76,17 @@ class LinkedCloneArtifactSaver(object):
         VCenterDetailsFactory.set_deplyment_vcenter_params(
             vcenter_resource_model=vcenter_data_model, deploy_params=deploy_from_vm_model)
 
-        data_holder = DeployFromTemplateDetails(deploy_from_vm_model,
-                                                save_action.actionParams.sourceVmUuid)  # todo: change name for cloned vm!
+        new_vm_name = self.generate_cloned_vm_name(save_action)
+
+        data_holder = DeployFromTemplateDetails(deploy_from_vm_model, new_vm_name)
         return data_holder
+
+    def generate_cloned_vm_name(self, save_action):
+        source_vm = self.pv_service.get_vm_by_uuid(save_action.actionParams.sourceVmUuid)
+        if not source_vm:
+            raise Exception('Source VM not found!')
+        new_vm_name = ''.join(['Clone of ', source_vm.name])[0:32]
+        return new_vm_name
 
     def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
         sandbox_path = '/'.join([data_holder.template_resource_model.vm_location, 'SavedApps', saved_sandbox_id])
