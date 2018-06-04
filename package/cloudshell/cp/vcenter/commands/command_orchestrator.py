@@ -177,10 +177,9 @@ class CommandOrchestrator(object):
         :param CancellationContext cancellation_context:
         :return: list[SaveAppResult] save_app_results
         """
-        save_app_results = self.command_wrapper.execute_command_with_connection(context,
-                                                                                self.save_app_command.save_app,
-                                                                                save_actions,
-                                                                                cancellation_context,)
+        connection = self.command_wrapper.execute_command_with_connection(context, self.save_app_command.save_app,
+                                                                          save_actions, cancellation_context, )
+        save_app_results = connection
         return save_app_results
 
     def deploy_from_template(self, context, deploy_action, cancellation_context):
