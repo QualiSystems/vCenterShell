@@ -82,7 +82,7 @@ class LinkedCloneArtifactSaver(object):
         return data_holder
 
     def generate_cloned_vm_name(self, save_action):
-        source_vm = self.pv_service.get_vm_by_uuid(save_action.actionParams.sourceVmUuid)
+        source_vm = self.pv_service.get_vm_by_uuid(self.si, save_action.actionParams.sourceVmUuid)
         if not source_vm:
             raise Exception('Source VM not found!')
         new_vm_name = ''.join(['Clone of ', source_vm.name])[0:32]
