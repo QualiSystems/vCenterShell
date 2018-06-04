@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from threading import Lock
 
-from cloudshell.cp.core.models import Artifact, DataElement, SaveAppResult
+from cloudshell.cp.core.models import Artifact, SaveAppResult, Attribute
 
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
@@ -52,8 +52,8 @@ class LinkedCloneArtifactSaver(object):
         save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
 
         vcenter_vm_path = '/'.join([data_holder.template_resource_model.vm_location, result.vmName])
-        saved_entity_attributes = {'vCenter VM': vcenter_vm_path,
-                                   'vCenter VM Snapshot': self.SNAPSHOT_NAME}
+        saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
+                                   Attribute('vCenter VM Snapshot', self.SNAPSHOT_NAME)]
 
         return SaveAppResult(save_action.actionId,
                              True,
