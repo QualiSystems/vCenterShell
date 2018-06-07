@@ -54,6 +54,7 @@ from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.core.models import DeployApp, DeployAppResult, SaveApp, SaveAppResult
+from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
 
 
 class CommandOrchestrator(object):
@@ -122,6 +123,8 @@ class CommandOrchestrator(object):
             disconnector=self.virtual_switch_disconnect_command,
             resource_model_parser=self.resource_model_parser)
 
+        self.folder_manager = FolderManager(pv_service)
+
         # Destroy VM Command
         self.destroy_virtual_machine_command = \
             DestroyVirtualMachineCommand(pv_service=pv_service,
@@ -155,7 +158,8 @@ class CommandOrchestrator(object):
                                                task_waiter=synchronous_task_waiter,
                                                deployer=vm_deployer,
                                                resource_model_parser=self.resource_model_parser,
-                                               snapshot_saver=self.snapshot_saver)
+                                               snapshot_saver=self.snapshot_saver,
+                                               folder_manager=self.folder_manager)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(

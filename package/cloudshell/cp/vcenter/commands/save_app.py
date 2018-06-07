@@ -9,11 +9,12 @@ from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
 
 class SaveAppCommand:
-    def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver):
+    def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager):
         """
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
         :param task_waiter: Waits for the task to be completed
+        :param folder_manager: cloudshell.cp.vcenter.common.vcenter.folder_manager.FolderManager
         :type task_waiter:  SynchronousTaskWaiter
         """
         self.pyvmomi_service = pyvmomi_service
@@ -21,6 +22,7 @@ class SaveAppCommand:
         self.deployer = deployer
         self.resource_model_parser = resource_model_parser
         self.snapshot_saver = snapshot_saver
+        self.folder_manager = folder_manager
 
     def save_app(self, si, logger, vcenter_data_model, reservation_id, save_app_actions, cancellation_context):
         """
@@ -51,7 +53,8 @@ class SaveAppCommand:
                                                          reservation_id,
                                                          self.resource_model_parser,
                                                          self.snapshot_saver,
-                                                         self.task_waiter): list(g)
+                                                         self.task_waiter,
+                                                         self.folder_manager): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,
