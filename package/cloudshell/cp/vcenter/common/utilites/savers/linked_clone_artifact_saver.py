@@ -7,11 +7,13 @@ from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTem
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
 
+SAVED_APPS = "SavedApps"
+
 
 # todo interface for save from base
 class LinkedCloneArtifactSaver(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
-                 resource_model_parser, snapshot_saver, task_waiter):
+                 resource_model_parser, snapshot_saver, task_waiter, folder_manager):
         self.SNAPSHOT_NAME = 'artifact'
         self.saved_apps_folder_lock = Lock()
         self.saved_sandbox_folder_lock = Lock()
@@ -24,6 +26,7 @@ class LinkedCloneArtifactSaver(object):
         self.snapshot_saver = snapshot_saver
         self.task_waiter = task_waiter
         self.resource_model_parser = resource_model_parser
+        self.folder_manager = folder_manager
 
     def save(self, save_action, cancellation_context):
         # todo folderService (which will also handle locks)
@@ -65,8 +68,8 @@ class LinkedCloneArtifactSaver(object):
                                                                                             data_holder)
 
     def prepare_cloned_vm_vcenter_folder_structure(self, data_holder, saved_sandbox_id):
-        saved_apps_folder = self._get_or_create_saved_apps_folder_in_vcenter(data_holder)
-        self._get_or_create_saved_sandbox_folder(saved_apps_folder, saved_sandbox_id, data_holder)
+        self._get_or_create_saved_apps_folder_in_vcenter(data_holder)
+        self._get_or_create_saved_sandbox_folder(saved_sandbox_id, data_holder)
 
     def prepare_vm_data_holder(self, save_action, vcenter_data_model):
         deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
@@ -88,33 +91,17 @@ class LinkedCloneArtifactSaver(object):
         new_vm_name = ''.join(['Clone of ', source_vm.name])[0:32]
         return new_vm_name
 
-    def _get_or_create_saved_sandbox_folder(self, saved_apps_folder, saved_sandbox_id, data_holder):
-        sandbox_path = '/'.join([data_holder.template_resource_model.vm_location, 'SavedApps', saved_sandbox_id])
-        saved_sandbox_folder = self.pv_service.get_folder(self.si, sandbox_path)
-        self.logger.info('Checking if saved sandbox folder {0} exists under SavedApps folder in vCenter'.format(saved_sandbox_id))
-        if not saved_sandbox_folder:
-            saved_apps_folder.CreateFolder(saved_sandbox_id)
-            self.logger.info('Saved sandbox folder didn''t exist, was created.')
+    def _get_or_create_saved_sandbox_folder(self, saved_sandbox_id, data_holder):
+        saved_apps_folder_path = '/'.join([data_holder.template_resource_model.vm_location, 'SavedApps'])
+        self.folder_manager.get_or_create_vcenter_folder(self.si, self.logger, saved_apps_folder_path, saved_sandbox_id)
 
     def _vcenter_sandbox_folder_path(self, saved_sandbox_id, data_holder):
         vm_location = '/'.join(data_holder.template_resource_model.vm_location.split('/')[1:])
         return '/'.join([vm_location, 'SavedApps', saved_sandbox_id])
 
     def _get_or_create_saved_apps_folder_in_vcenter(self, data_holder):
-        self.logger.info('Checking if SavedApps folder exists in VM Location: ' + data_holder.template_resource_model.vm_location)
-
-        saved_apps_path = data_holder.template_resource_model.vm_location + '/' + "SavedApps"
-        saved_apps_folder = self.pv_service.get_folder(self.si, saved_apps_path)
-        if not saved_apps_folder:
-            vm_location_path = data_holder.template_resource_model.vm_location
-
-            self.logger.info('SavedApps folder not found, creating saved apps in path ' + vm_location_path)
-
-            vm_location_folder = self.pv_service.get_folder(self.si, vm_location_path)
-            saved_apps_folder = vm_location_folder.CreateFolder("SavedApps")
-
-            self.logger.info('SavedApps folder created')
-        return saved_apps_folder
+        root_path = data_holder.template_resource_model.vm_location
+        return self.folder_manager.get_or_create_vcenter_folder(self.si, self.logger, root_path, SAVED_APPS)
 
     @contextmanager
     def manage_power_during_save(self, save_action):

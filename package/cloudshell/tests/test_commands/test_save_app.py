@@ -5,6 +5,8 @@ from uuid import uuid4 as guid
 from cloudshell.cp.vcenter.commands.save_app import SaveAppCommand
 from cloudshell.cp.core.models import SaveApp, SaveAppParams
 
+from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
+
 
 class MockResourceParser(object):
     @staticmethod
@@ -17,12 +19,14 @@ class TestSaveAppCommand(TestCase):
         self.pyvmomi_service = Mock()
         vm = Mock()
         vm.name = 'some string'
+        folder_manager = FolderManager(self.pyvmomi_service)
         self.pyvmomi_service.get_vm_by_uuid = Mock(return_value=vm)
         self.save_command = SaveAppCommand(pyvmomi_service=self.pyvmomi_service,
                                            task_waiter=Mock(),
                                            deployer=Mock(),
                                            resource_model_parser=MockResourceParser(),
-                                           snapshot_saver=Mock())
+                                           snapshot_saver=Mock(),
+                                           folder_manager=folder_manager)
         clone_result = Mock()
         clone_result.vmName = 'whatever'
         self.save_command.deployer.deploy_clone_from_vm = Mock(return_value=clone_result)
@@ -100,14 +104,9 @@ class TestSaveAppCommand(TestCase):
 
         vm_location_folder = Mock()
 
-        def cant_find_saved_apps_folder(si, path):
-            if path == vcenter_data_model.default_datacenter + '/' \
-                    + vcenter_data_model.vm_location + '/'\
-                    + 'SavedApps':
-                return None
-            return vm_location_folder
-
-        self.save_command.pyvmomi_service.get_folder = Mock(side_effect=cant_find_saved_apps_folder)
+        self.save_command.pyvmomi_service.get_folder = Mock(side_effect=[vm_location_folder, None, None,
+                                                                         vm_location_folder, vm_location_folder,
+                                                                         vm_location_folder])
 
         result = self.save_command.save_app(si=Mock(),
                                             logger=Mock(),
