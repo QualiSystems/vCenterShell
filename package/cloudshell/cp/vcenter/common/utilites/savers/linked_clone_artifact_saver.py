@@ -93,7 +93,7 @@ class LinkedCloneArtifactSaver(object):
 
     def _get_or_create_saved_sandbox_folder(self, saved_sandbox_id, data_holder):
         saved_apps_folder_path = '/'.join([data_holder.template_resource_model.vm_location, 'SavedApps'])
-        self.folder_manager.get_or_create_vcenter_folder(self.si,self.logger, saved_apps_folder_path, saved_sandbox_id)
+        self.folder_manager.get_or_create_vcenter_folder(self.si, self.logger, saved_apps_folder_path, saved_sandbox_id)
 
     def _vcenter_sandbox_folder_path(self, saved_sandbox_id, data_holder):
         vm_location = '/'.join(data_holder.template_resource_model.vm_location.split('/')[1:])
