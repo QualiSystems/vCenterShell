@@ -7,6 +7,9 @@ from cloudshell.cp.vcenter.common.utilites.savers.artifact_saver import Artifact
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
+import os
+from multiprocessing.pool import ThreadPool
+
 
 class SaveAppCommand:
     def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager):
@@ -23,6 +26,8 @@ class SaveAppCommand:
         self.resource_model_parser = resource_model_parser
         self.snapshot_saver = snapshot_saver
         self.folder_manager = folder_manager
+        SAVE_APPS_THREAD_POOL_SIZE = int(os.getenv('SaveAppsThreadPoolSize', 10))
+        self._pool = ThreadPool(SAVE_APPS_THREAD_POOL_SIZE)
 
     def save_app(self, si, logger, vcenter_data_model, reservation_id, save_app_actions, cancellation_context):
         """
@@ -63,27 +68,45 @@ class SaveAppCommand:
 
         error_results = [r for r in results if not r.success]
         if not error_results:
-            self.execute_save_actions_grouped_by_type(artifactSaversToActions,
-                                                      cancellation_context,
-                                                      logger,
-                                                      results)
+            self._execute_save_actions_using_pool(artifactSaversToActions,
+                                                  cancellation_context,
+                                                  logger,
+                                                  results)
 
         return results
 
-    def execute_save_actions_grouped_by_type(self, artifactSaversToActions, cancellation_context, logger, results):
-        # TODO run all saves in parallel, not grouped by savers
+    def _execute_save_actions_grouped_by_type(self, artifactSaversToActions, cancellation_context, logger, results):
         for artifactSaver in artifactSaversToActions.keys():
             save_actions = artifactSaversToActions[artifactSaver]
             for action in save_actions:
-                try:
-                    results.append(artifactSaver.save(save_action=action, cancellation_context=cancellation_context))
-                except Exception:
-                    ex_type, ex, tb = sys.exc_info()
-                    results.append(SaveAppResult(action.actionId,
-                                                 success=False,
-                                                 errorMessage=ex.message,
-                                                 infoMessage='\n'.join(traceback.format_exception(ex_type, ex, tb))))
-                    logger.exception('Save app action {0} failed'.format(action.actionId))
+                results.append(self._save((artifactSaver, action, cancellation_context, logger)))
+
+    def _execute_save_actions_using_pool(self, artifactSaversToActions, cancellation_context, logger, results):
+        save_params = []
+
+        for artifactSaver in artifactSaversToActions.keys():
+            save_params.extend(self._get_save_params(artifactSaver,
+                                                     artifactSaversToActions,
+                                                     cancellation_context,
+                                                     logger))
+
+        results.extend(self._pool.map(self._save, save_params))
+
+        return results
+
+    def _get_save_params(self, artifactSaver, artifactSaversToActions, cancellation_context, logger):
+        return [(artifactSaver, a, cancellation_context, logger) for a in artifactSaversToActions[artifactSaver]]
+
+    def _save(self, (artifactSaver, action, cancellation_context, logger)):
+        try:
+            return artifactSaver.save(save_action=action, cancellation_context=cancellation_context)
+        except Exception:
+            ex_type, ex, tb = sys.exc_info()
+            logger.exception('Save app action {0} failed'.format(action.actionId))
+            return SaveAppResult(action.actionId,
+                                 success=False,
+                                 errorMessage=ex.message,
+                                 infoMessage='\n'.join(traceback.format_exception(ex_type, ex, tb)))
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
         unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
@@ -106,3 +129,11 @@ class SaveAppCommand:
                                                  errorMessage=result_error_message))
 
 
+def _get_async_results(async_results, thread_pool):
+    thread_pool.close()
+    thread_pool.join()
+    results = []
+    for async_result in async_results:
+        save_result = async_result.get()
+        results.append(save_result)
+    return results
