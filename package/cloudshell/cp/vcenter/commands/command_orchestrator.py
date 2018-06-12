@@ -204,7 +204,8 @@ class CommandOrchestrator(object):
             context,
             self.deploy_command.execute_deploy_from_template,
             data_holder,
-            cancellation_context)
+            cancellation_context,
+            self.folder_manager)
 
         deploy_result_action.actionId = deploy_action.actionId
         return deploy_result_action
@@ -227,7 +228,8 @@ class CommandOrchestrator(object):
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
             data_holder,
-            cancellation_context)
+            cancellation_context,
+            self.folder_manager)
 
         deploy_result_action.actionId = deploy_action.actionId
         return deploy_result_action
@@ -253,7 +255,8 @@ class CommandOrchestrator(object):
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
             data_holder,
-            cancellation_context)
+            cancellation_context,
+            self.folder_manager)
 
         deploy_result_action.actionId = deploy_action.actionId
         return deploy_result_action
@@ -279,7 +282,8 @@ class CommandOrchestrator(object):
             self.deploy_command.execute_deploy_from_image,
             data_holder,
             context.resource,
-            cancellation_context)
+            cancellation_context,
+            self.folder_manager)
 
         deploy_result_action.actionId = deploy_action.actionId
         return deploy_result_action
