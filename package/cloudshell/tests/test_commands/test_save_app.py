@@ -6,6 +6,7 @@ from cloudshell.cp.vcenter.commands.save_app import SaveAppCommand
 from cloudshell.cp.core.models import SaveApp, SaveAppParams
 
 from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
+from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 
 
 class MockResourceParser(object):
@@ -30,7 +31,6 @@ class TestSaveAppCommand(TestCase):
         clone_result = Mock()
         clone_result.vmName = 'whatever'
         self.save_command.deployer.deploy_clone_from_vm = Mock(return_value=clone_result)
-
 
     def test_save_runs_successfully(self):
         # receive a save request with 2 actions, return a save response with 2 results.
@@ -59,6 +59,58 @@ class TestSaveAppCommand(TestCase):
         self.assertTrue(result[1].actionId == save_action2.actionId)
         self.assertTrue(result[1].success)
 
+    def test_nonempty_saved_sandbox_storage_replaces_default_storage(self):
+        # receive a save request with 2 actions, return a save response with 2 results.
+        # baseline test
+        save_action1 = self._create_arbitrary_save_app_action()
+
+        # path to save apps folder and saved sandbox folder uses default datacenter and vm location
+        vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB Cluster'
+        vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.saved_sandbox_storage = 'sandbox_storage'
+        vcenter_data_model.vm_storage = 'default_storage'
+
+        self.save_command.save_app(si=Mock(),
+                                   logger=Mock(),
+                                   vcenter_data_model=vcenter_data_model,
+                                   reservation_id='abc',
+                                   save_app_actions=[save_action1],
+                                   cancellation_context=None)
+
+        # Assert
+        deploy_method_mock = self.save_command.deployer.deploy_clone_from_vm
+        args = deploy_method_mock.call_args_list[0][0]  # [0] = get first call of method [0] = get *args
+        data_holder = next(a for a in args if isinstance(a, DeployFromTemplateDetails))
+
+        self.assertTrue(data_holder.template_resource_model.vm_storage == vcenter_data_model.saved_sandbox_storage)
+
+    def test_empty_saved_sandbox_storage_does_not_replace_default_storage(self):
+        # receive a save request with 2 actions, return a save response with 2 results.
+        # baseline test
+        save_action1 = self._create_arbitrary_save_app_action()
+
+        # path to save apps folder and saved sandbox folder uses default datacenter and vm location
+        vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB Cluster'
+        vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.saved_sandbox_storage = ''
+        vcenter_data_model.vm_storage = 'default_storage'
+
+        self.save_command.save_app(si=Mock(),
+                                   logger=Mock(),
+                                   vcenter_data_model=vcenter_data_model,
+                                   reservation_id='abc',
+                                   save_app_actions=[save_action1],
+                                   cancellation_context=None)
+
+        # Assert
+        deploy_method_mock = self.save_command.deployer.deploy_clone_from_vm
+        args = deploy_method_mock.call_args_list[0][0]  # [0] = get first call of method [0] = get *args
+        data_holder = next(a for a in args if isinstance(a, DeployFromTemplateDetails))
+
+        self.assertTrue(data_holder.template_resource_model.vm_storage == vcenter_data_model.vm_storage)
+
     def test_behavior_during_save_configured_as_power_off(self):
         # if user configured the save app action behavior during clone as power off
         # the vm, assuming it was powered on when save started
@@ -75,6 +127,36 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+        result = self.save_command.save_app(si=Mock(),
+                                            logger=Mock(),
+                                            vcenter_data_model=vcenter_data_model,
+                                            reservation_id='abc',
+                                            save_app_actions=[save_action],
+                                            cancellation_context=None)
+
+        # Assert
+        self.assertTrue(result[0].type == 'SaveApp')
+        self.assertTrue(result[0].success)
+
+        self.assertTrue(vm.PowerOff.called)
+        self.assertTrue(vm.PowerOff.called)
+
+    def test_behavior_during_save_configured_as_power_off_on_vcenter_model_empty_on_deployment_option(self):
+        # if behavior during save is empty on deployment, default to vcenter model
+
+        vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB Cluster'
+        vcenter_data_model.vm_location = 'QualiFolder'
+
+        save_action = self._create_arbitrary_save_app_action()
+        save_action.actionParams.deploymentPathAttributes['Behavior during save'] = ''
+        vcenter_data_model.behavior_during_save = 'Power Off'
+
+        vm = Mock()
+        vm.summary.runtime.powerState = 'poweredOn'
+        vm.name = 'some string'
+        self.save_command.pyvmomi_service.find_by_uuid = Mock(return_value=vm)
+
         result = self.save_command.save_app(si=Mock(),
                                             logger=Mock(),
                                             vcenter_data_model=vcenter_data_model,

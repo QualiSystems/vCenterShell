@@ -7,6 +7,7 @@ from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTem
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
 from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFactory
 
+
 SAVED_APPS = "SavedApps"
 
 
@@ -29,8 +30,6 @@ class LinkedCloneArtifactSaver(object):
         self.folder_manager = folder_manager
 
     def save(self, save_action, cancellation_context):
-        # todo folderService (which will also handle locks)
-
         self.logger.info('Saving artifact as linked clone')
 
         data_holder = self.prepare_vm_data_holder(save_action, self.vcenter_data_model)
@@ -40,6 +39,9 @@ class LinkedCloneArtifactSaver(object):
         self.prepare_cloned_vm_vcenter_folder_structure(data_holder, saved_sandbox_id)
 
         self.update_cloned_vm_target_location(data_holder, saved_sandbox_id)
+
+        if self.vcenter_data_model.saved_sandbox_storage:
+            data_holder.template_resource_model.vm_storage = self.vcenter_data_model.saved_sandbox_storage
 
         with self.manage_power_during_save(save_action):
             result = self.deployer.deploy_clone_from_vm(self.si,
@@ -107,8 +109,8 @@ class LinkedCloneArtifactSaver(object):
     def manage_power_during_save(self, save_action):
         # https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
 
-        save_attributes = save_action.actionParams.deploymentPathAttributes
-        power_off_during_clone = save_attributes.get("Behavior during save") == "Power Off"
+        power_off_during_clone = self.should_vm_be_powered_off_during_clone(save_action)
+
         source_vm_uuid = save_action.actionParams.sourceVmUuid
 
         if power_off_during_clone:
@@ -128,3 +130,10 @@ class LinkedCloneArtifactSaver(object):
 
         else:
             yield
+
+    def should_vm_be_powered_off_during_clone(self, save_action):
+        save_attributes = save_action.actionParams.deploymentPathAttributes
+        behavior_during_save = save_attributes.get(
+            "Behavior during save") or self.vcenter_data_model.behavior_during_save
+        power_off_during_clone = behavior_during_save == "Power Off"
+        return power_off_during_clone
