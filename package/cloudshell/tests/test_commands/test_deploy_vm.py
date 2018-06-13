@@ -34,6 +34,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         resource_context = Mock()
         logger = Mock()
         vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB'
+        vcenter_data_model.vm_location = 'TargetFolder'
         reservation_id = Mock()
         cancellation_context = object()
 
@@ -44,7 +46,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                 deployment_params=deploy_params,
                 vcenter_data_model=vcenter_data_model,
                 reservation_id=reservation_id,
-                cancellation_context=cancellation_context)
+                cancellation_context=cancellation_context,
+                folder_manager=Mock())
 
         # assert
         self.assertTrue(result)
@@ -55,11 +58,14 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         deployer = Mock()
         si = Mock()
         deployment_params = Mock()
+        deployment_params.template_resource_model.vm_location = 'SomeFolder'
+
         connectivity = Mock()
         res = Mock()
         deployer.deploy_from_image = Mock(return_value=res)
         session = Mock()
         vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB'
         logger = Mock()
         reservation_id = Mock()
 
@@ -67,6 +73,7 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         cancellation_context = object()
 
         # act
+        folder_manager = Mock()
         result = deploy_command.execute_deploy_from_image(si=si,
                                                           logger=logger,
                                                           session=session,
@@ -74,7 +81,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                                                           deployment_params=deployment_params,
                                                           resource_context=connectivity,
                                                           reservation_id=reservation_id,
-                                                          cancellation_context=cancellation_context)
+                                                          cancellation_context=cancellation_context,
+                                                          folder_manager=folder_manager)
 
         # assert
         self.assertTrue(result)
@@ -104,7 +112,10 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
 
         reservation_id = Mock()
         logger = Mock()
+
         vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB'
+        vcenter_data_model.vm_location = 'TargetFolder'
 
         template_resource_model = vCenterVMFromTemplateResourceModel()
 
@@ -122,7 +133,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                 vcenter_data_model=vcenter_data_model,
                 deployment_params=deploy_params,
                 reservation_id=reservation_id,
-                cancellation_context=cancellation_context)
+                cancellation_context=cancellation_context,
+                folder_manager=Mock())
 
         # assert
         self.assertTrue(result)
@@ -153,6 +165,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
         resource_context = Mock()
         logger = Mock()
         vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB'
+        vcenter_data_model.vm_location = 'TargetFolder'
         reservation_id = Mock()
         cancellation_context = object()
 
@@ -163,7 +177,8 @@ class TestDeployFromTemplateCommand(unittest.TestCase):
                 deployment_params=deploy_params,
                 vcenter_data_model=vcenter_data_model,
                 reservation_id=reservation_id,
-                cancellation_context=cancellation_context)
+                cancellation_context=cancellation_context,
+                folder_manager=Mock())
 
         # assert
         self.assertTrue(result)

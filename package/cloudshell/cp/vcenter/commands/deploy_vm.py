@@ -1,4 +1,6 @@
-﻿from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+﻿from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
+from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from os.path import normpath
 
 
 class DeployCommand(object):
@@ -11,7 +13,7 @@ class DeployCommand(object):
         """
         self.deployer = deployer
 
-    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
+    def execute_deploy_from_linked_clone(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context, folder_manager):
         """
         Calls the deployer to deploy vm from snapshot
         :param cancellation_context:
@@ -22,11 +24,13 @@ class DeployCommand(object):
         :param vcenter_data_model:
         :return:
         """
+        self._prepare_deployed_apps_folder(deployment_params, si, logger, folder_manager, vcenter_data_model)
+
         deploy_result = self.deployer.deploy_from_linked_clone(si, logger, deployment_params, vcenter_data_model,
                                                                reservation_id, cancellation_context)
         return deploy_result
 
-    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
+    def execute_deploy_clone_from_vm(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context, folder_manager):
         """
         Calls the deployer to deploy vm from another vm
         :param cancellation_context:
@@ -37,11 +41,25 @@ class DeployCommand(object):
         :param vcenter_data_model:
         :return:
         """
+        self._prepare_deployed_apps_folder(deployment_params, si, logger, folder_manager, vcenter_data_model)
         deploy_result = self.deployer.deploy_clone_from_vm(si, logger, deployment_params, vcenter_data_model,
                                                            reservation_id, cancellation_context)
         return deploy_result
 
-    def execute_deploy_from_template(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context):
+    def _prepare_deployed_apps_folder(self, data_holder, si, logger, folder_manager, vcenter_resource_model):
+        vm_location = data_holder.template_resource_model.vm_location or vcenter_resource_model.vm_location
+
+        folder_path = VMLocation.combine([vcenter_resource_model.default_datacenter, vm_location])
+
+        folder_manager.get_or_create_vcenter_folder(si,
+                                                    logger,
+                                                    folder_path,
+                                                    'DeployedApps')
+
+        data_holder.template_resource_model.vm_location = VMLocation.combine([vm_location, 'DeployedApps'])
+        logger.info('VM will be deployed to {0}'.format(data_holder.template_resource_model.vm_location))
+
+    def execute_deploy_from_template(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context, folder_manager):
         """
 
         :param str reservation_id:
@@ -51,12 +69,14 @@ class DeployCommand(object):
         :param vcenter_data_model:
         :return:
         """
+        self._prepare_deployed_apps_folder(deployment_params, si, logger, folder_manager, vcenter_data_model)
+
         deploy_result = self.deployer.deploy_from_template(si, logger, deployment_params, vcenter_data_model,
                                                            reservation_id, cancellation_context)
         return deploy_result
 
     def execute_deploy_from_image(self, si, logger, session, vcenter_data_model, reservation_id, deployment_params,
-                                  resource_context, cancellation_context):
+                                  resource_context, cancellation_context, folder_manager):
         """
 
         :param cancellation_context:
@@ -69,6 +89,8 @@ class DeployCommand(object):
         :param resource_context:
         :return:
         """
+        self._prepare_deployed_apps_folder(deployment_params, si, logger, folder_manager, vcenter_data_model)
+
         deploy_result = self.deployer.deploy_from_image(si=si,
                                                         logger=logger,
                                                         session=session,
