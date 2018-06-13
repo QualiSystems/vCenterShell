@@ -42,7 +42,8 @@ class TestCommandOrchestrator(TestCase):
                                                                  "Autoload": "True",
                                                                  "VCenter VM": "sds",
                                                                  "VCenter VM Snapshot": "sds",
-                                                                 "VCenter Template": "dsds" }
+                                                                 "VCenter Template": "dsds",
+                                                                 "Behavior during save": "Powered Off"}
 
         self.resource = create_autospec(ResourceInfo)
         self.resource.name = 'Cloud1'
