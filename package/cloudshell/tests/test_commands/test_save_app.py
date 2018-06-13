@@ -173,10 +173,10 @@ class TestSaveAppCommand(TestCase):
 
     def test_create_saved_apps_folder_if_not_found_in_vcenter(self):
         # vcenter folder under the vm location, will be created when it doesnt exist.
-        # a typical scheme would be QualiSB\Qualifolder\SavedApps
+        # a typical scheme would be QualiSB\Qualifolder\Saved Sandboxes
         # where QualiSB is datacenter, QualiFolder is vm location,
-        # and SavedApps is the folder under which apps will be saved
-        # (under SavedApps there is a folder for each sandbox)
+        # and Saved Sandboxes is the folder under which apps will be saved
+        # (under Saved Sandboxes there is a folder for each sandbox)
 
         save_action = self._create_arbitrary_save_app_action()
 
@@ -201,8 +201,8 @@ class TestSaveAppCommand(TestCase):
         self.assertTrue(result[0].type == 'SaveApp')
         self.assertTrue(result[0].success)
 
-        # SavedApps folder was created
-        vm_location_folder.CreateFolder.assert_called_with('SavedApps')
+        # Saved Sandboxes folder was created
+        vm_location_folder.CreateFolder.assert_called_with('Saved Sandboxes')
 
     def test_create_saved_sandbox_folder_if_not_found_in_vcenter(self):
         # show the sandbox folder under saved apps folder is created when doesnt exist
@@ -217,7 +217,7 @@ class TestSaveAppCommand(TestCase):
         def cant_find_saved_apps_folder(si, path):
             if path == vcenter_data_model.default_datacenter + '/' \
                     + vcenter_data_model.vm_location + '/'\
-                    + 'SavedApps' '/'\
+                    + 'Saved Sandboxes' '/'\
                     + save_action.actionParams.savedSandboxId:
                 return None
             return saved_apps_folder

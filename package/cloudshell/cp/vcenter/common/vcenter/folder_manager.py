@@ -3,10 +3,34 @@ from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 
 
 class FolderManager(object):
-    def __init__(self, pv_service):
+    def __init__(self, pv_service, task_waiter):
         self.pv_service = pv_service
         self.locks = dict()
         self.locks_lock = Lock()
+        self.task_waiter = task_waiter
+
+    def delete_folder(self, si, logger, folder_full_path):
+        logger.info('Trying to remove {0} and all child folders and vms'.format(folder_full_path))
+        folder = self.pv_service.get_folder(si, folder_full_path)
+
+        if not folder:
+            logger.info('Could not find {0}, maybe it was already removed?'.format(folder_full_path))
+
+        vms, _ = self.pv_service.get_folder_contents(folder, True)
+
+        for vm in vms:
+            self.pv_service.power_off_before_destroy(logger, vm)
+
+        if folder_full_path not in self.locks.keys():
+            with self.locks_lock:
+                if folder_full_path not in self.locks.keys():
+                    self.locks[folder_full_path] = Lock()
+
+        with self.locks[folder_full_path]:
+            task = folder.Destroy_Task()
+            result = self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy Folder")
+
+        logger.info('Remove result for {0} and all child folders and vms\n{1}'.format(folder_full_path, result))
 
     def get_or_create_vcenter_folder(self, si, logger, path, folder_name):
         logger.info('Getting or creating {0} in {1}'.format(folder_name, path))

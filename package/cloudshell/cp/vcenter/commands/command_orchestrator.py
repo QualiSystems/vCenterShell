@@ -123,7 +123,8 @@ class CommandOrchestrator(object):
             disconnector=self.virtual_switch_disconnect_command,
             resource_model_parser=self.resource_model_parser)
 
-        self.folder_manager = FolderManager(pv_service)
+        self.folder_manager = FolderManager(pv_service=pv_service,
+                                            task_waiter=synchronous_task_waiter)
 
         # Destroy VM Command
         self.destroy_virtual_machine_command = \

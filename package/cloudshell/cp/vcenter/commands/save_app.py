@@ -1,3 +1,4 @@
+import copy
 from itertools import groupby
 import sys, traceback
 
@@ -75,27 +76,36 @@ class SaveAppCommand:
 
         return results
 
-    def _execute_save_actions_grouped_by_type(self, artifactSaversToActions, cancellation_context, logger, results):
-        for artifactSaver in artifactSaversToActions.keys():
-            save_actions = artifactSaversToActions[artifactSaver]
-            for action in save_actions:
-                results.append(self._save((artifactSaver, action, cancellation_context, logger)))
-
     def _execute_save_actions_using_pool(self, artifactSaversToActions, cancellation_context, logger, results):
         save_params = []
+        destroy_params = []
 
         for artifactSaver in artifactSaversToActions.keys():
             save_params.extend(self._get_save_params(artifactSaver,
                                                      artifactSaversToActions,
                                                      cancellation_context,
                                                      logger))
+            destroy_params.extend(self._get_destroy_params(artifactSaver, artifactSaversToActions))
+
+        if cancellation_context.is_cancelled:
+            raise Exception('Save sandbox was cancelled')
+
+        results_before_deploy = copy.deepcopy(results)
 
         results.extend(self._pool.map(self._save, save_params))
+
+        if cancellation_context.is_cancelled:
+            results = results_before_deploy
+            for param in destroy_params:
+                results.append(self._destroy(param))
 
         return results
 
     def _get_save_params(self, artifactSaver, artifactSaversToActions, cancellation_context, logger):
         return [(artifactSaver, a, cancellation_context, logger) for a in artifactSaversToActions[artifactSaver]]
+
+    def _get_destroy_params(self, artifactSaver, artifactSaversToActions):
+        return [(artifactSaver, a) for a in artifactSaversToActions[artifactSaver]]
 
     def _save(self, (artifactSaver, action, cancellation_context, logger)):
         try:
@@ -107,6 +117,13 @@ class SaveAppCommand:
                                  success=False,
                                  errorMessage=ex.message,
                                  infoMessage='\n'.join(traceback.format_exception(ex_type, ex, tb)))
+
+    def _destroy(self, (artifactSaver, action)):
+        artifactSaver.destroy(save_action=action)
+        return SaveAppResult(action.actionId,
+                             success=False,
+                             errorMessage='Save app action {0} was cancelled'.format(action.actionId),
+                             infoMessage='')
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
         unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
