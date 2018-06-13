@@ -13,3 +13,4 @@ class VCenterDeployVMFromLinkedCloneResourceModel(object):
         self.auto_delete = True
         self.autoload = True
         self.refresh_ip_timeout = 0
+        self.behavior_during_save = ''

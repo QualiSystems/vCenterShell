@@ -17,3 +17,4 @@ class vCenterVMFromImageResourceModel(object):
         self.ip_regex = ''
         self.default_datacenter = ''
         self.refresh_ip_timeout = 0
+        self.behavior_during_save = ''

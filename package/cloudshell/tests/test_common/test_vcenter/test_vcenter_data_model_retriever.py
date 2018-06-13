@@ -29,7 +29,9 @@ class TestVCenterDataModelRetriever(unittest.TestCase):
                                    'execution_server_selector': '',
                                    'reserved_networks': '',
                                    'default_datacenter': '',
-                                   'promiscuous_mode': ''}
+                                   'promiscuous_mode': '',
+                                   'behavior_during_save': '',
+                                   'saved_sandbox_storage': ''}
 
         api.GetResourceDetails = Mock(return_value=vcenter_resource)
 
