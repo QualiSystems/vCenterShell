@@ -306,7 +306,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
               <ns0:AllowedValues>
                 <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
                 <ns0:AllowedValue>Power Off</ns0:AllowedValue>
@@ -369,7 +369,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
               <ns0:AllowedValues>
                 <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
                 <ns0:AllowedValue>Power Off</ns0:AllowedValue>
@@ -435,7 +435,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
               <ns0:AllowedValues>
                 <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
                 <ns0:AllowedValue>Power Off</ns0:AllowedValue>
@@ -510,7 +510,7 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save" UserInput="false">
               <ns0:AllowedValues>
                 <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
                 <ns0:AllowedValue>Power Off</ns0:AllowedValue>
