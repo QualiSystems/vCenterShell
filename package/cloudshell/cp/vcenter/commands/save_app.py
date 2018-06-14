@@ -13,7 +13,8 @@ from multiprocessing.pool import ThreadPool
 
 
 class SaveAppCommand:
-    def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager):
+    def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager,
+                 cancellation_service):
         """
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
@@ -29,6 +30,7 @@ class SaveAppCommand:
         self.folder_manager = folder_manager
         SAVE_APPS_THREAD_POOL_SIZE = int(os.getenv('SaveAppsThreadPoolSize', 10))
         self._pool = ThreadPool(SAVE_APPS_THREAD_POOL_SIZE)
+        self.cs = cancellation_service
 
     def save_app(self, si, logger, vcenter_data_model, reservation_id, save_app_actions, cancellation_context):
         """
@@ -69,10 +71,10 @@ class SaveAppCommand:
 
         error_results = [r for r in results if not r.success]
         if not error_results:
-            self._execute_save_actions_using_pool(artifactSaversToActions,
-                                                  cancellation_context,
-                                                  logger,
-                                                  results)
+            results = self._execute_save_actions_using_pool(artifactSaversToActions,
+                                                            cancellation_context,
+                                                            logger,
+                                                            results)
 
         return results
 
@@ -87,14 +89,14 @@ class SaveAppCommand:
                                                      logger))
             destroy_params.extend(self._get_destroy_params(artifactSaver, artifactSaversToActions))
 
-        if cancellation_context.is_cancelled:
+        if self.cs.check_if_cancelled(cancellation_context):
             raise Exception('Save sandbox was cancelled')
 
         results_before_deploy = copy.deepcopy(results)
 
         results.extend(self._pool.map(self._save, save_params))
 
-        if cancellation_context.is_cancelled:
+        if self.cs.check_if_cancelled(cancellation_context):
             results = results_before_deploy
             for param in destroy_params:
                 results.append(self._destroy(param))
@@ -145,12 +147,3 @@ class SaveAppCommand:
                                                  success=False,
                                                  errorMessage=result_error_message))
 
-
-def _get_async_results(async_results, thread_pool):
-    thread_pool.close()
-    thread_pool.join()
-    results = []
-    for async_result in async_results:
-        save_result = async_result.get()
-        results.append(save_result)
-    return results

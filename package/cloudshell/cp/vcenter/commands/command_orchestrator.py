@@ -55,6 +55,7 @@ from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.core.models import DeployApp, DeployAppResult, SaveApp, SaveAppResult
 from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
+from cloudshell.cp.vcenter.common.vcenter.cancellation_service import CommandCancellationService
 
 
 class CommandOrchestrator(object):
@@ -65,6 +66,7 @@ class CommandOrchestrator(object):
 
         """
         synchronous_task_waiter = SynchronousTaskWaiter()
+        cancellation_service = CommandCancellationService()
         pv_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=synchronous_task_waiter)
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
@@ -160,7 +162,8 @@ class CommandOrchestrator(object):
                                                deployer=vm_deployer,
                                                resource_model_parser=self.resource_model_parser,
                                                snapshot_saver=self.snapshot_saver,
-                                               folder_manager=self.folder_manager)
+                                               folder_manager=self.folder_manager,
+                                               cancellation_service=cancellation_service)
 
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
