@@ -1,5 +1,5 @@
 from unittest import TestCase
-from mock import Mock
+from mock import Mock, PropertyMock
 from uuid import uuid4 as guid
 
 from cloudshell.cp.vcenter.commands.save_app import SaveAppCommand
@@ -7,7 +7,7 @@ from cloudshell.cp.core.models import SaveApp, SaveAppParams
 
 from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-
+from cloudshell.cp.vcenter.models.QualiDriverModels import CancellationContext
 
 class MockResourceParser(object):
     @staticmethod
@@ -18,19 +18,25 @@ class MockResourceParser(object):
 class TestSaveAppCommand(TestCase):
     def setUp(self):
         self.pyvmomi_service = Mock()
+        self.cancellation_context = Mock()
+        self.cancellation_context.is_cancelled = False
         vm = Mock()
         vm.name = 'some string'
-        folder_manager = FolderManager(self.pyvmomi_service)
+        task_waiter = Mock()
+        self.folder_manager = FolderManager(self.pyvmomi_service, task_waiter)
         self.pyvmomi_service.get_vm_by_uuid = Mock(return_value=vm)
+        self.cancellation_service = Mock()
+        self.cancellation_service.check_if_cancelled = Mock(return_value=False)
+        clone_result = Mock(vmName='whatever')
+        self.deployer = Mock()
+        self.deployer.deploy_clone_from_vm = Mock(return_value=clone_result)
         self.save_command = SaveAppCommand(pyvmomi_service=self.pyvmomi_service,
                                            task_waiter=Mock(),
-                                           deployer=Mock(),
+                                           deployer=self.deployer,
                                            resource_model_parser=MockResourceParser(),
                                            snapshot_saver=Mock(),
-                                           folder_manager=folder_manager)
-        clone_result = Mock()
-        clone_result.vmName = 'whatever'
-        self.save_command.deployer.deploy_clone_from_vm = Mock(return_value=clone_result)
+                                           folder_manager=self.folder_manager,
+                                           cancellation_service=self.cancellation_service)
 
     def test_save_runs_successfully(self):
         # receive a save request with 2 actions, return a save response with 2 results.
@@ -48,7 +54,7 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action1, save_action2],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
@@ -58,6 +64,65 @@ class TestSaveAppCommand(TestCase):
         self.assertTrue(result[1].type == 'SaveApp')
         self.assertTrue(result[1].actionId == save_action2.actionId)
         self.assertTrue(result[1].success)
+
+    def test_exception_thrown_if_command_cancelled_before_anything_runs(self):
+        save_action1 = self._create_arbitrary_save_app_action()
+        save_action2 = self._create_arbitrary_save_app_action()
+
+        vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB Cluster'
+        vcenter_data_model.vm_location = 'QualiFolder'
+
+        cancellation_context = Mock()
+        cancellation_context.is_cancelled = True
+
+        with self.assertRaises(Exception) as context:
+            self.save_command.save_app(si=Mock(),
+                                       logger=Mock(),
+                                       vcenter_data_model=vcenter_data_model,
+                                       reservation_id='abc',
+                                       save_app_actions=[save_action1, save_action2],
+                                       cancellation_context=cancellation_context)
+            self.assertIn('Save sandbox was cancelled', context.exception.message)
+
+    def test_destroy_on_vms_and_folders_if_command_cancelled_during_deploy(self):
+        save_action1 = self._create_arbitrary_save_app_action()
+        save_action2 = self._create_arbitrary_save_app_action()
+
+        vcenter_data_model = Mock()
+        vcenter_data_model.default_datacenter = 'QualiSB Cluster'
+        vcenter_data_model.vm_location = 'QualiFolder'
+
+        return_values = [False, True]
+
+        cancellation_service = Mock()
+        cancellation_service.check_if_cancelled = Mock(side_effect=return_values)
+
+        self.save_command = SaveAppCommand(pyvmomi_service=self.pyvmomi_service,
+                                           task_waiter=Mock(),
+                                           deployer=self.deployer,
+                                           resource_model_parser=MockResourceParser(),
+                                           snapshot_saver=Mock(),
+                                           folder_manager=self.folder_manager,
+                                           cancellation_service=cancellation_service)
+
+        result = self.save_command.save_app(si=Mock(),
+                                            logger=Mock(),
+                                            vcenter_data_model=vcenter_data_model,
+                                            reservation_id='abc',
+                                            save_app_actions=[save_action1, save_action2],
+                                            cancellation_context=self.cancellation_context)
+
+        # Assert
+        self.assertTrue(result[0].type == 'SaveApp')
+        self.assertTrue(result[0].actionId == save_action1.actionId)
+        self.assertTrue(result[0].errorMessage == 'Save app action {0} was cancelled'.format(save_action1.actionId))
+        self.assertTrue(not result[0].success)
+
+        self.assertTrue(result[1].type == 'SaveApp')
+        self.assertTrue(result[1].actionId == save_action2.actionId)
+        self.assertTrue(result[0].errorMessage == 'Save app action {0} was cancelled'.format(save_action2.actionId))
+        self.assertTrue(not result[1].success)
 
     def test_nonempty_saved_sandbox_storage_replaces_default_storage(self):
         # receive a save request with 2 actions, return a save response with 2 results.
@@ -76,7 +141,7 @@ class TestSaveAppCommand(TestCase):
                                    vcenter_data_model=vcenter_data_model,
                                    reservation_id='abc',
                                    save_app_actions=[save_action1],
-                                   cancellation_context=None)
+                                   cancellation_context=self.cancellation_context)
 
         # Assert
         deploy_method_mock = self.save_command.deployer.deploy_clone_from_vm
@@ -102,7 +167,7 @@ class TestSaveAppCommand(TestCase):
                                    vcenter_data_model=vcenter_data_model,
                                    reservation_id='abc',
                                    save_app_actions=[save_action1],
-                                   cancellation_context=None)
+                                   cancellation_context=self.cancellation_context)
 
         # Assert
         deploy_method_mock = self.save_command.deployer.deploy_clone_from_vm
@@ -132,7 +197,7 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
@@ -162,7 +227,7 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
@@ -173,16 +238,18 @@ class TestSaveAppCommand(TestCase):
 
     def test_create_saved_apps_folder_if_not_found_in_vcenter(self):
         # vcenter folder under the vm location, will be created when it doesnt exist.
-        # a typical scheme would be QualiSB\Qualifolder\SavedApps
+        # a typical scheme would be QualiSB\Qualifolder\Saved Sandboxes
         # where QualiSB is datacenter, QualiFolder is vm location,
-        # and SavedApps is the folder under which apps will be saved
-        # (under SavedApps there is a folder for each sandbox)
+        # and Saved Sandboxes is the folder under which apps will be saved
+        # (under Saved Sandboxes there is a folder for each sandbox)
 
         save_action = self._create_arbitrary_save_app_action()
 
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+
+        
 
         vm_location_folder = Mock()
 
@@ -195,18 +262,20 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
         self.assertTrue(result[0].success)
 
-        # SavedApps folder was created
-        vm_location_folder.CreateFolder.assert_called_with('SavedApps')
+        # Saved Sandboxes folder was created
+        vm_location_folder.CreateFolder.assert_called_with('Saved Sandboxes')
 
     def test_create_saved_sandbox_folder_if_not_found_in_vcenter(self):
         # show the sandbox folder under saved apps folder is created when doesnt exist
         save_action = self._create_arbitrary_save_app_action()
+
+        
 
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
@@ -217,7 +286,7 @@ class TestSaveAppCommand(TestCase):
         def cant_find_saved_apps_folder(si, path):
             if path == vcenter_data_model.default_datacenter + '/' \
                     + vcenter_data_model.vm_location + '/'\
-                    + 'SavedApps' '/'\
+                    + 'Saved Sandboxes' '/'\
                     + save_action.actionParams.savedSandboxId:
                 return None
             return saved_apps_folder
@@ -229,7 +298,7 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
@@ -264,7 +333,7 @@ class TestSaveAppCommand(TestCase):
                                             vcenter_data_model=vcenter_data_model,
                                             reservation_id='abc',
                                             save_app_actions=[save_action],
-                                            cancellation_context=None)
+                                            cancellation_context=self.cancellation_context)
 
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')

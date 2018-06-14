@@ -2,6 +2,9 @@
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from os.path import normpath
 
+DEPLOYED_APPS = 'Deployed Apps'
+
+
 
 class DeployCommand(object):
     """ Command to Create a VM from a template """
@@ -54,9 +57,9 @@ class DeployCommand(object):
         folder_manager.get_or_create_vcenter_folder(si,
                                                     logger,
                                                     folder_path,
-                                                    'DeployedApps')
+                                                    DEPLOYED_APPS)
 
-        data_holder.template_resource_model.vm_location = VMLocation.combine([vm_location, 'DeployedApps'])
+        data_holder.template_resource_model.vm_location = VMLocation.combine([vm_location, DEPLOYED_APPS])
         logger.info('VM will be deployed to {0}'.format(data_holder.template_resource_model.vm_location))
 
     def execute_deploy_from_template(self, si, logger, vcenter_data_model, reservation_id, deployment_params, cancellation_context, folder_manager):

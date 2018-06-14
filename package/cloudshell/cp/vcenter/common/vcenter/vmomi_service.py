@@ -560,16 +560,19 @@ class pyVmomiService:
         :param logger:
         """
 
-        if vm.runtime.powerState == 'poweredOn':
-            logger.info(("The current powerState is: {0}. Attempting to power off {1}"
-                         .format(vm.runtime.powerState, vm.name)))
-            task = vm.PowerOffVM_Task()
-            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Power Off Before Destroy")
+        self.power_off_before_destroy(logger, vm)
 
         logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
         return self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy VM")
+
+    def power_off_before_destroy(self, logger, vm):
+        if vm.runtime.powerState == 'poweredOn':
+            logger.info(("The current powerState is: {0}. Attempting to power off {1}"
+                         .format(vm.runtime.powerState, vm.name)))
+            task = vm.PowerOffVM_Task()
+            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Power Off Before Destroy")
 
     def destroy_vm_by_name(self, si, vm_name, vm_path, logger):
         """ 
@@ -702,6 +705,21 @@ class pyVmomiService:
             if snapshot_header.name == name:
                 return snapshot_header
         return None
+
+    def get_folder_contents(self, folder, recursive=False):
+        vms = []
+        folders = []
+
+        for item in folder.childEntity:
+            if isinstance(item, self.vim.VirtualMachine):
+                vms.append(item)
+            elif isinstance(item, self.vim.Folder):
+                folders.append(item)
+                if recursive:
+                    v, f = self.get_folder_contents(item, recursive)
+                    vms.extend(v)
+                    folders.extend(f)
+        return vms, folders
 
 
 def vm_has_no_vnics(vm):
