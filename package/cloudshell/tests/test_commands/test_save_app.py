@@ -2,7 +2,7 @@ from unittest import TestCase
 from mock import Mock, PropertyMock
 from uuid import uuid4 as guid
 
-from cloudshell.cp.vcenter.commands.save_app import SaveAppCommand
+from cloudshell.cp.vcenter.commands.save_sandbox import SaveAppCommand
 from cloudshell.cp.core.models import SaveApp, SaveAppParams
 
 from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
