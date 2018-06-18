@@ -247,6 +247,21 @@ class VNicService(object):
         return False
 
     @staticmethod
+    def is_vnic_attached_to_one_of_these_networks(device, networks):
+        for network in networks:
+            if hasattr(device, 'backing'):
+                found = False
+                if hasattr(device.backing, 'port') and hasattr(device.backing.port, 'portgroupKey'):
+                    if device.backing.port.portgroupKey == network.key:
+                        found = True
+                if hasattr(device.backing, 'network') and hasattr(device.backing.network, 'name'):
+                    if device.backing.network.name == network.name:
+                        found = True
+                if found:
+                    return True
+        return False
+
+    @staticmethod
     def is_vnic_connected(vnic):
         is_connected = hasattr(vnic, 'connectable') and vnic.connectable.connected
         return is_connected

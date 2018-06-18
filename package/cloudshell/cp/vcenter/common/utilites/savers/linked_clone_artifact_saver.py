@@ -15,7 +15,7 @@ SAVED_SANDBOXES = "Saved Sandboxes"
 # todo interface for save from base
 class LinkedCloneArtifactSaver(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
-                 resource_model_parser, snapshot_saver, task_waiter, folder_manager):
+                 resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer):
         self.SNAPSHOT_NAME = 'artifact'
         self.saved_apps_folder_lock = Lock()
         self.saved_sandbox_folder_lock = Lock()
@@ -29,6 +29,7 @@ class LinkedCloneArtifactSaver(object):
         self.task_waiter = task_waiter
         self.resource_model_parser = resource_model_parser
         self.folder_manager = folder_manager
+        self.pg_configurer = port_configurer
 
     def save(self, save_action, cancellation_context):
         self.logger.info('Saving artifact as linked clone')
@@ -52,6 +53,8 @@ class LinkedCloneArtifactSaver(object):
                                                         self.reservation_id,
                                                         cancellation_context)
 
+        self._disconnect_all_quali_created_networks(result)
+
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name=self.SNAPSHOT_NAME, save_memory='Nope')
 
@@ -65,6 +68,15 @@ class LinkedCloneArtifactSaver(object):
                              True,
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
+
+    def _disconnect_all_quali_created_networks(self, result):
+        network_full_name = VMLocation.combine([self.vcenter_data_model.default_datacenter, self.vcenter_data_model.holding_network])
+        default_network = self.pv_service.get_network_by_full_name(self.si, network_full_name)
+        vm = self.pv_service.get_vm_by_uuid(result.vmUuid)
+        self.pg_configurer.disconnect_all_networks_if_created_by_quali(vm,
+                                                                       default_network,
+                                                                       self.vcenter_data_model.reserved_networks,
+                                                                       self.logger)
 
     def destroy(self, save_action):
         saved_sandbox_path = self._get_saved_sandbox_path(save_action)

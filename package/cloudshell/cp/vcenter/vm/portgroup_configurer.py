@@ -100,6 +100,21 @@ class VirtualMachinePortGroupConfigurer(object):
         self.erase_network_by_mapping(network_for_removal, reserved_networks, logger=logger)
         return res
 
+    def disconnect_all_networks_if_created_by_quali(self, vm, default_network, reserved_networks, logger):
+        vnics = self.vnic_service.map_vnics(vm)
+
+        quali_networks = [self.vnic_service.get_network_by_device(vm, vnic, self.pyvmomi_service, logger)
+                          for vnic in vnics if vnic.name.lower().startswith('qs_')]
+
+        update_mapping = [VNicDeviceMapper(vnic, vnic, default_network, False, vnic.macAddress)
+                          for vnic in vnics.values() if self.vnic_service.is_vnic_attached_to_one_of_these_networks(quali_networks)]
+
+        res = self.update_vnic_by_mapping(vm, update_mapping, logger)
+
+        self.erase_network_by_mapping(quali_networks, reserved_networks, logger=logger)
+
+        return res
+
     def get_networks_on_vnics(self, vm, vnics, logger):
         return [self.vnic_service.get_network_by_device(vm, vnic, self.pyvmomi_service, logger)
                 for vnic in vnics]

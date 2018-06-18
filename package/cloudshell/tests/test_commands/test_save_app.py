@@ -36,7 +36,8 @@ class TestSaveAppCommand(TestCase):
                                            resource_model_parser=MockResourceParser(),
                                            snapshot_saver=Mock(),
                                            folder_manager=self.folder_manager,
-                                           cancellation_service=self.cancellation_service)
+                                           cancellation_service=self.cancellation_service,
+                                           port_group_configurer=Mock())
 
     def test_save_runs_successfully(self):
         # receive a save request with 2 actions, return a save response with 2 results.
@@ -104,7 +105,8 @@ class TestSaveAppCommand(TestCase):
                                            resource_model_parser=MockResourceParser(),
                                            snapshot_saver=Mock(),
                                            folder_manager=self.folder_manager,
-                                           cancellation_service=cancellation_service)
+                                           cancellation_service=cancellation_service,
+                                           port_group_configurer=Mock())
 
         result = self.save_command.save_app(si=Mock(),
                                             logger=Mock(),

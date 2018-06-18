@@ -14,13 +14,14 @@ from multiprocessing.pool import ThreadPool
 
 class SaveAppCommand:
     def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager,
-                 cancellation_service):
+                 cancellation_service, port_group_configurer):
         """
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
         :param task_waiter: Waits for the task to be completed
         :param folder_manager: cloudshell.cp.vcenter.common.vcenter.folder_manager.FolderManager
         :type task_waiter:  SynchronousTaskWaiter
+        :param port_group_configurer: VirtualMachinePortGroupConfigurer
         """
         self.pyvmomi_service = pyvmomi_service
         self.task_waiter = task_waiter
@@ -31,6 +32,7 @@ class SaveAppCommand:
         SAVE_APPS_THREAD_POOL_SIZE = int(os.getenv('SaveAppsThreadPoolSize', 10))
         self._pool = ThreadPool(SAVE_APPS_THREAD_POOL_SIZE)
         self.cs = cancellation_service
+        self.port_group_configurer = port_group_configurer
 
     def save_app(self, si, logger, vcenter_data_model, reservation_id, save_app_actions, cancellation_context):
         """
@@ -62,7 +64,8 @@ class SaveAppCommand:
                                                          self.resource_model_parser,
                                                          self.snapshot_saver,
                                                          self.task_waiter,
-                                                         self.folder_manager): list(g)
+                                                         self.folder_manager,
+                                                         self.port_group_configurer): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,
