@@ -49,6 +49,7 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.holding_network = 'DEFAULT NETWORK'
 
         result = self.save_command.save_app(si=Mock(),
                                             logger=Mock(),
@@ -194,6 +195,8 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.holding_network = 'DEFAULT NETWORK'
+
         result = self.save_command.save_app(si=Mock(),
                                             logger=Mock(),
                                             vcenter_data_model=vcenter_data_model,
@@ -214,6 +217,7 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.holding_network = 'DEFAULT NETWORK'
 
         save_action = self._create_arbitrary_save_app_action()
         save_action.actionParams.deploymentPathAttributes['Behavior during save'] = ''
@@ -250,8 +254,7 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
-
-        
+        vcenter_data_model.holding_network = 'DEFAULT NETWORK'
 
         vm_location_folder = Mock()
 
@@ -277,11 +280,10 @@ class TestSaveAppCommand(TestCase):
         # show the sandbox folder under saved apps folder is created when doesnt exist
         save_action = self._create_arbitrary_save_app_action()
 
-        
-
         vcenter_data_model = Mock()
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
+        vcenter_data_model.holding_network = 'DEFAULT NETWORK'
 
         saved_apps_folder = Mock()
 
