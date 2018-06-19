@@ -104,7 +104,8 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue=""  Name="Behavior during save" Description="Behavior during save" IsReadOnly="false" Type="String">
+    <ns0:AttributeInfo DefaultValue=""  Name="Behavior during save" Description="Determines the VM behavior when the sandbox is saved. If Power off is selected, and the VM was powered on before the save, then the VM will shut down for the duration of the save, and then be powered on at the end.
+Restricted Values: Remain Powered On (Default), Power Off" IsReadOnly="false" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
