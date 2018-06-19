@@ -105,15 +105,17 @@ class SaveAppCommand:
 
         operation_error = next((a for a in results if not a.success), False)
 
-        if self.cs.check_if_cancelled(cancellation_context) or operation_error:
-            thread_id = threading.current_thread().ident
+        thread_id = threading.current_thread().ident
 
-            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id)) \
-                if operation_error else logger.info('[{0}] Save sandbox was cancelled, rolling back saved apps'.format(thread_id))
+        if self.cs.check_if_cancelled(cancellation_context):
+            logger.info('[{0}] Save sandbox was cancelled, rolling back saved apps'.format(thread_id))
             results = results_before_deploy
             for param in destroy_params:
                 results.append(self._destroy(param))
                 logger.info('[{0}] Save Sandbox roll back completed'.format(thread_id))
+
+        if operation_error:
+            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id))
 
         return results
 
