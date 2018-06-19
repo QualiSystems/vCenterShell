@@ -25,4 +25,4 @@ class CommandCancellationService(object):
         :return:
         """
         if cancellation_context and cancellation_context.is_cancelled:
-            raise CancellationException("Command was cancelled", data)
+            return True

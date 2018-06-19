@@ -111,6 +111,8 @@ class VirtualMachinePortGroupConfigurer(object):
 
         res = self.update_vnic_by_mapping(vm, update_mapping, logger)
 
+        logger.info('Updated VM, networks disconnected')
+
         self.erase_network_by_mapping(quali_networks, reserved_networks, logger=logger)
 
         return res

@@ -1,3 +1,4 @@
+import threading
 from contextlib import contextmanager
 from threading import Lock
 
@@ -32,7 +33,8 @@ class LinkedCloneArtifactSaver(object):
         self.pg_configurer = port_configurer
 
     def save(self, save_action, cancellation_context):
-        self.logger.info('Saving artifact as linked clone')
+        thread_id = threading.current_thread().ident
+        self.logger.info('[{0}] Starting Save Action \nSource type: Linked Clone'.format(thread_id))
 
         vm = self._get_source_vm(save_action)
         self._add_clone_vm_source_to_deployment_attributes(save_action, vm)
@@ -49,6 +51,10 @@ class LinkedCloneArtifactSaver(object):
             data_holder.template_resource_model.vm_storage = self.vcenter_data_model.saved_sandbox_storage
 
         with self._manage_power_during_save(save_action):
+            self.logger.info('[{0}] Save sandbox - Creating Source VM'.format(thread_id))
+
+            self.logger.info('[{0}] Copying existing sandbox app to create saved app source: \nOriginal app: {1}'.format(thread_id, data_holder.template_resource_model.vcenter_vm))
+
             result = self.deployer.deploy_clone_from_vm(self.si,
                                                         self.logger,
                                                         data_holder,
@@ -58,8 +64,13 @@ class LinkedCloneArtifactSaver(object):
 
         self._disconnect_all_quali_created_networks(result)
 
+        self.logger.info('[{1}] Successfully cloned an app from sandbox to saved sandbox - saved sandbox id: {0}'.format(saved_sandbox_id, thread_id))
+        self.logger.info('[{2}] Saved Sandbox App will clone from VM: {0}\n{1}'.format(result.vmUuid, result.vmName, thread_id))
+
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name=self.SNAPSHOT_NAME, save_memory='Nope')
+
+        self.logger.info('Saved snapshot on {0}'.format(result.vmName))
 
         save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
 
@@ -67,13 +78,18 @@ class LinkedCloneArtifactSaver(object):
         saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
                                    Attribute('vCenter VM Snapshot', self.SNAPSHOT_NAME)]
 
+        self.logger.info('[{1}] Save Action using source type: Linked Clone Successful. Saved Sandbox App with snapshot created: {0}'.format(result.vmName, thread_id))
+
         return SaveAppResult(save_action.actionId,
                              True,
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
 
     def _disconnect_all_quali_created_networks(self, result):
+        thread_id = threading.current_thread().ident
+        self.logger.info('{0} clearing networks configured by cloudshell on saved sandbox source app {1}'.format(thread_id, result.vmName))
         network_full_name = VMLocation.combine([self.vcenter_data_model.default_datacenter, self.vcenter_data_model.holding_network])
+        self.logger.info('{0} Holding network is {1}'.format(thread_id, network_full_name))
         default_network = self.pv_service.get_network_by_full_name(self.si, network_full_name)
         vm = self.pv_service.get_vm_by_uuid(self.si, result.vmUuid)
         self.pg_configurer.disconnect_all_networks_if_created_by_quali(vm,
@@ -96,6 +112,9 @@ class LinkedCloneArtifactSaver(object):
         return vm
 
     def destroy(self, save_action):
+        thread_id = threading.current_thread().ident
+
+        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
         saved_sandbox_path = self._get_saved_sandbox_path(save_action)
 
         try:
@@ -135,10 +154,8 @@ class LinkedCloneArtifactSaver(object):
 
     def _add_clone_vm_source_to_deployment_attributes(self, save_action, vm):
         attributes = save_action.actionParams.deploymentPathAttributes
-        vcenter_vm_attribute = attributes.get('vCenter VM')
         vm_full_path = self.pv_service.get_vm_full_path(self.si, vm)
-        if not vcenter_vm_attribute:
-            save_action.actionParams.deploymentPathAttributes['vCenter VM'] = vm_full_path
+        save_action.actionParams.deploymentPathAttributes['vCenter VM'] = vm_full_path
         return attributes
 
     def _generate_cloned_vm_name(self, save_action):

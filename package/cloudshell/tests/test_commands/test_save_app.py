@@ -342,7 +342,7 @@ class TestSaveAppCommand(TestCase):
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
         self.assertTrue(not result[0].success)
-        self.assertTrue(result[0].errorMessage==error_message)
+        self.assertTrue(result[0].errorMessage == error_message)
 
     def test_save_fails_due_to_unsupported_save_type(self):
         # if cloud provider sends an invalid save action with unsupported save type

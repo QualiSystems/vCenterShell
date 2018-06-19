@@ -1,4 +1,5 @@
 import copy
+import threading
 from itertools import groupby
 import sys, traceback
 
@@ -48,7 +49,7 @@ class SaveAppCommand:
         """
         results = []
 
-        logger.info('Save apps command starting on ' + vcenter_data_model.default_datacenter)
+        logger.info('Save Sandbox command starting on ' + vcenter_data_model.default_datacenter)
 
         if not save_app_actions:
             raise Exception('Failed to save app, missing data in request.')
@@ -74,11 +75,14 @@ class SaveAppCommand:
 
         error_results = [r for r in results if not r.success]
         if not error_results:
+            logger.info('Handling Save App requests')
             results = self._execute_save_actions_using_pool(artifactSaversToActions,
                                                             cancellation_context,
                                                             logger,
                                                             results)
-
+            logger.info('Completed Save Sandbox command')
+        else:
+            logger.error('Some save app requests were not valid, Save Sandbox command failed.')
         return results
 
     def _execute_save_actions_using_pool(self, artifactSaversToActions, cancellation_context, logger, results):
@@ -99,10 +103,19 @@ class SaveAppCommand:
 
         results.extend(self._pool.map(self._save, save_params))
 
+        operation_error = next((a for a in results if not a.success), False)
+
+        thread_id = threading.current_thread().ident
+
         if self.cs.check_if_cancelled(cancellation_context):
+            logger.info('[{0}] Save sandbox was cancelled, rolling back saved apps'.format(thread_id))
             results = results_before_deploy
             for param in destroy_params:
                 results.append(self._destroy(param))
+                logger.info('[{0}] Save Sandbox roll back completed'.format(thread_id))
+
+        if operation_error:
+            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id))
 
         return results
 
