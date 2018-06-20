@@ -24,6 +24,8 @@ xmlns="http://schemas.qualisystems.com/ResourceManagement/ShellsConfigurationSch
 			<Attribute Name="Execution Server Selector" Value="" />
 			<Attribute Name="Reserved Networks" Value="" />
 			<Attribute Name="Promiscuous Mode" Value="True" />
+			<Attribute Name="Behavior during save" Value="Remain Powered On" />
+			<Attribute Name="Saved Sandbox Storage" Value="" />
         </Attributes>
     </ResourceTemplate>
 </ResourceTemplates>
