@@ -1,3 +1,4 @@
+import threading
 from contextlib import contextmanager
 from threading import Lock
 
@@ -15,7 +16,7 @@ SAVED_SANDBOXES = "Saved Sandboxes"
 # todo interface for save from base
 class LinkedCloneArtifactSaver(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
-                 resource_model_parser, snapshot_saver, task_waiter, folder_manager):
+                 resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer):
         self.SNAPSHOT_NAME = 'artifact'
         self.saved_apps_folder_lock = Lock()
         self.saved_sandbox_folder_lock = Lock()
@@ -29,9 +30,14 @@ class LinkedCloneArtifactSaver(object):
         self.task_waiter = task_waiter
         self.resource_model_parser = resource_model_parser
         self.folder_manager = folder_manager
+        self.pg_configurer = port_configurer
 
     def save(self, save_action, cancellation_context):
-        self.logger.info('Saving artifact as linked clone')
+        thread_id = threading.current_thread().ident
+        self.logger.info('[{0}] Starting Save Action \nSource type: Linked Clone'.format(thread_id))
+
+        vm = self._get_source_vm(save_action)
+        self._add_clone_vm_source_to_deployment_attributes(save_action, vm)
 
         data_holder = self._prepare_vm_data_holder(save_action, self.vcenter_data_model)
 
@@ -45,6 +51,10 @@ class LinkedCloneArtifactSaver(object):
             data_holder.template_resource_model.vm_storage = self.vcenter_data_model.saved_sandbox_storage
 
         with self._manage_power_during_save(save_action):
+            self.logger.info('[{0}] Save sandbox - Creating Source VM'.format(thread_id))
+
+            self.logger.info('[{0}] Copying existing sandbox app to create saved app source: \nOriginal app: {1}'.format(thread_id, data_holder.template_resource_model.vcenter_vm))
+
             result = self.deployer.deploy_clone_from_vm(self.si,
                                                         self.logger,
                                                         data_holder,
@@ -52,8 +62,15 @@ class LinkedCloneArtifactSaver(object):
                                                         self.reservation_id,
                                                         cancellation_context)
 
+        self._disconnect_all_quali_created_networks(result)
+
+        self.logger.info('[{1}] Successfully cloned an app from sandbox to saved sandbox - saved sandbox id: {0}'.format(saved_sandbox_id, thread_id))
+        self.logger.info('[{2}] Saved Sandbox App will clone from VM: {0}\n{1}'.format(result.vmUuid, result.vmName, thread_id))
+
         self.snapshot_saver.save_snapshot(self.si, self.logger, result.vmUuid,
                                           snapshot_name=self.SNAPSHOT_NAME, save_memory='Nope')
+
+        self.logger.info('Saved snapshot on {0}'.format(result.vmName))
 
         save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
 
@@ -61,12 +78,43 @@ class LinkedCloneArtifactSaver(object):
         saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
                                    Attribute('vCenter VM Snapshot', self.SNAPSHOT_NAME)]
 
+        self.logger.info('[{1}] Save Action using source type: Linked Clone Successful. Saved Sandbox App with snapshot created: {0}'.format(result.vmName, thread_id))
+
         return SaveAppResult(save_action.actionId,
                              True,
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
 
+    def _disconnect_all_quali_created_networks(self, result):
+        thread_id = threading.current_thread().ident
+        self.logger.info('{0} clearing networks configured by cloudshell on saved sandbox source app {1}'.format(thread_id, result.vmName))
+        network_full_name = VMLocation.combine([self.vcenter_data_model.default_datacenter, self.vcenter_data_model.holding_network])
+        self.logger.info('{0} Holding network is {1}'.format(thread_id, network_full_name))
+        default_network = self.pv_service.get_network_by_full_name(self.si, network_full_name)
+        vm = self.pv_service.get_vm_by_uuid(self.si, result.vmUuid)
+        self.pg_configurer.disconnect_all_networks_if_created_by_quali(vm,
+                                                                       default_network,
+                                                                       self.vcenter_data_model.reserved_networks,
+                                                                       self.logger)
+
+    def _get_source_vm(self, save_action):
+        vm_uuid = save_action.actionParams.sourceVmUuid
+        could_not_save_artifact_message = 'Could not find VM with uuid {0}. \nCould not save artifact'.format(vm_uuid)
+        try:
+            self.logger.info('Looking for VM with uuid: {0}'.format(vm_uuid))
+            vm = self.pv_service.get_vm_by_uuid(self.si, vm_uuid)
+            if not vm:
+                raise Exception(could_not_save_artifact_message)
+        except:
+            self.logger.exception(could_not_save_artifact_message)
+            raise Exception(could_not_save_artifact_message)
+
+        return vm
+
     def destroy(self, save_action):
+        thread_id = threading.current_thread().ident
+
+        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
         saved_sandbox_path = self._get_saved_sandbox_path(save_action)
 
         try:
@@ -103,6 +151,12 @@ class LinkedCloneArtifactSaver(object):
 
         data_holder = DeployFromTemplateDetails(deploy_from_vm_model, new_vm_name)
         return data_holder
+
+    def _add_clone_vm_source_to_deployment_attributes(self, save_action, vm):
+        attributes = save_action.actionParams.deploymentPathAttributes
+        vm_full_path = self.pv_service.get_vm_full_path(self.si, vm)
+        save_action.actionParams.deploymentPathAttributes['vCenter VM'] = vm_full_path
+        return attributes
 
     def _generate_cloned_vm_name(self, save_action):
         source_vm = self.pv_service.get_vm_by_uuid(self.si, save_action.actionParams.sourceVmUuid)
@@ -151,7 +205,6 @@ class LinkedCloneArtifactSaver(object):
 
     def _should_vm_be_powered_off_during_clone(self, save_action):
         save_attributes = save_action.actionParams.deploymentPathAttributes
-        behavior_during_save = save_attributes.get(
-            "Behavior during save") or self.vcenter_data_model.behavior_during_save
+        behavior_during_save = save_attributes.get("Behavior during save") or self.vcenter_data_model.behavior_during_save
         power_off_during_clone = behavior_during_save == "Power Off"
         return power_off_during_clone

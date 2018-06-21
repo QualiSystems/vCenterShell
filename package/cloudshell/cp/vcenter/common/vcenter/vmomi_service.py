@@ -721,6 +721,30 @@ class pyVmomiService:
                     folders.extend(f)
         return vms, folders
 
+    def get_vm_full_path(self, si, vm):
+        """
+        :param vm: vim.VirtualMachine
+        :return:
+        """
+        folder_name = None
+        folder = vm.parent
+
+        if folder:
+            folder_name = folder.name
+            folder_parent = folder.parent
+
+            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(folder_parent, vim.Datacenter):
+                folder_name = folder_parent.name + '/' + folder_name
+                try:
+                    folder_parent = folder_parent.parent
+                except Exception:
+                    break
+            # at this stage we receive a path like this: vm/FOLDER1/FOLDER2;
+            # we're not interested in the "vm" part, so we throw that away
+            folder_name = '/'.join(folder_name.split('/')[1:])
+        # ok, now we're adding the vm name; btw, if there is no folder, that's cool, just return vm.name
+        return VMLocation.combine([folder_name, vm.name]) if folder_name else vm.name
+
 
 def vm_has_no_vnics(vm):
     # Is there any network device on vm

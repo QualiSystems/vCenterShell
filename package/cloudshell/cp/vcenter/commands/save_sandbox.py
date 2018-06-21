@@ -1,4 +1,5 @@
 import copy
+import threading
 from itertools import groupby
 import sys, traceback
 
@@ -14,13 +15,14 @@ from multiprocessing.pool import ThreadPool
 
 class SaveAppCommand:
     def __init__(self, pyvmomi_service, task_waiter, deployer, resource_model_parser, snapshot_saver, folder_manager,
-                 cancellation_service):
+                 cancellation_service, port_group_configurer):
         """
         :param pyvmomi_service:
         :type pyvmomi_service: pyVmomiService
         :param task_waiter: Waits for the task to be completed
         :param folder_manager: cloudshell.cp.vcenter.common.vcenter.folder_manager.FolderManager
         :type task_waiter:  SynchronousTaskWaiter
+        :param port_group_configurer: VirtualMachinePortGroupConfigurer
         """
         self.pyvmomi_service = pyvmomi_service
         self.task_waiter = task_waiter
@@ -31,6 +33,7 @@ class SaveAppCommand:
         SAVE_APPS_THREAD_POOL_SIZE = int(os.getenv('SaveAppsThreadPoolSize', 10))
         self._pool = ThreadPool(SAVE_APPS_THREAD_POOL_SIZE)
         self.cs = cancellation_service
+        self.port_group_configurer = port_group_configurer
 
     def save_app(self, si, logger, vcenter_data_model, reservation_id, save_app_actions, cancellation_context):
         """
@@ -46,7 +49,7 @@ class SaveAppCommand:
         """
         results = []
 
-        logger.info('Save apps command starting on ' + vcenter_data_model.default_datacenter)
+        logger.info('Save Sandbox command starting on ' + vcenter_data_model.default_datacenter)
 
         if not save_app_actions:
             raise Exception('Failed to save app, missing data in request.')
@@ -62,7 +65,8 @@ class SaveAppCommand:
                                                          self.resource_model_parser,
                                                          self.snapshot_saver,
                                                          self.task_waiter,
-                                                         self.folder_manager): list(g)
+                                                         self.folder_manager,
+                                                         self.port_group_configurer): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,
@@ -71,11 +75,14 @@ class SaveAppCommand:
 
         error_results = [r for r in results if not r.success]
         if not error_results:
+            logger.info('Handling Save App requests')
             results = self._execute_save_actions_using_pool(artifactSaversToActions,
                                                             cancellation_context,
                                                             logger,
                                                             results)
-
+            logger.info('Completed Save Sandbox command')
+        else:
+            logger.error('Some save app requests were not valid, Save Sandbox command failed.')
         return results
 
     def _execute_save_actions_using_pool(self, artifactSaversToActions, cancellation_context, logger, results):
@@ -96,10 +103,19 @@ class SaveAppCommand:
 
         results.extend(self._pool.map(self._save, save_params))
 
+        operation_error = next((a for a in results if not a.success), False)
+
+        thread_id = threading.current_thread().ident
+
         if self.cs.check_if_cancelled(cancellation_context):
+            logger.info('[{0}] Save sandbox was cancelled, rolling back saved apps'.format(thread_id))
             results = results_before_deploy
             for param in destroy_params:
                 results.append(self._destroy(param))
+                logger.info('[{0}] Save Sandbox roll back completed'.format(thread_id))
+
+        if operation_error:
+            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id))
 
         return results
 

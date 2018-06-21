@@ -164,7 +164,8 @@ class CommandOrchestrator(object):
                                                resource_model_parser=self.resource_model_parser,
                                                snapshot_saver=self.snapshot_saver,
                                                folder_manager=self.folder_manager,
-                                               cancellation_service=cancellation_service)
+                                               cancellation_service=cancellation_service,
+                                               port_group_configurer=virtual_machine_port_group_configurer)
 
         self.delete_saved_sandbox_command = DeleteSavedSandboxCommand(pyvmomi_service=pv_service,
                                                                task_waiter=synchronous_task_waiter,
