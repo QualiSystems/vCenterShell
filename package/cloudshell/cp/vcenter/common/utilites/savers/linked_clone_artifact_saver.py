@@ -1,5 +1,6 @@
 import threading
 from contextlib import contextmanager
+from itertools import groupby
 from threading import Lock
 
 from cloudshell.cp.core.models import Artifact, SaveAppResult, Attribute
@@ -13,8 +14,7 @@ from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFacto
 SAVED_SANDBOXES = "Saved Sandboxes"
 
 
-# todo interface for save from base
-class LinkedCloneArtifactSaver(object):
+class LinkedCloneArtifactHandler(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
                  resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer):
         self.SNAPSHOT_NAME = 'artifact'
@@ -85,6 +85,24 @@ class LinkedCloneArtifactSaver(object):
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
 
+    def delete(self, delete_saved_app_actions, cancellation_context):
+        sandbox_id_to_delete_actions = groupby(delete_saved_app_actions, lambda x: x.actionParams.savedSandboxId)
+        for sandbox_id in sandbox_id_to_delete_actions:
+            self._get_saved_sandbox_id_full_path(self.)
+
+    def destroy(self, save_action):
+        thread_id = threading.current_thread().ident
+
+        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
+        saved_sandbox_path = self._get_saved_sandbox_path(save_action)
+
+        try:
+            self.folder_manager.delete_folder(self.si, self.logger, saved_sandbox_path)
+        except:
+            self.logger.info('Rollback for save_action {0} failed'.format(save_action.actionId))
+
+        self.logger.info('Rollback for save_action {0} successful'.format(save_action.actionId))
+
     def _disconnect_all_quali_created_networks(self, result):
         thread_id = threading.current_thread().ident
         self.logger.info('{0} clearing networks configured by cloudshell on saved sandbox source app {1}'.format(thread_id, result.vmName))
@@ -111,22 +129,12 @@ class LinkedCloneArtifactSaver(object):
 
         return vm
 
-    def destroy(self, save_action):
-        thread_id = threading.current_thread().ident
-
-        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
-        saved_sandbox_path = self._get_saved_sandbox_path(save_action)
-
-        try:
-            self.folder_manager.delete_folder(self.si, self.logger, saved_sandbox_path)
-        except:
-            self.logger.info('Rollback for save_action {0} failed'.format(save_action.actionId))
-
-        self.logger.info('Rollback for save_action {0} successful'.format(save_action.actionId))
-
     def _get_saved_sandbox_path(self, save_action):
         data_holder = self._prepare_vm_data_holder(save_action, self.vcenter_data_model)
         saved_sandbox_id = save_action.actionParams.savedSandboxId
+        return self._get_saved_sandbox_id_full_path(data_holder, saved_sandbox_id)
+
+    def _get_saved_sandbox_id_full_path(self, data_holder, saved_sandbox_id):
         saved_sandbox_path = VMLocation.combine(
             [data_holder.template_resource_model.vm_location, SAVED_SANDBOXES, saved_sandbox_id])
         return saved_sandbox_path

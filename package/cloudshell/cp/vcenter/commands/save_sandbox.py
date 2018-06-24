@@ -5,7 +5,7 @@ import sys, traceback
 
 from cloudshell.cp.core.models import SaveApp, SaveAppResult
 
-from cloudshell.cp.vcenter.common.utilites.savers.artifact_saver import ArtifactSaver, UnsupportedArtifactSaver
+from cloudshell.cp.vcenter.common.utilites.savers.artifact_saver import ArtifactHandler, UnsupportedArtifactHandler
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 
@@ -55,18 +55,18 @@ class SaveAppCommand:
             raise Exception('Failed to save app, missing data in request.')
 
         actions_grouped_by_save_types = groupby(save_app_actions, lambda x: x.actionParams.saveDeploymentModel)
-        artifactSaversToActions = {ArtifactSaver.factory(k,
-                                                         self.pyvmomi_service,
-                                                         vcenter_data_model,
-                                                         si,
-                                                         logger,
-                                                         self.deployer,
-                                                         reservation_id,
-                                                         self.resource_model_parser,
-                                                         self.snapshot_saver,
-                                                         self.task_waiter,
-                                                         self.folder_manager,
-                                                         self.port_group_configurer): list(g)
+        artifactSaversToActions = {ArtifactHandler.factory(k,
+                                                           self.pyvmomi_service,
+                                                           vcenter_data_model,
+                                                           si,
+                                                           logger,
+                                                           self.deployer,
+                                                           reservation_id,
+                                                           self.resource_model_parser,
+                                                           self.snapshot_saver,
+                                                           self.task_waiter,
+                                                           self.folder_manager,
+                                                           self.port_group_configurer): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,
@@ -145,7 +145,7 @@ class SaveAppCommand:
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
         unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
-                              isinstance(saver, UnsupportedArtifactSaver)]
+                              isinstance(saver, UnsupportedArtifactHandler)]
         if unsupported_savers:
             log_error_message = "Unsupported save type was included in save app request: {0}" \
                 .format(', '.join({saver.unsupported_save_type for saver in unsupported_savers}))

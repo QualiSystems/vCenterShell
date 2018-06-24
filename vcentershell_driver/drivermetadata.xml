@@ -35,7 +35,7 @@
             <Command Description="" DisplayName="Orchestration Save" Name="orchestration_save" Tags="remote_connectivity,allow_unreserved" />
             <Command Description="" DisplayName="Orchestration Restore" Name="orchestration_restore" Tags="remote_connectivity,allow_unreserved" />
             <Command Description="" DisplayName="Get VmDetails" EnableCancellation="true" Name="GetVmDetails" Tags="allow_unreserved" />
-            <Command Description="" DisplayName="Save Sandbox" EnableCancellation="true" Name="SaveSandbox" Tags="allow_unreserved" />
+            <Command Description="" DisplayName="SaveApp" EnableCancellation="true" Name="SaveApp" Tags="allow_unreserved" />
         </Category>
         <Category Name="Power">
             <Command Description="" DisplayName="Power On" Name="PowerOn" Tags="power" />
