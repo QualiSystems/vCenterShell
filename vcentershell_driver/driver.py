@@ -77,7 +77,7 @@ class VCenterShellDriver(ResourceDriverInterface):
         save_app_results = self.command_orchestrator.save_sandbox(context, save_actions, cancellation_context)
         return DriverResponse(save_app_results).to_driver_response_json()
 
-    def DeleteSavedApps(self, context, ports, cancellation_context=None, request=''):
+    def DeleteSavedApps(self, context, request, cancellation_context=None):
         actions = self.request_parser.convert_driver_request_to_actions(request)
         delete_actions = [x for x in actions if isinstance(x, DeleteSavedApp)]
         save_app_results = self.command_orchestrator.delete_saved_sandbox(context, delete_actions, cancellation_context)
