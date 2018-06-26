@@ -66,8 +66,8 @@ class DeleteSavedSandboxCommand:
                                                              self.pg): list(g)
                                      for k, g in actions_grouped_by_save_types}
 
-        if not next((a for a in artifactHandlersToActions.keys() if isinstance(a, UnsupportedArtifactHandler)), None):
-            return
+        self._validate_save_deployment_models(artifactHandlersToActions, delete_sandbox_actions, results)
+
         error_results = [r for r in results if not r.success]
         if not error_results:
             results = self._execute_delete_saved_sandbox(artifactHandlersToActions,
@@ -76,6 +76,19 @@ class DeleteSavedSandboxCommand:
                                                          results)
 
         return results
+
+    def _validate_save_deployment_models(self, artifactHandlersToActions, delete_sandbox_actions, results):
+        unsupported_save_deployment_models = [a.unsupported_save_type for a in artifactHandlersToActions.keys() if
+                                              isinstance(a, UnsupportedArtifactHandler)]
+        if unsupported_save_deployment_models:
+            for action in delete_sandbox_actions:
+                results.append(
+                    ActionResultBase(type='DeleteSavedAppResult',
+                                     actionId=action.actionId,
+                                     success=False,
+                                     infoMessage='Unsupported save deployment models: {0}'.format(
+                                         ', '.join(unsupported_save_deployment_models)))
+                )
 
     def _execute_delete_saved_sandbox(self, artifactHandlersToActions, cancellation_context, logger, results):
         for artifactHandler in artifactHandlersToActions.keys():
