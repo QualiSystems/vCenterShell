@@ -1,5 +1,5 @@
 from cloudshell.cp.core import DriverRequestParser
-from cloudshell.cp.core.models import DeployApp, DriverResponse, SaveApp
+from cloudshell.cp.core.models import DeployApp, DriverResponse, SaveApp, DeleteSavedApp
 from cloudshell.cp.core.utils import single
 
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
@@ -25,7 +25,7 @@ class VCenterShellDriver(ResourceDriverInterface):
         self.deployments['vCenter VM From Template'] = self.deploy_from_template
         self.deployments['vCenter VM From Image'] = self.deploy_from_image
 
-    def initialize(self):
+    def initialize(self, **kwargs):
         pass
 
     def ApplyConnectivityChanges(self, context, request):
@@ -74,7 +74,13 @@ class VCenterShellDriver(ResourceDriverInterface):
     def SaveApp(self, context, request, cancellation_context=None):
         actions = self.request_parser.convert_driver_request_to_actions(request)
         save_actions = [x for x in actions if isinstance(x, SaveApp)]
-        save_app_results = self.command_orchestrator.save_app(context, save_actions, cancellation_context)
+        save_app_results = self.command_orchestrator.save_sandbox(context, save_actions, cancellation_context)
+        return DriverResponse(save_app_results).to_driver_response_json()
+
+    def DeleteSavedApps(self, context, ports, cancellation_context=None, request=''):
+        actions = self.request_parser.convert_driver_request_to_actions(request)
+        delete_actions = [x for x in actions if isinstance(x, DeleteSavedApp)]
+        save_app_results = self.command_orchestrator.delete_saved_sandbox(context, delete_actions, cancellation_context)
         return DriverResponse(save_app_results).to_driver_response_json()
 
     def deploy_from_template(self, context, deploy_action, cancellation_context):

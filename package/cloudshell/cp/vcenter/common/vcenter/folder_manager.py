@@ -1,5 +1,7 @@
 from threading import Lock
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
+from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
+SUCCESS = 'Success'
 
 
 class FolderManager(object):
@@ -9,7 +11,7 @@ class FolderManager(object):
         self.locks_lock = Lock()
         self.task_waiter = task_waiter
 
-    def delete_folder(self, si, logger, folder_full_path):
+    def delete_folder_with_vm_power_off(self, si, logger, folder_full_path):
         logger.info('Trying to remove {0} and all child folders and vms'.format(folder_full_path))
         folder = self.pv_service.get_folder(si, folder_full_path)
 
@@ -27,10 +29,18 @@ class FolderManager(object):
                     self.locks[folder_full_path] = Lock()
 
         with self.locks[folder_full_path]:
-            task = folder.Destroy_Task()
-            result = self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy Folder")
+            result = self.delete_folder(folder, logger)
 
         logger.info('Remove result for {0} and all child folders and vms\n{1}'.format(folder_full_path, result))
+
+    def delete_folder(self, folder, logger):
+        task = folder.Destroy_Task()
+        try:
+            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy Folder")
+            result = SUCCESS
+        except TaskFaultException as e:
+            result = e.message
+        return result
 
     def get_or_create_vcenter_folder(self, si, logger, path, folder_name):
         logger.info('Getting or creating {0} in {1}'.format(folder_name, path))

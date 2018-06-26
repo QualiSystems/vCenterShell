@@ -1,9 +1,11 @@
 import threading
 from contextlib import contextmanager
+from itertools import groupby
 from threading import Lock
 
-from cloudshell.cp.core.models import Artifact, SaveAppResult, Attribute
+from cloudshell.cp.core.models import Artifact, SaveAppResult, Attribute, ActionResultBase
 
+from cloudshell.cp.vcenter.common.vcenter.folder_manager import SUCCESS
 from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
@@ -13,8 +15,7 @@ from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFacto
 SAVED_SANDBOXES = "Saved Sandboxes"
 
 
-# todo interface for save from base
-class LinkedCloneArtifactSaver(object):
+class LinkedCloneArtifactHandler(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
                  resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer):
         self.SNAPSHOT_NAME = 'artifact'
@@ -72,7 +73,7 @@ class LinkedCloneArtifactSaver(object):
 
         self.logger.info('Saved snapshot on {0}'.format(result.vmName))
 
-        save_artifact = Artifact(artifactId=result.vmUuid, artifactName=result.vmName)
+        save_artifact = Artifact(artifactRef=result.vmUuid, artifactName=result.vmName)
 
         vcenter_vm_path = '/'.join([data_holder.template_resource_model.vm_location, result.vmName])
         saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
@@ -84,6 +85,43 @@ class LinkedCloneArtifactSaver(object):
                              True,
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
+
+    def delete(self, delete_saved_app_actions, cancellation_context):
+        tasks = self._get_delete_tasks(delete_saved_app_actions)
+
+        for task in tasks:
+            for artifact in task.artifacts:
+                vm = self.pv_service.get_vm_by_uuid(self.si, artifact.artifactRef)
+                if vm:
+                    self._power_off_vm(vm)  # todo Make parallel
+                    self._delete_vm(vm)
+
+        root_path = VMLocation.combine([self.vcenter_data_model.default_datacenter, self.vcenter_data_model.vm_location])
+
+        saved_sandbox_paths = {self._get_saved_sandbox_id_full_path(root_path, task.action.actionParams.savedSandboxId) for task in tasks}
+
+        for path in saved_sandbox_paths:
+            folder = self.pv_service.get_folder(self.si, path)
+            result = self.folder_manager.delete_folder(folder, self.logger)
+            [task.set_result(result) for task in tasks if task.action.actionParams.savedSandboxId in path]
+
+        return [task.DeleteSavedAppResult() for task in tasks]
+
+    def _get_delete_tasks(self, delete_saved_app_actions):
+        return [DeleteAppTask(action.actionParams.artifacts, action) for action in delete_saved_app_actions]
+
+    def destroy(self, save_action):
+        thread_id = threading.current_thread().ident
+
+        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
+        saved_sandbox_path = self._get_saved_sandbox_path(save_action)
+
+        try:
+            self.folder_manager.delete_folder_with_vm_power_off(self.si, self.logger, saved_sandbox_path)
+        except:
+            self.logger.info('Rollback for save_action {0} failed'.format(save_action.actionId))
+
+        self.logger.info('Rollback for save_action {0} successful'.format(save_action.actionId))
 
     def _disconnect_all_quali_created_networks(self, result):
         thread_id = threading.current_thread().ident
@@ -111,24 +149,14 @@ class LinkedCloneArtifactSaver(object):
 
         return vm
 
-    def destroy(self, save_action):
-        thread_id = threading.current_thread().ident
-
-        self.logger.info('[{0}] Rollback initiated'.format(thread_id))
-        saved_sandbox_path = self._get_saved_sandbox_path(save_action)
-
-        try:
-            self.folder_manager.delete_folder(self.si, self.logger, saved_sandbox_path)
-        except:
-            self.logger.info('Rollback for save_action {0} failed'.format(save_action.actionId))
-
-        self.logger.info('Rollback for save_action {0} successful'.format(save_action.actionId))
-
     def _get_saved_sandbox_path(self, save_action):
         data_holder = self._prepare_vm_data_holder(save_action, self.vcenter_data_model)
         saved_sandbox_id = save_action.actionParams.savedSandboxId
+        return self._get_saved_sandbox_id_full_path(data_holder.template_resource_model.vm_location, saved_sandbox_id)
+
+    def _get_saved_sandbox_id_full_path(self, vm_location, saved_sandbox_id):
         saved_sandbox_path = VMLocation.combine(
-            [data_holder.template_resource_model.vm_location, SAVED_SANDBOXES, saved_sandbox_id])
+            [vm_location, SAVED_SANDBOXES, saved_sandbox_id])
         return saved_sandbox_path
 
     def _update_cloned_vm_target_location(self, data_holder, saved_sandbox_id):
@@ -190,21 +218,66 @@ class LinkedCloneArtifactSaver(object):
             vm = self.pv_service.find_by_uuid(self.si, source_vm_uuid)
             vm_started_as_powered_on = vm.summary.runtime.powerState == 'poweredOn'
             if vm_started_as_powered_on:
-                task = vm.PowerOff()
-                self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
+                self._power_off_vm(vm)
 
             yield
 
             # power on vm_uuid -> if not originally powered off
             if vm_started_as_powered_on:
-                task = vm.PowerOn()
-                self.task_waiter.wait_for_task(task, self.logger, 'Power On')
+                self._power_on_vm(vm)
 
         else:
             yield
+
+    def _power_on_vm(self, vm):
+        task = vm.PowerOn()
+        self.task_waiter.wait_for_task(task, self.logger, 'Power On')
+
+    def _power_off_vm(self, vm):
+        if vm.summary.runtime.powerState != 'poweredOff':
+            task = vm.PowerOff()
+            self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
+
+    def _delete_vm(self, vm):
+        task = vm.Destroy_Task()
+        self.task_waiter.wait_for_task(task, self.logger, 'Delete VM')
 
     def _should_vm_be_powered_off_during_clone(self, save_action):
         save_attributes = save_action.actionParams.deploymentPathAttributes
         behavior_during_save = save_attributes.get("Behavior during save") or self.vcenter_data_model.behavior_during_save
         power_off_during_clone = behavior_during_save == "Power Off"
         return power_off_during_clone
+
+
+class DeleteAppTask(object):
+    def __init__(self, artifacts, action):
+        self.artifacts = artifacts
+        self.action = action
+        self._result = None
+
+    @property
+    def result(self):
+        return self._result
+
+    def set_result(self, value):
+        self._result = value
+
+    def success(self):
+        # if vm was not found thats considered success, because didn't need to delete artifact
+        # if vm exists, and result success, we were able to delete parent folder
+        return self.result and self.result == SUCCESS
+
+    def error_message(self):
+        if not self.success():
+            return self.result or ''
+        return ''
+
+    def DeleteSavedAppResult(self):
+        return ActionResultBase(
+            type='DeleteSavedApp',
+            actionId=self.action.actionId,
+            success=self.success(),
+            errorMessage=self.error_message()
+        )
+
+
