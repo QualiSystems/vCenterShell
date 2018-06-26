@@ -75,7 +75,7 @@ class LinkedCloneArtifactHandler(object):
 
         save_artifact = Artifact(artifactRef=result.vmUuid, artifactName=result.vmName)
 
-        vcenter_vm_path = '/'.join([data_holder.template_resource_model.vm_location, result.vmName])
+        vcenter_vm_path = self._get_saved_app_result_vcenter_vm_path(data_holder, result)
         saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
                                    Attribute('vCenter VM Snapshot', self.SNAPSHOT_NAME)]
 
@@ -85,6 +85,12 @@ class LinkedCloneArtifactHandler(object):
                              True,
                              artifacts=[save_artifact],
                              savedEntityAttributes=saved_entity_attributes)
+
+    def _get_saved_app_result_vcenter_vm_path(self, data_holder, result):
+        # remove datacenter from path, its not necessary as attribute of saved app
+        vm_location_with_datacenter = data_holder.template_resource_model.vm_location
+        vm_location_without_datacenter = '/'.join(vm_location_with_datacenter.split('/')[1:])
+        return '/'.join([vm_location_without_datacenter, result.vmName])
 
     def delete(self, delete_saved_app_actions, cancellation_context):
         tasks = self._get_delete_tasks(delete_saved_app_actions)
@@ -171,6 +177,9 @@ class LinkedCloneArtifactHandler(object):
         deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
             save_action.actionParams.deploymentPathAttributes,
             vCenterCloneVMFromVMResourceModel)
+
+        # default vm_location for saved app is actually vcenter location, we want to concentrate all our saved sandboxes in same location
+        deploy_from_vm_model.vm_location = self.vcenter_data_model.vm_location or deploy_from_vm_model.vm_location
 
         VCenterDetailsFactory.set_deplyment_vcenter_params(
             vcenter_resource_model=vcenter_data_model, deploy_params=deploy_from_vm_model)
