@@ -26,7 +26,7 @@
                 </Parameters>
             </Command>
             <Command Description="" DisplayName="Get Snapshots" Name="remote_get_snapshots" Tags="remote_connectivity,allow_unreserved" />
-            <Command Description="" DisplayName="Delete Saved Apps" EnableCancellation="true" Name="DeleteSavedApps" Tags="remote_connectivity, allow_unreserved">
+            <Command Description="" DisplayName="Delete Saved Apps" EnableCancellation="true" Name="DeleteSavedApps" Tags="allow_unreserved">
             </Command>
         </Category>
         <Category Name="Hidden Commands">
