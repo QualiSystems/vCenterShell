@@ -1,4 +1,4 @@
-<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.9.0">
+<Driver Description="this driver manage all the commands that runs at the vcenter context" MainClass="driver.VCenterShellDriver" Name="VCenter Driver" Version="1.10.1">
     <Layout>
         <Category Name="Deployment">
             <Command Description="" DisplayName="Deploy From Template" EnableCancellation="true" Name="deploy_from_template" Tags="allow_unreserved" />
