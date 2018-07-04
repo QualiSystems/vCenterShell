@@ -66,7 +66,8 @@ class SaveAppCommand:
                                                            self.snapshot_saver,
                                                            self.task_waiter,
                                                            self.folder_manager,
-                                                           self.port_group_configurer): list(g)
+                                                           self.port_group_configurer,
+                                                           self.cs): list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,

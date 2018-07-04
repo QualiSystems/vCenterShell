@@ -34,12 +34,16 @@ class FolderManager(object):
         logger.info('Remove result for {0} and all child folders and vms\n{1}'.format(folder_full_path, result))
 
     def delete_folder(self, folder, logger):
+        folder_name = folder.name
         task = folder.Destroy_Task()
         try:
             self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy Folder")
             result = SUCCESS
+            logger.info('Folder {0} was deleted'.format(folder_name))
         except TaskFaultException as e:
             result = e.message
+            logger.info('Failed to delete folder {0}'.format(folder_name))
+            logger.exception(e.message)
         return result
 
     def get_or_create_vcenter_folder(self, si, logger, path, folder_name):

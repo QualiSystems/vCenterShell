@@ -17,7 +17,8 @@ SAVED_SANDBOXES = "Saved Sandboxes"
 
 class LinkedCloneArtifactHandler(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
-                 resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer):
+                 resource_model_parser, snapshot_saver, task_waiter, folder_manager, port_configurer,
+                 cancellation_service):
         self.SNAPSHOT_NAME = 'artifact'
         self.saved_apps_folder_lock = Lock()
         self.saved_sandbox_folder_lock = Lock()
@@ -32,6 +33,7 @@ class LinkedCloneArtifactHandler(object):
         self.resource_model_parser = resource_model_parser
         self.folder_manager = folder_manager
         self.pg_configurer = port_configurer
+        self.cs = cancellation_service
 
     def save(self, save_action, cancellation_context):
         thread_id = threading.current_thread().ident
@@ -92,26 +94,52 @@ class LinkedCloneArtifactHandler(object):
         vm_location_without_datacenter = '/'.join(vm_location_with_datacenter.split('/')[1:])
         return '/'.join([vm_location_without_datacenter, result.vmName])
 
-    def delete(self, delete_saved_app_actions, cancellation_context):
+    def delete(self, delete_saved_app_actions, cancellation_context, pool):
+        self.logger.info('Delete saved sandbox started')
+
         tasks = self._get_delete_tasks(delete_saved_app_actions)
 
-        for task in tasks:
-            for artifact in task.artifacts:
-                vm = self.pv_service.get_vm_by_uuid(self.si, artifact.artifactRef)
-                if vm:
-                    self._power_off_vm(vm)  # todo Make parallel
-                    self._delete_vm(vm)
+        if self.cs.check_if_cancelled(cancellation_context):
+            raise Exception('Delete saved sandbox was cancelled')
+
+        artifacts = [(artifact, cancellation_context) for task in tasks for artifact in task.artifacts]
+
+        pool.map(self._get_rid_of_vm_if_found, artifacts)
+
+        if self.cs.check_if_cancelled(cancellation_context):
+            raise Exception('Delete saved sandbox was cancelled')
 
         root_path = VMLocation.combine([self.vcenter_data_model.default_datacenter, self.vcenter_data_model.vm_location])
 
         saved_sandbox_paths = {self._get_saved_sandbox_id_full_path(root_path, task.action.actionParams.savedSandboxId) for task in tasks}
 
+        self.logger.info('Saved sandbox path/s: {0}'.format(', '.join(saved_sandbox_paths)))
+
         for path in saved_sandbox_paths:
+            self.logger.info('Going to dispose of saved sandbox {0}'.format(path))
             folder = self.pv_service.get_folder(self.si, path)
+            if not folder:
+                self.logger.info('Could not find folder: {0}'.format(path))
+            else:
+                self.logger.info('Found folder: {0}'.format(path))
             result = self.folder_manager.delete_folder(folder, self.logger)
             [task.set_result(result) for task in tasks if task.action.actionParams.savedSandboxId in path]
 
         return [task.DeleteSavedAppResult() for task in tasks]
+
+    def _get_rid_of_vm_if_found(self, (artifact, cancellation_context)):
+        self.logger.info('Checking if need to dispose of artifact: {0}'.format(artifact.artifactRef))
+        vm = self.pv_service.get_vm_by_uuid(self.si, artifact.artifactRef)
+        if vm:
+            self.logger.info('Will dispose {0}, it is a VM'.format(artifact.artifactRef))
+
+            self._power_off_vm(vm, cancellation_context)
+            self.logger.info('Powered off {0}'.format(artifact.artifactRef))
+
+            self._delete_vm(vm, cancellation_context)
+            self.logger.info('Deleted {0}'.format(artifact.artifactRef))
+            return
+        self.logger.info('{0} was not a vm or vm not found'.format(artifact.artifactRef))
 
     def _get_delete_tasks(self, delete_saved_app_actions):
         return [DeleteAppTask(action.actionParams.artifacts, action) for action in delete_saved_app_actions]
@@ -242,14 +270,14 @@ class LinkedCloneArtifactHandler(object):
         task = vm.PowerOn()
         self.task_waiter.wait_for_task(task, self.logger, 'Power On')
 
-    def _power_off_vm(self, vm):
+    def _power_off_vm(self, vm, cancellation_context=None):
         if vm.summary.runtime.powerState != 'poweredOff':
             task = vm.PowerOff()
-            self.task_waiter.wait_for_task(task, self.logger, 'Power Off')
+            self.task_waiter.wait_for_task(task, self.logger, 'Power Off', cancellation_context)
 
-    def _delete_vm(self, vm):
+    def _delete_vm(self, vm, cancellation_context=None):
         task = vm.Destroy_Task()
-        self.task_waiter.wait_for_task(task, self.logger, 'Delete VM')
+        self.task_waiter.wait_for_task(task, self.logger, 'Delete VM', cancellation_context)
 
     def _should_vm_be_powered_off_during_clone(self, save_action):
         save_attributes = save_action.actionParams.deploymentPathAttributes
