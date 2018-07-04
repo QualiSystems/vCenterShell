@@ -9,6 +9,7 @@ from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
 from cloudshell.cp.vcenter.models.QualiDriverModels import CancellationContext
 
+
 class MockResourceParser(object):
     @staticmethod
     def convert_to_resource_model(dummy, callable):
@@ -289,8 +290,8 @@ class TestSaveAppCommand(TestCase):
 
         def cant_find_saved_apps_folder(si, path):
             if path == vcenter_data_model.default_datacenter + '/' \
-                    + vcenter_data_model.vm_location + '/'\
-                    + 'Saved Sandboxes' '/'\
+                    + vcenter_data_model.vm_location + '/' \
+                    + 'Saved Sandboxes' '/' \
                     + save_action.actionParams.savedSandboxId:
                 return None
             return saved_apps_folder
@@ -355,11 +356,11 @@ class TestSaveAppCommand(TestCase):
         vcenter_data_model.default_datacenter = 'QualiSB Cluster'
         vcenter_data_model.vm_location = 'QualiFolder'
         result = self.save_command.save_app(si=Mock(),
-                                   logger=Mock(),
-                                   vcenter_data_model=vcenter_data_model,
-                                   reservation_id='abc',
-                                   save_app_actions=[save_action],
-                                   cancellation_context=None)
+                                            logger=Mock(),
+                                            vcenter_data_model=vcenter_data_model,
+                                            reservation_id='abc',
+                                            save_app_actions=[save_action],
+                                            cancellation_context=None)
 
         # Assert
         self.assertTrue(not result[0].success)

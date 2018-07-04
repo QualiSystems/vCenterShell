@@ -27,14 +27,14 @@ class DeleteSavedSandboxCommand:
         self.resource_model_parser = resource_model_parser
         self.snapshot_saver = snapshot_saver
         self.folder_manager = folder_manager
-        SAVE_APPS_THREAD_POOL_SIZE = int(os.getenv('SaveAppsThreadPoolSize', 10))
-        self._pool = ThreadPool(SAVE_APPS_THREAD_POOL_SIZE)
+        DELETE_SAVED_APPS_THREAD_POOL_SIZE = int(os.getenv('DeleteSavedAppsThreadPoolSize', 10))
+        self._pool = ThreadPool(DELETE_SAVED_APPS_THREAD_POOL_SIZE)
         self.cs = cancellation_service
         self.pg = port_group_configurer
 
     def delete_sandbox(self, si, logger, vcenter_data_model, delete_sandbox_actions, cancellation_context):
         """
-        Cretaes an artifact of an app, that can later be restored
+        Deletes a saved sandbox's artifacts
 
         :param vcenter_data_model: VMwarevCenterResourceModel
         :param vim.ServiceInstance si: py_vmomi service instance
@@ -46,10 +46,10 @@ class DeleteSavedSandboxCommand:
         """
         results = []
 
-        logger.info('Save apps command starting on ' + vcenter_data_model.default_datacenter)
+        logger.info('Deleting saved sandbox command starting on ' + vcenter_data_model.default_datacenter)
 
         if not delete_sandbox_actions:
-            raise Exception('Failed to save app, missing data in request.')
+            raise Exception('Failed to delete saved sandbox, missing data in request.')
 
         actions_grouped_by_save_types = groupby(delete_sandbox_actions, lambda x: x.actionParams.saveDeploymentModel)
         artifactHandlersToActions = {ArtifactHandler.factory(k,
@@ -63,7 +63,8 @@ class DeleteSavedSandboxCommand:
                                                              self.snapshot_saver,
                                                              self.task_waiter,
                                                              self.folder_manager,
-                                                             self.pg): list(g)
+                                                             self.pg,
+                                                             self.cs): list(g)
                                      for k, g in actions_grouped_by_save_types}
 
         self._validate_save_deployment_models(artifactHandlersToActions, delete_sandbox_actions, results)
@@ -82,43 +83,21 @@ class DeleteSavedSandboxCommand:
                                               isinstance(a, UnsupportedArtifactHandler)]
         if unsupported_save_deployment_models:
             for action in delete_sandbox_actions:
+                unsupported_msg = 'Unsupported save deployment models: {0}'.format(
+                    ', '.join(unsupported_save_deployment_models))
                 results.append(
                     ActionResultBase(type='DeleteSavedAppResult',
                                      actionId=action.actionId,
                                      success=False,
-                                     infoMessage='Unsupported save deployment models: {0}'.format(
-                                         ', '.join(unsupported_save_deployment_models)))
+                                     infoMessage=unsupported_msg,
+                                     errorMessage=unsupported_msg)
                 )
 
     def _execute_delete_saved_sandbox(self, artifactHandlersToActions, cancellation_context, logger, results):
         for artifactHandler in artifactHandlersToActions.keys():
-            delete_sandbox_results = artifactHandler.delete(artifactHandlersToActions[artifactHandler], cancellation_context)
+            delete_sandbox_results = artifactHandler.delete(artifactHandlersToActions[artifactHandler],
+                                                            cancellation_context,
+                                                            self._pool)
             results.extend(delete_sandbox_results)
         return results
 
-    def _destroy(self, (artifactSaver, action)):
-        artifactSaver.destroy(save_action=action)
-        return ActionResultBase(action.actionId,
-                                success=False,
-                                errorMessage='Save app action {0} was cancelled'.format(action.actionId),
-                                infoMessage='')
-
-    def _validate_supported_artifact_handlers(self, artifactHandlersToActions, logger, results):
-        unsupported_handlers = [saver for saver in artifactHandlersToActions.keys() if
-                                isinstance(saver, UnsupportedArtifactHandler)]
-        if unsupported_handlers:
-            log_error_message = "Unsupported save type was included in delete saved app request: {0}" \
-                .format(', '.join({saver.unsupported_save_type for saver in unsupported_handlers}))
-            logger.error(log_error_message)
-
-            for artifact_handler in artifactHandlersToActions.keys():
-                if artifact_handler in unsupported_handlers:
-                    result_error_message = 'Unsupported save type ' + artifact_handler.unsupported_save_type
-                else:
-                    result_error_message = ''
-
-                delete_saved_app_actions = artifactHandlersToActions[artifact_handler]
-                for action in delete_saved_app_actions:
-                    results.append(ActionResultBase(action.actionId,
-                                                    success=False,
-                                                    errorMessage=result_error_message))
