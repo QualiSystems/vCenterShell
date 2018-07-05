@@ -55,6 +55,9 @@ class SaveAppCommand:
             raise Exception('Failed to save app, missing data in request.')
 
         actions_grouped_by_save_types = groupby(save_app_actions, lambda x: x.actionParams.saveDeploymentModel)
+        # artifactSaver or artifactHandler are different ways to save artifacts. For example, currently
+        # we clone a vm, thenk take a snapshot. restore will be to deploy from linked snapshot
+        # a future artifact handler we might develop is save vm to OVF file and restore from file.
         artifactSaversToActions = {ArtifactHandler.factory(k,
                                                            self.pyvmomi_service,
                                                            vcenter_data_model,
@@ -67,7 +70,8 @@ class SaveAppCommand:
                                                            self.task_waiter,
                                                            self.folder_manager,
                                                            self.port_group_configurer,
-                                                           self.cs): list(g)
+                                                           self.cs)
+                                   : list(g)
                                    for k, g in actions_grouped_by_save_types}
 
         self.validate_requested_save_types_supported(artifactSaversToActions,
@@ -129,6 +133,7 @@ class SaveAppCommand:
     def _save(self, (artifactSaver, action, cancellation_context, logger)):
         try:
             return artifactSaver.save(save_action=action, cancellation_context=cancellation_context)
+
         except Exception:
             ex_type, ex, tb = sys.exc_info()
             logger.exception('Save app action {0} failed'.format(action.actionId))
