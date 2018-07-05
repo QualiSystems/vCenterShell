@@ -114,14 +114,19 @@ class SaveAppCommand:
 
         if self.cs.check_if_cancelled(cancellation_context):
             logger.info('[{0}] Save sandbox was cancelled, rolling back saved apps'.format(thread_id))
-            results = results_before_deploy
-            for param in destroy_params:
-                results.append(self._destroy(param))
-                logger.info('[{0}] Save Sandbox roll back completed'.format(thread_id))
+            results = self._rollback(destroy_params, logger, results, results_before_deploy, thread_id)
 
-        if operation_error:
+        elif operation_error:
             logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id))
+            results = self._rollback(destroy_params, logger, results, results_before_deploy, thread_id)
 
+        return results
+
+    def _rollback(self, destroy_params, logger, results, results_before_deploy, thread_id):
+        results = results_before_deploy
+        for param in destroy_params:
+            results.append(self._destroy(param))
+            logger.info('[{0}] Save Sandbox roll back completed'.format(thread_id))
         return results
 
     def _get_save_params(self, artifactSaver, artifactSaversToActions, cancellation_context, logger):
@@ -146,7 +151,7 @@ class SaveAppCommand:
         artifactSaver.destroy(save_action=action)
         return SaveAppResult(action.actionId,
                              success=False,
-                             errorMessage='Save app action {0} was cancelled'.format(action.actionId),
+                             errorMessage='Save app action {0} was rolled back'.format(action.actionId),
                              infoMessage='')
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
