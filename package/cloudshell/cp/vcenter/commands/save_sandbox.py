@@ -151,7 +151,7 @@ class SaveAppCommand:
         artifactSaver.destroy(save_action=action)
         return SaveAppResult(action.actionId,
                              success=False,
-                             errorMessage='Save app action {0} was cancelled'.format(action.actionId),
+                             errorMessage='Save app action {0} was rolled back'.format(action.actionId),
                              infoMessage='')
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):

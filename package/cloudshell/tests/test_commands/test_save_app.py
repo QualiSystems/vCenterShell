@@ -120,12 +120,12 @@ class TestSaveAppCommand(TestCase):
         # Assert
         self.assertTrue(result[0].type == 'SaveApp')
         self.assertTrue(result[0].actionId == save_action1.actionId)
-        self.assertTrue(result[0].errorMessage == 'Save app action {0} was cancelled'.format(save_action1.actionId))
+        self.assertTrue(result[0].errorMessage == 'Save app action {0} was rolled back'.format(save_action1.actionId))
         self.assertTrue(not result[0].success)
 
         self.assertTrue(result[1].type == 'SaveApp')
         self.assertTrue(result[1].actionId == save_action2.actionId)
-        self.assertTrue(result[0].errorMessage == 'Save app action {0} was cancelled'.format(save_action2.actionId))
+        self.assertTrue(result[0].errorMessage == 'Save app action {0} was rolled back'.format(save_action2.actionId))
         self.assertTrue(not result[1].success)
 
     def test_nonempty_saved_sandbox_storage_replaces_default_storage(self):
@@ -327,7 +327,7 @@ class TestSaveAppCommand(TestCase):
         save_action = self._create_arbitrary_save_app_action()
 
         self.save_command.deployer = Mock()
-        error_message = 'Clone VM failed!'
+        error_message = 'Save app action  was rolled back'
         self.save_command.deployer.deploy_clone_from_vm = Mock(side_effect=Exception(error_message))
 
         vcenter_data_model = Mock()
