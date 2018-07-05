@@ -128,9 +128,10 @@ class LinkedCloneArtifactHandler(object):
             folder = self.pv_service.get_folder(self.si, path)
             if not folder:
                 self.logger.info('Could not find folder: {0}'.format(path))
+                result = 'Could not find folder {0}'.format(path)
             else:
                 self.logger.info('Found folder: {0}'.format(path))
-            result = self.folder_manager.delete_folder(folder, self.logger)
+                result = self.folder_manager.delete_folder(folder, self.logger)
             [task.set_result(result) for task in tasks if task.action.actionParams.savedSandboxId in path]
 
         return [task.DeleteSavedAppResult() for task in tasks]
