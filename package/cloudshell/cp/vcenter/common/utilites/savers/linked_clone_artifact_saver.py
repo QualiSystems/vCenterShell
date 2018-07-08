@@ -128,7 +128,7 @@ class LinkedCloneArtifactHandler(object):
             folder = self.pv_service.get_folder(self.si, path)
             if not folder:
                 self.logger.info('Could not find folder: {0}'.format(path))
-                result = 'Could not find folder {0}'.format(path)
+                result = SUCCESS
             else:
                 self.logger.info('Found folder: {0}'.format(path))
                 result = self.folder_manager.delete_folder(folder, self.logger)
