@@ -127,12 +127,16 @@ class LinkedCloneArtifactHandler(object):
             self.logger.info('Going to dispose of saved sandbox {0}'.format(path))
             folder = self.pv_service.get_folder(self.si, path)
             if not folder:
-                self.logger.info('Could not find folder: {0}'.format(path))
-                result = 'Could not find folder {0}'.format(path)
+                folder_not_found_msg = 'Could not find folder: {0}'.format(path)
+                self.logger.info(folder_not_found_msg)
+                result = SUCCESS
+                msg = folder_not_found_msg
             else:
                 self.logger.info('Found folder: {0}'.format(path))
                 result = self.folder_manager.delete_folder(folder, self.logger)
-            [task.set_result(result) for task in tasks if task.action.actionParams.savedSandboxId in path]
+                msg = ''
+            [task.set_result(result) and task.set_msg(msg)
+             for task in tasks if task.action.actionParams.savedSandboxId in path]
 
         return [task.DeleteSavedAppResult() for task in tasks]
 
@@ -300,6 +304,7 @@ class DeleteAppTask(object):
         self.artifacts = artifacts
         self.action = action
         self._result = None
+        self._msg = None
 
     @property
     def result(self):
@@ -307,6 +312,9 @@ class DeleteAppTask(object):
 
     def set_result(self, value):
         self._result = value
+
+    def set_msg(self, msg):
+        self._msg = msg
 
     def success(self):
         # if vm was not found thats considered success, because didn't need to delete artifact
@@ -318,12 +326,16 @@ class DeleteAppTask(object):
             return self.result or ''
         return ''
 
+    def msg(self):
+        return self._msg or ''
+
     def DeleteSavedAppResult(self):
         return ActionResultBase(
             type='DeleteSavedApp',
             actionId=self.action.actionId,
             success=self.success(),
-            errorMessage=self.error_message()
+            errorMessage=self.error_message(),
+            infoMessage=self.msg()
         )
 
 
