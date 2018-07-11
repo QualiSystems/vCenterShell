@@ -193,6 +193,11 @@ class VCenterAutoModelDiscovery(object):
 
     def _validate_saved_sandbox_storage(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         accepted_types = (vim.Datastore, vim.StoragePod)
+
+        # saved sandbox storage isnt mandatory so if not configured exit without validation
+        if key not in attributes or not attributes[key]:
+            return
+
         datastore = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
         if not datastore:
             datastore = self._get_default(all_items_in_vc, accepted_types, key)
