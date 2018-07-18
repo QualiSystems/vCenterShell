@@ -34,8 +34,14 @@ class VMIPManager(object):
 
     @staticmethod
     def get_ip_match_function(ip_regex=None):
-        ip_regex = ip_regex or '.*'
-        return re.compile(ip_regex).match
+
+        if(not ip_regex):
+            return  re.compile('.*').match
+
+        try:
+            return re.compile(ip_regex).match
+        except Exception as e:
+            raise ValueError('Invalid IP REGEX : {0} '.format(ip_regex))
 
     def _obtain_ip(self, vm, default_network, match_function, logger):
         ip = None
