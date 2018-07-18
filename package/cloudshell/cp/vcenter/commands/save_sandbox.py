@@ -117,7 +117,7 @@ class SaveAppCommand:
             results = self._rollback(destroy_params, logger, results, results_before_deploy, thread_id)
 
         elif operation_error:
-            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps'.format(thread_id))
+            logger.error('[{0}] Save Sandbox operation failed, rolling backed saved apps. See logs for more information'.format(thread_id))
             results = self._rollback(destroy_params, logger, results, results_before_deploy, thread_id)
 
         return results
