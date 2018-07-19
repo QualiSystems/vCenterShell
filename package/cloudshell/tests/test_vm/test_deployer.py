@@ -145,11 +145,8 @@ class TestVirtualMachineDeployer(TestCase):
                     "vcenter_image_arguments": "--compress=9,--schemaValidate,--etc",
                     'ip_regex': '',
                     'refresh_ip_timeout': '10',
-                    'auto_power_on': 'True',
                     'auto_power_off': 'True',
-                    'wait_for_ip': 'True',
-                    'auto_delete': 'True',
-                    'autoload': 'True'
+                    'auto_delete': 'True'
                 }
         })
 
