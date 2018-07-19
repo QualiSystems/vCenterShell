@@ -1,6 +1,8 @@
 import traceback
 
 from cloudshell.cp.core.models import DeployAppResult
+from cloudshell.cp.core.utils import convert_to_bool
+
 from cloudshell.cp.vcenter.models.VCenterDeployVMFromLinkedCloneResourceModel import \
     VCenterDeployVMFromLinkedCloneResourceModel
 from cloudshell.cp.vcenter.models.vCenterCloneVMFromVMResourceModel import vCenterCloneVMFromVMResourceModel
@@ -126,7 +128,7 @@ class VirtualMachineDeployer(object):
                                                    datastore_name=other_params.vm_storage,
                                                    cluster_name=other_params.vm_cluster,
                                                    resource_pool=other_params.vm_resource_pool,
-                                                   power_on=other_params.auto_power_on,
+                                                   power_on=False,
                                                    snapshot=snapshot)
 
         if cancellation_context.is_cancelled:
@@ -149,7 +151,9 @@ class VirtualMachineDeployer(object):
                                vmUuid=clone_vm_result.vm.summary.config.uuid,
                                vmDetailsData=vm_details_data,
                                deployedAppAdditionalData={'ip_regex': other_params.ip_regex,
-                                                          'refresh_ip_timeout': other_params.refresh_ip_timeout})
+                                                          'refresh_ip_timeout': other_params.refresh_ip_timeout,
+                                                          'auto_power_off': convert_to_bool(other_params.auto_power_off),
+                                                          'auto_delete': convert_to_bool(other_params.auto_delete)})
 
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context, reservation_id,
                           cancellation_context):
@@ -182,7 +186,9 @@ class VirtualMachineDeployer(object):
                                                               logger)
 
                 additional_data = {'ip_regex': data_holder.image_params.ip_regex,
-                                   'refresh_ip_timeout': data_holder.image_params.refresh_ip_timeout}
+                                   'refresh_ip_timeout': data_holder.image_params.refresh_ip_timeout,
+                                   'auto_power_off': convert_to_bool(data_holder.image_params.auto_power_off),
+                                   'auto_delete': convert_to_bool(data_holder.image_params.auto_delete)}
 
                 return DeployAppResult(vmName=vm_name,
                                        vmUuid=vm.config.uuid,
@@ -223,7 +229,7 @@ class VirtualMachineDeployer(object):
         image_params.datastore = data_holder.vm_storage
         image_params.datacenter = data_holder.default_datacenter
         image_params.image_url = data_holder.vcenter_image
-        image_params.power_on = data_holder.auto_power_on
+        image_params.power_on = False
         image_params.vcenter_name = data_holder.vcenter_name
         return image_params
 
