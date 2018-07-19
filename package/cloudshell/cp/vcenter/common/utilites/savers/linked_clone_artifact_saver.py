@@ -13,9 +13,6 @@ from cloudshell.cp.vcenter.vm.vcenter_details_factory import VCenterDetailsFacto
 
 
 SAVED_SANDBOXES = "Saved Sandboxes"
-COPY_TO_SAVED_ATTRIBUTES = ['VM Cluster', 'VM Storage, VM Resource Pool', 'VM Location', 'Auto Power On', 'Auto Power Off',
-                            'Wait for IP', 'Auto Delete', 'Autoload', 'IP Regex', 'Refresh IP']
-
 
 class LinkedCloneArtifactHandler(object):
     def __init__(self, pv_service, vcenter_data_model, si, logger, deployer, reservation_id,
@@ -81,13 +78,8 @@ class LinkedCloneArtifactHandler(object):
 
         vcenter_vm_path = self._get_saved_app_result_vcenter_vm_path(data_holder, result)
 
-        original_deployment_attributes = save_action.actionParams.deploymentPathAttributes
-
         saved_entity_attributes = [Attribute('vCenter VM', vcenter_vm_path),
                                    Attribute('vCenter VM Snapshot', self.SNAPSHOT_NAME)]
-
-        saved_entity_attributes.extend([Attribute(k, v) for k, v in original_deployment_attributes.iteritems()
-                                        if k in COPY_TO_SAVED_ATTRIBUTES])
 
         self.logger.info('[{1}] Save Action using source type: Linked Clone Successful. Saved Sandbox App with snapshot created: {0}'.format(result.vmName, thread_id))
 
