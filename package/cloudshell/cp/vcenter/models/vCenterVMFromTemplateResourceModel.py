@@ -1,6 +1,5 @@
 class vCenterVMFromTemplateResourceModel(object):
     def __init__(self):
-        self.vcenter_name = ''
         self.vcenter_template = ''
         self.vm_cluster = ''
         self.vm_storage = ''
@@ -13,3 +12,4 @@ class vCenterVMFromTemplateResourceModel(object):
         self.auto_delete = True
         self.autoload = True
         self.refresh_ip_timeout = 0
+        self.behavior_during_save = ''

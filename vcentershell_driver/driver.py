@@ -1,13 +1,15 @@
+from cloudshell.cp.core import DriverRequestParser
+from cloudshell.cp.core.models import DeployApp, DriverResponse, SaveApp, DeleteSavedApp
+from cloudshell.cp.core.utils import single
+
 from cloudshell.cp.vcenter.commands.command_orchestrator import CommandOrchestrator
-from cloudshell.shell.core.context import ResourceCommandContext
+from cloudshell.shell.core.context import ResourceCommandContext, CancellationContext
 from cloudshell.shell.core.resource_driver_interface import ResourceDriverInterface
 from cloudshell.cp.vcenter.common.vcenter.model_auto_discovery import VCenterAutoModelDiscovery
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
-import jsonpickle
 
 
-class VCenterShellDriver (ResourceDriverInterface):
-
+class VCenterShellDriver(ResourceDriverInterface):
     def cleanup(self):
         pass
 
@@ -15,6 +17,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         """
         ctor must be without arguments, it is created with reflection at run time
         """
+        self.request_parser = DriverRequestParser()
         self.command_orchestrator = CommandOrchestrator()  # type: CommandOrchestrator
         self.deployments = dict()
         self.deployments['vCenter Clone VM From VM'] = self.deploy_clone_from_vm
@@ -22,7 +25,7 @@ class VCenterShellDriver (ResourceDriverInterface):
         self.deployments['vCenter VM From Template'] = self.deploy_from_template
         self.deployments['vCenter VM From Image'] = self.deploy_from_image
 
-    def initialize(self):
+    def initialize(self, **kwargs):
         pass
 
     def ApplyConnectivityChanges(self, context, request):
@@ -34,8 +37,8 @@ class VCenterShellDriver (ResourceDriverInterface):
     def disconnect(self, context, ports, network_name):
         return self.command_orchestrator.disconnect(context, ports, network_name)
 
-    def destroy_vm_only(self, context, ports):
-        return self.command_orchestrator.destroy_vm_only(context, ports)
+    def DeleteInstance(self, context, ports):
+        return self.command_orchestrator.DeleteInstance(context, ports)
 
     def remote_refresh_ip(self, context, cancellation_context, ports):
         return self.command_orchestrator.refresh_ip(context, cancellation_context, ports)
@@ -56,27 +59,43 @@ class VCenterShellDriver (ResourceDriverInterface):
     def PowerCycle(self, context, ports, delay):
         return self.command_orchestrator.power_cycle(context, ports, delay)
 
-    def Deploy(self, context, request=None):
-        app_request = jsonpickle.decode(request)
-        deployment_name = app_request['DeploymentServiceName']
+    def Deploy(self, context, request=None, cancellation_context=None):
+        actions = self.request_parser.convert_driver_request_to_actions(request)
+        deploy_action = single(actions, lambda x: isinstance(x, DeployApp))
+        deployment_name = deploy_action.actionParams.deployment.deploymentPath
+
         if deployment_name in self.deployments.keys():
             deploy_method = self.deployments[deployment_name]
-            return deploy_method(context, request)
+            deploy_result = deploy_method(context, deploy_action, cancellation_context)
+            return DriverResponse([deploy_result]).to_driver_response_json()
         else:
             raise Exception('Could not find the deployment')
 
+    def SaveApp(self, context, request, cancellation_context=None):
+        actions = self.request_parser.convert_driver_request_to_actions(request)
+        save_actions = [x for x in actions if isinstance(x, SaveApp)]
+        save_app_results = self.command_orchestrator.save_sandbox(context, save_actions, cancellation_context)
+        return DriverResponse(save_app_results).to_driver_response_json()
 
-    def deploy_from_template(self, context, request):
-        return self.command_orchestrator.deploy_from_template(context, request)
+    def DeleteSavedApps(self, context, request, cancellation_context=None):
+        actions = self.request_parser.convert_driver_request_to_actions(request)
+        delete_actions = [x for x in actions if isinstance(x, DeleteSavedApp)]
+        save_app_results = self.command_orchestrator.delete_saved_sandbox(context, delete_actions, cancellation_context)
+        return DriverResponse(save_app_results).to_driver_response_json()
 
-    def deploy_clone_from_vm(self, context, request):
-        return self.command_orchestrator.deploy_clone_from_vm(context, request)
+    def deploy_from_template(self, context, deploy_action, cancellation_context):
+        return self.command_orchestrator.deploy_from_template(context, deploy_action, cancellation_context)
 
-    def deploy_from_linked_clone(self, context, request):
-        return self.command_orchestrator.deploy_from_linked_clone(context, request)
+    def deploy_clone_from_vm(self, context, deploy_action, cancellation_context):
+        return self.command_orchestrator.deploy_clone_from_vm(context, deploy_action, cancellation_context)
 
-    def deploy_from_image(self, context, request):
-        return self.command_orchestrator.deploy_from_image(context, request)
+    def deploy_from_linked_clone(self, context, deploy_action, cancellation_context):
+        return self.command_orchestrator.deploy_from_linked_clone(context, deploy_action, cancellation_context)
+
+    def deploy_from_image(self, context, deploy_action, cancellation_context):
+        if cancellation_context is None:
+            cancellation_context = CancellationContext()
+        return self.command_orchestrator.deploy_from_image(context, deploy_action, cancellation_context)
 
     def get_inventory(self, context):
         """

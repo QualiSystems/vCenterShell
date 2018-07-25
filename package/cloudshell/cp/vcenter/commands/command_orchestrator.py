@@ -1,10 +1,11 @@
 import time
-from datetime import datetime, date
+from datetime import datetime
 import jsonpickle
 
 from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
 from cloudshell.shell.core.context import ResourceRemoteCommandContext
+from cloudshell.shell.core.driver_context import CancellationContext
 
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo
@@ -14,7 +15,7 @@ from pyVim.connect import SmartConnect, Disconnect
 from cloudshell.cp.vcenter.commands.connect_dvswitch import VirtualSwitchConnectCommand
 from cloudshell.cp.vcenter.commands.connect_orchestrator import ConnectionCommandOrchestrator
 from cloudshell.cp.vcenter.commands.deploy_vm import DeployCommand
-from cloudshell.cp.vcenter.commands.destroy_vm import DestroyVirtualMachineCommand
+from cloudshell.cp.vcenter.commands.DeleteInstance import DestroyVirtualMachineCommand
 from cloudshell.cp.vcenter.commands.disconnect_dvswitch import VirtualSwitchToMachineDisconnectCommand
 from cloudshell.cp.vcenter.commands.load_vm import VMLoader
 from cloudshell.cp.vcenter.commands.power_manager_vm import VirtualMachinePowerManagementCommand
@@ -22,6 +23,8 @@ from cloudshell.cp.vcenter.commands.refresh_ip import RefreshIpCommand
 from cloudshell.cp.vcenter.commands.restore_snapshot import SnapshotRestoreCommand
 from cloudshell.cp.vcenter.commands.save_snapshot import SaveSnapshotCommand
 from cloudshell.cp.vcenter.commands.retrieve_snapshots import RetrieveSnapshotsCommand
+from cloudshell.cp.vcenter.commands.save_sandbox import SaveAppCommand
+from cloudshell.cp.vcenter.commands.delete_saved_sandbox import DeleteSavedSandboxCommand
 from cloudshell.cp.vcenter.common.cloud_shell.resource_remover import CloudshellResourceRemover
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.utilites.command_result import set_command_result, get_result_from_command_output
@@ -51,6 +54,10 @@ from cloudshell.cp.vcenter.vm.portgroup_configurer import VirtualMachinePortGrou
 from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider
 from cloudshell.cp.vcenter.vm.vnic_to_network_mapper import VnicToNetworkMapper
 from cloudshell.cp.vcenter.models.DeployFromTemplateDetails import DeployFromTemplateDetails
+from cloudshell.cp.core.models import DeployApp, DeployAppResult, SaveApp, SaveAppResult
+from cloudshell.cp.vcenter.common.vcenter.folder_manager import FolderManager
+from cloudshell.cp.vcenter.common.vcenter.cancellation_service import CommandCancellationService
+
 
 class CommandOrchestrator(object):
     def __init__(self):
@@ -60,6 +67,7 @@ class CommandOrchestrator(object):
 
         """
         synchronous_task_waiter = SynchronousTaskWaiter()
+        cancellation_service = CommandCancellationService()
         pv_service = pyVmomiService(connect=SmartConnect, disconnect=Disconnect, task_waiter=synchronous_task_waiter)
         self.resource_model_parser = ResourceModelParser()
         port_group_name_generator = DvPortGroupNameGenerator()
@@ -77,7 +85,7 @@ class CommandOrchestrator(object):
         vm_deployer = VirtualMachineDeployer(pv_service=pv_service,
                                              name_generator=generate_unique_name,
                                              ovf_service=ovf_service,
-                                             resource_model_parser=ResourceModelParser(),
+                                             resource_model_parser=self.resource_model_parser,
                                              vm_details_provider=vm_details_provider)
 
         dv_port_group_creator = DvPortGroupCreator(pyvmomi_service=pv_service,
@@ -118,6 +126,9 @@ class CommandOrchestrator(object):
             disconnector=self.virtual_switch_disconnect_command,
             resource_model_parser=self.resource_model_parser)
 
+        self.folder_manager = FolderManager(pv_service=pv_service,
+                                            task_waiter=synchronous_task_waiter)
+
         # Destroy VM Command
         self.destroy_virtual_machine_command = \
             DestroyVirtualMachineCommand(pv_service=pv_service,
@@ -130,7 +141,7 @@ class CommandOrchestrator(object):
 
         # Refresh IP command
         self.refresh_ip_command = RefreshIpCommand(pyvmomi_service=pv_service,
-                                                   resource_model_parser=ResourceModelParser(),
+                                                   resource_model_parser=self.resource_model_parser,
                                                    ip_manager=ip_manager)
 
         # Get Vm Details command
@@ -147,6 +158,24 @@ class CommandOrchestrator(object):
 
         self.snapshots_retriever = RetrieveSnapshotsCommand(pyvmomi_service=pv_service)
 
+        self.save_app_command = SaveAppCommand(pyvmomi_service=pv_service,
+                                               task_waiter=synchronous_task_waiter,
+                                               deployer=vm_deployer,
+                                               resource_model_parser=self.resource_model_parser,
+                                               snapshot_saver=self.snapshot_saver,
+                                               folder_manager=self.folder_manager,
+                                               cancellation_service=cancellation_service,
+                                               port_group_configurer=virtual_machine_port_group_configurer)
+
+        self.delete_saved_sandbox_command = DeleteSavedSandboxCommand(pyvmomi_service=pv_service,
+                                                                      task_waiter=synchronous_task_waiter,
+                                                                      deployer=vm_deployer,
+                                                                      resource_model_parser=self.resource_model_parser,
+                                                                      snapshot_saver=self.snapshot_saver,
+                                                                      folder_manager=self.folder_manager,
+                                                                      cancellation_service=cancellation_service,
+                                                                      port_group_configurer=virtual_machine_port_group_configurer)
+
     def connect_bulk(self, context, request):
         results = self.command_wrapper.execute_command_with_connection(
             context,
@@ -159,103 +188,134 @@ class CommandOrchestrator(object):
         driver_response_root.driverResponse = driver_response
         return set_command_result(result=driver_response_root, unpicklable=False)
 
-    def deploy_from_template(self, context, request):
+    def save_sandbox(self, context, save_actions, cancellation_context):
+        """
+        Save sandbox command, persists an artifact of existing VMs, from which new vms can be restored
+        :param ResourceCommandContext context:
+        :param list[SaveApp] save_actions:
+        :param CancellationContext cancellation_context:
+        :return: list[SaveAppResult] save_app_results
+        """
+        connection = self.command_wrapper.execute_command_with_connection(context, self.save_app_command.save_app,
+                                                                          save_actions, cancellation_context, )
+        save_app_results = connection
+        return save_app_results
+
+    def delete_saved_sandbox(self, context, delete_saved_apps, cancellation_context):
+        """
+        Delete a saved sandbox, along with any vms associated with it
+        :param ResourceCommandContext context:
+        :param list[DeleteSavedApp] delete_saved_apps:
+        :param CancellationContext cancellation_context:
+        :return: list[SaveAppResult] save_app_results
+        """
+        connection = self.command_wrapper.execute_command_with_connection(context,
+                                                                          self.delete_saved_sandbox_command.delete_sandbox,
+                                                                          delete_saved_apps, cancellation_context)
+        delete_saved_apps_results = connection
+        return delete_saved_apps_results
+
+    def deploy_from_template(self, context, deploy_action, cancellation_context):
         """
         Deploy From Template Command, will deploy vm from template
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
+        deploy_from_template_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=vCenterVMFromTemplateResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_template_model, deploy_action.actionParams.appName)
 
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterVMFromTemplateResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_template,
-            data_holder)
+            data_holder,
+            cancellation_context,
+            self.folder_manager)
 
-        return set_command_result(result=result, unpicklable=False)
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
-    def deploy_clone_from_vm(self, context, request):
+    def deploy_clone_from_vm(self, context, deploy_action, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
+        deploy_from_vm_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=vCenterCloneVMFromVMResourceModel)
+        data_holder = DeployFromTemplateDetails(deploy_from_vm_model, deploy_action.actionParams.appName)
 
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        clone_from_vm_model = ResourceModelParser().convert_to_resource_model(data['Attributes'], vCenterCloneVMFromVMResourceModel)
-        data_holder = DeployFromTemplateDetails(clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_clone_from_vm,
-            data_holder)
+            data_holder,
+            cancellation_context,
+            self.folder_manager)
 
-        res = set_command_result(result=result, unpicklable=False)
-        return res
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
-    def deploy_from_linked_clone(self, context, request):
+    def deploy_from_linked_clone(self, context, deploy_action, cancellation_context):
         """
         Deploy Cloned VM From VM Command, will deploy vm from template
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
-        :return str deploy results
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
+        :return DeployAppResult deploy results
         """
-
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], VCenterDeployVMFromLinkedCloneResourceModel)
+        linked_clone_from_vm_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=VCenterDeployVMFromLinkedCloneResourceModel)
+        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, deploy_action.actionParams.appName)
 
         if not linked_clone_from_vm_model.vcenter_vm_snapshot:
-            raise ValueError('Please insert snapshot to deploy from')
+            raise ValueError('Please insert snapshot to deploy an app from a linked clone')
 
-        data_holder = DeployFromTemplateDetails(linked_clone_from_vm_model, data['UserRequestedAppName'] or data['AppName'])
-
-        # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_linked_clone,
-            data_holder)
+            data_holder,
+            cancellation_context,
+            self.folder_manager)
 
-        return set_command_result(result=result, unpicklable=False)
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
-    def deploy_from_image(self, context, request):
+    def deploy_from_image(self, context, deploy_action, cancellation_context):
         """
         Deploy From Image Command, will deploy vm from ovf image
 
-        :param models.QualiDriverModels.ResourceCommandContext context: the context of the command
-        :param str request: represent a json string '{ "DeploymentServiceName": "..", "AppName": "..", "Attributes": {"Key1": "Value1", ..} }'
+        :param CancellationContext cancellation_context:
+        :param ResourceCommandContext context: the context of the command
+        :param DeployApp deploy_action:
         :return str deploy results
         """
-
-        # get command parameters from the environment
-        data = jsonpickle.decode(request)
-        data['Attributes']['vCenter Name'] = context.resource.name
-        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(data['Attributes'], vCenterVMFromImageResourceModel)
-        data_holder = DeployFromImageDetails(deploy_from_image_model, data['UserRequestedAppName'] or data['AppName'])
+        deploy_action.actionParams.deployment.attributes['vCenter Name'] = context.resource.name
+        deploy_from_image_model = self.resource_model_parser.convert_to_resource_model(
+            attributes=deploy_action.actionParams.deployment.attributes,
+            resource_model_type=vCenterVMFromImageResourceModel)
+        data_holder = DeployFromImageDetails(deploy_from_image_model, deploy_action.actionParams.appName)
 
         # execute command
-        result = self.command_wrapper.execute_command_with_connection(
+        deploy_result_action = self.command_wrapper.execute_command_with_connection(
             context,
             self.deploy_command.execute_deploy_from_image,
             data_holder,
-            context.resource)
+            context.resource,
+            cancellation_context,
+            self.folder_manager)
 
-        return set_command_result(result=result, unpicklable=False)
+        deploy_result_action.actionId = deploy_action.actionId
+        return deploy_result_action
 
     # remote command
     def disconnect_all(self, context, ports):
@@ -295,7 +355,7 @@ class CommandOrchestrator(object):
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
-    def destroy_vm_only(self, context, ports):
+    def DeleteInstance(self, context, ports):
         """
         Destroy Vm Command, will only destroy the vm and will not remove the resource
 
@@ -306,7 +366,7 @@ class CommandOrchestrator(object):
         # execute command
         res = self.command_wrapper.execute_command_with_connection(
             context,
-            self.destroy_virtual_machine_command.destroy_vm_only,
+            self.destroy_virtual_machine_command.DeleteInstance,
             resource_details.vm_uuid,
             resource_details.fullname)
         return set_command_result(result=res, unpicklable=False)
@@ -325,7 +385,8 @@ class CommandOrchestrator(object):
                                                                    self.refresh_ip_command.refresh_ip,
                                                                    resource_details,
                                                                    cancellation_context,
-                                                                   context.remote_endpoints[0].app_context.app_request_json)
+                                                                   context.remote_endpoints[
+                                                                       0].app_context.app_request_json)
         return set_command_result(result=res, unpicklable=False)
 
     # remote command
@@ -402,7 +463,7 @@ class CommandOrchestrator(object):
                                                                    vm_name)
         return set_command_result(result=res, unpicklable=False)
 
-    def get_vm_details(self, context,cancellation_context, requests_json):
+    def get_vm_details(self, context, cancellation_context, requests_json):
         requests = DeployDataHolder(jsonpickle.decode(requests_json)).items
         res = self.command_wrapper.execute_command_with_connection(context,
                                                                    self.vm_details.get_vm_details,

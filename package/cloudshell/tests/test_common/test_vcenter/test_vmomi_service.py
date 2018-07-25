@@ -78,7 +78,7 @@ class TestVmomiService(unittest.TestCase):
                                               power_on=False)
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -120,7 +120,7 @@ class TestVmomiService(unittest.TestCase):
                                               resource_pool='my_resource_pool')
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -162,7 +162,7 @@ class TestVmomiService(unittest.TestCase):
                                               datastore_name='my_datastore')
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -203,7 +203,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder='my_folder')
 
         '#assert'
-        self.assertRaises(ValueError, pv_service.clone_vm, params, Mock())
+        self.assertRaises(ValueError, pv_service.clone_vm, params, Mock(), Mock())
         self.assertTrue(pv_service.get_folder.called)
         self.assertFalse(vim_mock.vm.RelocateSpec.called)
         self.assertFalse(vim_mock.vm.CloneSpec.called)
@@ -241,7 +241,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder='my_folder')
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertIsNone(res.error)
@@ -279,10 +279,11 @@ class TestVmomiService(unittest.TestCase):
                                               template_name='my_temp',
                                               vm_name='my_name',
                                               vm_folder='my_folder')
+        cancellation_context = object()
 
         '#act'
         res = pv_service.clone_vm(clone_params=params,
-                                  logger=Mock())
+                                  logger=Mock(), cancellation_context=cancellation_context)
 
         '#assert'
         self.assertIsNone(res.error)
@@ -306,7 +307,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -325,7 +326,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -344,7 +345,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)
@@ -361,7 +362,7 @@ class TestVmomiService(unittest.TestCase):
                                               vm_folder=None)
 
         '#act'
-        res = pv_service.clone_vm(clone_params=params, logger=Mock())
+        res = pv_service.clone_vm(clone_params=params, logger=Mock(), cancellation_context=Mock())
 
         '#assert'
         self.assertTrue(res.error is not None)

@@ -8,9 +8,9 @@ from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWait
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService
 from cloudshell.cp.vcenter.network.vnic.vnic_service import VNicService
 from cloudshell.cp.vcenter.vm.ip_manager import VMIPManager
-from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider, VmNetworkData, VmDataField
+from cloudshell.cp.core.models import  VmDetailsProperty,VmDetailsData,VmDetailsNetworkInterface
 from cloudshell.tests.utils.testing_credentials import TestCredentials
-
+from cloudshell.cp.vcenter.vm.vm_details_provider import VmDetailsProvider,VmDetailsData
 
 class TestVmDetailsCommand(TestCase):
 
@@ -48,29 +48,31 @@ class TestVmDetailsCommand(TestCase):
             cancellation_context=cancellation_context)
         # ASSERT
         self.assertEqual(len(datas), 1)
-        data = datas[0]
-        self.assertEqual(data.app_name, 'App1')
-        self.assertEqual(data.error, None)
-        self.assertEqual(len(data.vm_instance_data), 6)
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Cloned VM Name'), '')
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Current Snapshot'), 'Snap1')
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'CPU'), '4 vCPU')
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Memory'), '2 GB')
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Disk Size'), '20 GB')
-        self.assertEqual(next(x.value for x in data.vm_instance_data if x.key == 'Guest OS'), 'Centos')
+        vm_details = datas[0]
+        if isinstance(vm_details,VmDetailsData):
+            pass
+        self.assertEqual(vm_details.appName, 'App1')
+        self.assertEqual(vm_details.errorMessage, '')
+        self.assertEqual(len(vm_details.vmInstanceData), 6)
 
-        self.assertEqual(len(data.vm_network_data), 1)
-        nic = data.vm_network_data[0]
-        self.assertEqual(nic.interface_id, 'Mac1')
-        self.assertEqual(nic.is_predefined, True)
-        self.assertEqual(nic.is_primary, True)
-        self.assertEqual(nic.network_id, '65')
+        self.assertEqual(len(vm_details.vmNetworkData), 1)
+        nic = vm_details.vmNetworkData[0]
 
-        self.assertEqual(len(nic.network_data), 4)
-        self.assertEqual(next(x.value for x in nic.network_data if x.key == 'IP'), '1.2.3.4')
-        self.assertEqual(next(x.value for x in nic.network_data if x.key == 'MAC Address'), 'Mac1')
-        self.assertEqual(next(x.value for x in nic.network_data if x.key == 'Network Adapter'), 'NetDeviceLabel')
-        self.assertEqual(next(x.value for x in nic.network_data if x.key == 'Port Group Name'), 'Net1')
+        if isinstance(nic,VmDetailsNetworkInterface):
+            pass
+
+        self.assertEqual(nic.interfaceId, 'Mac1')
+        self.assertEqual(nic.isPredefined, True)
+        self.assertEqual(nic.isPrimary, True)
+        self.assertEqual(nic.networkId, '65')
+
+        self.assertEqual(len(nic.networkData), 4)
+
+        self.assertEqual(self._get_value(nic.networkData, 'IP') , '1.2.3.4')
+        self.assertEqual(self._get_value(nic.networkData, 'MAC Address') , 'Mac1')
+        self.assertEqual(self._get_value(nic.networkData, 'Network Adapter') , 'NetDeviceLabel')
+        self.assertEqual(self._get_value(nic.networkData, 'Port Group Name') , 'Net1')
+
 
     def mock_vm(self):
         vm = Mock()
@@ -93,6 +95,12 @@ class TestVmDetailsCommand(TestCase):
         vm.guest.net = [Mock(deviceConfigId='2', ipAddress=['1.2.3.4'])]
         vm.guest.ipAddress = '1.2.3.4'
         return vm
+
+    def _get_value(self, data, key):
+        for item in data:
+            if item.key == key:
+                return item.value
+        return None
 
     # def integration(self):
     #     credentials = TestCredentials()

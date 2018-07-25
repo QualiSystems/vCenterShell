@@ -103,8 +103,12 @@ class ReservationContextDetails:
 
 class CancellationContext:
     def __init__(self):
-        self.is_cancelled = False
+        self._is_cancelled = False
         """:type : bool"""
+
+    @property
+    def is_cancelled(self):
+        return self._is_cancelled
 
 
 class AutoLoadCommandContext:

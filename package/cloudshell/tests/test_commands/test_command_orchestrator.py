@@ -1,4 +1,6 @@
 from unittest import TestCase
+
+from cloudshell.cp.core.models import DeployApp, DeployAppParams, AppResourceInfo, DeployAppDeploymentInfo, DeployAppResult
 from freezegun import freeze_time
 
 import jsonpickle
@@ -14,35 +16,35 @@ SAVE_SNAPSHOT = 'cloudshell.cp.vcenter.commands.command_orchestrator.CommandOrch
 
 class TestCommandOrchestrator(TestCase):
     def setUp(self):
-        self.deploy_request = '''{
-            "AppName": "TestApp",
-            "UserRequestedAppName": "TestApp123",
-            "DeploymentServiceName": "vCenter VM From Image",
-            "Attributes": {
-                "Default Datacenter": "",
-                "Auto Power Off": "True",
-                "Auto Power On": "True",
-                "Wait for IP": "True",
-                "VM Cluster": "",
-                "VM Location": "",
-                "VM Storage": "",
-                "VM Resource Pool": "",
-                "vCenter Image": "c:\\tinyvm1.ova",
-                "vCenter Image Arguments": "",
-                "IP Regex": "",
-                "Refresh IP Timeout": "600",
-                "Auto Delete": "True",
-                "Autoload": "True",
-                "VCenter VM": "sds",
-                "VCenter VM Snapshot": "sds",
-                "VCenter Template": "dsds"
-            },
-            "LogicalResourceRequestAttributes": {
-                "Public IP": "",
-                "Password": "Password1",
-                "User": "root"
-            }
-        }'''
+        self.deploy_action = DeployApp()
+        self.deploy_action.actionId = '0a21384c-5620-4e6a-b162-c726681865a9'
+        self.deploy_action.actionParams = DeployAppParams()
+        self.deploy_action.actionParams.appName = 'myApp'
+        self.deploy_action.actionParams.appResource = AppResourceInfo()
+        self.deploy_action.actionParams.appResource.attributes = {"Public IP": "",
+                                                                  "Password": "Password1",
+                                                                  "User": "root"}
+        self.deploy_action.actionParams.deployment = DeployAppDeploymentInfo()
+        self.deploy_action.actionParams.deployment.deploymentPath = 'deployment model name'
+        self.deploy_action.actionParams.deployment.attributes = {"Default Datacenter": "",
+                                                                 "Auto Power Off": "True",
+                                                                 "Auto Power On": "True",
+                                                                 "Wait for IP": "True",
+                                                                 "VM Cluster": "",
+                                                                 "VM Location": "",
+                                                                 "VM Storage": "",
+                                                                 "VM Resource Pool": "",
+                                                                 "vCenter Image": "c:\\tinyvm1.ova",
+                                                                 "vCenter Image Arguments": "",
+                                                                 "IP Regex": "",
+                                                                 "Refresh IP Timeout": "600",
+                                                                 "Auto Delete": "True",
+                                                                 "Autoload": "True",
+                                                                 "VCenter VM": "sds",
+                                                                 "VCenter VM Snapshot": "sds",
+                                                                 "VCenter Template": "dsds",
+                                                                 "Behavior during save": "Powered Off"}
+
         self.resource = create_autospec(ResourceInfo)
         self.resource.name = 'Cloud1'
         self.resource.ResourceModelName = 'VMwarev Center'
@@ -72,7 +74,7 @@ class TestCommandOrchestrator(TestCase):
         self.context.remote_endpoints = Mock()
         self.context.remote_endpoints = [self.resource]
         self.command_orchestrator = CommandOrchestrator()
-        self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=True)
+        self.command_orchestrator.command_wrapper.execute_command_with_connection = Mock(return_value=DeployAppResult())
         self.ports = [Mock()]
         self.command_orchestrator._parse_remote_model = Mock(return_value=remote_resource)
 
@@ -88,33 +90,37 @@ class TestCommandOrchestrator(TestCase):
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
-    def test_destroy_vm_only(self):
+    def test_DeleteInstance(self):
         # act
-        self.command_orchestrator.destroy_vm_only(self.context, self.ports)
+        self.command_orchestrator.DeleteInstance(self.context, self.ports)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_template(self):
         # act
-        self.command_orchestrator.deploy_from_template(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_template(self.context, self.deploy_action, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_vm_from_vm(self):
         # act
-        self.command_orchestrator.deploy_clone_from_vm(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_clone_from_vm(self.context, self.deploy_action, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_snapshot(self):
         # act
-        self.command_orchestrator.deploy_from_linked_clone(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_linked_clone(self.context, self.deploy_action, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 
     def test_deploy_from_image(self):
         # act
-        self.command_orchestrator.deploy_from_image(self.context, self.deploy_request)
+        cancellation_context = object()
+        self.command_orchestrator.deploy_from_image(self.context, self.deploy_action, cancellation_context)
         # assert
         self.assertTrue(self.command_orchestrator.command_wrapper.execute_command_with_connection.called)
 

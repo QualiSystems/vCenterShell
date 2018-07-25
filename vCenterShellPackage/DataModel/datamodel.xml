@@ -52,12 +52,6 @@
         <ns0:Rule Name="Setting" />
       </ns0:Rules>
     </ns0:AttributeInfo>
-    <ns0:AttributeInfo DefaultValue="" IsReadOnly="false" Name="Cloud Provider" Type="String">
-      <ns0:Rules>
-        <ns0:Rule Name="Configuration" />
-        <ns0:Rule Name="Setting" />
-      </ns0:Rules>
-    </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="This attribute points to a pre-define group of execution servers. Usually used for different sites or domains." IsReadOnly="false" Name="Execution Server Selector" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
@@ -93,6 +87,18 @@
       </ns0:Rules>
     </ns0:AttributeInfo>
     <ns0:AttributeInfo DefaultValue="" Description="The vCenter storage in which the VMs will be created. The storage can be either a datastore or a datastore cluster. For example: datastore1 (To use a specific datastore inside a cluster, specify the cluster name and the datastore name. For example: clustername/datastore1)" IsReadOnly="false" Name="VM Storage" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue=""  Name="Saved Sandbox Storage" Description="The vCenter storage in which the content of saved sandboxes will be created. The storage can be either a datastore or a datastore cluster. For example: datastore1  or clustername/datastore1 (for datastore inside a cluster)" IsReadOnly="false" Type="String">
+      <ns0:Rules>
+        <ns0:Rule Name="Configuration" />
+        <ns0:Rule Name="Setting" />
+      </ns0:Rules>
+    </ns0:AttributeInfo>
+    <ns0:AttributeInfo DefaultValue=""  Name="Behavior during save" Description="Determines the VM behavior when the sandbox is saved. If Power off is selected, and the VM was powered on before the save, then the VM will shut down for the duration of the save, and then be powered on at the end." IsReadOnly="false" Type="String">
       <ns0:Rules>
         <ns0:Rule Name="Configuration" />
         <ns0:Rule Name="Setting" />
@@ -190,6 +196,15 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Saved Sandbox Storage">
+              <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
+                <ns0:AllowedValue>Power Off</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Holding Network">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
@@ -233,6 +248,8 @@
             <ns0:AttributeValue Name="VM Cluster" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="Saved Sandbox Storage" Value="" />
+            <ns0:AttributeValue Name="Behavior during save" Value="Remain Powered On" />
             <ns0:AttributeValue Name="VM Location" Value="QualiSystems" />
             <ns0:AttributeValue Name="Shutdown Method" Value="hard" />
             <ns0:AttributeValue Name="OVF Tool Path" Value="C:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" />
@@ -274,7 +291,7 @@
       <ns0:Models>
         <ns0:ResourceModel Description="" Name="vCenter Clone VM From VM" ImagePath="DeploymentTypes-vCenterClone.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -282,6 +299,12 @@
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
+                <ns0:AllowedValue>Power Off</ns0:AllowedValue>
+              </ns0:AllowedValues>
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
               <ns0:AllowedValues />
@@ -320,6 +343,7 @@
             <ns0:AttributeValue Name="vCenter Template" Value="" />
 			<ns0:AttributeValue Name="VM Cluster" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="Behavior during save" Value="Remain Powered On" />
 			<ns0:AttributeValue Name="IP Regex" Value="" />
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
@@ -330,7 +354,7 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="vCenter VM From Template" ImagePath="DeploymentTypes-vCenterTemplate.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Template" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -338,6 +362,12 @@
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
+                <ns0:AllowedValue>Power Off</ns0:AllowedValue>
+              </ns0:AllowedValues>
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
               <ns0:AllowedValues />
@@ -376,6 +406,7 @@
             <ns0:AttributeValue Name="vCenter Template" Value="" />
 			<ns0:AttributeValue Name="VM Cluster" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="Behavior during save" Value="Remain Powered On" />
 			<ns0:AttributeValue Name="IP Regex" Value="" />
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
@@ -386,10 +417,10 @@
         </ns0:ResourceModel>
         <ns0:ResourceModel Description="" Name="VCenter Deploy VM From Linked Clone" ImagePath="DeploymentTypes-vCenterLinked.png" SupportsConcurrentCommands="false">
           <ns0:AttachedAttributes>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM Snapshot" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter VM Snapshot" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Cluster" UserInput="false">
@@ -397,6 +428,12 @@
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage" UserInput="false">
               <ns0:AllowedValues />
+            </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save"  UserInput="false">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
+                <ns0:AllowedValue>Power Off</ns0:AllowedValue>
+              </ns0:AllowedValues>
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool" UserInput="false">
               <ns0:AllowedValues />
@@ -435,6 +472,7 @@
             <ns0:AttributeValue Name="vCenter Template" Value="" />
 			<ns0:AttributeValue Name="VM Cluster" Value="" />
 			<ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="Behavior during save" Value="Remain Powered On" />
 			<ns0:AttributeValue Name="IP Regex" Value="" />
 			<ns0:AttributeValue Name="Refresh IP Timeout" Value="600" />
           </ns0:AttributeValues>
@@ -466,13 +504,19 @@
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Storage">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="Behavior during save" UserInput="false">
+              <ns0:AllowedValues>
+                <ns0:AllowedValue>Remain Powered On</ns0:AllowedValue>
+                <ns0:AllowedValue>Power Off</ns0:AllowedValue>
+              </ns0:AllowedValues>
+            </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="VM Resource Pool">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
-            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true">
+            <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="vCenter Image Arguments" UserInput="true" EditableOnlyInAppTemplate="true">
               <ns0:AllowedValues />
             </ns0:AttachedAttribute>
             <ns0:AttachedAttribute IsLocal="true" IsOverridable="true" Name="IP Regex" UserInput="false">
@@ -497,6 +541,7 @@
             <ns0:AttributeValue Name="VM Cluster" Value="" />
             <ns0:AttributeValue Name="VM Location" Value="" />
             <ns0:AttributeValue Name="VM Storage" Value="" />
+            <ns0:AttributeValue Name="Behavior during save" Value="Remain Powered On" />
             <ns0:AttributeValue Name="IP Regex" Value="" />
             <ns0:AttributeValue Name="VM Resource Pool" Value="" />
             <ns0:AttributeValue Name="vCenter Image" Value="" />

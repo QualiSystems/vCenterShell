@@ -405,10 +405,11 @@ class pyVmomiService:
             self.vm = vm
             self.error = error
 
-    def clone_vm(self, clone_params, logger):
+    def clone_vm(self, clone_params, logger, cancellation_context):
         """
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
+        :param cancellation_context:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
@@ -470,7 +471,8 @@ class pyVmomiService:
         logger.info("cloning VM...")
         try:
             task = template.Clone(folder=dest_folder, name=clone_params.vm_name, spec=clone_spec)
-            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM')
+            vm = self.task_waiter.wait_for_task(task=task, logger=logger, action_name='Clone VM',
+                                                cancellation_context=cancellation_context)
         except TaskFaultException:
             raise
         except vim.fault.NoPermission as error:
@@ -558,16 +560,19 @@ class pyVmomiService:
         :param logger:
         """
 
-        if vm.runtime.powerState == 'poweredOn':
-            logger.info(("The current powerState is: {0}. Attempting to power off {1}"
-                         .format(vm.runtime.powerState, vm.name)))
-            task = vm.PowerOffVM_Task()
-            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Power Off Before Destroy")
+        self.power_off_before_destroy(logger, vm)
 
         logger.info(("Destroying VM {0}".format(vm.name)))
 
         task = vm.Destroy_Task()
         return self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Destroy VM")
+
+    def power_off_before_destroy(self, logger, vm):
+        if vm.runtime.powerState == 'poweredOn':
+            logger.info(("The current powerState is: {0}. Attempting to power off {1}"
+                         .format(vm.runtime.powerState, vm.name)))
+            task = vm.PowerOffVM_Task()
+            self.task_waiter.wait_for_task(task=task, logger=logger, action_name="Power Off Before Destroy")
 
     def destroy_vm_by_name(self, si, vm_name, vm_path, logger):
         """ 
@@ -700,6 +705,45 @@ class pyVmomiService:
             if snapshot_header.name == name:
                 return snapshot_header
         return None
+
+    def get_folder_contents(self, folder, recursive=False):
+        vms = []
+        folders = []
+
+        for item in folder.childEntity:
+            if isinstance(item, self.vim.VirtualMachine):
+                vms.append(item)
+            elif isinstance(item, self.vim.Folder):
+                folders.append(item)
+                if recursive:
+                    v, f = self.get_folder_contents(item, recursive)
+                    vms.extend(v)
+                    folders.extend(f)
+        return vms, folders
+
+    def get_vm_full_path(self, si, vm):
+        """
+        :param vm: vim.VirtualMachine
+        :return:
+        """
+        folder_name = None
+        folder = vm.parent
+
+        if folder:
+            folder_name = folder.name
+            folder_parent = folder.parent
+
+            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(folder_parent, vim.Datacenter):
+                folder_name = folder_parent.name + '/' + folder_name
+                try:
+                    folder_parent = folder_parent.parent
+                except Exception:
+                    break
+            # at this stage we receive a path like this: vm/FOLDER1/FOLDER2;
+            # we're not interested in the "vm" part, so we throw that away
+            folder_name = '/'.join(folder_name.split('/')[1:])
+        # ok, now we're adding the vm name; btw, if there is no folder, that's cool, just return vm.name
+        return VMLocation.combine([folder_name, vm.name]) if folder_name else vm.name
 
 
 def vm_has_no_vnics(vm):

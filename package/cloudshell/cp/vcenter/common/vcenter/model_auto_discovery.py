@@ -191,6 +191,23 @@ class VCenterAutoModelDiscovery(object):
             d_name = attributes[key]
         auto_att.append(AutoLoadAttribute('', key, d_name))
 
+    def _validate_saved_sandbox_storage(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
+        accepted_types = (vim.Datastore, vim.StoragePod)
+
+        # saved sandbox storage isnt mandatory so if not configured exit without validation
+        if key not in attributes or not attributes[key]:
+            return
+
+        datastore = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
+        if not datastore:
+            datastore = self._get_default(all_items_in_vc, accepted_types, key)
+            d_name = self.get_full_name(dc_name, datastore)
+            # removing the upper folder
+            d_name = d_name.replace('datastore/', '')
+        else:
+            d_name = attributes[key]
+        auto_att.append(AutoLoadAttribute('', key, d_name))
+
     def _validate_vm_location(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
         accepted_types = None
         folder = self._validate_attribute(si, attributes, accepted_types, key, dc_name)

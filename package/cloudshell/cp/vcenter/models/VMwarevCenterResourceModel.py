@@ -14,3 +14,5 @@ class VMwarevCenterResourceModel(object):
         self.reserved_networks = ''
         self.default_datacenter = ''
         self.promiscuous_mode = ''
+        self.behavior_during_save = ''
+        self.saved_sandbox_storage = ''

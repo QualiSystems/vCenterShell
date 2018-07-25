@@ -31,6 +31,5 @@ def set_command_result(result, unpicklable=False):
 
     json = jsonpickle.encode(result, unpicklable=unpicklable)
     result_for_output = str(json)
-    print result_for_output
     return result_for_output
 
