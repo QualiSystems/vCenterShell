@@ -3,10 +3,12 @@ from threading import Lock
 
 from retrying import retry
 
+from pyVmomi import vim
 from cloudshell.cp.vcenter.common.model_factory import ResourceModelParser
 from cloudshell.cp.vcenter.common.cloud_shell.driver_helper import CloudshellDriverHelper
 from cloudshell.cp.vcenter.common.vcenter.vmomi_service import pyVmomiService, VCenterAuthError
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
+
 
 DISCONNCTING_VCENERT = 'disconnecting from vcenter: {0}'
 COMMAND_ERROR = 'error has occurred while executing command: {0}'
@@ -123,9 +125,9 @@ class CommandWrapper:
 
     def get_py_service_connection(self, req_connection_details, logger):
         logger.info("get_py_service_connection")
-        if self.si is None or self.has_connection_details_changed(req_connection_details):
+        if self.need_a_new_service_connection(req_connection_details, logger):
             with self.lock:
-                if self.si is None or self.has_connection_details_changed(req_connection_details):
+                if self.need_a_new_service_connection(req_connection_details, logger):
                     logger.info("Creating a new connection.")
                     self.si = self.pv_service.connect(req_connection_details.host,
                                                       req_connection_details.username,
@@ -133,6 +135,27 @@ class CommandWrapper:
                                                       req_connection_details.port)
                     self.connection_details = req_connection_details
         return self.si
+
+    def need_a_new_service_connection(self, req_connection_details, logger):
+        # the idea is if we haven't instantiated the ServiceInstance session,
+        # or if the connect details were changed
+        # or if an SI no longer is authorized to work with host due to timing out,
+        # we try to get a new connection
+        return (
+
+                self.si is None or
+                self.has_connection_details_changed(req_connection_details) or
+                self.service_instance_disconnected_by_server(logger)
+
+               )
+
+    def service_instance_disconnected_by_server(self, logger):
+        try:
+            self.si.CurrentTime()
+        except vim.fault.NotAuthenticated:
+            logger.info("ServiceInstance was disconnected. Will try to retrieve a new serviceinstance")
+            return True
+        return False
 
     def has_connection_details_changed(self, req_connection_details):
         """
