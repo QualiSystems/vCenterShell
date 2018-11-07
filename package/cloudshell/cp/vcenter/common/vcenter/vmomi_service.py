@@ -524,9 +524,13 @@ class pyVmomiService:
                                      [self.vim.StoragePod],
                                      name)
             if datastore:
-                datastore = sorted(datastore.childEntity,
-                                   key=lambda data: data.summary.freeSpace,
-                                   reverse=True)[0]
+                storage_by_freespace = sorted(datastore.childEntity,
+                                              key=lambda data: data.summary.freeSpace,
+                                              reverse=True)
+                if len(storage_by_freespace) > 0:
+                    datastore = storage_by_freespace[0]
+                else:
+                    raise ValueError('There are no available storage devices under the provided cluster "{0}"'.format(clone_params.datastore_name))
 
         if not datastore:
             raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
