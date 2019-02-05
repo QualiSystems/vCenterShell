@@ -64,7 +64,7 @@ class pyVmomiService:
         context = None
         import ssl
         if hasattr(ssl, 'SSLContext'):
-            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
             context.verify_mode = ssl.CERT_NONE
 
         try:
