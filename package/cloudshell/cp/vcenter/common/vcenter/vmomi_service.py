@@ -69,8 +69,13 @@ class pyVmomiService:
 
         try:
             if context:
-                '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
-                si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                try:
+                    '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
+                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                except ssl.SSLEOFError:
+                    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+                    context.verify_mode = ssl.CERT_NONE
+                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
             else:
                 '#si = SmartConnect(host=address, user=user, pwd=password, port=port)'
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
