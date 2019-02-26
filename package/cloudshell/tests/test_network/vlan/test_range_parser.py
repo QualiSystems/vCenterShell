@@ -18,6 +18,37 @@ class TestVLanIdRangeParser(TestCase):
         self.assertEqual(vlan_id[0].start, 11)
         self.assertEqual(vlan_id[0].end, 100)
 
+    def test_two_numbers_sets_with_dash(self):
+        v_lan_id_range_parser = VLanIdRangeParser()
+        vlan_id = v_lan_id_range_parser.parse_vlan_id('Trunk', '11-100,200-300')
+
+        self.assertEqual(vlan_id[0].start, 11)
+        self.assertEqual(vlan_id[0].end, 100)
+        self.assertEqual(vlan_id[1].start, 200)
+        self.assertEqual(vlan_id[1].end, 300)
+
+    def test_three_numbers_sets_with_dash(self):
+        v_lan_id_range_parser = VLanIdRangeParser()
+        vlan_id = v_lan_id_range_parser.parse_vlan_id('Trunk', '11-100,200-300,500-600')
+
+        self.assertEqual(vlan_id[0].start, 11)
+        self.assertEqual(vlan_id[0].end, 100)
+        self.assertEqual(vlan_id[1].start, 200)
+        self.assertEqual(vlan_id[1].end, 300)
+        self.assertEqual(vlan_id[2].start, 500)
+        self.assertEqual(vlan_id[2].end, 600)
+
+    def test_three_numbers_sets_some_with_dash(self):
+        v_lan_id_range_parser = VLanIdRangeParser()
+        vlan_id = v_lan_id_range_parser.parse_vlan_id('Trunk', '11-100,300,500-600')
+
+        self.assertEqual(vlan_id[0].start, 11)
+        self.assertEqual(vlan_id[0].end, 100)
+        self.assertEqual(vlan_id[1].start, 300)
+        self.assertEqual(vlan_id[1].end, 300)
+        self.assertEqual(vlan_id[2].start, 500)
+        self.assertEqual(vlan_id[2].end, 600)
+
     def test_one_number_access_mode(self):
         v_lan_id_range_parser = VLanIdRangeParser()
         vlan_id = v_lan_id_range_parser.parse_vlan_id('Access', '100')
