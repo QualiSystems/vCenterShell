@@ -8,6 +8,8 @@ class DvPortGroupNameGenerator(object):
     @staticmethod
     def generate_port_group_name(dv_switch_name, vlan_id, vlan_type):
         dv_switch_name = dv_switch_name[:MAX_DVSWITCH_LENGTH]
+        if ',' in vlan_id:
+            vlan_id = vlan_id.split(',')[0] + '...'
         return NAME_FORMAT.format(QS_NAME_PREFIX, dv_switch_name, VLAN, str(vlan_id), str(vlan_type))
 
     @staticmethod
