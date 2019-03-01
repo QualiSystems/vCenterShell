@@ -258,6 +258,9 @@ class ConnectionCommandOrchestrator(object):
                 for nic_name, actions in nics_to_actions.items():
                     nic_name = self._validate_vnic_name(nic_name)
                     for action in actions:
+                        # the vlan_id in the dictionary is the one we use for the PG name - instead of
+                        # having it from whatever inside the vlan - this will require more changes to make it happen,
+                        # but will not require the below re-value of the vlan_id
                         if ',' in vlan_id:
                             vlan_id = vlan_id.split(',')[0]+'...'
                         res = connection_res_map[mode][vlan_id][nic_name][0]
