@@ -312,30 +312,31 @@ class pyVmomiService:
         path, name = get_path_and_name(default_network_full_name)
         return self.find_network_by_name(si, path, name) if name else None
 
-    def get_obj(self, content, vimtype, name):
+    def get_obj(self, content, vimtypes, name):
         """
         Return an object by name for a specific type, if name is None the
         first found object is returned
 
         :param content:    pyvmomi content object
-        :param vimtype:    the type of object too search
+        :param vimtypes:    the types of object to search
         :param name:       the object name to return
         """
         obj = None
 
-        container = self._get_all_objects_by_type(content, vimtype)
+        for vim_type in vimtypes:
+            container = self._get_all_objects_by_type(content, vim_type)
 
-        # If no name was given will return the first object from list of a objects matching the given vimtype type
-        for c in container.view:
-            if name:
-                if  c.name == name:
+            # If no name was given will return the first object from list of a objects matching the given vimtype type
+            for c in container.view:
+                if name:
+                    if c.name == name:
+                        obj = c
+                        break
+                else:
                     obj = c
                     break
-            else:
-                obj = c
-                break
 
-        return obj
+            return obj
 
     @staticmethod
     def _get_all_objects_by_type(content, vimtype):
