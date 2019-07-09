@@ -54,6 +54,7 @@ class VCenterAutoModelDiscovery(object):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
+
         logger = self._get_logger(context)
         logger.info('Autodiscovery started')
         si = None
@@ -136,9 +137,7 @@ class VCenterAutoModelDiscovery(object):
 
     def _validate_attribute(self, si, attributes, vim_type, name, prefix=''):
         if name in attributes and attributes[name]:
-            att_value = attributes[name]
-            if prefix:
-                att_value = '{0}/{1}'.format(prefix, att_value)
+            att_value = self._get_attribute_value(attributes, name, prefix)
 
             obj = self.pv_service.get_folder(si, att_value)
             if not obj or isinstance(obj, str):
@@ -147,6 +146,12 @@ class VCenterAutoModelDiscovery(object):
                 raise ValueError('The given {0}: {1} is not of the correct type'.format(name, attributes[name]))
             return obj
         return False
+
+    def _get_attribute_value(self, attributes, name, prefix):
+        att_value = attributes[name]
+        if prefix:
+            att_value = '{0}/{1}'.format(prefix, att_value)
+        return att_value
 
     def _get_default(self, all_item_in_vc, vim_type, key):
         obj = self._get_default_from_vc_by_type_and_name(all_item_in_vc, vim_type)
@@ -218,8 +223,19 @@ class VCenterAutoModelDiscovery(object):
         auto_att.append(AutoLoadAttribute('', key, f_name))
 
     def _validate_vm_cluster(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        accepted_types = (vim.ClusterComputeResource, vim.HostSystem)
-        cluster = self._validate_attribute(si, attributes, accepted_types, key, dc_name)
+        """
+
+        :param si:
+        :param all_items_in_vc:
+        :param auto_att:
+        :param dc_name:
+        :param attributes:
+        :param key:
+        :return:
+        """
+        accepted_types = [[vim.ClusterComputeResource], [vim.HostSystem]]
+        cluster_name = attributes[key]
+        cluster = self.pv_service.get_obj(si.content, accepted_types, cluster_name)
         if not cluster:
             cluster = self._get_default(all_items_in_vc, accepted_types, key)
             c_name = self.get_full_name(dc_name, cluster)
