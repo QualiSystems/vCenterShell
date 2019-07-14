@@ -8,6 +8,7 @@ from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
+from debug_utils import debugger
 
 
 class VCenterAuthError(Exception):
@@ -227,7 +228,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
-    def find_dvs_by_path(self,si ,path):
+    def find_dvs_by_path(self, si, path):
         """
         Finds vm in the vCenter or returns "None"
         :param si:         pyvmomi 'ServiceInstance'
@@ -336,12 +337,12 @@ class pyVmomiService:
                     obj = c
                     break
 
-            return obj
+        return obj
 
     @staticmethod
     def _get_all_objects_by_type(content, vimtype):
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vimtype, True)
+            content.rootFolder, vimtype, True)
         return container
 
     @staticmethod
@@ -419,6 +420,8 @@ class pyVmomiService:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
+        debugger.attach_debugger()
+
         result = self.CloneVmResult()
 
         if not isinstance(clone_params.si, self.vim.ServiceInstance):
@@ -523,11 +526,11 @@ class pyVmomiService:
         name = parts[len(parts) - 1]
         if name:
             datastore = self.get_obj(clone_params.si.content,
-                                     [self.vim.Datastore],
+                                     [[self.vim.Datastore]],
                                      name)
         if not datastore:
             datastore = self.get_obj(clone_params.si.content,
-                                     [self.vim.StoragePod],
+                                     [[self.vim.StoragePod]],
                                      name)
             if datastore:
                 datastore = sorted(datastore.childEntity,
@@ -540,10 +543,12 @@ class pyVmomiService:
 
     def _get_resource_pool(self, datacenter_name, clone_params):
 
-        resource_full_path = '{0}/{1}/{2}'.format(datacenter_name,
-                                                  clone_params.cluster_name,
-                                                  clone_params.resource_pool)
-        obj = self.get_folder(clone_params.si, resource_full_path)
+        obj_name = '{0}/{1}/{2}'.format(datacenter_name,
+                                        clone_params.cluster_name,
+                                        clone_params.resource_pool).rstrip('/').split('/')[-1]
+        # obj = self.get_folder(clone_params.si, resource_full_path)
+        accepted_types = [[vim.ResourcePool], [vim.ClusterComputeResource], [vim.HostSystem]]
+        obj = self.get_obj(clone_params.si.content, accepted_types, obj_name)
 
         resource_pool = None
         host = None
@@ -739,7 +744,8 @@ class pyVmomiService:
             folder_name = folder.name
             folder_parent = folder.parent
 
-            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(folder_parent, vim.Datacenter):
+            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(
+                    folder_parent, vim.Datacenter):
                 folder_name = folder_parent.name + '/' + folder_name
                 try:
                     folder_parent = folder_parent.parent
@@ -755,4 +761,4 @@ class pyVmomiService:
 def vm_has_no_vnics(vm):
     # Is there any network device on vm
     return next((False for device in vm.config.hardware.device
-                if isinstance(device, vim.vm.device.VirtualEthernetCard) and hasattr(device, 'macAddress')), True)
+                 if isinstance(device, vim.vm.device.VirtualEthernetCard) and hasattr(device, 'macAddress')), True)
