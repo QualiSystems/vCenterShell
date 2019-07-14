@@ -8,7 +8,6 @@ from cloudshell.cp.vcenter.common.vcenter.vm_location import VMLocation
 from cloudshell.cp.vcenter.common.utilites.common_utils import str2bool
 from cloudshell.cp.vcenter.common.vcenter.task_waiter import SynchronousTaskWaiter
 from cloudshell.cp.vcenter.exceptions.task_waiter import TaskFaultException
-from debug_utils import debugger
 
 
 class VCenterAuthError(Exception):
@@ -420,7 +419,6 @@ class pyVmomiService:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
-        debugger.attach_debugger()
 
         result = self.CloneVmResult()
 
