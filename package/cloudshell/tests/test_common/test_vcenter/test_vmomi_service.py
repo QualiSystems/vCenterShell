@@ -69,7 +69,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
+        pv_service.get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -111,7 +111,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
+        pv_service.get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -153,7 +153,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
+        pv_service.get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -195,7 +195,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=folder)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
+        pv_service.get_resource_pool = Mock(return_value=Mock(spec=vim.ResourcePool))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -233,7 +233,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=folder)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
+        pv_service.get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
@@ -273,7 +273,7 @@ class TestVmomiService(unittest.TestCase):
         pv_service.get_obj = Mock()
         pv_service.get_folder = Mock(return_value=datacenter)
         pv_service._get_datastore = Mock(return_value=Mock(spec=vim.Datastore))
-        pv_service._get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
+        pv_service.get_resource_pool = Mock(return_value=(Mock(spec=vim.ResourcePool), None))
 
         params = pv_service.CloneVmParameters(si=si,
                                               template_name='my_temp',
