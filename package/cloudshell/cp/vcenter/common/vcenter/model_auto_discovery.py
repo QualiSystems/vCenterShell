@@ -16,6 +16,7 @@ from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionCo
 
 from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 
+
 DOMAIN = 'Global'
 ADDRESS = 'address'
 USER = 'User'
@@ -36,8 +37,16 @@ ATTRIBUTE_NAMES_THAT_ARE_SLASH_BACKSLASH_AGNOSTIC = [DEFAULT_DVSWITCH, DEFAULT_D
                                                      VM_RESOURCE_POOL, VM_CLUSTER]
 
 
+class ResourcePoolParams(object):
+    def __init__(self):
+        self.cluster_name = ''
+        self.resource_pool = ''
+        self.si = None
+
+
 class VCenterAutoModelDiscovery(object):
     def __init__(self):
+        self.dc = None
         self.parser = ResourceModelParser()
         self.pv_service = pyVmomiService(SmartConnect, Disconnect, SynchronousTaskWaiter())
         self.context_based_logger_factory = ContextBasedLoggerFactory()
@@ -54,7 +63,6 @@ class VCenterAutoModelDiscovery(object):
         """
         :type context: models.QualiDriverModels.AutoLoadCommandContext
         """
-
         logger = self._get_logger(context)
         logger.info('Autodiscovery started')
         si = None
@@ -77,6 +85,7 @@ class VCenterAutoModelDiscovery(object):
         try:
             all_dc = self.pv_service.get_all_items_in_vcenter(si, vim.Datacenter)
             dc = self._validate_datacenter(si, all_dc, auto_attr, resource.attributes)
+            self.dc = dc
 
             all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
             dc_name = dc.name
@@ -247,12 +256,19 @@ class VCenterAutoModelDiscovery(object):
         return cluster
 
     def _validate_vm_resource_pool(self, si, all_items_in_vc, auto_att, dc_name, attributes, key):
-        cluster = self._validate_vm_cluster(si, all_items_in_vc, auto_att, dc_name, attributes, VM_CLUSTER)
-
         if key not in attributes or not attributes[key]:
             return
+
+        cluster = self._validate_vm_cluster(si, all_items_in_vc, auto_att, dc_name, attributes, VM_CLUSTER)
+
         pool_name = attributes[key]
-        pool = self._find_resource_pool_by_path(pool_name, cluster)
+
+        rp_params = ResourcePoolParams()
+        rp_params.cluster_name = cluster.name
+        rp_params.resource_pool = pool_name
+        rp_params.si = si
+
+        pool = self.pv_service.get_resource_pool(self.dc, rp_params)
         if pool:
             auto_att.append(AutoLoadAttribute('', key, pool_name))
             return

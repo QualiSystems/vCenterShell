@@ -448,7 +448,7 @@ class pyVmomiService:
 
         snapshot = self._get_snapshot(clone_params, template)
 
-        resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
+        resource_pool, host = self.get_resource_pool(datacenter.name, clone_params)
 
         if not resource_pool and not host:
             raise ValueError('The specifed host, cluster or resource pool could not be found')
@@ -539,7 +539,7 @@ class pyVmomiService:
             raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
         return datastore
 
-    def _get_resource_pool(self, datacenter_name, clone_params):
+    def get_resource_pool(self, datacenter_name, clone_params):
 
         obj_name = '{0}/{1}/{2}'.format(datacenter_name,
                                         clone_params.cluster_name,
