@@ -69,8 +69,13 @@ class pyVmomiService:
 
         try:
             if context:
-                '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
-                si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                try:
+                    '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
+                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                except ssl.SSLEOFError:
+                    context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+                    context.verify_mode = ssl.CERT_NONE
+                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
             else:
                 '#si = SmartConnect(host=address, user=user, pwd=password, port=port)'
                 si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
@@ -222,7 +227,7 @@ class pyVmomiService:
         '#searches for the specific vm in the folder'
         return search_index.FindChild(look_in, name)
 
-    def find_dvs_by_path(self,si ,path):
+    def find_dvs_by_path(self, si, path):
         """
         Finds vm in the vCenter or returns "None"
         :param si:         pyvmomi 'ServiceInstance'
@@ -307,35 +312,36 @@ class pyVmomiService:
         path, name = get_path_and_name(default_network_full_name)
         return self.find_network_by_name(si, path, name) if name else None
 
-    def get_obj(self, content, vimtype, name):
+    def get_obj(self, content, vimtypes, name):
         """
         Return an object by name for a specific type, if name is None the
         first found object is returned
 
         :param content:    pyvmomi content object
-        :param vimtype:    the type of object too search
+        :param vimtypes:    the types of object to search
         :param name:       the object name to return
         """
         obj = None
 
-        container = self._get_all_objects_by_type(content, vimtype)
+        for vim_type in vimtypes:
+            container = self._get_all_objects_by_type(content, vim_type)
 
-        # If no name was given will return the first object from list of a objects matching the given vimtype type
-        for c in container.view:
-            if name:
-                if  c.name == name:
+            # If no name was given will return the first object from list of a objects matching the given vimtype type
+            for c in container.view:
+                if name:
+                    if c.name == name:
+                        obj = c
+                        break
+                else:
                     obj = c
                     break
-            else:
-                obj = c
-                break
 
         return obj
 
     @staticmethod
     def _get_all_objects_by_type(content, vimtype):
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vimtype, True)
+            content.rootFolder, vimtype, True)
         return container
 
     @staticmethod
@@ -413,6 +419,7 @@ class pyVmomiService:
         :param clone_params: CloneVmParameters =
         :param logger:
         """
+
         result = self.CloneVmResult()
 
         if not isinstance(clone_params.si, self.vim.ServiceInstance):
@@ -441,7 +448,7 @@ class pyVmomiService:
 
         snapshot = self._get_snapshot(clone_params, template)
 
-        resource_pool, host = self._get_resource_pool(datacenter.name, clone_params)
+        resource_pool, host = self.get_resource_pool(datacenter.name, clone_params)
 
         if not resource_pool and not host:
             raise ValueError('The specifed host, cluster or resource pool could not be found')
@@ -517,11 +524,11 @@ class pyVmomiService:
         name = parts[len(parts) - 1]
         if name:
             datastore = self.get_obj(clone_params.si.content,
-                                     [self.vim.Datastore],
+                                     [[self.vim.Datastore]],
                                      name)
         if not datastore:
             datastore = self.get_obj(clone_params.si.content,
-                                     [self.vim.StoragePod],
+                                     [[self.vim.StoragePod]],
                                      name)
             if datastore:
                 datastore = sorted(datastore.childEntity,
@@ -532,12 +539,14 @@ class pyVmomiService:
             raise ValueError('Could not find Datastore: "{0}"'.format(clone_params.datastore_name))
         return datastore
 
-    def _get_resource_pool(self, datacenter_name, clone_params):
+    def get_resource_pool(self, datacenter_name, clone_params):
 
-        resource_full_path = '{0}/{1}/{2}'.format(datacenter_name,
-                                                  clone_params.cluster_name,
-                                                  clone_params.resource_pool)
-        obj = self.get_folder(clone_params.si, resource_full_path)
+        obj_name = '{0}/{1}/{2}'.format(datacenter_name,
+                                        clone_params.cluster_name,
+                                        clone_params.resource_pool).rstrip('/').split('/')[-1]
+        # obj = self.get_folder(clone_params.si, resource_full_path)
+        accepted_types = [[vim.ResourcePool], [vim.ClusterComputeResource], [vim.HostSystem]]
+        obj = self.get_obj(clone_params.si.content, accepted_types, obj_name)
 
         resource_pool = None
         host = None
@@ -733,7 +742,8 @@ class pyVmomiService:
             folder_name = folder.name
             folder_parent = folder.parent
 
-            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(folder_parent, vim.Datacenter):
+            while folder_parent and folder_parent.name and folder_parent != si.content.rootFolder and not isinstance(
+                    folder_parent, vim.Datacenter):
                 folder_name = folder_parent.name + '/' + folder_name
                 try:
                     folder_parent = folder_parent.parent
@@ -749,4 +759,4 @@ class pyVmomiService:
 def vm_has_no_vnics(vm):
     # Is there any network device on vm
     return next((False for device in vm.config.hardware.device
-                if isinstance(device, vim.vm.device.VirtualEthernetCard) and hasattr(device, 'macAddress')), True)
+                 if isinstance(device, vim.vm.device.VirtualEthernetCard) and hasattr(device, 'macAddress')), True)
