@@ -25,12 +25,15 @@ class TestVmDetailsCommand(TestCase):
         si = Mock()
         pyvmomi_service = Mock()
         pyvmomi_service.find_by_uuid = Mock(return_value=vm)
-        param = Mock()
-        param.name = 'ip_regex'
-        param.value = '.*'
+        ip_regex_param = Mock()
+        ip_regex_param.name = 'ip_regex'
+        ip_regex_param.value = '.*'
+        wait_for_ip_param = Mock()
+        wait_for_ip_param.name = 'wait_for_ip'
+        wait_for_ip_param.value = 'False'
         request = Mock()
         request.deployedAppJson.name = 'App1'
-        request.deployedAppJson.vmdetails.vmCustomParams = [param]
+        request.deployedAppJson.vmdetails.vmCustomParams = [ip_regex_param, wait_for_ip_param]
         request.appRequestJson.deploymentService.model = 'vCenter Clone VM From VM'
         request.appRequestJson.deploymentService.attributes = [Mock()]
         resource_context = Mock()
