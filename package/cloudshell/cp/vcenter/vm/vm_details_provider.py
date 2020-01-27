@@ -11,13 +11,28 @@ class VmDetailsProvider(object):
         self.pyvmomi_service = pyvmomi_service # type: pyVmomiService
         self.ip_manager = ip_manager  # type: VMIPManager
 
-    def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, logger):
-        """"""
+    def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, wait_for_ip, logger):
+        """
+        creates the details provider
+        :param vm:
+        :param name:
+        :param reserved_networks:
+        :param ip_regex:
+        :param deployment_details_provider:
+        :param wait_for_ip: type: string contains 'True' or 'False'
+        :param logger:
+        :return:
+        """
+
+        logger.info('waiting for ip = {0}'.format(wait_for_ip))
 
         vm_instance_data = self._get_vm_instance_data(vm, deployment_details_provider)
-        vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
 
-        return VmDetailsData(vmInstanceData=vm_instance_data, vmNetworkData=vm_network_data)
+        if wait_for_ip == 'True':
+            vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
+            return VmDetailsData(vmInstanceData=vm_instance_data, vmNetworkData=vm_network_data)
+        else:
+            return VmDetailsData(vmInstanceData=vm_instance_data, vmNetworkData=None)
 
     def _get_vm_instance_data(self, vm, deployment_details_provider):
         data = []
