@@ -16,6 +16,6 @@ def get_uuid(virtual_machine_name):
 
 
 def get_vm_uuid(py_vmomi_service, si, virtual_machine_name):
-    vm = py_vmomi_service.get_obj(si.content, [vim.VirtualMachine], virtual_machine_name)
+    vm = py_vmomi_service.get_obj(si.content, [[vim.VirtualMachine]], virtual_machine_name)
     vm_uuid = vm.config.uuid
     return vm_uuid
