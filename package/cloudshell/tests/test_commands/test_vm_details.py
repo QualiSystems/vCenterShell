@@ -30,7 +30,7 @@ class TestVmDetailsCommand(TestCase):
         ip_regex_param.value = '.*'
         wait_for_ip_param = Mock()
         wait_for_ip_param.name = 'wait_for_ip'
-        wait_for_ip_param.value = 'False'
+        wait_for_ip_param.value = 'True'
         request = Mock()
         request.deployedAppJson.name = 'App1'
         request.deployedAppJson.vmdetails.vmCustomParams = [ip_regex_param, wait_for_ip_param]
