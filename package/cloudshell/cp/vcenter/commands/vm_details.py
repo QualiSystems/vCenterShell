@@ -23,7 +23,7 @@ class VmDetailsCommand(object):
             try:
                 vm = self.pyvmomi_service.find_by_uuid(si, request.deployedAppJson.vmdetails.uid)
 
-                wait_for_ip = next((p.value for p in request.deployedAppJson.vmdetails.vmCustomParams if p.name == 'wait_for_ip'), False)
+                wait_for_ip = next((p.value for p in request.deployedAppJson.vmdetails.vmCustomParams if p.name == 'wait_for_ip'), 'False')
 
                 self._wait_for_vm_to_be_ready(vm, request, logger)
 
