@@ -11,11 +11,23 @@ class VmDetailsProvider(object):
         self.pyvmomi_service = pyvmomi_service # type: pyVmomiService
         self.ip_manager = ip_manager  # type: VMIPManager
 
-    def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, logger):
-        """"""
+    def create(self, vm, name, reserved_networks, ip_regex, deployment_details_provider, wait_for_ip, logger):
+        """
+        creates the details provider
+        :param vm:
+        :param name:
+        :param reserved_networks:
+        :param ip_regex:
+        :param deployment_details_provider:
+        :param wait_for_ip: type: string contains 'True' or 'False'
+        :param logger:
+        :return:
+        """
+
+        logger.info('waiting for ip = {0}'.format(wait_for_ip))
 
         vm_instance_data = self._get_vm_instance_data(vm, deployment_details_provider)
-        vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, logger)
+        vm_network_data = self._get_vm_network_data(vm, reserved_networks, ip_regex, wait_for_ip, logger)
 
         return VmDetailsData(vmInstanceData=vm_instance_data, vmNetworkData=vm_network_data)
 
@@ -39,10 +51,14 @@ class VmDetailsProvider(object):
 
         return data
 
-    def _get_vm_network_data(self, vm, reserved_networks, ip_regex, logger):
+    def _get_vm_network_data(self, vm, reserved_networks, ip_regex, wait_for_ip, logger):
         network_interfaces = []
 
-        primary_ip = self._get_primary_ip(vm, ip_regex, logger)
+        if wait_for_ip == 'True':
+            primary_ip = self._get_primary_ip(vm, ip_regex, logger)
+        else:
+            primary_ip = None;
+
         net_devices = [d for d in vm.config.hardware.device if isinstance(d, vim.vm.device.VirtualEthernetCard)]
 
         for device in net_devices:

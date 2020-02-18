@@ -207,6 +207,7 @@ class VirtualMachineDeployer(object):
                 reserved_networks=vcenter_model.reserved_networks,
                 ip_regex=deploy_model.ip_regex,
                 deployment_details_provider=DeploymentDetailsProviderFromTemplateModel(deploy_model),
+                wait_for_ip = deploy_model.wait_for_ip,
                 logger=logger)
         except Exception:
             logger.error("Error getting vm details for '{0}': {1}".format(vm_name, traceback.format_exc()))
