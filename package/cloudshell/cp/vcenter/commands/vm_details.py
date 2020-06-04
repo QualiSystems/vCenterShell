@@ -86,4 +86,7 @@ class DeploymentDetailsProviderFromAppJson(object):
         if self.deployment == 'vCenter VM From Template':
             data.append(VmDetailsProperty(key='Template Name',value= self.dep_attributes.get('vCenter Template','')))
 
+        if self.deployment == 'vCenter Static VM':
+            data.append(VmDetailsProperty(key='VM Name',value= self.dep_attributes.get('vCenter VM','')))
+
         return data
