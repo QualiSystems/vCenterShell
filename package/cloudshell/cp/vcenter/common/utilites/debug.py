@@ -9,7 +9,7 @@ def nice_format(data):
 
 
 def nice_print(data):
-    print pprint.pformat(data, indent=4)
+    print((pprint.pformat(data, indent=4)))
 
 
 def print_attributes(obj, skip_private=True):
@@ -17,6 +17,6 @@ def print_attributes(obj, skip_private=True):
         if skip_private and attr_name.startswith("_"):
             continue
         try:
-            print u"{:>20}: {}".format(attr_name, getattr(obj, attr_name))
+            print(("{:>20}: {}".format(attr_name, getattr(obj, attr_name))))
         except:
             pass

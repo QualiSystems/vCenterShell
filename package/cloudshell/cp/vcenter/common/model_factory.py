@@ -43,6 +43,8 @@ class ResourceModelParser:
         for attrib in attributes:
             property_name = ResourceModelParser.get_property_name_from_attribute_name(attrib)
             property_name_for_attribute_name = ResourceModelParser.get_property_name_with_attribute_name_postfix(attrib)
+            property_name = property_name.rsplit(".", 1)[-1]
+
             if props.__contains__(property_name):
                 value = attributes[attrib]
                 setattr(instance, property_name, value)
@@ -158,7 +160,7 @@ class ResourceModelParser:
         try:
             instance = cls()
         except TypeError as type_error:
-            raise ValueError('Failed to instantiate class {0}. Error: {1}'.format(class_name, type_error.message))
+            raise ValueError('Failed to instantiate class {0}. Error: {1}'.format(class_name, type_error))
 
         return instance
 
@@ -169,7 +171,7 @@ class ResourceModelParser:
         :param attribute: Attribute name, may contain upper and lower case and spaces
         :return: string
         """
-        if isinstance(attribute, str) or isinstance(attribute, unicode):
+        if isinstance(attribute, str) or isinstance(attribute, str):
             attribute_name = attribute
         elif hasattr(attribute, 'Name'):
             attribute_name = attribute.Name

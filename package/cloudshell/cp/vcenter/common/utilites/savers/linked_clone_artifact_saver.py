@@ -132,7 +132,8 @@ class LinkedCloneArtifactHandler(object):
 
         return [task.DeleteSavedAppResult() for task in tasks]
 
-    def _get_rid_of_vm_if_found(self, (artifact, cancellation_context)):
+    def _get_rid_of_vm_if_found(self, params):
+        artifact, cancellation_context = params
         self.logger.info('Checking if need to dispose of artifact: {0}'.format(artifact.artifactRef))
         vm = self.pv_service.get_vm_by_uuid(self.si, artifact.artifactRef)
         if vm:

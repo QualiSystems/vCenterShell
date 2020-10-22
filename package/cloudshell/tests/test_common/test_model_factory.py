@@ -22,7 +22,7 @@ class TestDataModel(TestCase):
             try:
                 klass = ResourceModelParser().get_class('cloudshell.cp.vcenter.models.' + model_name)
             except ValueError as value_error:
-                validation_errors.append('Failed to parse Model Name {0} with error {1}.'.format(model_name, value_error.message))
+                validation_errors.append('Failed to parse Model Name {0} with error {1}.'.format(model_name, value_error))
                 continue
 
             attribute_names = self.get_model_attributes(ns, resource_model)
@@ -32,7 +32,7 @@ class TestDataModel(TestCase):
                     validation_errors.append('attribute {0} is missing on class {1}'.format(attribute_name, model_name))
 
         for validation_error in validation_errors:
-            print validation_error
+            print(validation_error)
 
         self.assertSequenceEqual(validation_errors, [])
 

@@ -97,14 +97,14 @@ def main():
     try:
         si = None
         try:
-            print "Trying to connect to VCENTER SERVER . . ."
+            print("Trying to connect to VCENTER SERVER . . .")
             #si = connect.Connect(args.host, int(args.port), args.user, args.password, service="hostd")
             si = connect.Connect(inputs['vcenter_ip'], 443, inputs['vcenter_user'], inputs['vcenter_password'])
-        except IOError, e:
+        except IOError as e:
             pass
             atexit.register(Disconnect, si)
 
-        print "Connected to VCENTER SERVER !"
+        print("Connected to VCENTER SERVER !")
 
         content = si.RetrieveContent()
 
@@ -130,18 +130,18 @@ def main():
             for snapshot in snapshots:
                 if snapshot_name == snapshot.name:
                     snap_obj = snapshot.snapshot
-                    print "Removing snapshot ", snap_obj
+                    print(("Removing snapshot ", snap_obj))
                     invoke_and_track(snap_obj.RemoveSnapshot_Task(True))
                 else:
-                    print "Couldn't find any snapshots"
+                    print("Couldn't find any snapshots")
 
-    except vmodl.MethodFault, e:
-        print "Caught vmodl fault: %s" % e.msg
+    except vmodl.MethodFault as e:
+        print(("Caught vmodl fault: %s" % e.msg))
         return 1
-    except Exception, e:
+    except Exception as e:
         if str(e).startswith("'vim.Task'"):
             return 1
-        print "Caught exception: %s" % str(e)
+        print(("Caught exception: %s" % str(e)))
         return 1
 
 # Start program

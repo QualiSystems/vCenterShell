@@ -20,7 +20,7 @@ class SnapshotRetriever:
         if not vm.snapshot:
             return None
         current_snapshot_id = vm.snapshot.currentSnapshot._moId
-        for snapshot_name in all_snapshots.keys():
+        for snapshot_name in list(all_snapshots.keys()):
             # noinspection PyProtectedMember
             if all_snapshots[snapshot_name]._moId == current_snapshot_id:
                 return snapshot_name

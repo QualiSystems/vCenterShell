@@ -17,20 +17,22 @@ from cloudshell.shell.core.session.cloudshell_session import CloudShellSessionCo
 from cloudshell.cp.vcenter.common.utilites.common_utils import back_slash_to_front_converter
 
 
+SHELL_NAME = "VMware vCenter Cloud Provider 2G"
+
 DOMAIN = 'Global'
 ADDRESS = 'address'
-USER = 'User'
-PASSWORD = 'Password'
-DEFAULT_DVSWITCH = 'Default dvSwitch'
-DEFAULT_DATACENTER = 'Default Datacenter'
-EXECUTION_SERVER_SELECTOR = 'Execution Server Selector'
-HOLDING_NETWORK = 'Holding Network'
-OVF_TOOL_PATH = 'OVF Tool Path'
-SHUTDOWN_METHOD = 'Shutdown Method'
-VM_CLUSTER = 'VM Cluster'
-VM_LOCATION = 'VM Location'
-VM_RESOURCE_POOL = 'VM Resource Pool'
-VM_STORAGE = 'VM Storage'
+USER = f'{SHELL_NAME}.User'
+PASSWORD = f'{SHELL_NAME}.Password'
+DEFAULT_DVSWITCH = f'{SHELL_NAME}.Default dvSwitch'
+DEFAULT_DATACENTER = f'{SHELL_NAME}.Default Datacenter'
+EXECUTION_SERVER_SELECTOR = f'{SHELL_NAME}.Execution Server Selector'
+HOLDING_NETWORK = f'{SHELL_NAME}.Holding Network'
+OVF_TOOL_PATH = f'{SHELL_NAME}.OVF Tool Path'
+SHUTDOWN_METHOD = f'{SHELL_NAME}.Shutdown Method'
+VM_CLUSTER = f'{SHELL_NAME}.VM Cluster'
+VM_LOCATION = f'{SHELL_NAME}.VM Location'
+VM_RESOURCE_POOL = f'{SHELL_NAME}.VM Resource Pool'
+VM_STORAGE = f'{SHELL_NAME}.VM Storage'
 SHUTDOWN_METHODS = ['soft', 'hard']
 
 ATTRIBUTE_NAMES_THAT_ARE_SLASH_BACKSLASH_AGNOSTIC = [DEFAULT_DVSWITCH, DEFAULT_DATACENTER, VM_LOCATION, VM_STORAGE,
@@ -90,7 +92,7 @@ class VCenterAutoModelDiscovery(object):
             all_items_in_dc = self.pv_service.get_all_items_in_vcenter(si, None, dc)
             dc_name = dc.name
 
-            for key, value in resource.attributes.items():
+            for key, value in list(resource.attributes.items()):
                 if key in [USER, PASSWORD, DEFAULT_DATACENTER, VM_CLUSTER]:
                     continue
                 validation_method = self._get_validation_method(key)
@@ -365,7 +367,7 @@ class VCenterAutoModelDiscovery(object):
         :rtype attributes_with_slash: dict[str,str]
         """
         attributes_with_slash = dict()
-        for key, value in attributes_with_slash_or_backslash.items():
+        for key, value in list(attributes_with_slash_or_backslash.items()):
             if key in ATTRIBUTE_NAMES_THAT_ARE_SLASH_BACKSLASH_AGNOSTIC:
                 value = back_slash_to_front_converter(value)
             attributes_with_slash[key] = value

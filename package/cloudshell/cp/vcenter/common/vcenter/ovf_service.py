@@ -1,6 +1,6 @@
 import os
 import subprocess
-from urllib2 import urlopen
+from urllib.request import urlopen
 from cloudshell.cp.vcenter.common.utilites.common_utils import fixurl
 from cloudshell.cp.vcenter.models.VMwarevCenterResourceModel import VMwarevCenterResourceModel
 
@@ -29,7 +29,6 @@ class OvfImageDeployerService(object):
         :param logger:
         """
         ovf_tool_exe_path = vcenter_data_model.ovf_tool_path
-
         self._validate_url_exists(ovf_tool_exe_path, 'OVF Tool', logger)
 
         args = self._get_args(ovf_tool_exe_path, image_params, logger)
@@ -42,7 +41,7 @@ class OvfImageDeployerService(object):
         process.stdin.close()
 
         if result:
-            res = '\n\r'.join(result)
+            res = '\n\r'.join(data.decode() for data in result)
         else:
             if image_params.user_arguments.find('--quiet') == -1:
                 raise Exception('no result has return from the ovftool')
@@ -112,10 +111,10 @@ class OvfImageDeployerService(object):
         ovf_destination = OVF_DESTENATION_FORMAT. \
             format(image_params.connectivity.username,
                    image_params.connectivity.password,
-                   str(image_params.connectivity.host).encode('ascii'),
-                   str(image_params.datacenter).encode('ascii'),
-                   str(image_params.cluster).encode('ascii'),
-                   str(resource_pool_str).encode('ascii'))
+                   image_params.connectivity.host,
+                   image_params.datacenter,
+                   image_params.cluster,
+                   resource_pool_str)
         return fixurl(ovf_destination)
 
     @staticmethod

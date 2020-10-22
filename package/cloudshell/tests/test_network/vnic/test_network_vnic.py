@@ -43,7 +43,7 @@ class TestNetwork(TestCase):
 
         nicspec.device = device
         res = VNicService.vnic_attach_to_network_standard(nicspec=nicspec,network= network, logger=Mock())
-        self.assertEquals(res.device.backing.network.name, "xnet")
+        self.assertEqual(res.device.backing.network.name, "xnet")
 
     def test_device_attahed_to_network_distributed(self):
         network_name = "PORT-GROUP"
@@ -62,7 +62,7 @@ class TestNetwork(TestCase):
 
         nicspec.device = device
         res = VNicService.vnic_attach_to_network_distributed(nicspec=nicspec, port_group=port_group, logger=Mock())
-        self.assertEquals(res.device.backing.port.portgroupKey, "group_net")
+        self.assertEqual(res.device.backing.port.portgroupKey, "group_net")
 
 
     def test_xx(self):
@@ -95,7 +95,7 @@ class TestNetwork(TestCase):
         nicspec.device = Mock()
         connect_status = True
         nicspec = VNicService.vnic_set_connectivity_status(nicspec=nicspec, is_connected=connect_status, logger=Mock())
-        self.assertEquals(nicspec.device.connectable.connected, connect_status)
+        self.assertEqual(nicspec.device.connectable.connected, connect_status)
 
     def test_vnic_is_attachet_to_network(self):
         nicspec = Mock()

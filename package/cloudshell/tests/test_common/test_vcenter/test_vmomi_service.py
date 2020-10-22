@@ -1,7 +1,6 @@
 ﻿import unittest
 from datetime import datetime
 
-from cloudshell.core.logger.qs_logger import get_qs_logger
 from mock import Mock, MagicMock, create_autospec
 from pyVim.connect import SmartConnect, Disconnect
 from pyVmomi import vim
@@ -42,7 +41,7 @@ class TestVmomiService(unittest.TestCase):
         if res.error is None and res.vm is not None:
             destroyed = pv_service.destroy_vm(vm=res.vm, logger=Mock())
 
-        print 'destroy took: {0}'.format(str(datetime.now() - now))
+        print(('destroy took: {0}'.format(str(datetime.now() - now))))
 
         self.assertIsNone(destroyed)
 

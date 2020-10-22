@@ -79,7 +79,7 @@ class DeleteSavedSandboxCommand:
         return results
 
     def _validate_save_deployment_models(self, artifactHandlersToActions, delete_sandbox_actions, results):
-        unsupported_save_deployment_models = [a.unsupported_save_type for a in artifactHandlersToActions.keys() if
+        unsupported_save_deployment_models = [a.unsupported_save_type for a in list(artifactHandlersToActions.keys()) if
                                               isinstance(a, UnsupportedArtifactHandler)]
         if unsupported_save_deployment_models:
             for action in delete_sandbox_actions:
@@ -94,7 +94,7 @@ class DeleteSavedSandboxCommand:
                 )
 
     def _execute_delete_saved_sandbox(self, artifactHandlersToActions, cancellation_context, logger, results):
-        for artifactHandler in artifactHandlersToActions.keys():
+        for artifactHandler in list(artifactHandlersToActions.keys()):
             delete_sandbox_results = artifactHandler.delete(artifactHandlersToActions[artifactHandler],
                                                             cancellation_context,
                                                             self._pool)

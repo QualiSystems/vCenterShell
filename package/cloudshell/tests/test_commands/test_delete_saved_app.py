@@ -73,7 +73,7 @@ class TestDeleteSavedSandboxCommand(TestCase):
 
         with self.assertRaises(Exception) as context:
             self._delete_saved_sandbox_without_actions()
-        self.assertIn('Failed to delete saved sandbox, missing data in request.', context.exception.message)
+        self.assertIn('Failed to delete saved sandbox, missing data in request.', str(context.exception))
 
     def test_delete_saved_sandbox_fails_due_to_unsupported_save_type(self):
         # if cloud provider sends an invalid delete save action with unsupported save type

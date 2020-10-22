@@ -23,9 +23,9 @@ class FolderManager(object):
         for vm in vms:
             self.pv_service.power_off_before_destroy(logger, vm)
 
-        if folder_full_path not in self.locks.keys():
+        if folder_full_path not in list(self.locks.keys()):
             with self.locks_lock:
-                if folder_full_path not in self.locks.keys():
+                if folder_full_path not in list(self.locks.keys()):
                     self.locks[folder_full_path] = Lock()
 
         with self.locks[folder_full_path]:
@@ -41,9 +41,8 @@ class FolderManager(object):
             result = SUCCESS
             logger.info('Folder {0} was deleted'.format(folder_name))
         except TaskFaultException as e:
-            result = e.message
-            logger.info('Failed to delete folder {0}'.format(folder_name))
-            logger.exception(e.message)
+            result = str(e)
+            logger.exception('Failed to delete folder {0}'.format(folder_name))
         return result
 
     def get_or_create_vcenter_folder(self, si, logger, path, folder_name):
@@ -55,9 +54,9 @@ class FolderManager(object):
 
         vcenter_folder_path = VMLocation.combine([path, folder_name])
 
-        if vcenter_folder_path not in self.locks.keys():
+        if vcenter_folder_path not in list(self.locks.keys()):
             with self.locks_lock:
-                if vcenter_folder_path not in self.locks.keys():
+                if vcenter_folder_path not in list(self.locks.keys()):
                     self.locks[vcenter_folder_path] = Lock()
 
         vcenter_folder = self.pv_service.get_folder(si, vcenter_folder_path)

@@ -63,15 +63,13 @@ class pyVmomiService:
         '# Disabling SSL certificate verification'
         context = None
         import ssl
-        if hasattr(ssl, 'SSLContext'):
-            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-            context.verify_mode = ssl.CERT_NONE
+        ssl._create_default_https_context = ssl._create_unverified_context
 
         try:
             if context:
                 try:
                     '#si = SmartConnect(host=address, user=user, pwd=password, port=port, sslContext=context)'
-                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port, sslContext=context)
+                    si = self.pyvmomi_connect(host=address, user=user, pwd=password, port=port)
                 except (ssl.SSLEOFError, vim.fault.HostConnectFault):
                     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
                     context.verify_mode = ssl.CERT_NONE

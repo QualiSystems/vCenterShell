@@ -4,8 +4,6 @@ import jsonpickle
 
 from cloudshell.cp.vcenter.commands.vm_details import VmDetailsCommand
 from cloudshell.cp.vcenter.models.DeployFromImageDetails import DeployFromImageDetails
-from cloudshell.shell.core.context import ResourceRemoteCommandContext
-from cloudshell.shell.core.driver_context import CancellationContext
 
 from cloudshell.cp.vcenter.models.OrchestrationSaveResult import OrchestrationSaveResult
 from cloudshell.cp.vcenter.models.OrchestrationSavedArtifactsInfo import OrchestrationSavedArtifactsInfo

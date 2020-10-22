@@ -1,6 +1,6 @@
 ﻿# util methods to help us work with collections
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 
 
 def first_or_default(collection, predicate):
@@ -41,17 +41,17 @@ def get_object_as_string(obj):
     if isinstance(obj, list):
         return '\r\n\;'.join([get_object_as_string(item) for item in obj])
     attrs = vars(obj)
-    as_string = ', '.join("%s: %s" % item for item in attrs.items())
+    as_string = ', '.join("%s: %s" % item for item in list(attrs.items()))
     return as_string
 
 
 def fixurl(url):
     # turn string into unicode
-    if not isinstance(url, unicode):
+    if not isinstance(url, str):
         url = url.decode('utf8')
 
     # parse it
-    parsed = urlparse.urlsplit(url)
+    parsed = urllib.parse.urlsplit(url)
 
     # divide the netloc further
     userpass, at, hostport = parsed.netloc.rpartition('@')
@@ -59,24 +59,19 @@ def fixurl(url):
     host, colon2, port = hostport.partition(':')
 
     # encode each component
-    scheme = parsed.scheme.encode('utf8')
-    user = urllib.quote(user.encode('utf8'))
-    colon1 = colon1.encode('utf8')
-    pass_ = urllib.quote(pass_.encode('utf8'))
-    at = at.encode('utf8')
-    host = host.encode('idna')
-    colon2 = colon2.encode('utf8')
-    port = port.encode('utf8')
+    scheme = parsed.scheme
+    user = urllib.parse.quote(user)
+    pass_ = urllib.parse.quote(pass_)
     path = '/'.join(  # could be encoded slashes!
-        urllib.quote(urllib.unquote(pce).encode('utf8'), '')
+        urllib.parse.quote(urllib.parse.unquote(pce), '')
         for pce in parsed.path.split('/')
     )
-    query = urllib.quote(urllib.unquote(parsed.query).encode('utf8'), '=&?/')
-    fragment = urllib.quote(urllib.unquote(parsed.fragment).encode('utf8'))
+    query = urllib.parse.quote(urllib.parse.unquote(parsed.query), '=&?/')
+    fragment = urllib.parse.quote(urllib.parse.unquote(parsed.fragment))
 
     # put it back together
     netloc = ''.join((user, colon1, pass_, at, host, colon2, port))
-    return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+    return urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
 
 def str2bool(boolean_as_string):
@@ -90,12 +85,15 @@ def str2bool(boolean_as_string):
 
 
 def get_error_message_from_exception(ex):
-    error_message = ''  # traceback.format_exc()
     if hasattr(ex, 'message') and ex.message:
-        error_message += ex.message
+        error_message = ex.message
     elif hasattr(ex, 'msg') and ex.msg:
-        error_message += ex.msg
+        error_message = ex.msg
+    else:
+        error_message = str(ex)
+
     if hasattr(ex, 'faultMessage'):
         if hasattr(ex.faultMessage, 'message'):
             error_message += '. ' + ex.faultMessage.message
+
     return error_message

@@ -1,5 +1,5 @@
 import unittest
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from mock import Mock, patch
 from cloudshell.cp.vcenter.models.VCenterConnectionDetails import VCenterConnectionDetails
@@ -80,7 +80,6 @@ class TestOvfImageService(unittest.TestCase):
         ovf._validate_url_exists = Mock(return_value=True)
 
         self.assertRaises(Exception, ovf.deploy_image, vcenter_data_model, image_params)
-        self.assertTrue(PROCESS.stdin.close.called)
 
     @patch('subprocess.Popen', ProccesMock.Popen)
     def test_deploy_image_error(self):
@@ -109,6 +108,6 @@ class TestOvfImageService(unittest.TestCase):
             # should not reach here
             self.assertTrue(False)
         except Exception as inst:
-            self.assertTrue(inst.message.find('password to vcenter') == -1)
-            self.assertTrue(inst.message.find(urllib.quote_plus('******')) > -1)
+            self.assertTrue(str(inst).find('password to vcenter') == -1)
+            self.assertTrue(str(inst).find(urllib.parse.quote_plus('******')) > -1)
             self.assertTrue(PROCESS.stdin.close.called)

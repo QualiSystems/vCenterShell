@@ -1,6 +1,6 @@
 class DeployDataHolder(object):
     def __init__(self, d):
-        for a, b in d.items():
+        for a, b in list(d.items()):
             if isinstance(b, dict):
                 setattr(self, a, DeployDataHolder(b))
             elif isinstance(b, list):
@@ -22,7 +22,7 @@ class DeployDataHolder(object):
 
     @staticmethod
     def _is_primitive(thing):
-        primitive = (int, str, bool, float, unicode)
+        primitive = (int, str, bool, float, bytes)
         return isinstance(thing, primitive)
 
     @classmethod

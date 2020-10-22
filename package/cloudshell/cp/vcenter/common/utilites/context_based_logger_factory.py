@@ -1,4 +1,4 @@
-from cloudshell.core.logger.qs_logger import get_qs_logger
+from cloudshell.logging.qs_logger import get_qs_logger
 
 
 class ContextBasedLoggerFactory(object):

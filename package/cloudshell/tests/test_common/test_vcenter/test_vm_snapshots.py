@@ -35,7 +35,7 @@ class TestSnapshotRetriever(unittest.TestCase):
         all_snapshots = SnapshotRetriever.get_vm_snapshots(vm)
 
         # assert
-        self.assertSequenceEqual(all_snapshots.keys(), ['snap1'])
+        self.assertSequenceEqual(list(all_snapshots.keys()), ['snap1'])
 
     def test_two_snapshots_when_root_snapshot_has_a_child(self):
         # Arrange
@@ -55,7 +55,7 @@ class TestSnapshotRetriever(unittest.TestCase):
         all_snapshots = SnapshotRetriever.get_vm_snapshots(vm)
 
         # assert
-        self.assertSequenceEqual(all_snapshots.keys(), ['root', 'root/child'])
+        self.assertSequenceEqual(list(all_snapshots.keys()), ['root', 'root/child'])
 
     def test_combine_should_combine_base_snapshot_location_with_snapshot_name(self):
         # Act

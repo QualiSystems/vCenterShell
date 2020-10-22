@@ -1,10 +1,10 @@
-import ConfigParser, os
+import configparser, os
 
 
 class TestCredentials:
 
     def __init__(self):
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config_path = os.path.join(os.path.dirname(__file__), 'config.ini')
         config.readfp(open(config_path))
         self.host = config.get('Credentials', 'host')

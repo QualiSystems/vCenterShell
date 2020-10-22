@@ -86,7 +86,7 @@ class TestSaveAppCommand(TestCase):
                                        reservation_id='abc',
                                        save_app_actions=[save_action1, save_action2],
                                        cancellation_context=cancellation_context)
-            self.assertIn('Save sandbox was cancelled', context.exception.message)
+            self.assertIn('Save sandbox was cancelled', str(context.exception))
 
     def test_destroy_on_vms_and_folders_if_command_cancelled_during_deploy(self):
         save_action1 = self._create_arbitrary_save_app_action()
@@ -317,7 +317,7 @@ class TestSaveAppCommand(TestCase):
 
         with self.assertRaises(Exception) as context:
             self._save_app_without_actions()
-        self.assertIn('Failed to save app, missing data in request.', context.exception.message)
+        self.assertIn('Failed to save app, missing data in request.', str(context.exception))
 
     def test_error_thrown_during_save(self):
         # if error is thrown during save, SaveAppResult will still be returned,

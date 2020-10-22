@@ -98,9 +98,9 @@ class ConnectionCommandOrchestrator(object):
 
     def _group_vm_action_type_by_mode(self, grouped_by_vm_by_requset):
         grouped_by_vm_by_requset_by_mode = dict()
-        for machine, req_to_actions in grouped_by_vm_by_requset.items():
+        for machine, req_to_actions in list(grouped_by_vm_by_requset.items()):
             grouped_by_vm_by_requset_by_mode[machine] = dict()
-            for req_type, actions in req_to_actions.items():
+            for req_type, actions in list(req_to_actions.items()):
                 grouped_by_vm_by_requset_by_mode[machine][req_type] = dict()
                 for action in actions:
                     self._add_safely_to_dict(dictionary=grouped_by_vm_by_requset_by_mode[machine][req_type],
@@ -110,7 +110,7 @@ class ConnectionCommandOrchestrator(object):
 
     def _group_vm_actions_by_req_type(self, grouped_by_vm):
         grouped_by_vm_by_requset = dict()
-        for machine, actions in grouped_by_vm.items():
+        for machine, actions in list(grouped_by_vm.items()):
             grouped_by_vm_by_requset[machine] = dict()
             for action in actions:
                 self._add_safely_to_dict(dictionary=grouped_by_vm_by_requset[machine], key=action.type, value=action)
@@ -125,7 +125,7 @@ class ConnectionCommandOrchestrator(object):
 
     def _create_mapping_from_groupings(self, grouped_by_vm_by_requset_by_mode):
         vm_mapping = dict()
-        for vm, req_to_modes in grouped_by_vm_by_requset_by_mode.items():
+        for vm, req_to_modes in list(grouped_by_vm_by_requset_by_mode.items()):
             actions_mapping = self.ActionsMapping()
 
             remove_mappings = self._get_remove_mappings(req_to_modes, vm)
@@ -142,7 +142,7 @@ class ConnectionCommandOrchestrator(object):
     def _get_remove_mappings(self, req_to_modes, vm):
         remove_mappings = []
         if ACTION_TYPE_REMOVE_VLAN in req_to_modes:
-            for mode, actions in req_to_modes[ACTION_TYPE_REMOVE_VLAN].items():
+            for mode, actions in list(req_to_modes[ACTION_TYPE_REMOVE_VLAN].items()):
                 for action in actions:
                     macs = self._get_macs_from_action(action)
                     for mac in macs:
@@ -165,7 +165,7 @@ class ConnectionCommandOrchestrator(object):
         set_mappings = []
         if ACTION_TYPE_SET_VLAN in req_to_modes:
             set_requests = req_to_modes[ACTION_TYPE_SET_VLAN]
-            for mode, actions in set_requests.items():
+            for mode, actions in list(set_requests.items()):
                 for action in actions:
                     vnic_name = self._get_vnic_name(action)
                     vnic_names = self._split_names(vnic_name)
@@ -174,7 +174,7 @@ class ConnectionCommandOrchestrator(object):
                         set_mappings.append(vnic_to_network)
 
         # this line makes sure that the vNICS with names are first
-        return sorted(set_mappings, key=lambda x: x.vnic_name, reverse=True)
+        return sorted(set_mappings, key=lambda x: x.vnic_name or "", reverse=True)
 
     def _create_map(self, vlan_id, mode, vnic_name):
         vnic_to_network = VmNetworkMapping()
@@ -188,7 +188,7 @@ class ConnectionCommandOrchestrator(object):
     def _run_async_connection_actions(self, si, mappings, pool, logger):
 
         async_results = []
-        for vm, action_mappings in mappings.items():
+        for vm, action_mappings in list(mappings.items()):
             async_results.append(pool.apply_async(self._apply_connectivity_changes, (si, vm, action_mappings, logger)))
         return async_results
 
@@ -228,7 +228,7 @@ class ConnectionCommandOrchestrator(object):
 
         except Exception as e:
             self.logger.exception('Exception raised while connecting vm({})'.format(vm_uuid))
-            for mode, actions in set_vlan_actions.items():
+            for mode, actions in list(set_vlan_actions.items()):
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
                     results.append(error_result)
@@ -253,9 +253,9 @@ class ConnectionCommandOrchestrator(object):
 
     def _get_set_vlan_result_suc(self, act_by_mode_by_vlan_by_nic, connection_res_map):
         results = []
-        for mode, vlans_to_nics in act_by_mode_by_vlan_by_nic.items():
-            for vlan_id, nics_to_actions in vlans_to_nics.items():
-                for nic_name, actions in nics_to_actions.items():
+        for mode, vlans_to_nics in list(act_by_mode_by_vlan_by_nic.items()):
+            for vlan_id, nics_to_actions in list(vlans_to_nics.items()):
+                for nic_name, actions in list(nics_to_actions.items()):
                     nic_name = self._validate_vnic_name(nic_name)
                     for action in actions:
                         res = connection_res_map[mode][vlan_id][nic_name][0]
@@ -276,7 +276,7 @@ class ConnectionCommandOrchestrator(object):
         final_res = []
         for result in results:
             self._add_safely_to_dict(value=result, dictionary=mapping, key=result.actionId)
-        for action_id, actions in mapping.items():
+        for action_id, actions in list(mapping.items()):
             final_act = actions[0]
             for action in actions[1:]:
                 final_act.updatedInterface = '{0},{1}'.format(final_act.updatedInterface, action.updatedInterface)
@@ -285,9 +285,9 @@ class ConnectionCommandOrchestrator(object):
 
     def _group_actions_by_vlan_by_vnic(self, set_actions_grouped_by_vlan_id):
         set_act_group_by_mode_by_vlan_by_requsted_vnic = dict()
-        for mode, vlan_to_action in set_actions_grouped_by_vlan_id.items():
+        for mode, vlan_to_action in list(set_actions_grouped_by_vlan_id.items()):
             set_act_group_by_mode_by_vlan_by_requsted_vnic[mode] = dict()
-            for vlan_id, actions in vlan_to_action.items():
+            for vlan_id, actions in list(vlan_to_action.items()):
                 set_act_group_by_mode_by_vlan_by_requsted_vnic[mode][vlan_id] = dict()
                 for action in actions:
                     name = self._get_vnic_name(action)
@@ -308,7 +308,7 @@ class ConnectionCommandOrchestrator(object):
 
     def _group_action_by_vlan_id(self, set_vlan_actions):
         set_actions_grouped_by_vlan_id = dict()
-        for mode, actions in set_vlan_actions.items():
+        for mode, actions in list(set_vlan_actions.items()):
             set_actions_grouped_by_vlan_id[mode] = dict()
             for action in actions:
                 vlan_id = action.connectionParams.vlanId
@@ -330,7 +330,7 @@ class ConnectionCommandOrchestrator(object):
                                                                             action_mappings.remove_mapping)
 
             interface_to_action = dict()
-            for mode, actions in mode_to_actions.items():
+            for mode, actions in list(mode_to_actions.items()):
                 for action in actions:
                     names = self._get_macs_from_action(action)
                     for name in names:
@@ -350,7 +350,7 @@ class ConnectionCommandOrchestrator(object):
         except Exception as e:
             self.logger.error('Exception raised while disconnecting vm({0}) with exception: {1}'
                               .format(vm_uuid, traceback.format_exc()))
-            for mode, actions in mode_to_actions.items():
+            for mode, actions in list(mode_to_actions.items()):
                 for action in actions:
                     error_result = self._create_error_action_res(action, e)
                     final_res.append(error_result)

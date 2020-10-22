@@ -34,14 +34,14 @@ class VnicToNetworkMapper(object):
         return mapping
 
     def _find_available_vnic(self, vnics_to_network_mapping, default_network):
-        for vnic_name, network_name in vnics_to_network_mapping.items():
+        for vnic_name, network_name in list(vnics_to_network_mapping.items()):
             if network_name == default_network.name:
                 return vnic_name
         raise ValueError('No vNIC available')
 
     def _map_vnic_to_network(self, vnics, existing_network, default_network, reserved_networks):
         mapping = dict()
-        for vnic_name, vnic in vnics.items():
+        for vnic_name, vnic in list(vnics.items()):
             network_to_map = ''
             if hasattr(vnic, 'backing'):
                 if hasattr(vnic.backing, 'network') and hasattr(vnic.backing.network, 'name'):

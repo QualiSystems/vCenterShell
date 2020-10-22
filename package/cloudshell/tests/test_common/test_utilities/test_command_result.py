@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 
 from cloudshell.cp.vcenter.models.ActionResult import ActionResult
@@ -73,4 +74,18 @@ class TestCommandResult(TestCase):
 
         result = set_command_result(driver_response_root)
 
-        self.assertEqual(result, '{"driverResponse": {"actionResults": [{"success": true, "updatedInterface": "AA-BB", "errorMessage": "", "infoMessage": "", "actionId": "A", "type": "setVlan"}]}}')
+        self.assertDictEqual(json.loads(result), {
+            "driverResponse":
+                {
+                    "actionResults": [
+                        {"success": True,
+                         "updatedInterface": "AA-BB",
+                         "errorMessage": "",
+                         "infoMessage": "",
+                         "actionId": "A",
+                         "type": "setVlan"
+                         }
+                    ]
+                }
+            }
+        )

@@ -94,7 +94,7 @@ class SaveAppCommand:
         save_params = []
         destroy_params = []
 
-        for artifactSaver in artifactSaversToActions.keys():
+        for artifactSaver in list(artifactSaversToActions.keys()):
             save_params.extend(self._get_save_params(artifactSaver,
                                                      artifactSaversToActions,
                                                      cancellation_context,
@@ -135,7 +135,8 @@ class SaveAppCommand:
     def _get_destroy_params(self, artifactSaver, artifactSaversToActions):
         return [(artifactSaver, a) for a in artifactSaversToActions[artifactSaver]]
 
-    def _save(self, (artifactSaver, action, cancellation_context, logger)):
+    def _save(self, save_params):
+        artifactSaver, action, cancellation_context, logger = save_params
         try:
             return artifactSaver.save(save_action=action, cancellation_context=cancellation_context)
 
@@ -144,10 +145,11 @@ class SaveAppCommand:
             logger.exception('Save app action {0} failed'.format(action.actionId))
             return SaveAppResult(action.actionId,
                                  success=False,
-                                 errorMessage=ex.message,
+                                 errorMessage=str(ex),
                                  infoMessage='\n'.join(traceback.format_exception(ex_type, ex, tb)))
 
-    def _destroy(self, (artifactSaver, action)):
+    def _destroy(self, destroy_params):
+        artifactSaver, action = destroy_params
         artifactSaver.destroy(save_action=action)
         return SaveAppResult(action.actionId,
                              success=False,
@@ -155,14 +157,14 @@ class SaveAppCommand:
                              infoMessage='')
 
     def validate_requested_save_types_supported(self, artifactSaversToActions, logger, results):
-        unsupported_savers = [saver for saver in artifactSaversToActions.keys() if
+        unsupported_savers = [saver for saver in list(artifactSaversToActions.keys()) if
                               isinstance(saver, UnsupportedArtifactHandler)]
         if unsupported_savers:
             log_error_message = "Unsupported save type was included in save app request: {0}" \
                 .format(', '.join({saver.unsupported_save_type for saver in unsupported_savers}))
             logger.error(log_error_message)
 
-            for artifactSaver in artifactSaversToActions.keys():
+            for artifactSaver in list(artifactSaversToActions.keys()):
                 if artifactSaver in unsupported_savers:
                     result_error_message = 'Unsupported save type ' + artifactSaver.unsupported_save_type
                 else:

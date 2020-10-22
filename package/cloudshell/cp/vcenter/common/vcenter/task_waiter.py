@@ -40,7 +40,7 @@ class SynchronousTaskWaiter(object):
         else:  # error state
             multi_msg = ''
             if task.info.error.faultMessage:
-                multi_msg = ', '.join([err.message for err in task.info.error.faultMessage])
+                multi_msg = ', '.join([getattr(err, "message", str(err)) for err in task.info.error.faultMessage])
             elif task.info.error.msg:
                 multi_msg = task.info.error.msg
 

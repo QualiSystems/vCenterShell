@@ -115,7 +115,7 @@ class DvPortGroupCreator(object):
 
         task = dv_switch.AddDVPortgroup_Task([dv_pg_spec])
 
-        logger.info(u"DV Port Group '{}' CREATE Task ...".format(dv_port_name))
+        logger.info("DV Port Group '{}' CREATE Task ...".format(dv_port_name))
         return task
 
     @staticmethod

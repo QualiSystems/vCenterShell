@@ -16,7 +16,7 @@ class VNicService(object):
             nicspec.device.connectable.startConnected = is_connected
 
         nicspec.device.connectable.connected = is_connected
-        logger.debug(u"vNIC {} set connected as '{}'".format(nicspec, is_connected))
+        logger.debug("vNIC {} set connected as '{}'".format(nicspec, is_connected))
         return nicspec
 
     @staticmethod
@@ -31,11 +31,11 @@ class VNicService(object):
         if issubclass(type(nicspec), vim.vm.device.VirtualDeviceSpec):
             nicspec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
             VNicService.vnic_set_connectivity_status(nicspec, True)
-            logger.debug(u"Attaching new vNIC '{}' to VM '{}'...".format(nicspec, virtual_machine))
+            logger.debug("Attaching new vNIC '{}' to VM '{}'...".format(nicspec, virtual_machine))
             task = pyVmomiService.vm_reconfig_task(virtual_machine, [nicspec])
             return task
         else:
-            logger.warn(u"Cannot attach new vNIC '{}' to VM '{}'".format(nicspec, virtual_machine))
+            logger.warn("Cannot attach new vNIC '{}' to VM '{}'".format(nicspec, virtual_machine))
             return None
 
     @staticmethod
@@ -84,7 +84,7 @@ class VNicService(object):
             elif hasattr(backing, 'port') and hasattr(backing.port, 'portgroupKey'):
                 return VNicService._network_get_network_by_connection(vm, backing.port, pyvmomi_service)
         except:
-            logger.debug(u"Cannot determinate which Network connected to device {}".format(device))
+            logger.debug("Cannot determinate which Network connected to device {}".format(device))
             return None
 
     @staticmethod
@@ -166,10 +166,10 @@ class VNicService(object):
             nicspec.device.connectable.startConnected = True
             nicspec.device.connectable.allowGuestControl = True
 
-            logger.debug(u"Assigning network '{}' for vNIC".format(network_name))
+            logger.debug("Assigning network '{}' for vNIC".format(network_name))
         else:
             # logger.warn(u"Cannot assigning network '{}' for vNIC {}".format(network, nicspec))
-            logger.warn(u"Cannot assigning network  for vNIC ".format(network, nicspec))
+            logger.warn("Cannot assigning network  for vNIC ".format(network, nicspec))
         return nicspec
 
     @staticmethod
@@ -191,9 +191,9 @@ class VNicService(object):
             nicspec.device.backing = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
             nicspec.device.backing.port = dvs_port_connection
 
-            logger.debug(u"Assigning portgroup '{}' for vNIC".format(network_name))
+            logger.debug("Assigning portgroup '{}' for vNIC".format(network_name))
         else:
-            logger.warn(u"Cannot assigning portgroup for vNIC")
+            logger.warn("Cannot assigning portgroup for vNIC")
         return nicspec
 
     @staticmethod

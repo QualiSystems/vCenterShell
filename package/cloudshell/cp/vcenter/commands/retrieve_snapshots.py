@@ -23,4 +23,4 @@ class RetrieveSnapshotsCommand:
         logger.info("Get snapshots")
         snapshots = SnapshotRetriever.get_vm_snapshots(vm)
 
-        return snapshots.keys()
+        return list(snapshots.keys())
