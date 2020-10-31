@@ -82,3 +82,4 @@ debug.xml
 debug_info.txt
 
 /package/dist/
+/venv/*
