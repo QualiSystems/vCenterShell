@@ -371,7 +371,8 @@ class pyVmomiService:
                      cluster_name=None,
                      resource_pool=None,
                      power_on=True,
-                     snapshot=''):
+                     snapshot='',
+                     customization_spec=''):
             """
             Constructor of CloneVmParameters
             :param si:              pyvmomi 'ServiceInstance'
@@ -393,6 +394,7 @@ class pyVmomiService:
             self.resource_pool = resource_pool
             self.power_on = str2bool(power_on)
             self.snapshot = snapshot
+            self.customization_spec = customization_spec
 
     class CloneVmResult:
         """
@@ -414,7 +416,7 @@ class pyVmomiService:
         Clone a VM from a template/VM and return the vm oject or throws argument is not valid
 
         :param cancellation_context:
-        :param clone_params: CloneVmParameters =
+        :param CloneVmParameters clone_params:
         :param logger:
         """
 
@@ -448,6 +450,8 @@ class pyVmomiService:
 
         resource_pool, host = self.get_resource_pool(datacenter.name, clone_params)
 
+        customization_spec = self._get_customization_spec(clone_params)
+
         if not resource_pool and not host:
             raise ValueError('The specifed host, cluster or resource pool could not be found')
 
@@ -464,6 +468,9 @@ class pyVmomiService:
             clone_spec.snapshot = snapshot
             clone_spec.template = False
             placement.diskMoveType = 'createNewChildDiskBacking'
+
+        if customization_spec:
+            clone_spec.customization = customization_spec.spec
 
         placement.datastore = self._get_datastore(clone_params)
 
@@ -752,6 +759,13 @@ class pyVmomiService:
             folder_name = '/'.join(folder_name.split('/')[1:])
         # ok, now we're adding the vm name; btw, if there is no folder, that's cool, just return vm.name
         return VMLocation.combine([folder_name, vm.name]) if folder_name else vm.name
+
+    def _get_customization_spec(self, clone_params):
+        if clone_params.customization_spec:
+            return clone_params.si.content.customizationSpecManager.GetCustomizationSpec(
+                name=clone_params.customization_spec)
+        return None
+
 
 
 def vm_has_no_vnics(vm):

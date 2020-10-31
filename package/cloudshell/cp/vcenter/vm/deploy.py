@@ -56,7 +56,7 @@ class VirtualMachineDeployer(object):
                                     logger=logger,
                                     app_name=data_holder.app_name,
                                     template_name=template_resource_model.vcenter_vm,
-                                    other_params=template_resource_model,
+                                    deploy_params=template_resource_model,
                                     vcenter_data_model=vcenter_data_model,
                                     reservation_id=reservation_id,
                                     cancellation_context=cancellation_context,
@@ -106,9 +106,8 @@ class VirtualMachineDeployer(object):
                                     reservation_id,
                                     cancellation_context)
 
-    def _deploy_a_clone(self, si, logger, app_name, template_name, other_params, vcenter_data_model, reservation_id,
-                        cancellation_context,
-                        snapshot=''):
+    def _deploy_a_clone(self, si, logger, app_name, template_name, deploy_params, vcenter_data_model, reservation_id,
+                        cancellation_context, snapshot=''):
         """
         :rtype DeployAppResult:
         """
@@ -116,20 +115,21 @@ class VirtualMachineDeployer(object):
         vm_name = self.name_generator(app_name, reservation_id)
 
         VCenterDetailsFactory.set_deplyment_vcenter_params(
-            vcenter_resource_model=vcenter_data_model, deploy_params=other_params)
+            vcenter_resource_model=vcenter_data_model, deploy_params=deploy_params)
 
-        template_name = VMLocation.combine([other_params.default_datacenter,
+        template_name = VMLocation.combine([deploy_params.default_datacenter,
                                             template_name])
 
         params = self.pv_service.CloneVmParameters(si=si,
                                                    template_name=template_name,
                                                    vm_name=vm_name,
-                                                   vm_folder=other_params.vm_location,
-                                                   datastore_name=other_params.vm_storage,
-                                                   cluster_name=other_params.vm_cluster,
-                                                   resource_pool=other_params.vm_resource_pool,
+                                                   vm_folder=deploy_params.vm_location,
+                                                   datastore_name=deploy_params.vm_storage,
+                                                   cluster_name=deploy_params.vm_cluster,
+                                                   resource_pool=deploy_params.vm_resource_pool,
                                                    power_on=False,
-                                                   snapshot=snapshot)
+                                                   snapshot=snapshot,
+                                                   customization_spec=deploy_params.customization_spec)
 
         if cancellation_context.is_cancelled:
             raise Exception("Action 'Clone VM' was cancelled.")
@@ -144,16 +144,16 @@ class VirtualMachineDeployer(object):
             self.pv_service.destroy_vm(vm=clone_vm_result.vm, logger=logger)
             raise Exception("Action 'Clone VM' was cancelled.")
 
-        vm_details_data = self._safely_get_vm_details(clone_vm_result.vm, vm_name, vcenter_data_model, other_params,
+        vm_details_data = self._safely_get_vm_details(clone_vm_result.vm, vm_name, vcenter_data_model, deploy_params,
                                                       logger)
 
         return DeployAppResult(vmName=vm_name,
                                vmUuid=clone_vm_result.vm.summary.config.uuid,
                                vmDetailsData=vm_details_data,
-                               deployedAppAdditionalData={'ip_regex': other_params.ip_regex,
-                                                          'refresh_ip_timeout': other_params.refresh_ip_timeout,
-                                                          'auto_power_off': convert_to_bool(other_params.auto_power_off),
-                                                          'auto_delete': convert_to_bool(other_params.auto_delete)})
+                               deployedAppAdditionalData={'ip_regex': deploy_params.ip_regex,
+                                                          'refresh_ip_timeout': deploy_params.refresh_ip_timeout,
+                                                          'auto_power_off': convert_to_bool(deploy_params.auto_power_off),
+                                                          'auto_delete': convert_to_bool(deploy_params.auto_delete)})
 
     def deploy_from_image(self, si, logger, session, vcenter_data_model, data_holder, resource_context, reservation_id,
                           cancellation_context):
