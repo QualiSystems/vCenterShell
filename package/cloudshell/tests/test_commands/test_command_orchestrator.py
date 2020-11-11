@@ -39,6 +39,7 @@ class TestCommandOrchestrator(TestCase):
                                                                  "IP Regex": "",
                                                                  "Refresh IP Timeout": "600",
                                                                  "Auto Delete": "True",
+                                                                 "Customization Spec": "",
                                                                  "Autoload": "True",
                                                                  "VCenter VM": "sds",
                                                                  "VCenter VM Snapshot": "sds",

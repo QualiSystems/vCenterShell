@@ -41,7 +41,7 @@ class OvfImageDeployerService(object):
         process.stdin.close()
 
         if result:
-            res = '\n\r'.join(data.decode() for data in result)
+            res = '\n\r'.join(data.decode() if isinstance(data, bytes) else data for data in result)
         else:
             if image_params.user_arguments.find('--quiet') == -1:
                 raise Exception('no result has return from the ovftool')
